@@ -18,7 +18,7 @@ Tested on ArchLinux.
 1. Create virtualenv directory `$ mkdir ~/virtualenv`
 2. Create new virtualenv `$ python3.5 -m venv ~/virtualenv/myvenv`
 3. Activate the new virtualenv `$ source ~/virtualenv/myvenv/bin/activate`
-4. Clone the **cxflow** repository `(myvenv) $ git@gitlab.com:Cognexa/cxflow.git`
+4. Clone the **cxflow** repository `(myvenv) $ git clone git@gitlab.com:Cognexa/cxflow.git`
 5. Enter the directory `(myvenv) $ cd cxflow`
 6. **Optional**: *if you want to run some special version of TensorFlow or just to install it by yourself (e.g. when pip installation in the next step fails), do it now. The following TensorFlow versions were tested: 0.10.0, 0.11.0, 0.12.1, 1.0.0*
 7. Install **cxflow** dependencies `(myvenv) $ pip install -r requirements.txt`
