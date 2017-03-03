@@ -8,17 +8,12 @@ from datetime import datetime
 import tensorflow as tf
 
 
-FuelIterator = typing.NewType('FuelIterator', typing.Iterable[typing.Mapping[str, typing.Any]])
-
-
 class AbstractNet:
-    TRAIN = 1
-    VALID = 2
-    TEST = 3
 
-    def __init__(self, name: str, learning_rate: float, log_root: str='log', optimizer: str='adam',
+    def __init__(self, dataset, name: str, learning_rate: float, log_root: str='log', optimizer: str='adam',
                  device: str='/cpu:0', threads: int=4, restore_from=None, **kwargs):
 
+        self.dataset = dataset
         self.name = name
         self.learning_rate = learning_rate
         self.log_root = log_root
