@@ -1,9 +1,9 @@
 #!/usr/bin/python3 -msrc.entry_point
 
 from .network_manager import NetworkManager
+from .utils.arg_parser import parse_arg
 from .utils.stream_types import StreamTypes
 
-import ast
 from argparse import ArgumentParser
 from collections import defaultdict
 import importlib
@@ -16,36 +16,6 @@ import typing
 
 
 class EntryPoint:
-
-    @staticmethod
-    def _parse_arg(arg: str):
-        assert '=' in arg
-
-        if ':' in arg:
-            key = arg[:arg.index(':')]
-            typee = arg[arg.index(':')+1:arg.index('=')]
-            value = arg[arg.index('=')+1:]
-        else:
-            key = arg[:arg.index('=')]
-            typee = 'str'
-            value = arg[arg.index('=')+1:]
-
-        try:
-            if typee == 'ast':
-                value = ast.literal_eval(value)
-            elif typee == 'int':
-                value = int(float(value))
-            elif typee == 'bool':
-                value = bool(int(value))
-            else:
-                value = eval(typee)(value)
-        except (Exception, AssertionError) as e:
-            logging.error('Couldn\'t convert argument %s of value %s to type %s. Original argument: "%s". Exception: %s',
-                          key, value, typee, arg, e)
-            raise AttributeError('Couldn\'t convert argument {} of value {} to type {}. Original argument: "{}". Exception: {}'.format(
-                                 key, value, typee, arg, e))
-
-        return key, value
 
     def __init__(self):
         parser = ArgumentParser('cxflow')
@@ -65,7 +35,7 @@ class EntryPoint:
     def _load_config(self, config_file: str, additional_args: typing.Iterable[str]):
         with open(config_file, 'r') as f:
             self.config = defaultdict(defaultdict, json.load(f))
-        for key_full, value in [EntryPoint._parse_arg(arg) for arg in additional_args]:
+        for key_full, value in [parse_arg(arg) for arg in additional_args]:
             key_split = key_full.split('.')
             key_prefix = key_split[:-1]
             key = key_split[-1]
