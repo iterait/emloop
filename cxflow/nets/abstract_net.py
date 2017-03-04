@@ -1,22 +1,22 @@
+from ..datasets.abstract_dataset import AbstractDataset
+
+import tensorflow as tf
+
 import abc
 import logging
 import typing
-from collections import defaultdict
 from os import path
-from datetime import datetime
-
-import tensorflow as tf
 
 
 class AbstractNet:
 
-    def __init__(self, dataset, name: str, learning_rate: float, log_root: str='log', optimizer: str='adam',
+    def __init__(self, dataset: AbstractDataset, log_dir: str, name: str, learning_rate: float, optimizer: str='adam',
                  device: str='/cpu:0', threads: int=4, restore_from=None, **kwargs):
 
         self.dataset = dataset
         self.name = name
         self.learning_rate = learning_rate
-        self.log_root = log_root
+        self.log_dir = log_dir
         self.device = device
         self.threads = threads
 
@@ -26,9 +26,6 @@ class AbstractNet:
 
         # Extended init
         self.extended_init(**kwargs)
-
-        # Save mandatory parameters
-        self.log_dir = path.join(self.log_root, '{}_{}'.format(self.name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
 
         # Define the optimizer
         self.optimizer = AbstractNet.build_optimizer(optimizer_name=optimizer)(learning_rate=self.learning_rate)
@@ -68,12 +65,12 @@ class AbstractNet:
                                                          graph=self.session.graph,
                                                          flush_secs=10)
 
-    def save_checkpoint(self, epoch_id: int):
+    def save_checkpoint(self, epoch_id: int) -> str:
         save_path = self.saver.save(self.session, path.join(self.log_dir, 'model_{}.ckpt'.format(epoch_id)))
         return save_path
 
     @staticmethod
-    def build_optimizer(optimizer_name: str):
+    def build_optimizer(optimizer_name: str):  # TODO: return type (be carefull TF0.10-1.0
         optimizer_name = optimizer_name.lower()
 
         if optimizer_name == 'adam':
@@ -101,29 +98,6 @@ class AbstractNet:
 
     def extended_init(self, **kwargs):
         pass
-
-    def register_binary_confussion_matrix(self, predicted, actual):
-        self.to_evaluate += ['tp', 'tn', 'fp', 'fn']
-
-        predicted = tf.cast(predicted, dtype=tf.bool)
-        is_label_one = tf.cast(actual, dtype=tf.bool)
-        is_label_zero = tf.logical_not(is_label_one)
-
-        self.tp = tf.reduce_mean(tf.cast(tf.logical_and(predicted, is_label_one), tf.float32))
-        self.fp = tf.reduce_mean(tf.cast(tf.logical_and(predicted, is_label_zero), tf.float32))
-        self.tn = tf.reduce_mean(tf.cast(tf.logical_and(predicted, is_label_zero), tf.float32))
-        self.fn = tf.reduce_mean(tf.cast(tf.logical_and(predicted, is_label_one), tf.float32))
-
-    def register_nary_confussion_matrix(self, n, predicted, gold):
-        for i in range(n):
-            for j in range(n):
-                self.to_evaluate.append('cm_{}_{}'.format(i, j))
-
-                is_predicted_i = tf.cast(tf.equal(predicted, i*tf.ones_like(predicted)), dtype=tf.bool)
-                is_gold_j = tf.cast(tf.equal(gold, j*tf.ones_like(predicted)), dtype=tf.bool)
-
-                setattr(self, 'cm_{}_{}'.format(i, j),
-                        tf.reduce_mean(tf.cast(tf.logical_and(is_predicted_i, is_gold_j), tf.float32)))
 
     @staticmethod
     def _get_activation(activation_name: str) -> typing.Callable[[tf.Tensor], tf.Tensor]:

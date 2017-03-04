@@ -1,3 +1,5 @@
+from .datasets.abstract_dataset import AbstractDataset
+
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .nets.abstract_net import AbstractNet
 
@@ -15,7 +17,7 @@ class NetworkManager:
     Train and evaluate network
     """
 
-    def __init__(self, net: AbstractNet, dataset,
+    def __init__(self, net: AbstractNet, dataset: AbstractDataset,
                  dont_ignore_extra_sources=False, dont_ignore_incomplete_batches=False,
                  hooks: typing.Iterable[AbstractHook]=[]):
         """
@@ -91,7 +93,7 @@ class NetworkManager:
         return self._run_epoch(epoch_iterator=stream, train=False,
                                batch_size=batch_size, batch_limit=batch_limit, stream_type=stream_type)
 
-    def run_main_loop(self, batch_size: int, eval_batch_size_multiplier: float=1, **kwargs):
+    def run_main_loop(self, batch_size: int, eval_batch_size_multiplier: float=1, **kwargs) -> None:
         train_batch_size = batch_size
         eval_batch_size = int(batch_size * eval_batch_size_multiplier)
 

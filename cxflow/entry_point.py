@@ -2,11 +2,10 @@
 
 from .network_manager import NetworkManager
 from .utils.arg_parser import parse_arg
-from .utils.stream_types import StreamTypes
 from .dataset_loader import DatasetLoader
 
 from argparse import ArgumentParser
-from collections import defaultdict
+from datetime import datetime
 import importlib
 import logging
 import os
@@ -20,19 +19,21 @@ class EntryPoint:
 
     def __init__(self):
         parser = ArgumentParser('cxflow')
-        parser.add_argument('config_file', help='relative path to the config file')
+        parser.add_argument('config_file', help='path to the config file')
+        parser.add_argument('-o',  '--output-root', default='log', help='output directory')
         known_args, unknown_args = parser.parse_known_args()
 
         self.net = None
+        self._output_root = known_args.output_root
 
         self._load_config(config_file=known_args.config_file, additional_args=unknown_args)
+        self.output_dir = self._create_output_dir()
+        self.dumped_config_file = self._dump_config()
         self._create_dataset()
         self._create_network()
-        self._dump_config()
 
-    def _load_config(self, config_file: str, additional_args: typing.Iterable[str]):
+    def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> None:
         with open(config_file, 'r') as f:
-            # self.config = defaultdict(defaultdict, yaml.load(f))
             self.config = yaml.load(f)
 
         # TODO: fix CLI: http://yaml.readthedocs.io/en/latest/detail.html#adding-replacing-comments
@@ -46,11 +47,23 @@ class EntryPoint:
                 conf = conf[key_part]
             conf[key] = value
 
-    def _create_dataset(self):
-        data_loader = DatasetLoader(self.config)
+    def _create_output_dir(self) -> str:
+        name = 'UnknownNetName'
+        try:
+            name = self.config['net']['name']
+        except:
+            logging.warning('Net name not found in the config')
+
+        output_dir = path.join(self._output_root,'{}_{}'.format(name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        return output_dir
+
+    def _create_dataset(self) -> None:
+        data_loader = DatasetLoader(self.config, self.dumped_config_file)
         self.dataset = data_loader.load_dataset()
 
-    def _create_network(self):
+    def _create_network(self) -> None:
         logging.info('Creating net')
 
         logging.debug('Loading net module')
@@ -60,13 +73,15 @@ class EntryPoint:
         net_class = getattr(net_module, self.config['net']['net_class'])
 
         logging.debug('Constructing net')
-        self.net = net_class(dataset=self.dataset, **self.config['net'])
+        self.net = net_class(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
 
-    def _dump_config(self):
-        with open(path.join(self.net.log_dir, 'config.yaml'), 'w') as f:
+    def _dump_config(self) -> str:
+        dumped_config_f = path.join(self.output_dir, 'config.yaml')
+        with open(dumped_config_f, 'w') as f:
             yaml.dump(self.config, f)
+        return dumped_config_f
 
-    def run(self):
+    def run(self) -> None:
         hooks = []
         if 'hooks' in self.config:
             logging.info('Creating hooks')
@@ -93,7 +108,7 @@ class EntryPoint:
         manager.run_main_loop(batch_size=self.config['net']['batch_size'])
 
 
-def init_entry_point():
+def init_entry_point() -> None:
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
 
     sys.path.insert(0, os.getcwd())

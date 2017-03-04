@@ -1,7 +1,9 @@
+from .abstract_dataset import AbstractDataset
+
 from abc import abstractmethod
 
 
-class AbstractFuelDataset:
+class AbstractFuelDataset(AbstractDataset):
 
     def __init__(self, **kwargs):
         # Save kwargs
