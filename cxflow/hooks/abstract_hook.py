@@ -9,18 +9,18 @@ class AbstractHook:
     def __init__(self, net: AbstractNet, config: dict, **kwargs):
         pass
 
-    def before_training(self, net: AbstractNet, **kwargs) -> None:
+    def before_training(self, **kwargs) -> None:
         pass
 
-    def before_first_epoch(self, net: AbstractNet, valid_results: dict, test_results: dict=None, **kwargs) -> None:
+    def before_first_epoch(self, valid_results: dict, test_results: dict=None, **kwargs) -> None:
         pass
 
-    def after_batch(self, net: AbstractNet, stream_type: str, results: dict, **kwargs) -> None:
+    def after_batch(self, stream_type: str, results: dict, **kwargs) -> None:
         pass
 
-    def after_epoch(self, net: AbstractNet, epoch_id: int, train_results: dict, valid_results: dict,
-                    test_results: dict=None, **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
+                    **kwargs) -> None:
         pass
 
-    def after_training(self, net: AbstractNet, **kwargs) -> None:
+    def after_training(self, **kwargs) -> None:
         pass

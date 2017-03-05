@@ -96,7 +96,10 @@ class EntryPoint:
                 logging.debug('Loading hook class %s', hook_conf['hook_class'])
                 hook_class = getattr(hook_module, hook_conf['hook_class'])
 
-                hooks.append(hook_class(net=self.net, config=self.config, **hook_conf))
+                logging.debug('Constructing hook')
+                hook = hook_class(net=self.net, config=self.config, **hook_conf)
+
+                hooks.append(hook)
         else:
             logging.warning('No hooks found')
 

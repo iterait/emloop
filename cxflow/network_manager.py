@@ -72,7 +72,7 @@ class NetworkManager:
             batch_result = self._run_batch(train=train, **d)
 
             for hook in self.hooks:
-                hook.after_batch(net=self.net, stream_type=stream_type, results=batch_result)
+                hook.after_batch(stream_type=stream_type, results=batch_result)
 
             for name, value in batch_result.items():
                 summed_results[name] += value
@@ -100,7 +100,7 @@ class NetworkManager:
         epoch_id = 0
 
         for hook in self.hooks:
-            hook.before_training(net=self.net, **kwargs)
+            hook.before_training(**kwargs)
 
         valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), batch_size=eval_batch_size,
                                              stream_type='valid', **kwargs)
@@ -108,7 +108,7 @@ class NetworkManager:
                                             stream_type='test', **kwargs)
 
         for hook in self.hooks:
-            hook.before_first_epoch(net=self.net, valid_results=valid_results, test_results=test_results)
+            hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
 
         while True:
             epoch_id += 1
@@ -122,11 +122,11 @@ class NetworkManager:
 
             try:
                 for hook in self.hooks:
-                    hook.after_epoch(net=self.net, epoch_id=epoch_id, train_results=train_results,
-                                     valid_results=valid_results, test_results=test_results)
+                    hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
+                                     test_results=test_results)
             except TrainingTerminated as e:
                 logging.info('Training terminated by a hook: %s', e)
                 break
 
         for hook in self.hooks:
-            hook.after_training(net=self.net, **kwargs)
+            hook.after_training(**kwargs)

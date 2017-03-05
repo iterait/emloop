@@ -65,8 +65,8 @@ class AbstractNet:
                                                          graph=self.session.graph,
                                                          flush_secs=10)
 
-    def save_checkpoint(self, epoch_id: int) -> str:
-        save_path = self.saver.save(self.session, path.join(self.log_dir, 'model_{}.ckpt'.format(epoch_id)))
+    def save_checkpoint(self, name: str) -> str:
+        save_path = self.saver.save(self.session, path.join(self.log_dir, 'model_{}.ckpt'.format(name)))
         return save_path
 
     @staticmethod
