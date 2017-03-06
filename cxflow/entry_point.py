@@ -13,6 +13,7 @@ from os import path
 import sys
 import typing
 import yaml
+import ruamel.yaml
 
 
 class EntryPoint:
@@ -36,11 +37,10 @@ class EntryPoint:
         self._create_dataset()
         self._create_network()
 
-    def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> None:
+    def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> dict:
         with open(config_file, 'r') as f:
-            self.config = yaml.load(f)
+            self.config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
 
-        # TODO: fix CLI: http://yaml.readthedocs.io/en/latest/detail.html#adding-replacing-comments
         for key_full, value in [parse_arg(arg) for arg in additional_args]:
             key_split = key_full.split('.')
             key_prefix = key_split[:-1]
@@ -50,6 +50,9 @@ class EntryPoint:
             for key_part in key_prefix:
                 conf = conf[key_part]
             conf[key] = value
+
+        self.config = yaml.load(ruamel.yaml.dump(self.config, Dumper=ruamel.yaml.RoundTripDumper))
+        return self.config
 
     def _create_output_dir(self) -> str:
         name = 'UnknownNetName'
