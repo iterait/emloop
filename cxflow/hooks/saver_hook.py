@@ -6,7 +6,7 @@ import logging
 
 class SaverHook(AbstractHook):
     def __init__(self, net: AbstractNet, save_every_n_epochs: int=1, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(net=net, **kwargs)
         self.net = net
         self.save_every_n_epochs = save_every_n_epochs
 
