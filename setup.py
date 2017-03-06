@@ -29,5 +29,6 @@ setup(name='cxflow',
       entry_points={
           'console_scripts': [
               'cxflow=cxflow.entry_point:init_entry_point',
+              'cxgridsearch=cxflow.grid_search:init_grid_search',
           ]
       })

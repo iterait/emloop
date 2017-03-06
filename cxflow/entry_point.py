@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -msrc.entry_point
+#!/usr/bin/python3 -mentry_point
 
 from .network_manager import NetworkManager
 from .utils.arg_parser import parse_arg
