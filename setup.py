@@ -1,12 +1,12 @@
 from setuptools import setup
 
 setup(name='cxflow',
-      version='0.2',
+      version='0.3',
       description='Smart TensorFlow trainer',
       long_description='Trainer of TensorFlow models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
       classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
