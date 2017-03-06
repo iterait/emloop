@@ -45,11 +45,35 @@ class EntryPoint:
         self.net = None
         self._output_root = known_args.output_root
 
-        self._load_config(config_file=known_args.config_file, additional_args=unknown_args)
-        self.output_dir = self._create_output_dir()
-        self.dumped_config_file = self._dump_config()
-        self._create_dataset()
-        self._create_network()
+        try:
+            self._load_config(config_file=known_args.config_file, additional_args=unknown_args)
+        except Exception as e:
+            logging.error('Loading config failed: %s', e)
+            quit()
+
+        try:
+            self.output_dir = self._create_output_dir()
+        except Exception as e:
+            logging.error('Creating output dir failed: %s', e)
+            quit()
+
+        try:
+            self.dumped_config_file = self._dump_config()
+        except Exception as e:
+            logging.error('Saving modified config failed: %s', e)
+            quit()
+
+        try:
+            self._create_dataset()
+        except Exception as e:
+            logging.error('Creating dataset failed: %s', e)
+            quit()
+
+        try:
+            self._create_network()
+        except Exception as e:
+            logging.error('Creating network failed: %s', e)
+            quit()
 
     def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> dict:
         """Load config from `config_file` and apply CLI args `additional_args`. The result is saved as `self.config`"""
