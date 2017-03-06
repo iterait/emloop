@@ -12,6 +12,22 @@ class AbstractNet:
 
     def __init__(self, dataset: AbstractDataset, log_dir: str, name: str, learning_rate: float, optimizer: str='adam',
                  device: str='/cpu:0', threads: int=4, restore_from=None, **kwargs):
+        """
+        Abstract net which should be an ancestor to all nets.
+
+        At first, all kwargs are saved as attributes. Then, overloaded `extended_init` is called. Then, the model is
+        created (or restored) via `create_net`.
+
+        :param dataset: dataset to be used
+        :param log_dir: training directory (for logging purposes)
+        :param name: name of the training
+        :param learning_rate: learning rate
+        :param optimizer: @see build_optimizer for options
+        :param device: {/cpu:0, /gpu:0}
+        :param threads: number of threads to be used
+        :param restore_from: name of checkpoint to be restored from or None if new model should be created
+        :param kwargs: will be saved as attributes
+        """
 
         self.dataset = dataset
         self.name = name
@@ -25,7 +41,8 @@ class AbstractNet:
             setattr(self, name, value)
 
         # Extended init
-        self.extended_init(**kwargs)
+        self.extended_init(dataset=dataset, log_dir=log_dir, name=name, learning_rate=learning_rate,
+                           optimizer=optimizer, device=device, threads=threads, restore_from=restore_from, **kwargs)
 
         # Define the optimizer
         self.optimizer = AbstractNet.build_optimizer(optimizer_name=optimizer)(learning_rate=self.learning_rate)
@@ -66,11 +83,15 @@ class AbstractNet:
                                                          flush_secs=10)
 
     def save_checkpoint(self, name: str) -> str:
+        """Save TensorFlow checkpoint with named suffix."""
         save_path = self.saver.save(self.session, path.join(self.log_dir, 'model_{}.ckpt'.format(name)))
         return save_path
 
     @staticmethod
     def build_optimizer(optimizer_name: str):  # TODO: return type (be carefull TF0.10-1.0
+        """
+        Create a TensorFlow optimizer. Supported arguments are {adam, adadelta, adagrad, sgd, momentum,
+        proximaladagrad, proximalsgd, rmsprop}"""
         optimizer_name = optimizer_name.lower()
 
         if optimizer_name == 'adam':
@@ -94,9 +115,14 @@ class AbstractNet:
 
     @abc.abstractmethod
     def create_net(self) -> None:
+        """
+        This method describes the architecture of the networks. All placeholders, train_op and logged statistics must
+        be saved as attributes.
+        """
         pass
 
     def extended_init(self, **kwargs):
+        """This method is invoked after all kwargs are saved but before the model is created."""
         pass
 
     @staticmethod
