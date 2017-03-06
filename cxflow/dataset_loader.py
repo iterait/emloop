@@ -21,6 +21,13 @@ class DatasetLoader:
         self.config = config
         self.dumped_cofig_path = dumped_cofig_path
 
+        try:
+            self.config['dataset']['dataset_module']
+            self.config['dataset']['dataset_class']
+            self.config['dataset']['backend']
+        except KeyError:
+            logging.error('Dataset does not contain `dataset_module` or `dataset_class` or `backend`.')
+
         logging.debug('Loading dataset module')
         dataset_module = importlib.import_module(self.config['dataset']['dataset_module'])
 
@@ -34,7 +41,7 @@ class DatasetLoader:
         """Verify the passed dataset implements the interface of AbstractDataset."""
 
         for method_name in dir(AbstractDataset):
-            if callable(getattr(AbstractDataset, method_name)):
+            if callable(getattr(AbstractDataset, method_name)) and method_name != 'Stream':
                 try:
                     method = getattr(dataset, method_name)
                     if not callable(method):
