@@ -5,7 +5,19 @@ import importlib
 
 
 class DatasetLoader:
+    """
+    Entity responsible for correct dataset loading.
+
+    For each possible backend there must be implemented a method named `_load_<backend_name>`.
+    """
+
     def __init__(self, config: dict, dumped_cofig_path: str):
+        """
+        Create the loader.
+        :param config: config dict
+        :param dumped_cofig_path: path to the dumped config YAML
+        """
+
         self.config = config
         self.dumped_cofig_path = dumped_cofig_path
 
@@ -18,14 +30,17 @@ class DatasetLoader:
         self.load_f = getattr(self, '_load_{}'.format(self.config['dataset']['backend']))
 
     def load_dataset(self) -> AbstractDataset:
+        """Load the dataset by using the proper backend."""
         return self.load_f()
 
     def _load_fuel(self) -> AbstractDataset:
-        logging.debug('load fuel')
+        """Load the dataset by using Fuel (Python) backend"""
+        logging.debug('Using fuel backend')
         return self.dataset_class(**self.config['dataset'], **self.config['stream'])
 
     def _load_cxtream(self) -> AbstractDataset:
+        """Load the dataset by using cxtream (C++) backend"""
         logging.debug('Using cxtream backend')
-        logging.debug('Dumped config path: %s', self.dumped_cofig_path)
-        logging.error('Not implemented yet')
-        quit()
+        dataset = self.dataset_class(self.dumped_cofig_path)
+        # TODO: assert
+        return dataset
