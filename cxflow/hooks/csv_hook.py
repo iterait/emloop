@@ -7,15 +7,16 @@ import typing
 
 
 class CSVHook(AbstractHook):
-    def __init__(self, net: AbstractNet, metrics_to_display: typing.Iterable[str], **kwargs):
+    def __init__(self, net: AbstractNet, metrics_to_display: typing.Iterable[str],
+                 output_file: str="training.csv", **kwargs):
         super().__init__(net=net, **kwargs)
         self.metrics_to_display = metrics_to_display
-        self.file = path.join(net.log_dir, 'training.csv')
+        self.file = path.join(net.log_dir, output_file)
 
         logging.info('Saving training log to "%s"', self.file)
 
         with open(self.file, 'w') as f:
-            header = 'epoch_id,' +\
+            header = '"epoch_id",' +\
                      ','.join(['"train_{0}","valid_{0}","test_{0}"'.format(metric) for metric in metrics_to_display]) +\
                      '\n'
             f.write(header)
