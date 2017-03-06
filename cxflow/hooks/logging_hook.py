@@ -5,7 +5,14 @@ import typing
 
 
 class LoggingHook(AbstractHook):
+    """Log the training results to stderr via standard logging module."""
+
     def __init__(self, metrics_to_display: typing.Iterable[str], **kwargs):
+        """
+        :param net: trained network
+        :param metrics_to_display: list of names of statistics that will be logged
+        """
+
         super().__init__(**kwargs)
         self.metrics_to_display = metrics_to_display
 

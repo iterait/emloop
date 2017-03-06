@@ -4,7 +4,12 @@ import logging
 
 
 class EpochStopperHook(AbstractHook):
+    """Stop the training after given number of epochs."""
+
     def __init__(self, epoch_limit: int, **kwargs):
+        """
+        :param epoch_limit: maximum number of training epochs
+        """
         super().__init__(**kwargs)
         self.epoch_limit = epoch_limit
 

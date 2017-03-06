@@ -5,7 +5,13 @@ import logging
 
 
 class SaverHook(AbstractHook):
+    """Save the model every `n` epochs."""
+
     def __init__(self, net: AbstractNet, save_every_n_epochs: int=1, **kwargs):
+        """
+        :param net: trained net
+        :param save_every_n_epochs: how often is the model saved
+        """
         super().__init__(net=net, **kwargs)
         self.net = net
         self.save_every_n_epochs = save_every_n_epochs
@@ -22,7 +28,16 @@ class SaverHook(AbstractHook):
 
 
 class BestSaverHook(AbstractHook):
+    """Save the model when it outperforms itself."""
+
     def __init__(self, net: AbstractNet, metric: str, condition: str, output_name: str='best', **kwargs):
+        """
+        Example: metric=loss, condition=min -> saved the model when the loss is best so far.
+        :param net: trained network
+        :param metric: metric to be evaluated (usually loss)
+        :param condition: {min,max}
+        :param output_name: suffix of the dumped checkpoint
+        """
         super().__init__(net=net, **kwargs)
         self.net = net
         self.metric = metric

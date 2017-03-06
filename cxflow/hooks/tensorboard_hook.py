@@ -8,7 +8,13 @@ import typing
 
 
 class TensorBoardHook(AbstractHook):
+    """Log the training to TensorBoard"""
+
     def __init__(self, net: AbstractNet, metrics_to_log: typing.Iterable[str], **kwargs):
+        """
+        :param net: trained net
+        :param metrics_to_log: list of names of the variables to be logged
+        """
         super().__init__(net=net, **kwargs)
         self.net = net
         self.metrics_to_log = metrics_to_log

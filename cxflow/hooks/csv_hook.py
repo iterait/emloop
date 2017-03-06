@@ -7,8 +7,16 @@ import typing
 
 
 class CSVHook(AbstractHook):
+    """Log training results to .csv, which will be saved to `net.log_dir`."""
+
     def __init__(self, net: AbstractNet, metrics_to_display: typing.Iterable[str],
                  output_file: str="training.csv", **kwargs):
+        """
+        :param net: trained network
+        :param metrics_to_display: list of names of statistics that will be logged
+        :param output_file: name of the output file
+        """
+
         super().__init__(net=net, **kwargs)
         self.metrics_to_display = metrics_to_display
         self.file = path.join(net.log_dir, output_file)
