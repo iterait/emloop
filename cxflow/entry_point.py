@@ -21,7 +21,11 @@ class EntryPoint:
         parser = ArgumentParser('cxflow')
         parser.add_argument('config_file', help='path to the config file')
         parser.add_argument('-o',  '--output-root', default='log', help='output directory')
+        parser.add_argument('-v',  '--verbose', action='store_true', help='incease verbosity do level DEBUG')
         known_args, unknown_args = parser.parse_known_args()
+
+        logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
+                            level=logging.DEBUG if known_args.verbose else logging.INFO)
 
         self.net = None
         self._output_root = known_args.output_root
@@ -112,8 +116,6 @@ class EntryPoint:
 
 
 def init_entry_point() -> None:
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
-
     sys.path.insert(0, os.getcwd())
 
     entry_point = EntryPoint()
