@@ -17,8 +17,22 @@ import ruamel.yaml
 
 
 class EntryPoint:
+    """Entry point of the whole training. Should be used only via `cxflow` command."""
 
     def __init__(self):
+        """
+        Entry point constructor.
+
+        All arguments are passed via CLI arguments which should be in form of `key[:type]=value`.
+        Then the life cycle is as follows:
+        1. configuration file is loaded
+        2. CLI arguments are applied
+        3. training directory is created
+        4. final configuration is dumped
+        5. dataset is loaded
+        6. network is created
+        """
+
         parser = ArgumentParser('cxflow')
         parser.add_argument('config_file', help='path to the config file')
         parser.add_argument('-o',  '--output-root', default='log', help='output directory')
@@ -38,6 +52,8 @@ class EntryPoint:
         self._create_network()
 
     def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> dict:
+        """Load config from `config_file` and apply CLI args `additional_args`. The result is saved as `self.config`"""
+
         with open(config_file, 'r') as f:
             self.config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
 
@@ -55,6 +71,8 @@ class EntryPoint:
         return self.config
 
     def _create_output_dir(self) -> str:
+        """Create output directory with proper name (if specified in the net config section)."""
+
         name = 'UnknownNetName'
         try:
             name = self.config['net']['name']
@@ -67,10 +85,17 @@ class EntryPoint:
         return output_dir
 
     def _create_dataset(self) -> None:
+        """Use `DatasetLoader` in order to load the proper dataset."""
         data_loader = DatasetLoader(self.config, self.dumped_config_file)
         self.dataset = data_loader.load_dataset()
 
     def _create_network(self) -> None:
+        """
+        Use python reflection to construct the net.
+
+        Note that config must contain `net_module` and `net_class`.
+        """
+
         logging.info('Creating net')
 
         logging.debug('Loading net module')
@@ -82,13 +107,17 @@ class EntryPoint:
         logging.debug('Constructing net')
         self.net = net_class(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
 
-    def _dump_config(self) -> str:
-        dumped_config_f = path.join(self.output_dir, 'config.yaml')
+    def _dump_config(self, name='config.yaml') -> str:
+        """Save the YAML file."""
+
+        dumped_config_f = path.join(self.output_dir, name)
         with open(dumped_config_f, 'w') as f:
             yaml.dump(self.config, f)
         return dumped_config_f
 
     def run(self) -> None:
+        """Construct hooks, create `NetworkManager` and run the main loop."""
+
         hooks = []
         if 'hooks' in self.config:
             logging.info('Creating hooks')
