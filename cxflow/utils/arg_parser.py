@@ -3,6 +3,7 @@ import logging
 
 
 def parse_arg(arg: str):
+    """Parse CLI arg in form of key[:type]=value to (key, value). """
     assert '=' in arg
 
     if ':' in arg:
