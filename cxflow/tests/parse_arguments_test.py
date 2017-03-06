@@ -1,4 +1,4 @@
-from ..utils.arg_parser import parse_arg
+from cxflow.utils.arg_parser import parse_arg
 
 import logging
 from unittest import TestCase
