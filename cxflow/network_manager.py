@@ -9,20 +9,25 @@ from collections import defaultdict
 import logging
 import typing
 
-FuelIterator = typing.NewType('FuelIterator', typing.Iterable[typing.Mapping[str, typing.Any]])
-
 
 class NetworkManager:
-    """
-    Train and evaluate network
-    """
+    """Train the network, manage hooks etc."""
 
     def __init__(self, net: AbstractNet, dataset: AbstractDataset,
                  dont_ignore_extra_sources=False, dont_ignore_incomplete_batches=False,
                  hooks: typing.Iterable[AbstractHook]=[]):
         """
-        Construct the manager
+        :param net: trained network
+        :param dataset: loaded dataset
+        :param dont_ignore_extra_sources: if set to true, the manager will raise an error if the dataset stream provides
+                                          more data sources than expected by the network. If set to false, such
+                                          situation will be ignored, which is the default behavior.
+        :param dont_ignore_incomplete_batches: if set to false (default), the manager will skip incomplete batches (usually only
+                                               the last one). This is useful when specifieng model batch size directly
+                                               in the placeholders.
+        :param hooks: list of hooks
         """
+
         self.net = net
         self.dataset = dataset
         self.dont_ignore_extra_sources = dont_ignore_extra_sources
@@ -30,6 +35,8 @@ class NetworkManager:
         self.hooks = hooks
 
     def _run_batch(self, train: bool, **kwargs) -> typing.Mapping[str, np.ndarray]:
+        """Process a single batch (either train or eval)."""
+
         # setup the feed dict
         feed_dict = {}
         for placeholder_name, placeholder_value in kwargs.items():
@@ -53,17 +60,31 @@ class NetworkManager:
             return dict(zip(self.net.to_evaluate, batch_res))
 
     def train_batch(self, **kwargs) -> typing.Mapping[str, np.ndarray]:
+        """Train a single batch."""
+
         return self._run_batch(train=True, **kwargs)
 
     def evaluate_batch(self, **kwargs) -> typing.Mapping[str, np.ndarray]:
+        """Evaluate a single batch."""
+
         return self._run_batch(train=False, **kwargs)
 
-    def _run_epoch(self, epoch_iterator: FuelIterator, train: bool, batch_size: int, stream_type: str,
+    def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, batch_size: int, stream_type: str,
                    batch_limit: int = None):
+        """
+        Iterate through the stream
+        :param stream: Iterable stream
+        :param train: if set to true, the network will be trained
+        :param batch_size: batch size
+        :param stream_type: {train, valid, test}
+        :param batch_limit: in set to a number, only this number of batches will be used, ignoring the others.
+        :return: epoch summary results
+        """
+
         n_batches = 0
         summed_results = defaultdict(float)
 
-        for bid, d in enumerate(epoch_iterator):
+        for bid, d in enumerate(stream):
             if not self.dont_ignore_incomplete_batches:
                 if len(d[list(d.keys())[0]]) != batch_size:
                     continue
@@ -85,15 +106,25 @@ class NetworkManager:
 
         return summed_results
 
-    def train_by_stream(self, stream, batch_size: int, batch_limit: int = None):
-        return self._run_epoch(epoch_iterator=stream, train=True,
+    def train_by_stream(self, stream: AbstractDataset.Stream, batch_size: int, batch_limit: int = None):
+        """Given a stream and batch size, train the network on this stream."""
+
+        return self._run_epoch(stream=stream, train=True,
                                batch_size=batch_size, batch_limit=batch_limit, stream_type='train')
 
-    def evaluate_stream(self, stream, batch_size: int, stream_type: str, batch_limit: int = None):
-        return self._run_epoch(epoch_iterator=stream, train=False,
+    def evaluate_stream(self, stream: AbstractDataset.Stream, batch_size: int, stream_type: str, batch_limit: int = None):
+        """Given a stream and batch size, evaluate the network on this stream."""
+
+        return self._run_epoch(stream=stream, train=False,
                                batch_size=batch_size, batch_limit=batch_limit, stream_type=stream_type)
 
     def run_main_loop(self, batch_size: int, eval_batch_size_multiplier: float=1, **kwargs) -> None:
+        """
+        Start the main loop
+        :param batch_size: batch size
+        :param eval_batch_size_multiplier: valid/test batch size multiplier
+        """
+
         train_batch_size = batch_size
         eval_batch_size = int(batch_size * eval_batch_size_multiplier)
 
