@@ -26,7 +26,7 @@ Tested on ArchLinux.
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
-Please refer to repository [Cognexa/cxflow-demo](https://gitlab.com/Cognexa/cxflow-demo) for more information.
+Please refer to repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example) for more information.
 
 ## Testing
 Unit tests might be run by `(myvenv) $ python setup.py test`.
