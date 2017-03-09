@@ -191,9 +191,10 @@ class EntryPoint:
 
         try:
             logging.info('Running main loop')
-            manager.run_main_loop(batch_size=self.config['net']['batch_size'])
+            assert 'batch_size' in self.config['net']
+            manager.run_main_loop(**self.config['net'])
         except Exception as e:
-            logging.error('Running the main loo failed: %s', e)
+            logging.error('Running the main loop failed: %s', e)
             sys.exit(1)
 
 

@@ -10,8 +10,9 @@ from os import path
 
 class AbstractNet:
 
-    def __init__(self, dataset: AbstractDataset, log_dir: str, name: str, learning_rate: float, optimizer: str='adam',
-                 device: str='/cpu:0', threads: int=4, restore_from=None, **kwargs):
+    def __init__(self, dataset: AbstractDataset, log_dir: str, name: str, io: dict, learning_rate: float,
+                 optimizer: str='adam', device: str='/cpu:0', threads: int=4, restore_from=None,
+                 ignore_extra_sources: bool=True, skip_incomplete_batches: bool=False, **kwargs):
         """
         Abstract net which should be an ancestor to all nets.
 
@@ -21,20 +22,36 @@ class AbstractNet:
         :param dataset: dataset to be used
         :param log_dir: training directory (for logging purposes)
         :param name: name of the training
+        :param io: dict containing `in` and `out` which are mapped to list of strings representing placeholders and
+                   the provided outputs, respectively.
         :param learning_rate: learning rate
         :param optimizer: @see build_optimizer for options
         :param device: {/cpu:0, /gpu:0}
         :param threads: number of threads to be used
         :param restore_from: name of checkpoint to be restored from or None if new model should be created
+        :param ignore_extra_sources: if set to True (default), warning will be raised when the stream batch contains
+                                     a superset of requires sources. If set to False, an error will be raised.
+        :param skip_incomplete_batches: if set to True, the incomplete (in terms of batch_size) batches will not be
+                                        processed. If set to False (default), the batches will be processed normally.
+                                        This option is useful for TensorFlow constructs that requires fixed batch size,
+                                        which is rare nowadays (but still present in some advanced RNNs).
         :param kwargs: will be saved as attributes
         """
 
         self.dataset = dataset
         self.name = name
+        self.io = io
         self.learning_rate = learning_rate
         self.log_dir = log_dir
         self.device = device
         self.threads = threads
+        self.ignore_extra_sources = ignore_extra_sources
+        self.skip_incomplete_batches = skip_incomplete_batches
+
+        assert 'in' in self.io
+        assert 'out' in self.io
+        assert self.learning_rate > 0
+        assert self.threads > 0
 
         # Save kwargs
         for name, value in kwargs.items():
@@ -48,7 +65,6 @@ class AbstractNet:
         self.optimizer = AbstractNet.build_optimizer(optimizer_name=optimizer)(learning_rate=self.learning_rate)
 
         # Set default attributes
-        self.to_evaluate = []   # list of strings
         self.train_op = None
 
         with tf.device(self.device):

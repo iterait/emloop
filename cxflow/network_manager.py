@@ -13,61 +13,63 @@ import typing
 class NetworkManager:
     """Train the network, manage hooks etc."""
 
-    def __init__(self, net: AbstractNet, dataset: AbstractDataset,
-                 dont_ignore_extra_sources=False, dont_ignore_incomplete_batches=False,
-                 hooks: typing.Iterable[AbstractHook]=[]):
+    def __init__(self, net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=[]):
         """
         :param net: trained network
         :param dataset: loaded dataset
-        :param dont_ignore_extra_sources: if set to true, the manager will raise an error if the dataset stream provides
-                                          more data sources than expected by the network. If set to false, such
-                                          situation will be ignored, which is the default behavior.
-        :param dont_ignore_incomplete_batches: if set to false (default), the manager will skip incomplete batches (usually only
-                                               the last one). This is useful when specifieng model batch size directly
-                                               in the placeholders.
         :param hooks: list of hooks
         """
 
         self.net = net
         self.dataset = dataset
-        self.dont_ignore_extra_sources = dont_ignore_extra_sources
-        self.dont_ignore_incomplete_batches = dont_ignore_incomplete_batches
         self.hooks = hooks
 
-    def _run_batch(self, train: bool, **kwargs) -> typing.Mapping[str, np.ndarray]:
+    def _run_batch(self, train: bool, batch: typing.Mapping[str, typing.Any]) -> typing.Mapping[str, np.ndarray]:
         """Process a single batch (either train or eval)."""
+
+        # check stream sources
+        if set(self.net.io['in']) < set(batch.keys()):
+            if self.net.ignore_extra_sources:
+                logging.warning('Some sources provided by the stream does not match net placeholders. This might be'
+                                'an error. Ignoring. Set `net.ignore_extra_sources` to False in order to make this'
+                                'an error. Extra sources: %s', set(batch.keys()) - set(self.net.io['in']))
+            else:
+                logging.error('Some sources provided by the stream does not match net placeholders. Set'
+                              '`net.ignore_extra_sources` to True in order to ignore this error'
+                              'Extra sources: %s', set(batch.keys()) - set(self.net.io['in']))
+                raise ValueError()
+
+        elif set(self.net.io['in']) > set(batch.keys()):
+            logging.error('Stream does not provide all required sources. Missing sources: %s',
+                          set(self.net.io['in']) - set(batch.keys()))
 
         # setup the feed dict
         feed_dict = {}
-        for placeholder_name, placeholder_value in kwargs.items():
+        for placeholder_name in self.net.io['in']:
             try:
-                feed_dict[getattr(self.net, placeholder_name)] = placeholder_value
+                feed_dict[getattr(self.net, placeholder_name)] = batch[placeholder_name]
             except AttributeError as e:
-                if self.dont_ignore_extra_sources:
-                    raise e
+                logging.error('Placeholder "%s" not found in the net. Make sure it is saved as an object property.',
+                              placeholder_name)
+                raise e
 
         # setup fetches
         fetches = [self.net.train_op] if train else []
-        fetches += [getattr(self.net, to_eval) for to_eval in self.net.to_evaluate]
+        for to_eval in self.net.io['out']:
+            try:
+                fetches.append(getattr(self.net, to_eval))
+            except AttributeError as e:
+                logging.error('Net does not contain a required output "%s". Make sure it is saved as an object'
+                              'property.', to_eval)
 
         # run the computational graph for one batch
         batch_res = self.net.session.run(fetches=fetches, feed_dict=feed_dict)
 
         # zip the string names with results
         if train:
-            return dict(zip(self.net.to_evaluate, batch_res[1:]))
+            return dict(zip(self.net.io['out'], batch_res[1:]))
         else:
-            return dict(zip(self.net.to_evaluate, batch_res))
-
-    def train_batch(self, **kwargs) -> typing.Mapping[str, np.ndarray]:
-        """Train a single batch."""
-
-        return self._run_batch(train=True, **kwargs)
-
-    def evaluate_batch(self, **kwargs) -> typing.Mapping[str, np.ndarray]:
-        """Evaluate a single batch."""
-
-        return self._run_batch(train=False, **kwargs)
+            return dict(zip(self.net.io['out'], batch_res))
 
     def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, batch_size: int, stream_type: str,
                    batch_limit: int = None):
@@ -84,13 +86,13 @@ class NetworkManager:
         n_batches = 0
         summed_results = defaultdict(float)
 
-        for bid, d in enumerate(stream):
-            if not self.dont_ignore_incomplete_batches:
-                if len(d[list(d.keys())[0]]) != batch_size:
+        for bid, batch in enumerate(stream):
+            if self.net.skip_incomplete_batches:
+                if len(batch[list(batch.keys())[0]]) < batch_size:
                     continue
 
             n_batches += 1
-            batch_result = self._run_batch(train=train, **d)
+            batch_result = self._run_batch(train=train, batch=batch)
 
             for hook in self.hooks:
                 hook.after_batch(stream_type=stream_type, results=batch_result)
@@ -131,12 +133,12 @@ class NetworkManager:
         epoch_id = 0
 
         for hook in self.hooks:
-            hook.before_training(**kwargs)
+            hook.before_training()
 
         valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), batch_size=eval_batch_size,
-                                             stream_type='valid', **kwargs)
+                                             stream_type='valid')
         test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), batch_size=eval_batch_size,
-                                            stream_type='test', **kwargs)
+                                            stream_type='test')
 
         for hook in self.hooks:
             hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
@@ -144,12 +146,11 @@ class NetworkManager:
         while True:
             epoch_id += 1
 
-            train_results = self.train_by_stream(stream=self.dataset.create_train_stream(), batch_size=train_batch_size,
-                                                 **kwargs)
+            train_results = self.train_by_stream(stream=self.dataset.create_train_stream(), batch_size=train_batch_size)
             valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), batch_size=eval_batch_size,
-                                                 stream_type='valid', **kwargs)
+                                                 stream_type='valid')
             test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), batch_size=eval_batch_size,
-                                                stream_type='test', **kwargs)
+                                                stream_type='test')
 
             try:
                 for hook in self.hooks:
@@ -160,4 +161,4 @@ class NetworkManager:
                 break
 
         for hook in self.hooks:
-            hook.after_training(**kwargs)
+            hook.after_training()
