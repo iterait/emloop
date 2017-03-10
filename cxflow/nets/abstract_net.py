@@ -116,11 +116,11 @@ class AbstractNet:
                                                                 allow_soft_placement=True))
 
             for tensor_name in set(self.io['in'] + self.io['out']):
-                assert hasattr(self, tensor_name), 'IO defined tensor `{}` but it was not defined' \
+                assert hasattr(self, tensor_name), 'IO defined tensor `{}` but it was not defined ' \
                                                    'in the net.'.format(tensor_name)
                 tensor = getattr(self, tensor_name)
-                assert tensor.name == tensor_name+':0', 'Tensor stored in variable `{}` has different name `{}`.' \
-                                                        'This will prevent correct restoring of the' \
+                assert tensor.name == tensor_name+':0', 'Tensor stored in variable `{}` has different name `{}`. ' \
+                                                        'This will prevent correct restoring of the ' \
                                                         'model.'.format(tensor_name, tensor.name)
 
             logging.debug('Creating Saver')
