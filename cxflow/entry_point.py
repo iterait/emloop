@@ -4,6 +4,7 @@ from .network_manager import NetworkManager
 from .utils.arg_parser import parse_arg
 from .dataset_loader import DatasetLoader
 from .hooks.abstract_hook import AbstractHook
+from .nets.abstract_net import AbstractNet
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -67,14 +68,24 @@ class EntryPoint:
 
         logging.info('Creating net')
 
-        logging.debug('Loading net module')
-        net_module = importlib.import_module(self.config['net']['net_module'])
+        if 'restore_from' in self.config['net']:
+            logging.info('Restoring net from: "%s"', self.config['net']['restore_from'])
+            if 'net_module' in self.config['net'] or 'net_class' in self.config['net']:
+                logging.warning('`net_module` or `net_class` provided even though the net is restoring from "%s".'
+                                'Restoring anyway while ignoring these parameters. Consider removing them from config'
+                                'file.', self.config['net']['restore_from'])
 
-        logging.debug('Loading net class')
-        net_class = getattr(net_module, self.config['net']['net_class'])
+            self.net = AbstractNet(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
+        else:
+            logging.info('Creating new net')
+            logging.debug('Loading net module')
+            net_module = importlib.import_module(self.config['net']['net_module'])
 
-        logging.debug('Constructing net')
-        self.net = net_class(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
+            logging.debug('Loading net class')
+            net_class = getattr(net_module, self.config['net']['net_class'])
+
+            logging.debug('Constructing net instance')
+            self.net = net_class(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
 
     def _dump_config(self, name='config.yaml') -> str:
         """Save the YAML file."""

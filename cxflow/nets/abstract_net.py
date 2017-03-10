@@ -57,9 +57,10 @@ class AbstractNet:
         for name, value in kwargs.items():
             setattr(self, name, value)
 
-        # Extended init
-        self.extended_init(dataset=dataset, log_dir=log_dir, name=name, learning_rate=learning_rate,
-                           optimizer=optimizer, device=device, threads=threads, restore_from=restore_from, **kwargs)
+        if not restore_from:
+            # Extended init
+            self.extended_init(dataset=dataset, log_dir=log_dir, name=name, learning_rate=learning_rate,
+                               optimizer=optimizer, device=device, threads=threads, restore_from=restore_from, **kwargs)
 
         # Define the optimizer
         self.optimizer = AbstractNet.build_optimizer(optimizer_name=optimizer)(learning_rate=self.learning_rate)
@@ -67,21 +68,56 @@ class AbstractNet:
         # Set default attributes
         self.train_op = None
 
-        with tf.device(self.device):
-            self.create_net()
-            assert hasattr(self, 'train_op'), '`Net::create_net` must define `train_op`'
-
-            self.session = tf.Session(config=tf.ConfigProto(inter_op_parallelism_threads=self.threads,
-                                                            intra_op_parallelism_threads=self.threads,
-                                                            allow_soft_placement=True))
-
-        self.saver = tf.train.Saver()
-
         if restore_from:
-            logging.info('Restoring model from %s', restore_from)
-            self.saver.restore(self.session, restore_from)
+            with tf.device(self.device):
+                logging.debug('Creating empty session')
+                self.session = tf.Session(config=tf.ConfigProto(inter_op_parallelism_threads=self.threads,
+                                                                intra_op_parallelism_threads=self.threads,
+                                                                allow_soft_placement=True))
+                if not restore_from.endswith('.ckpt'):
+                    logging.warning('`restore_from` does not end with `.ckpt` suffix. Automatically adding it. Consider'
+                                    'explicitely adding the `.ckpt` suffix to the config.')
+                    restore_from += '.ckpt'
+
+                logging.debug('Loading meta graph')
+                self.saver = tf.train.import_meta_graph(restore_from + '.meta')
+
+                logging.debug('Restoring model')
+                self.saver.restore(self.session, restore_from)
+
+                try:
+                    logging.debug('Loading `train_op`')
+                    self.train_op = tf.get_default_graph().get_operation_by_name('train_op')
+                except Exception as e:
+                    logging.error('Cannot load `train_op`. Make sure the dumped model has a training operation'
+                                  'named `train_op`.')
+                    raise e
+
+                logging.debug('Loading net IO')
+                for tensor_name in set(self.io['in'] + self.io['out']):
+                    try:
+                        setattr(self, tensor_name, tf.get_default_graph().get_tensor_by_name(tensor_name+':0'))
+                    except Exception as e:
+                        logging.error('Cannot find tensor "%s" in model loaded from "%s".', tensor_name, restore_from)
+                        raise e
+
         else:
-            logging.info('Creating a brand new model (no restoring)')
+            # Create model placed to device
+            with tf.device(self.device):
+                logging.debug('Creating net')
+                self.create_net()
+
+                assert hasattr(self, 'train_op'), '`Net::create_net` must define `train_op`'
+                assert self.train_op.name == 'train_op', '`train_op` must be named as "train_op"'
+
+                logging.debug('Creating session')
+                self.session = tf.Session(config=tf.ConfigProto(inter_op_parallelism_threads=self.threads,
+                                                                intra_op_parallelism_threads=self.threads,
+                                                                allow_soft_placement=True))
+            logging.debug('Creating Saver')
+            self.saver = tf.train.Saver()
+
+            logging.debug('Init. variables')
             try:  # TF 0.12.1+
                 self.session.run(tf.global_variables_initializer())
                 self.session.run(tf.local_variables_initializer())
@@ -89,10 +125,11 @@ class AbstractNet:
                 self.session.run(tf.initialize_all_variables())
                 self.session.run(tf.initialize_local_variables())
 
+        logging.debug('Creating TensorBoard writer')
         try:  # TF 0.12.1+
             self.summary_writer = tf.summary.FileWriter(logdir=self.log_dir,
-                                                         graph=self.session.graph,
-                                                                 flush_secs=10)
+                                                        graph=self.session.graph,
+                                                        flush_secs=10)
         except AttributeError:  # TF 0.11.0-
             self.summary_writer = tf.train.SummaryWriter(logdir=self.log_dir,
                                                          graph=self.session.graph,
