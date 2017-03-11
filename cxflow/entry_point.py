@@ -38,6 +38,7 @@ class EntryPoint:
             conf[key] = value
 
         self.config = yaml.load(ruamel.yaml.dump(self.config, Dumper=ruamel.yaml.RoundTripDumper))
+        logging.debug('Loaded config: %s', self.config)
         return self.config
 
     def _create_output_dir(self) -> str:
@@ -206,6 +207,7 @@ class EntryPoint:
             manager.run_main_loop(**self.config['net'])
         except Exception as e:
             logging.error('Running the main loop failed: %s', e)
+            raise e
             sys.exit(1)
 
 
