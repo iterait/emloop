@@ -1,9 +1,29 @@
 image: ubuntu:latest
 
-test:
-  script:
+before_script:
   - apt-get update -qy
   - apt-get upgrade -qy
   - apt-get install -y git python3-dev python3-pip
+
+test:ubuntu_TFlatest:
+  script:
+  - pip3 install -r requirements.txt
+  - python3 setup.py test
+
+test:ubuntu_TF0.12:
+  script:
+  - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp35-cp35m-linux_x86_64.whl
+  - pip3 install -r requirements.txt
+  - python3 setup.py test
+
+test:ubuntu_TF0.11:
+  script:
+  - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0-cp35-cp35m-linux_x86_64.whl
+  - pip3 install -r requirements.txt
+  - python3 setup.py test
+
+test:ubuntu_TF0.10:
+  script:
+  - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.10.0-cp35-cp35m-linux_x86_64.whl
   - pip3 install -r requirements.txt
   - python3 setup.py test
