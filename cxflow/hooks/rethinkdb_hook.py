@@ -1,6 +1,7 @@
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
 
+import numpy as np
 import rethinkdb as r
 
 from datetime import datetime
@@ -54,11 +55,13 @@ class RethinkDBHook(AbstractHook):
 
         with r.connect(**self.credentials) as conn:
             response = r.table('training')\
-                        .insert({**{'valid_{}'.format(key): value for key, value in valid_results.items()},
-                                 **{'test_{}'.format(key): value for key, value in test_results.items()},
-                                 **{'timestamp': r.expr(datetime.now(pytz.utc))},
-                                 **{'setup_id': self.rethink_id},
-                                 **{'epoch_id': 0}
+                        .insert({**{'valid_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
+                                    for key, value in valid_results.items()},
+                                 **{'test_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
+                                    for key, value in test_results.items()},
+                                 **{'timestamp': r.expr(datetime.now(pytz.utc)),
+                                    'setup_id': self.rethink_id,
+                                    'epoch_id': 0}
                                  })\
                         .run(conn)
             if response['errors'] > 0:
@@ -76,12 +79,15 @@ class RethinkDBHook(AbstractHook):
 
         with r.connect(**self.credentials) as conn:
             response = r.table('training')\
-                        .insert({**{'train_{}'.format(key): value for key, value in train_results.items()},
-                                 **{'valid_{}'.format(key): value for key, value in valid_results.items()},
-                                 **{'test_{}'.format(key): value for key, value in test_results.items()},
-                                 **{'timestamp': r.expr(datetime.now(pytz.utc))},
-                                 **{'setup_id': self.rethink_id},
-                                 **{'epoch_id': epoch_id}
+                        .insert({**{'train_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
+                                    for key, value in train_results.items()},
+                                 **{'valid_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
+                                    for key, value in valid_results.items()},
+                                 **{'test_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
+                                    for key, value in test_results.items()},
+                                 **{'timestamp': r.expr(datetime.now(pytz.utc)),
+                                    'setup_id': self.rethink_id,
+                                    'epoch_id': epoch_id}
                                  })\
                         .run(conn)
             if response['errors'] > 0:
