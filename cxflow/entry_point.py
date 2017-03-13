@@ -16,6 +16,7 @@ import sys
 import typing
 import yaml
 import ruamel.yaml
+import traceback
 
 
 class EntryPoint:
@@ -160,36 +161,42 @@ class EntryPoint:
             self._load_config(config_file=config_file, additional_args=cli_options)
         except Exception as e:
             logging.error('Loading config failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
             self.output_dir = self._create_output_dir()
         except Exception as e:
             logging.error('Creating output dir failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
             self.dumped_config_file = self._dump_config()
         except Exception as e:
             logging.error('Saving modified config failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
             self._create_dataset()
         except Exception as e:
             logging.error('Creating dataset failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
             self._create_network()
         except Exception as e:
             logging.error('Creating network failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
             hooks = self._construct_hooks()
         except Exception as e:
             logging.error('Creating hooks failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
@@ -199,6 +206,7 @@ class EntryPoint:
                                      hooks=hooks)
         except Exception as e:
             logging.error('Creating NetworkManager failed: %s', e)
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
         try:
@@ -207,7 +215,7 @@ class EntryPoint:
             manager.run_main_loop(**self.config['net'])
         except Exception as e:
             logging.error('Running the main loop failed: %s', e)
-            raise e
+            traceback.print_exc(file=sys.stderr)
             sys.exit(1)
 
 

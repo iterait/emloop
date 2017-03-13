@@ -1,29 +1,43 @@
-image: ubuntu:latest
+.ubuntu_common: &ubuntuCommon
+  image: ubuntu:latest
+  before_script:
+    - apt-get update -qy
+    - apt-get install -y git python3-dev python3-pip
 
-before_script:
-  - apt-get update -qy
-  - apt-get upgrade -qy
-  - apt-get install -y git python3-dev python3-pip
-
-test:ubuntu_TFlatest:
+test:ubuntu_TFlatest_python3.5:
+  <<: *ubuntuCommon
   script:
   - pip3 install -r requirements.txt
   - python3 setup.py test
 
-test:ubuntu_TF0.12:
+test:ubuntu_TF0.12_python3.5:
+  <<: *ubuntuCommon
   script:
   - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp35-cp35m-linux_x86_64.whl
   - pip3 install -r requirements.txt
   - python3 setup.py test
 
-test:ubuntu_TF0.11:
+test:ubuntu_TF0.11_python3.5:
+  <<: *ubuntuCommon
   script:
   - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0-cp35-cp35m-linux_x86_64.whl
   - pip3 install -r requirements.txt
   - python3 setup.py test
 
-test:ubuntu_TF0.10:
+test:ubuntu_TF0.10_python3.5:
+  <<: *ubuntuCommon
   script:
   - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.10.0-cp35-cp35m-linux_x86_64.whl
   - pip3 install -r requirements.txt
   - python3 setup.py test
+
+.arch_common: &archCommon
+  before_script:
+  - pacman -S --noconfirm python python-pip git base-devel
+
+test:arch_TF1.0_python3.6:
+  image: pritunl/archlinux
+  <<: *archCommon
+  script:
+  - pip install -r requirements.txt
+  - python setup.py test
