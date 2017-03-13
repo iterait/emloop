@@ -24,15 +24,19 @@ class NetworkManager:
         self.dataset = dataset
         self.hooks = hooks
 
+        self._extra_sources_warned = False
+
     def _run_batch(self, train: bool, batch: typing.Mapping[str, typing.Any]) -> typing.Mapping[str, np.ndarray]:
         """Process a single batch (either train or eval)."""
 
         # check stream sources
         if set(self.net.io['in']) < set(batch.keys()):
             if self.net.ignore_extra_sources:
-                logging.warning('Some sources provided by the stream does not match net placeholders. This might be'
-                                'an error. Ignoring. Set `net.ignore_extra_sources` to False in order to make this'
-                                'an error. Extra sources: %s', set(batch.keys()) - set(self.net.io['in']))
+                if not self._extra_sources_warned:
+                    logging.warning('Some sources provided by the stream does not match net placeholders. This might be'
+                                    'an error. Ignoring. Set `net.ignore_extra_sources` to False in order to make this'
+                                    'an error. Extra sources: %s', set(batch.keys()) - set(self.net.io['in']))
+                    self._extra_sources_warned = True
             else:
                 logging.error('Some sources provided by the stream does not match net placeholders. Set'
                               '`net.ignore_extra_sources` to True in order to ignore this error'
