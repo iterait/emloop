@@ -98,7 +98,11 @@ class NetworkManager:
                 hook.after_batch(stream_type=stream_type, results=batch_result)
 
             for name, value in batch_result.items():
-                summed_results[name] += value
+                try:
+                    summed_results[name] += value
+                except Exception as e:
+                    logging.error('Cannot sum results "%s"', name)
+                    raise e
 
             if batch_limit and bid >= batch_limit:
                 break
