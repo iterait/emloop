@@ -60,11 +60,11 @@ class BestSaverHook(AbstractHook):
 
     def after_epoch(self, valid_results: dict, **kwargs) -> None:
         if self.condition == 'min':
-            if valid_results[self.metric] < self.best_metric:
+            if self.best_metric is None or valid_results[self.metric] < self.best_metric:
                 self.best_metric = valid_results[self.metric]
                 self._save_checkpoint()
         elif self.condition == 'max':
-            if valid_results[self.metric] > self.best_metric:
+            if self.best_metric is None or valid_results[self.metric] > self.best_metric:
                 self.best_metric = valid_results[self.metric]
                 self._save_checkpoint()
         else:

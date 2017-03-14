@@ -74,13 +74,13 @@ class ResultHook(AbstractHook):
 
     def after_epoch(self, valid_results: dict, **kwargs) -> None:
         if self.condition == 'min':
-            if valid_results[self.metric] < self.best_metric:
+            if self.best_metric is None or valid_results[self.metric] < self.best_metric:
                 logging.info('Saving results')
                 self.best_metric = valid_results[self.metric]
                 self._save_results(self.valid_buffer, self.valid_f)
                 self._save_results(self.test_buffer, self.test_f)
         elif self.condition == 'max':
-            if valid_results[self.metric] > self.best_metric:
+            if self.best_metric is None or valid_results[self.metric] > self.best_metric:
                 logging.info('Saving results')
                 self.best_metric = valid_results[self.metric]
                 self._save_results(self.valid_buffer, self.valid_f)
@@ -88,3 +88,4 @@ class ResultHook(AbstractHook):
         else:
             logging.error('BestSaverHook support only {min,max} as a condition')
             raise ValueError('BestSaverHook support only {min,max} as a condition')
+        self._reset()
