@@ -18,24 +18,24 @@ class DatasetLoader:
         :param dumped_cofig_path: path to the dumped config YAML
         """
 
-        self.config = config
-        self.dumped_cofig_path = dumped_cofig_path
+        self._config = config
+        self._dumped_cofig_path = dumped_cofig_path
 
         try:
-            self.config['dataset']['dataset_module']
-            self.config['dataset']['dataset_class']
-            self.config['dataset']['backend']
+            self._config['dataset']['dataset_module']
+            self._config['dataset']['dataset_class']
+            self._config['dataset']['backend']
         except KeyError as e:
             logging.error('Dataset does not contain `dataset_module` or `dataset_class` or `backend`.')
             raise e
 
         logging.debug('Loading dataset module')
-        dataset_module = importlib.import_module(self.config['dataset']['dataset_module'])
+        dataset_module = importlib.import_module(self._config['dataset']['dataset_module'])
 
         logging.debug('Loading dataset class')
-        self.dataset_class = getattr(dataset_module, self.config['dataset']['dataset_class'])
+        self._dataset_class = getattr(dataset_module, self._config['dataset']['dataset_class'])
 
-        self.load_f = getattr(self, '_load_{}'.format(self.config['dataset']['backend']))
+        self._load_f = getattr(self, '_load_{}'.format(self._config['dataset']['backend']))
 
     @staticmethod
     def _verify_dataset(dataset):
@@ -55,7 +55,7 @@ class DatasetLoader:
         """Load the dataset by using the proper backend."""
 
         logging.debug('Loading the dataset')
-        dataset =  self.load_f()
+        dataset =  self._load_f()
 
         logging.debug('Checking the dataset')
         DatasetLoader._verify_dataset(dataset)
@@ -66,10 +66,10 @@ class DatasetLoader:
         """Load the dataset by using Fuel (Python) backend"""
 
         logging.debug('Using fuel backend')
-        return self.dataset_class(**self.config['dataset'], **self.config['stream'])
+        return self._dataset_class(**self._config['dataset'], **self._config['stream'])
 
     def _load_cxtream(self) -> AbstractDataset:
         """Load the dataset by using cxtream (C++) backend"""
 
         logging.debug('Using cxtream backend')
-        return self.dataset_class(self.dumped_cofig_path)
+        return self._dataset_class(self._dumped_cofig_path)
