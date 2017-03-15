@@ -19,6 +19,9 @@ class AbstractNet:
         At first, all kwargs are saved as attributes. Then, overloaded `extended_init` is called. Then, the model is
         created (or restored) via `create_net`.
 
+        Note that nets have all common attributes public as they are in general accessed by `NetworkManager` and other
+        objects.
+
         :param dataset: dataset to be used
         :param log_dir: training directory (for logging purposes)
         :param name: name of the training
