@@ -18,12 +18,12 @@ class CSVHook(AbstractHook):
         """
 
         super().__init__(net=net, **kwargs)
-        self.metrics_to_display = metrics_to_display
-        self.file = path.join(net.log_dir, output_file)
+        self._metrics_to_display = metrics_to_display
+        self._file = path.join(net.log_dir, output_file)
 
-        logging.info('Saving training log to "%s"', self.file)
+        logging.info('Saving training log to "%s"', self._file)
 
-        with open(self.file, 'w') as f:
+        with open(self._file, 'w') as f:
             header = '"epoch_id",' +\
                      ','.join(['"train_{0}","valid_{0}","test_{0}"'.format(metric) for metric in metrics_to_display]) +\
                      '\n'
@@ -33,7 +33,7 @@ class CSVHook(AbstractHook):
         logging.info('Before first epoch')
 
         result_row = [0]
-        for key in self.metrics_to_display:
+        for key in self._metrics_to_display:
             result_row.append('')
             if key in valid_results:
                 result_row.append(valid_results[key])
@@ -50,7 +50,7 @@ class CSVHook(AbstractHook):
             else:
                 result_row.append('')
 
-        with open(self.file, 'a') as f:
+        with open(self._file, 'a') as f:
             row = ','.join(map(str, result_row))
             f.write(row + '\n')
 
@@ -59,7 +59,7 @@ class CSVHook(AbstractHook):
 
         logging.info('After epoch %d', epoch_id)
         result_row = [epoch_id]
-        for key in self.metrics_to_display:
+        for key in self._metrics_to_display:
             if key in train_results:
                 result_row.append(train_results[key])
             else:
@@ -81,6 +81,6 @@ class CSVHook(AbstractHook):
             else:
                 result_row.append('')
 
-        with open(self.file, 'a') as f:
+        with open(self._file, 'a') as f:
             row = ','.join(map(str, result_row))
             f.write(row + '\n')
