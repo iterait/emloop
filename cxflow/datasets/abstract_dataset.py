@@ -19,7 +19,11 @@ class AbstractDataset:
         """Return a valid iterator which provides a mapping (source name -> value)"""
         pass
 
+
+class AbstractDatasetWithTest(AbstractDataset):
+    """Same as `AbstractDataset` with test stream support."""
+
     @abstractmethod
-    def create_test_stream(self) -> Stream:
+    def create_test_stream(self) -> AbstractDataset.Stream:
         """Return a test iterator which provides a mapping (source name -> value)"""
         pass

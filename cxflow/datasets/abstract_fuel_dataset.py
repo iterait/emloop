@@ -1,4 +1,4 @@
-from .abstract_dataset import AbstractDataset
+from .abstract_dataset import AbstractDataset, AbstractDatasetWithTest
 
 from abc import abstractmethod
 
@@ -10,8 +10,11 @@ class AbstractFuelDataset(AbstractDataset):
     underscored versions should be used.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, train: dict, valid: dict, **kwargs):
         """Save all kwargs"""
+
+        self.train = train
+        self.valid = valid
 
         for name, value in kwargs.items():
             setattr(self, name, value)
@@ -22,8 +25,6 @@ class AbstractFuelDataset(AbstractDataset):
     def create_valid_stream(self):
         return self._create_valid_stream(**self.valid)
 
-    def create_test_stream(self):
-        return self._create_test_stream(**self.test)
 
     @abstractmethod
     def _create_train_stream(self, **kwargs):
@@ -34,6 +35,17 @@ class AbstractFuelDataset(AbstractDataset):
     def _create_valid_stream(self, **kwargs):
         """Return a valid iterator which is parametrized by kwargs"""
         pass
+
+
+class AbstractFuelDatasetWithTest(AbstractDatasetWithTest, AbstractFuelDataset):
+    """Same as `AbstractFuelDataset` with test stream methods."""
+
+    def __init__(self, test: dict, **kwargs):
+        super().__init__(**kwargs)
+        self.test = test
+
+    def create_test_stream(self):
+        return self._create_test_stream(**self.test)
 
     @abstractmethod
     def _create_test_stream(self, **kwargs):

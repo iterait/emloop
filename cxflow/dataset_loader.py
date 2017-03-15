@@ -25,8 +25,9 @@ class DatasetLoader:
             self.config['dataset']['dataset_module']
             self.config['dataset']['dataset_class']
             self.config['dataset']['backend']
-        except KeyError:
+        except KeyError as e:
             logging.error('Dataset does not contain `dataset_module` or `dataset_class` or `backend`.')
+            raise e
 
         logging.debug('Loading dataset module')
         dataset_module = importlib.import_module(self.config['dataset']['dataset_module'])

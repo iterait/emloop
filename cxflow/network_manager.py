@@ -128,7 +128,8 @@ class NetworkManager:
         return self._run_epoch(stream=stream, train=False,
                                batch_size=batch_size, batch_limit=batch_limit, stream_type=stream_type)
 
-    def run_main_loop(self, batch_size: int, eval_batch_size_multiplier: float=1, **kwargs) -> None:
+    def run_main_loop(self, batch_size: int, run_test_stream: bool, eval_batch_size_multiplier: float=1,
+                      **kwargs) -> None:
         """
         Start the main loop
         :param batch_size: batch size
@@ -145,8 +146,20 @@ class NetworkManager:
 
         valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), batch_size=eval_batch_size,
                                              stream_type='valid')
-        test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), batch_size=eval_batch_size,
-                                            stream_type='test')
+
+        if run_test_stream:
+            # logging.debug('%s', self.dataset.create_test_stream())
+            # logging.debug('%s', [method for method in dir(self.dataset) if callable(getattr(self.dataset, method))])
+            # quit()
+            try:
+                test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), batch_size=eval_batch_size,
+                                                    stream_type='test')
+            except AttributeError as e:
+                logging.error('Dataset does not provide test stream even though it was specified in the config. Either'
+                              'implement `create_test_stream` method or delete `stream.test` section in the config.')
+                raise e
+        else:
+            test_results = None
 
         for hook in self.hooks:
             hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
@@ -157,8 +170,19 @@ class NetworkManager:
             train_results = self.train_by_stream(stream=self.dataset.create_train_stream(), batch_size=train_batch_size)
             valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), batch_size=eval_batch_size,
                                                  stream_type='valid')
-            test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), batch_size=eval_batch_size,
-                                                stream_type='test')
+
+            if run_test_stream:
+                try:
+                    test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(),
+                                                        batch_size=eval_batch_size,
+                                                        stream_type='test')
+                except AttributeError as e:
+                    logging.error(
+                        'Dataset does not provide test stream even though it was specified in the config. Either'
+                        'implement `create_test_stream` method or delete `stream.test` section in the config.')
+                    raise e
+            else:
+                test_results = None
 
             try:
                 for hook in self.hooks:
