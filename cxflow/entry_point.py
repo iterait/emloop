@@ -211,9 +211,7 @@ class EntryPoint:
 
         try:
             logging.info('Running main loop')
-            assert 'batch_size' in self.config['net']
-            manager.run_main_loop(run_test_stream='test' in self.config['stream'],
-                                  **self.config['net'])
+            manager.run_main_loop(run_test_stream='test' in self.config['stream'])
         except Exception as e:
             logging.error('Running the main loop failed: %s', e)
             traceback.print_exc(file=sys.stderr)
