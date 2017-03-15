@@ -29,10 +29,10 @@ class RethinkDBHook(AbstractHook):
 
         super().__init__(net=net, config=config, **kwargs)
         with open(credentials_file, 'r') as f:
-            self.credentials = json.load(f)
+            self._credentials = json.load(f)
 
         logging.debug('Creating setup in the db')
-        with r.connect(**self.credentials) as conn:
+        with r.connect(**self._credentials) as conn:
             response = r.table('setups')\
                         .insert({**config,
                                  **{'timestamp': r.expr(datetime.now(pytz.utc))},
@@ -44,23 +44,23 @@ class RethinkDBHook(AbstractHook):
             if response['inserted'] != 1:
                 logging.error('Inserted unexpected number of documents: %s', response['inserted'])
                 return
-            self.rethink_id = response['generated_keys'][0]
-            logging.debug('Created setup: %s', self.rethink_id)
+            self._rethink_id = response['generated_keys'][0]
+            logging.debug('Created setup: %s', self._rethink_id)
 
         with open(path.join(net.log_dir, 'rethink_key.json'), 'w') as f:
-            json.dump({'rethink_id': self.rethink_id}, f)
+            json.dump({'rethink_id': self._rethink_id}, f)
 
     def before_first_epoch(self, valid_results: dict, test_results: dict = None, **kwargs) -> None:
         logging.debug('Rethink: before first epoch')
 
-        with r.connect(**self.credentials) as conn:
+        with r.connect(**self._credentials) as conn:
             response = r.table('training')\
                         .insert({**{'valid_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
                                     for key, value in valid_results.items()},
                                  **{'test_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
                                     for key, value in test_results.items()},
                                  **{'timestamp': r.expr(datetime.now(pytz.utc)),
-                                    'setup_id': self.rethink_id,
+                                    'setup_id': self._rethink_id,
                                     'epoch_id': 0}
                                  })\
                         .run(conn)
@@ -77,7 +77,7 @@ class RethinkDBHook(AbstractHook):
                     **kwargs) -> None:
         logging.info('Rethink: after epoch %d', epoch_id)
 
-        with r.connect(**self.credentials) as conn:
+        with r.connect(**self._credentials) as conn:
             response = r.table('training')\
                         .insert({**{'train_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
                                     for key, value in train_results.items()},
@@ -86,7 +86,7 @@ class RethinkDBHook(AbstractHook):
                                  **{'test_{}'.format(key): (value.tolist() if isinstance(value, np.ndarray) else value)
                                     for key, value in test_results.items()},
                                  **{'timestamp': r.expr(datetime.now(pytz.utc)),
-                                    'setup_id': self.rethink_id,
+                                    'setup_id': self._rethink_id,
                                     'epoch_id': epoch_id}
                                  })\
                         .run(conn)
