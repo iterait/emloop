@@ -26,28 +26,28 @@ class EntryPoint:
         """Load config from `config_file` and apply CLI args `additional_args`. The result is saved as `self.config`"""
 
         with open(config_file, 'r') as f:
-            self.config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
+            self._config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
 
         for key_full, value in [parse_arg(arg) for arg in additional_args]:
             key_split = key_full.split('.')
             key_prefix = key_split[:-1]
             key = key_split[-1]
 
-            conf = self.config
+            conf = self._config
             for key_part in key_prefix:
                 conf = conf[key_part]
             conf[key] = value
 
-        self.config = yaml.load(ruamel.yaml.dump(self.config, Dumper=ruamel.yaml.RoundTripDumper))
-        logging.debug('Loaded config: %s', self.config)
-        return self.config
+        self._config = yaml.load(ruamel.yaml.dump(self._config, Dumper=ruamel.yaml.RoundTripDumper))
+        logging.debug('Loaded config: %s', self._config)
+        return self._config
 
     def _create_output_dir(self) -> str:
         """Create output directory with proper name (if specified in the net config section)."""
 
         name = 'UnknownNetName'
         try:
-            name = self.config['net']['name']
+            name = self._config['net']['name']
         except:
             logging.warning('Net name not found in the config')
 
@@ -58,8 +58,8 @@ class EntryPoint:
 
     def _create_dataset(self) -> None:
         """Use `DatasetLoader` in order to load the proper dataset."""
-        data_loader = DatasetLoader(self.config, self.dumped_config_file)
-        self.dataset = data_loader.load_dataset()
+        data_loader = DatasetLoader(self._config, self.dumped_config_file)
+        self._dataset = data_loader.load_dataset()
 
     def _create_network(self) -> None:
         """
@@ -70,31 +70,31 @@ class EntryPoint:
 
         logging.info('Creating net')
 
-        if 'restore_from' in self.config['net']:
-            logging.info('Restoring net from: "%s"', self.config['net']['restore_from'])
-            if 'net_module' in self.config['net'] or 'net_class' in self.config['net']:
+        if 'restore_from' in self._config['net']:
+            logging.info('Restoring net from: "%s"', self._config['net']['restore_from'])
+            if 'net_module' in self._config['net'] or 'net_class' in self._config['net']:
                 logging.warning('`net_module` or `net_class` provided even though the net is restoring from "%s".'
                                 'Restoring anyway while ignoring these parameters. Consider removing them from config'
-                                'file.', self.config['net']['restore_from'])
+                                'file.', self._config['net']['restore_from'])
 
-            self.net = AbstractNet(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
+            self._net = AbstractNet(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
         else:
             logging.info('Creating new net')
             logging.debug('Loading net module')
-            net_module = importlib.import_module(self.config['net']['net_module'])
+            net_module = importlib.import_module(self._config['net']['net_module'])
 
             logging.debug('Loading net class')
-            net_class = getattr(net_module, self.config['net']['net_class'])
+            net_class = getattr(net_module, self._config['net']['net_class'])
 
             logging.debug('Constructing net instance')
-            self.net = net_class(dataset=self.dataset, log_dir=self.output_dir, **self.config['net'])
+            self._net = net_class(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
 
     def _dump_config(self, name='config.yaml') -> str:
         """Save the YAML file."""
 
         dumped_config_f = path.join(self.output_dir, name)
         with open(dumped_config_f, 'w') as f:
-            yaml.dump(self.config, f)
+            yaml.dump(self._config, f)
         return dumped_config_f
 
     def _construct_hook(self, hook_module: str, hook_class, **kwargs) -> AbstractHook:
@@ -115,16 +115,16 @@ class EntryPoint:
         hook_class = getattr(hook_module, hook_class)
 
         logging.debug('Constructing hook')
-        hook = hook_class(net=self.net, config=self.config, **kwargs)
+        hook = hook_class(net=self._net, config=self._config, **kwargs)
         return hook
 
     def _construct_hooks(self) -> typing.Iterable[AbstractHook]:
         """Construct hooks from the saved config. file."""
 
         hooks = []
-        if 'hooks' in self.config:
+        if 'hooks' in self._config:
             logging.info('Creating hooks')
-            for hook_conf in self.config['hooks']:
+            for hook_conf in self._config['hooks']:
                 try:
                     hook = self._construct_hook(**hook_conf)
                     hooks.append(hook)
@@ -154,7 +154,7 @@ class EntryPoint:
         9. mainloop is initiated
         """
 
-        self.net = None
+        self._net = None
         self._output_root = output_root
 
         try:
@@ -201,8 +201,8 @@ class EntryPoint:
 
         try:
             logging.info('Creating NetworkManager')
-            manager = NetworkManager(net=self.net,
-                                     dataset=self.dataset,
+            manager = NetworkManager(net=self._net,
+                                     dataset=self._dataset,
                                      hooks=hooks)
         except Exception as e:
             logging.error('Creating NetworkManager failed: %s', e)
@@ -211,7 +211,7 @@ class EntryPoint:
 
         try:
             logging.info('Running main loop')
-            manager.run_main_loop(run_test_stream='test' in self.config['stream'])
+            manager.run_main_loop(run_test_stream='test' in self._config['stream'])
         except Exception as e:
             logging.error('Running the main loop failed: %s', e)
             traceback.print_exc(file=sys.stderr)
