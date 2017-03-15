@@ -14,12 +14,12 @@ class LoggingHook(AbstractHook):
         """
 
         super().__init__(**kwargs)
-        self.metrics_to_display = metrics_to_display
+        self._metrics_to_display = metrics_to_display
 
     def before_first_epoch(self, valid_results: dict, test_results: dict = None, ** kwargs) -> None:
         logging.info('Before first epoch')
 
-        for key in self.metrics_to_display:
+        for key in self._metrics_to_display:
             if key in valid_results:
                 logging.info('\tValid %s:\t%f', key, valid_results[key])
             else:
@@ -34,7 +34,7 @@ class LoggingHook(AbstractHook):
     def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
                     **kwargs) -> None:
         logging.info('After epoch %d', epoch_id)
-        for key in self.metrics_to_display:
+        for key in self._metrics_to_display:
             if key in train_results:
                 logging.info('\tTrain %s:\t%f', key, train_results[key])
             else:
