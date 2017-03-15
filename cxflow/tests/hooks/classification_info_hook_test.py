@@ -33,14 +33,14 @@ class ClassificationInfoHookTest(TestCase):
         hook.after_batch('test', {'predicted': [2,2,0,1,2], 'gold': [0,2,0,0,2]})
         hook.after_batch('test', {'predicted': [0,2,1,1,2], 'gold': [2,2,2,0,1]})
 
-        self.assertListEqual([0,0,0,1,2,0,0,1,1,2], hook.train_predicted)
-        self.assertListEqual([0,0,0,0,2,0,1,2,0,1], hook.train_gold)
+        self.assertListEqual([0,0,0,1,2,0,0,1,1,2], hook._train_predicted)
+        self.assertListEqual([0,0,0,0,2,0,1,2,0,1], hook._train_gold)
 
-        self.assertListEqual([1,1,0,1,2,0,2,1,1,2], hook.valid_predicted)
-        self.assertListEqual([1,0,0,0,2,0,1,1,0,1], hook.valid_gold)
+        self.assertListEqual([1,1,0,1,2,0,2,1,1,2], hook._valid_predicted)
+        self.assertListEqual([1,0,0,0,2,0,1,1,0,1], hook._valid_gold)
 
-        self.assertListEqual([2,2,0,1,2,0,2,1,1,2], hook.test_predicted)
-        self.assertListEqual([0,2,0,0,2,2,2,2,0,1], hook.test_gold)
+        self.assertListEqual([2,2,0,1,2,0,2,1,1,2], hook._test_predicted)
+        self.assertListEqual([0,2,0,0,2,2,2,2,0,1], hook._test_gold)
 
         train_res = {'a': 'b'}
         valid_res = {'c': 'd'}
@@ -63,11 +63,11 @@ class ClassificationInfoHookTest(TestCase):
         self.assertIn('recall', test_res)
         self.assertIn('precision', test_res)
 
-        self.assertListEqual([], hook.train_predicted)
-        self.assertListEqual([], hook.train_gold)
+        self.assertListEqual([], hook._train_predicted)
+        self.assertListEqual([], hook._train_gold)
 
-        self.assertListEqual([], hook.valid_predicted)
-        self.assertListEqual([], hook.valid_gold)
+        self.assertListEqual([], hook._valid_predicted)
+        self.assertListEqual([], hook._valid_gold)
 
-        self.assertListEqual([], hook.test_predicted)
-        self.assertListEqual([], hook.test_gold)
+        self.assertListEqual([], hook._test_predicted)
+        self.assertListEqual([], hook._test_gold)
