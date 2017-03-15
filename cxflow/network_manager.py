@@ -20,18 +20,18 @@ class NetworkManager:
         :param hooks: list of hooks
         """
 
-        self.net = net
-        self.dataset = dataset
-        self.hooks = hooks
+        self._net = net
+        self._dataset = dataset
+        self._hooks = hooks
 
         self._extra_sources_warned = False
 
-        if self.net.skip_incomplete_batches and not hasattr(self.net, 'batch_size'):
+        if self._net.skip_incomplete_batches and not hasattr(self._net, 'batch_size'):
             logging.error('Config does not contain `net.batch_size` even though `net.skip_incomplete_batches` is set '
                           'to true. Either disable `net.skip_incomplete_batches` or set `net.batch_size`.')
             raise ValueError('Invalid config')
 
-        if not self.net.skip_incomplete_batches and hasattr(self.net, 'batch_size'):
+        if not self._net.skip_incomplete_batches and hasattr(self._net, 'batch_size'):
             logging.warning('Config contains `net.batch_size` even though `net.skip_incomplete_batches` si set to '
                             'false.' 'Note that `net.batch_size` has no effect since the batch sizes are set in '
                             '`stream.<name>.batch_size`. Please consider removing `net.batch_size`.')
@@ -41,50 +41,50 @@ class NetworkManager:
         """Process a single batch (either train or eval)."""
 
         # check stream sources
-        if set(self.net.io['in']) < set(batch.keys()):
-            if self.net.ignore_extra_sources:
+        if set(self._net.io['in']) < set(batch.keys()):
+            if self._net.ignore_extra_sources:
                 if not self._extra_sources_warned:
                     logging.warning('Some sources provided by the stream does not match net placeholders. This might '
                                     'be an error. Ignoring. Set `net.ignore_extra_sources` to False in order to make '
-                                    'this' 'an error. Extra sources: %s', set(batch.keys()) - set(self.net.io['in']))
+                                    'this' 'an error. Extra sources: %s', set(batch.keys()) - set(self._net.io['in']))
                     self._extra_sources_warned = True
             else:
                 logging.error('Some sources provided by the stream does not match net placeholders. Set'
                               '`net.ignore_extra_sources` to True in order to ignore this error'
-                              'Extra sources: %s', set(batch.keys()) - set(self.net.io['in']))
+                              'Extra sources: %s', set(batch.keys()) - set(self._net.io['in']))
                 raise ValueError()
 
-        elif set(self.net.io['in']) > set(batch.keys()):
+        elif set(self._net.io['in']) > set(batch.keys()):
             logging.error('Stream does not provide all required sources. Missing sources: %s',
-                          set(self.net.io['in']) - set(batch.keys()))
+                          set(self._net.io['in']) - set(batch.keys()))
 
         # setup the feed dict
         feed_dict = {}
-        for placeholder_name in self.net.io['in']:
+        for placeholder_name in self._net.io['in']:
             try:
-                feed_dict[getattr(self.net, placeholder_name)] = batch[placeholder_name]
+                feed_dict[getattr(self._net, placeholder_name)] = batch[placeholder_name]
             except AttributeError as e:
                 logging.error('Placeholder "%s" not found in the net. Make sure it is saved as an object property.',
                               placeholder_name)
                 raise e
 
         # setup fetches
-        fetches = [self.net.train_op] if train else []
-        for to_eval in self.net.io['out']:
+        fetches = [self._net.train_op] if train else []
+        for to_eval in self._net.io['out']:
             try:
-                fetches.append(getattr(self.net, to_eval))
+                fetches.append(getattr(self._net, to_eval))
             except AttributeError as e:
                 logging.error('Net does not contain a required output "%s". Make sure it is saved as an object'
                               'property.', to_eval)
 
         # run the computational graph for one batch
-        batch_res = self.net.session.run(fetches=fetches, feed_dict=feed_dict)
+        batch_res = self._net.session.run(fetches=fetches, feed_dict=feed_dict)
 
         # zip the string names with results
         if train:
-            return dict(zip(self.net.io['out'], batch_res[1:]))
+            return dict(zip(self._net.io['out'], batch_res[1:]))
         else:
-            return dict(zip(self.net.io['out'], batch_res))
+            return dict(zip(self._net.io['out'], batch_res))
 
     def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_type: str):
         """
@@ -99,14 +99,14 @@ class NetworkManager:
         summed_results = defaultdict(float)
 
         for bid, batch in enumerate(stream):
-            if self.net.skip_incomplete_batches:
-                if len(batch[list(batch.keys())[0]]) < self.net.batch_size:
+            if self._net.skip_incomplete_batches:
+                if len(batch[list(batch.keys())[0]]) < self._net.batch_size:
                     continue
 
             n_batches += 1
             batch_result = self._run_batch(train=train, batch=batch)
 
-            for hook in self.hooks:
+            for hook in self._hooks:
                 hook.after_batch(stream_type=stream_type, results=batch_result)
 
             for name, value in batch_result.items():
@@ -139,17 +139,17 @@ class NetworkManager:
 
         epoch_id = 0
 
-        for hook in self.hooks:
+        for hook in self._hooks:
             hook.before_training()
 
-        valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), stream_type='valid')
+        valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
 
         if run_test_stream:
             # logging.debug('%s', self.dataset.create_test_stream())
             # logging.debug('%s', [method for method in dir(self.dataset) if callable(getattr(self.dataset, method))])
             # quit()
             try:
-                test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), stream_type='test')
+                test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test')
             except AttributeError as e:
                 logging.error('Dataset does not provide test stream even though it was specified in the config. Either'
                               'implement `create_test_stream` method or delete `stream.test` section in the config.')
@@ -157,18 +157,18 @@ class NetworkManager:
         else:
             test_results = None
 
-        for hook in self.hooks:
+        for hook in self._hooks:
             hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
 
         while True:
             epoch_id += 1
 
-            train_results = self.train_by_stream(stream=self.dataset.create_train_stream())
-            valid_results = self.evaluate_stream(stream=self.dataset.create_valid_stream(), stream_type='valid')
+            train_results = self.train_by_stream(stream=self._dataset.create_train_stream())
+            valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
 
             if run_test_stream:
                 try:
-                    test_results = self.evaluate_stream(stream=self.dataset.create_test_stream(), stream_type='test')
+                    test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test')
                 except AttributeError as e:
                     logging.error(
                         'Dataset does not provide test stream even though it was specified in the config. Either'
@@ -178,12 +178,12 @@ class NetworkManager:
                 test_results = None
 
             try:
-                for hook in self.hooks:
+                for hook in self._hooks:
                     hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
                                      test_results=test_results)
             except TrainingTerminated as e:
                 logging.info('Training terminated by a hook: %s', e)
                 break
 
-        for hook in self.hooks:
+        for hook in self._hooks:
             hook.after_training()
