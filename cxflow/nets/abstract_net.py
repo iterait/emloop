@@ -25,7 +25,7 @@ class AbstractNet:
         :param io: dict containing `in` and `out` which are mapped to list of strings representing placeholders and
                    the provided outputs, respectively.
         :param learning_rate: learning rate
-        :param optimizer: @see build_optimizer for options
+        :param optimizer: @see _build_optimizer for options
         :param device: {/cpu:0, /gpu:0}
         :param threads: number of threads to be used
         :param restore_from: name of checkpoint to be restored from or None if new model should be created
@@ -63,7 +63,7 @@ class AbstractNet:
                                optimizer=optimizer, device=device, threads=threads, restore_from=restore_from, **kwargs)
 
         # Define the optimizer
-        self.optimizer = AbstractNet.build_optimizer(optimizer_name=optimizer)(learning_rate=self.learning_rate)
+        self.optimizer = AbstractNet._build_optimizer(optimizer_name=optimizer)(learning_rate=self.learning_rate)
 
         # Set default attributes
         self.train_op = None
@@ -150,7 +150,7 @@ class AbstractNet:
         return save_path
 
     @staticmethod
-    def build_optimizer(optimizer_name: str):  # TODO: return type (be carefull TF0.10-1.0
+    def _build_optimizer(optimizer_name: str):  # TODO: return type (be carefull TF0.10-1.0
         """
         Create a TensorFlow optimizer. Supported arguments are {adam, adadelta, adagrad, sgd, momentum,
         proximaladagrad, proximalsgd, rmsprop}"""
