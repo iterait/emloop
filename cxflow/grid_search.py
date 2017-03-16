@@ -43,7 +43,6 @@ def grid_search() -> None:
     else:
         for command in commands:
             try:
-                logging.info('Running: %s', command)
                 ret_code = os.system(command)
             except:
                 logging.error('Command failed: %s', command)
