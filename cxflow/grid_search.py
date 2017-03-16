@@ -39,7 +39,7 @@ def grid_search() -> None:
     if known.dry_run:
         logging.warning('Dry run')
         for command in commands:
-            logging.info(command)
+            print(command)
     else:
         for command in commands:
             try:
