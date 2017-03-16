@@ -32,7 +32,7 @@ class ResultHook(AbstractHook):
         """Append result to a buffer"""
 
         for metric in self._metrics_to_log:
-            buffer[metric].append(results[metric])
+            buffer[metric] += results[metric].tolist()
 
     def after_batch(self, stream_type: str, results: dict, **kwargs) -> None:
         """Save metrics of this batch."""
@@ -48,13 +48,13 @@ class ResultHook(AbstractHook):
                              'provided'.format(stream_type))
 
     def before_first_epoch(self, valid_results: dict, test_results: dict=None, **kwargs) -> None:
-        valid_results['results'] = self._valid_buffer
-        test_results['results'] = self._test_buffer
+        valid_results['results'] = dict(self._valid_buffer)
+        test_results['results'] = dict(self._test_buffer)
         self._reset()
 
     def after_epoch(self, train_results: dict, valid_results: dict, test_results: dict=None, **kwargs) -> None:
         if self._log_train_results:
-            train_results['results'] = self._train_buffer
-        valid_results['results'] = self._valid_buffer
-        test_results['results'] = self._test_buffer
+            train_results['results'] = dict(self._train_buffer)
+        valid_results['results'] = dict(self._valid_buffer)
+        test_results['results'] = dict(self._test_buffer)
         self._reset()
