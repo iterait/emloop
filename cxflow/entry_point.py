@@ -6,6 +6,8 @@ from .dataset_loader import DatasetLoader
 from .hooks.abstract_hook import AbstractHook
 from .nets.abstract_net import AbstractNet
 
+import numpy.random as npr
+
 from argparse import ArgumentParser
 from datetime import datetime
 import importlib
@@ -51,7 +53,9 @@ class EntryPoint:
         except:
             logging.warning('Net name not found in the config')
 
-        output_dir = path.join(self._output_root,'{}_{}'.format(name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
+        output_dir = path.join(self._output_root,'{}_{}_{}'.format(name,
+                                                                   datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+                                                                   npr.random_integers(10000, 99999)))
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         return output_dir
