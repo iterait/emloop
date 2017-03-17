@@ -1,4 +1,5 @@
 from .abstract_hook import AbstractHook
+from ..datasets.abstract_dataset import AbstractDataset
 
 import logging
 import typing
@@ -31,8 +32,9 @@ class LoggingHook(AbstractHook):
                 else:
                     logging.error('\tMissing test variable %s', key)
 
-    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
-                    **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
+                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
+
         logging.info('After epoch %d', epoch_id)
         for key in self._metrics_to_display:
             if key in train_results:

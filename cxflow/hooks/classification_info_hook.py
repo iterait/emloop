@@ -1,3 +1,4 @@
+from ..datasets.abstract_dataset import AbstractDataset
 from .abstract_hook import AbstractHook
 
 from sklearn.metrics import precision_recall_fscore_support
@@ -33,7 +34,7 @@ class ClassificationInfoHook(AbstractHook):
         self._test_predicted = []
         self._test_gold = []
 
-    def after_batch(self, stream_type: str, results: dict, **kwargs) -> None:
+    def after_batch(self, stream_type: str, results: AbstractDataset.Batch, **kwargs) -> None:
         """Save predicted and gold classes of this batch."""
         if stream_type == 'train':
             self._train_predicted += list(results[self._predicted_variable])
@@ -47,7 +48,8 @@ class ClassificationInfoHook(AbstractHook):
         else:
             raise ValueError('stream_type must be either train, valid or test')
 
-    def before_first_epoch(self, valid_results: dict, test_results: dict=None, **kwargs) -> None:
+    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
+                           **kwargs) -> None:
         """Add precision, recall and fscore to the valid and test results."""
 
         valid_precision, valid_recall, valid_fscore, _ = self._get_results(self._valid_gold, self._valid_predicted)
@@ -62,8 +64,8 @@ class ClassificationInfoHook(AbstractHook):
 
         self._reset()
 
-    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
-                    **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
+                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
         """Add precision, recall and fscore to the train, valid and test results."""
 
         train_precision, train_recall, train_fscore, _ = self._get_results(self._train_gold, self._train_predicted)

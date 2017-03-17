@@ -1,5 +1,6 @@
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
+from ..datasets.abstract_dataset import AbstractDataset
 
 import logging
 from os import path
@@ -29,7 +30,8 @@ class CSVHook(AbstractHook):
                      '\n'
             f.write(header)
 
-    def before_first_epoch(self, valid_results: dict, test_results: dict = None, ** kwargs) -> None:
+    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
+                           **kwargs) -> None:
         logging.info('Before first epoch')
 
         result_row = [0]
@@ -54,8 +56,8 @@ class CSVHook(AbstractHook):
             row = ','.join(map(str, result_row))
             f.write(row + '\n')
 
-    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
-                    **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
+                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
 
         logging.info('After epoch %d', epoch_id)
         result_row = [epoch_id]

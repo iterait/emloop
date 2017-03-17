@@ -1,5 +1,6 @@
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
+from ..datasets.abstract_dataset import AbstractDataset
 
 import tensorflow as tf
 
@@ -19,7 +20,8 @@ class TensorBoardHook(AbstractHook):
         self._net = net
         self._metrics_to_log = metrics_to_log
 
-    def before_first_epoch(self, valid_results: dict, test_results: dict = None, ** kwargs) -> None:
+    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
+                           **kwargs) -> None:
         logging.debug('TensorBoard logging before first epoch')
 
         measures = [tf.Summary.Value(tag='valid_{}'.format(key), simple_value=valid_results[key])
@@ -31,8 +33,8 @@ class TensorBoardHook(AbstractHook):
 
         self._net.summary_writer.add_summary(tf.Summary(value=measures), 0)
 
-    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
-                    **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
+                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
         logging.debug('TensorBoard logging after epoch %d', epoch_id)
 
         measures = [tf.Summary.Value(tag='train_{}'.format(key), simple_value=train_results[key])

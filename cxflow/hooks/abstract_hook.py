@@ -1,3 +1,4 @@
+from ..datasets.abstract_dataset import AbstractDataset
 from ..nets.abstract_net import AbstractNet
 
 
@@ -26,19 +27,20 @@ class AbstractHook:
     def before_training(self, **kwargs) -> None:
         pass
 
-    def before_first_epoch(self, valid_results: dict, test_results: dict=None, **kwargs) -> None:
+    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
+                           **kwargs) -> None:
         """Valid and test results are dictionaries of summary statistics of the zeroth epoch."""
         pass
 
-    def after_batch(self, stream_type: str, results: dict, **kwargs) -> None:
+    def after_batch(self, stream_type: str, results: AbstractDataset.Batch, **kwargs) -> None:
         """
         Stream type represents "train"/"valid"/"test" string. The results are dictionary of summary
         statistics of the previous batch
         """
         pass
 
-    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
-                    **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
+                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
         """Train, valid and test results are dictionaries of summary statistics of the `epoch_id`-th epoch."""
         pass
 

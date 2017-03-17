@@ -1,5 +1,6 @@
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
+from ..datasets.abstract_dataset import AbstractDataset
 
 import logging
 
@@ -54,11 +55,11 @@ class BestSaverHook(AbstractHook):
         except Exception as e:
             logging.error('Checkpoint not created because an unexpected exception occurred: %s', e)
 
-    def before_first_epoch(self, valid_results: dict, **kwargs) -> None:
+    def before_first_epoch(self, valid_results: AbstractDataset.Batch, **kwargs) -> None:
         self.best_metric = valid_results[self._metric]
         self._save_checkpoint()
 
-    def after_epoch(self, valid_results: dict, **kwargs) -> None:
+    def after_epoch(self, valid_results: AbstractDataset.Batch, **kwargs) -> None:
         if self._condition == 'min':
             if self.best_metric is None or valid_results[self._metric] < self.best_metric:
                 self.best_metric = valid_results[self._metric]

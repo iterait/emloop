@@ -1,5 +1,6 @@
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
+from ..datasets.abstract_dataset import AbstractDataset
 
 import numpy as np
 import rethinkdb as r
@@ -50,7 +51,8 @@ class RethinkDBHook(AbstractHook):
         with open(path.join(net.log_dir, 'rethink_key.json'), 'w') as f:
             json.dump({'rethink_id': self._rethink_id}, f)
 
-    def before_first_epoch(self, valid_results: dict, test_results: dict = None, **kwargs) -> None:
+    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
+                           **kwargs) -> None:
         logging.debug('Rethink: before first epoch')
 
         with r.connect(**self._credentials) as conn:
@@ -76,8 +78,8 @@ class RethinkDBHook(AbstractHook):
             progress_rethink_id = response['generated_keys'][0]
             logging.debug('Created train. progress: %s', progress_rethink_id)
 
-    def after_epoch(self, epoch_id: int, train_results: dict, valid_results: dict, test_results: dict=None,
-                    **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
+                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
         logging.info('Rethink: after epoch %d', epoch_id)
 
         with r.connect(**self._credentials) as conn:
