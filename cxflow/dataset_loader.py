@@ -42,7 +42,7 @@ class DatasetLoader:
         """Verify the passed dataset implements the interface of AbstractDataset."""
 
         for method_name in dir(AbstractDataset):
-            if callable(getattr(AbstractDataset, method_name)) and method_name != 'Stream':
+            if callable(getattr(AbstractDataset, method_name)) and method_name not in ['Stream', 'Batch']:
                 try:
                     method = getattr(dataset, method_name)
                     if not callable(method):

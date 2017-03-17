@@ -7,7 +7,8 @@ import typing
 class AbstractDataset:
     """cxflow dataset interface."""
 
-    Stream = typing.NewType('Stream', typing.Iterable[typing.Mapping[str, typing.Any]])
+    Batch = typing.NewType('Batch', typing.Mapping[str, typing.Any])
+    Stream = typing.NewType('Stream', typing.Iterable[Batch])
 
     @abstractmethod
     def create_train_stream(self) -> Stream:
