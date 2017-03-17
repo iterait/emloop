@@ -36,8 +36,7 @@ class NetworkManager:
                             'false.' 'Note that `net.batch_size` has no effect since the batch sizes are set in '
                             '`stream.<name>.batch_size`. Please consider removing `net.batch_size`.')
 
-
-    def _run_batch(self, train: bool, batch: typing.Mapping[str, typing.Any]) -> typing.Mapping[str, np.ndarray]:
+    def _run_batch(self, train: bool, batch: AbstractDataset.Batch) -> AbstractDataset.Batch:
         """Process a single batch (either train or eval)."""
 
         # check stream sources
@@ -86,7 +85,7 @@ class NetworkManager:
         else:
             return dict(zip(self._net.io['out'], batch_res))
 
-    def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_type: str):
+    def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_type: str) -> AbstractDataset.Batch:
         """
         Iterate through the stream
         :param stream: Iterable stream
@@ -121,12 +120,12 @@ class NetworkManager:
 
         return summed_results
 
-    def train_by_stream(self, stream: AbstractDataset.Stream):
+    def train_by_stream(self, stream: AbstractDataset.Stream) -> AbstractDataset.Batch:
         """Given a stream and batch size, train the network on this stream."""
 
         return self._run_epoch(stream=stream, train=True, stream_type='train')
 
-    def evaluate_stream(self, stream: AbstractDataset.Stream, stream_type: str):
+    def evaluate_stream(self, stream: AbstractDataset.Stream, stream_type: str) -> AbstractDataset.Batch:
         """Given a stream and batch size, evaluate the network on this stream."""
 
         return self._run_epoch(stream=stream, train=False, stream_type=stream_type)
