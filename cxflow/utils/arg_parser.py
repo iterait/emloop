@@ -1,8 +1,9 @@
 import ast
 import logging
+import typing
 
 
-def parse_arg(arg: str):
+def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     """Parse CLI arg in form of key[:type]=value to (key, value). """
     assert '=' in arg
 
