@@ -2,6 +2,7 @@ from .datasets.abstract_dataset import AbstractDataset
 
 import logging
 import importlib
+import typing
 
 
 class DatasetLoader:
@@ -11,7 +12,7 @@ class DatasetLoader:
     For each possible backend there must be implemented a method named `_load_<backend_name>`.
     """
 
-    def __init__(self, config: dict, dumped_cofig_path: str):
+    def __init__(self, config: typing.Mapping[str, typing.Any], dumped_cofig_path: str):
         """
         Create the loader.
         :param config: config dict
@@ -38,8 +39,12 @@ class DatasetLoader:
         self._load_f = getattr(self, '_load_{}'.format(self._config['dataset']['backend']))
 
     @staticmethod
-    def _verify_dataset(dataset):
-        """Verify the passed dataset implements the interface of AbstractDataset."""
+    def _verify_dataset(dataset: AbstractDataset) -> None:
+        """
+        Verify the passed dataset implements the interface of AbstractDataset.
+
+        Raise `ValueError` on inconsistency.
+        """
 
         for method_name in dir(AbstractDataset):
             if callable(getattr(AbstractDataset, method_name)) and method_name not in ['Stream', 'Batch']:
