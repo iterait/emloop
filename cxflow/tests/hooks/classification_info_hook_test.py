@@ -19,8 +19,6 @@ class ClassificationInfoHookTest(TestCase):
         super().__init__(*args, **kwargs)
 
     def test_classification_info(self):
-        # net = NetMocker()
-        # output_file = 'training.csv'
         hook = ClassificationInfoHook(predicted_variable='predicted', gold_variable='gold', f1_average='macro',
                                       net=None, config=None)
 
