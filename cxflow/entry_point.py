@@ -93,7 +93,7 @@ class EntryPoint:
             logging.debug('Constructing net instance')
             self._net = net_class(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
 
-    def _dump_config(self, name='config.yaml') -> str:
+    def _dump_config(self, name :str='config.yaml') -> str:
         """Save the YAML file."""
 
         dumped_config_f = path.join(self.output_dir, name)
@@ -101,7 +101,7 @@ class EntryPoint:
             yaml.dump(self._config, f)
         return dumped_config_f
 
-    def _construct_hook(self, hook_module: str, hook_class, **kwargs) -> AbstractHook:
+    def _construct_hook(self, hook_module: str, hook_class: str, **kwargs) -> AbstractHook:
         """
         Construct a hook.
 
