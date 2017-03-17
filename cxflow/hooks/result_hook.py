@@ -37,7 +37,8 @@ class ResultHook(AbstractHook):
         """Save metrics of this batch."""
 
         if stream_type == 'train':
-            self._save_partial_results(self._train_buffer, results)
+            if self._log_train_results:
+                self._save_partial_results(self._train_buffer, results)
         elif stream_type == 'valid':
             self._save_partial_results(self._valid_buffer, results)
         elif stream_type == 'test':
