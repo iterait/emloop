@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 import importlib
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 from os import path
 import sys
@@ -44,7 +45,7 @@ class EntryPoint:
         logging.debug('Loaded config: %s', self._config)
         return self._config
 
-    def _create_output_dir(self) -> str:
+    def create_output_dir(self, output_root: str) -> str:
         """Create output directory with proper name (if specified in the net config section)."""
 
         name = 'UnknownNetName'
@@ -53,11 +54,13 @@ class EntryPoint:
         except:
             logging.warning('Net name not found in the config')
 
-        output_dir = path.join(self._output_root,'{}_{}_{}'.format(name,
-                                                                   datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
-                                                                   npr.random_integers(10000, 99999)))
+        output_dir = path.join(output_root,'{}_{}_{}'.format(name,
+                                                             datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+                                                             npr.random_integers(10000, 99999)))
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
+
+        self.output_dir = output_dir
         return output_dir
 
     def _create_dataset(self) -> None:
@@ -141,7 +144,7 @@ class EntryPoint:
             logging.warning('No hooks found')
             return []
 
-    def train(self, config_file: str, output_root: str, cli_options: typing.Iterable[str]) -> None:
+    def train(self, config_file: str, cli_options: typing.Iterable[str]) -> None:
         """
         Train method resposible for constring all required objects and training itself.
 
@@ -149,58 +152,44 @@ class EntryPoint:
         Then the life cycle is as follows:
         1. configuration file is loaded
         2. CLI arguments are applied
-        3. training directory is created
-        4. final configuration is dumped
-        5. dataset is loaded
-        6. network is created
-        7. mainloop hooks are created
-        8. NetworkManager is created
-        9. mainloop is initiated
+        3. final configuration is dumped
+        4. dataset is loaded
+        5. network is created
+        6. mainloop hooks are created
+        7. NetworkManager is created
+        8. mainloop is initiated
         """
 
         self._net = None
-        self._output_root = output_root
 
         try:
             self._load_config(config_file=config_file, additional_args=cli_options)
         except Exception as e:
-            logging.error('Loading config failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
-            sys.exit(1)
-
-        try:
-            self.output_dir = self._create_output_dir()
-        except Exception as e:
-            logging.error('Creating output dir failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             self.dumped_config_file = self._dump_config()
         except Exception as e:
-            logging.error('Saving modified config failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             self._create_dataset()
         except Exception as e:
-            logging.error('Creating dataset failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             self._create_network()
         except Exception as e:
-            logging.error('Creating network failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Creating network failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             hooks = self._construct_hooks()
         except Exception as e:
-            logging.error('Creating hooks failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Creating hooks failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
@@ -209,44 +198,69 @@ class EntryPoint:
                                      dataset=self._dataset,
                                      hooks=hooks)
         except Exception as e:
-            logging.error('Creating NetworkManager failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Creating NetworkManager failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             logging.info('Running main loop')
             manager.run_main_loop(run_test_stream='test' in self._config['stream'])
         except Exception as e:
-            logging.error('Running the main loop failed: %s', e)
-            traceback.print_exc(file=sys.stderr)
+            logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
 
 def init_entry_point() -> None:
+    # make sure the path contains the current working directory
     sys.path.insert(0, os.getcwd())
 
+    # create parser
     parser = ArgumentParser('cxflow')
     subparsers = parser.add_subparsers(help='cxflow modes')
     parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
 
+    # create train subparser
     train_parser = subparsers.add_parser('train')
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
     train_parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
+    # create crossval subparser
     crossval_split_parser = subparsers.add_parser('xval-init')
     crossval_split_parser.set_defaults(subcommand='xval-init')
     crossval_split_parser.add_argument('-s', '--seed', type=int, default=100003, help='split seed')
 
+    # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
 
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
-                        level=logging.DEBUG if known_args.verbose else logging.INFO)
+    # set up global logger
+    logger = logging.getLogger('')
+    logger.handlers = []  # remove default handlers
+    if known_args.verbose:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
+    # set up custom logging format
+    formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)s: %(message)s', datefmt='%H:%M:%S')
+
+    # set up STDERR handler
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+    logger.addHandler(stderr_handler)
+
+    # create entry point - this cannot be done earlier as the logger wasn't set up and this cannot be done later as
+    # the logdir is required for file logger
     entry_point = EntryPoint()
+    output_dir = entry_point.create_output_dir(known_args.output_root)
+
+    # setup file handler
+    file_handler = RotatingFileHandler(path.join(output_dir, 'stderr.log'))
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    # run entry-point method according to the proper subcommand
     if known_args.subcommand == 'train':
         entry_point.train(config_file=known_args.config_file,
-                          output_root=known_args.output_root,
                           cli_options=unknown_args)
 
     elif known_args.subcommand == 'xval-init':
