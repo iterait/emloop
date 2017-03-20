@@ -20,6 +20,10 @@ class AbstractDataset:
         """Return a valid iterator which provides a mapping (source name -> value)"""
         pass
 
+    @abstractmethod
+    def split(self, num_splits: int, train: float, valid: float, test: float):
+        """Perform cross-val split"""
+        pass
 
 class AbstractDatasetWithTest(AbstractDataset):
     """Same as `AbstractDataset` with test stream support."""

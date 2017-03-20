@@ -208,6 +208,32 @@ class EntryPoint:
             logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
+    def split(self, config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
+        logging.info('Splitting to %d splits with ratios %f:%f:%f', num_splits, train_ratio, valid_ratio, test_ratio)
+
+        logging.debug('Loading config')
+        try:
+            self._load_config(config_file=config_file, additional_args=[])
+        except Exception as e:
+            logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
+            sys.exit(1)
+
+        try:
+            self.dumped_config_file = self._dump_config()
+        except Exception as e:
+            logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
+            sys.exit(1)
+
+        logging.debug('Creating dataset')
+        try:
+            self._create_dataset()
+        except Exception as e:
+            logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
+            sys.exit(1)
+
+        logging.debug('Splitting')
+        self._dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
+
 
 def init_entry_point() -> None:
     # make sure the path contains the current working directory
@@ -217,17 +243,19 @@ def init_entry_point() -> None:
     parser = ArgumentParser('cxflow')
     subparsers = parser.add_subparsers(help='cxflow modes')
     parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
+    parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
     # create train subparser
     train_parser = subparsers.add_parser('train')
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
-    train_parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
     # create crossval subparser
-    crossval_split_parser = subparsers.add_parser('xval-init')
-    crossval_split_parser.set_defaults(subcommand='xval-init')
-    crossval_split_parser.add_argument('-s', '--seed', type=int, default=100003, help='split seed')
+    split_parser = subparsers.add_parser('split')
+    split_parser.set_defaults(subcommand='split')
+    split_parser.add_argument('config_file', help='path to the config file')
+    split_parser.add_argument('-n', '--num-splits', type=int, help='number of splits')
+    split_parser.add_argument('-r', '--ratio', type=int, nargs=3, help='train, valid and test ratios')
 
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
@@ -263,8 +291,10 @@ def init_entry_point() -> None:
         entry_point.train(config_file=known_args.config_file,
                           cli_options=unknown_args)
 
-    elif known_args.subcommand == 'xval-init':
-        raise NotImplementedError()
+    elif known_args.subcommand == 'split':
+        entry_point.split(config_file=known_args.config_file, num_splits=known_args.num_splits,
+                          train_ratio=known_args.ratio[0], valid_ratio=known_args.ratio[1],
+                          test_ratio=known_args.ratio[2])
 
     else:
         logging.error('Unrecognized subcommand: "%s". Please run `cxflow -h` for more info.', known_args.subcommand)
