@@ -196,6 +196,8 @@ class AbstractNet:
             return tf.nn.relu
         if activation_name == 'Identity':
             return tf.identity
+        if activation_name == 'Softmax':
+            return tf.softmax
 
         raise NotImplementedError
 
