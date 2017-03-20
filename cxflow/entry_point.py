@@ -240,18 +240,20 @@ def init_entry_point() -> None:
     sys.path.insert(0, os.getcwd())
 
     # create parser
-    parser = ArgumentParser('cxflow')
+    common_parser = ArgumentParser('cxflow', add_help=False)
+    common_parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
+    common_parser.add_argument('-o', '--output-root', default='log', help='output directory')
+
+    parser = ArgumentParser('cxflow', add_help=False)
     subparsers = parser.add_subparsers(help='cxflow modes')
-    parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
-    parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
     # create train subparser
-    train_parser = subparsers.add_parser('train')
+    train_parser = subparsers.add_parser('train', parents=[common_parser])
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
 
     # create crossval subparser
-    split_parser = subparsers.add_parser('split')
+    split_parser = subparsers.add_parser('split', parents=[common_parser])
     split_parser.set_defaults(subcommand='split')
     split_parser.add_argument('config_file', help='path to the config file')
     split_parser.add_argument('-n', '--num-splits', type=int, help='number of splits')
