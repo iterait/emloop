@@ -3,8 +3,9 @@
 This is an official repository of **cxflow** - a smart manager and personal trainer of TensorFlow models.
 
 ## Development Status
-This software is in alpha stage.
-**Usage of this software is not recommended** since the back-compatibility will not be maintained.
+
+- **Status**: Regular Project
+- **Master Developer**: Petr Bělohlávek
 
 ## Example
 For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example).

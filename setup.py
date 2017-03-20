@@ -6,7 +6,7 @@ setup(name='cxflow',
       long_description='Trainer of TensorFlow models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
       classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
@@ -15,7 +15,8 @@ setup(name='cxflow',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6'
       ],
       keywords='tensorflow wrapper',
       url='https://github.com/Cognexa/cxflow',
