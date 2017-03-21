@@ -1,6 +1,6 @@
 #!/usr/bin/python3 -mentry_point
 
-from .network_manager import NetworkManager
+from .main_loop import MainLoop
 from .utils.arg_parser import parse_arg
 from .dataset_loader import DatasetLoader
 from .hooks.abstract_hook import AbstractHook
@@ -155,9 +155,9 @@ class EntryPoint:
         3. final configuration is dumped
         4. dataset is loaded
         5. network is created
-        6. mainloop hooks are created
-        7. NetworkManager is created
-        8. mainloop is initiated
+        6. main loop hooks are created
+        7. main loop is created
+        8. main loop is run
         """
 
         self._net = None
@@ -193,17 +193,17 @@ class EntryPoint:
             sys.exit(1)
 
         try:
-            logging.info('Creating NetworkManager')
-            manager = NetworkManager(net=self._net,
-                                     dataset=self._dataset,
-                                     hooks=hooks)
+            logging.info('Creating main loop')
+            main_loop = MainLoop(net=self._net,
+                                 dataset=self._dataset,
+                                 hooks=hooks)
         except Exception as e:
-            logging.error('Creating NetworkManager failed: %s\n%s', e, traceback.format_exc())
+            logging.error('Creating main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
-            logging.info('Running main loop')
-            manager.run_main_loop(run_test_stream='test' in self._config['stream'])
+            logging.info('Running the main loop')
+            main_loop.run(run_test_stream=('test' in self._config['stream']))
         except Exception as e:
             logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)

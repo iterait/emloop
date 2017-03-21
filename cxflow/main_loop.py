@@ -10,7 +10,7 @@ import logging
 import typing
 
 
-class NetworkManager:
+class MainLoop:
     """Train the network, manage hooks etc."""
 
     def __init__(self, net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=[]):
@@ -130,7 +130,7 @@ class NetworkManager:
 
         return self._run_epoch(stream=stream, train=False, stream_type=stream_type)
 
-    def run_main_loop(self, run_test_stream: bool) -> None:
+    def run(self, run_test_stream: bool) -> None:
         """
         Start the main loop
         :param run_test_stream: should the test stream be evaluated?
