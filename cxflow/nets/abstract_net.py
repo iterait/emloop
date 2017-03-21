@@ -19,7 +19,7 @@ class AbstractNet:
         At first, all kwargs are saved as attributes. Then, overloaded `extended_init` is called. Then, the model is
         created (or restored) via `create_net`.
 
-        Note that nets have all common attributes public as they are in general accessed by `NetworkManager` and other
+        Note that nets have all common attributes public as they are in general accessed by `MainLoop` and other
         objects.
 
         :param dataset: dataset to be used
