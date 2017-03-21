@@ -1,4 +1,4 @@
-from .datasets.abstract_dataset import AbstractDataset
+from .datasets.abstract_dataset import AbstractDataset, AbstractDatasetWithTest
 
 import logging
 import importlib
@@ -38,16 +38,17 @@ class DatasetLoader:
 
         self._load_f = getattr(self, '_load_{}'.format(self._config['dataset']['backend']))
 
-    @staticmethod
-    def _verify_dataset(dataset: AbstractDataset) -> None:
+    def _verify_dataset(self, dataset: AbstractDataset) -> None:
         """
         Verify the passed dataset implements the interface of AbstractDataset.
 
         Raise `ValueError` on inconsistency.
         """
 
-        for method_name in dir(AbstractDataset):
-            if callable(getattr(AbstractDataset, method_name)) and method_name not in ['Stream', 'Batch']:
+        abstract_class = AbstractDatasetWithTest if 'test' in self._config['stream'] else AbstractDataset
+
+        for method_name in dir(abstract_class):
+            if callable(getattr(abstract_class, method_name)) and method_name not in ['Stream', 'Batch', 'split']:
                 try:
                     method = getattr(dataset, method_name)
                     if not callable(method):
@@ -63,7 +64,7 @@ class DatasetLoader:
         dataset =  self._load_f()
 
         logging.debug('Checking the dataset')
-        DatasetLoader._verify_dataset(dataset)
+        self._verify_dataset(dataset)
 
         return dataset
 
