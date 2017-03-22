@@ -1,4 +1,4 @@
-from .datasets.abstract_dataset import AbstractDataset, AbstractDatasetWithTest
+from .datasets.abstract_dataset import AbstractDataset
 
 import logging
 import importlib
@@ -38,35 +38,11 @@ class DatasetLoader:
 
         self._load_f = getattr(self, '_load_{}'.format(self._config['dataset']['backend']))
 
-    def _verify_dataset(self, dataset: AbstractDataset) -> None:
-        """
-        Verify the passed dataset implements the interface of AbstractDataset.
-
-        Raise `ValueError` on inconsistency.
-        """
-
-        abstract_class = AbstractDatasetWithTest if 'test' in self._config['stream'] else AbstractDataset
-
-        for method_name in dir(abstract_class):
-            if callable(getattr(abstract_class, method_name)) and method_name not in ['Stream', 'Batch', 'split']:
-                try:
-                    method = getattr(dataset, method_name)
-                    if not callable(method):
-                        raise ValueError()
-                except:
-                    logging.error('Dataset does not contain callable method "%s"', method_name)
-                    raise ValueError()
-
     def load_dataset(self) -> AbstractDataset:
         """Load the dataset by using the proper backend."""
 
         logging.debug('Loading the dataset')
-        dataset =  self._load_f()
-
-        logging.debug('Checking the dataset')
-        self._verify_dataset(dataset)
-
-        return dataset
+        return self._load_f()
 
     def _load_fuel(self) -> AbstractDataset:
         """Load the dataset by using Fuel (Python) backend"""
