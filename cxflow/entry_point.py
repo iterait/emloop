@@ -240,24 +240,25 @@ def init_entry_point() -> None:
     sys.path.insert(0, os.getcwd())
 
     # create parser
-    common_parser = ArgumentParser('cxflow', add_help=False)
-    common_parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
-    common_parser.add_argument('-o', '--output-root', default='log', help='output directory')
-
-    parser = ArgumentParser('cxflow', add_help=False)
+    parser = ArgumentParser('cxflow')
     subparsers = parser.add_subparsers(help='cxflow modes')
 
     # create train subparser
-    train_parser = subparsers.add_parser('train', parents=[common_parser])
+    train_parser = subparsers.add_parser('train')
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
 
     # create crossval subparser
-    split_parser = subparsers.add_parser('split', parents=[common_parser])
+    split_parser = subparsers.add_parser('split')
     split_parser.set_defaults(subcommand='split')
     split_parser.add_argument('config_file', help='path to the config file')
     split_parser.add_argument('-n', '--num-splits', type=int, help='number of splits')
     split_parser.add_argument('-r', '--ratio', type=int, nargs=3, help='train, valid and test ratios')
+
+    # add common arguments
+    for p in [parser, train_parser, split_parser]:
+        p.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
+        p.add_argument('-o', '--output-root', default='log', help='output directory')
 
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
@@ -289,6 +290,9 @@ def init_entry_point() -> None:
     logger.addHandler(file_handler)
 
     # run entry-point method according to the proper subcommand
+    if not hasattr(known_args, 'subcommand'):
+        parser.print_help()
+        quit(1)
     if known_args.subcommand == 'train':
         entry_point.train(config_file=known_args.config_file,
                           cli_options=unknown_args)
