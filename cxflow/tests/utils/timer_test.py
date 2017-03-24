@@ -17,7 +17,7 @@ class ParseArgumentsTest(TestCase):
 
         self.assertIn('noop', log)
         self.assertEqual(len(log['noop']), 1)
-        self.assertAlmostEqual(log['noop'][0], 0, places=5)
+        self.assertAlmostEqual(log['noop'][0], 0, places=4)
 
     def test_appending(self):
         log = {}
