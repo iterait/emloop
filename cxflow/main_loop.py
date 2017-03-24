@@ -3,6 +3,8 @@ from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .nets.abstract_net import AbstractNet
 
+from .utils.profile import Timer
+
 import numpy as np
 
 from collections import defaultdict
@@ -23,6 +25,7 @@ class MainLoop:
         self._net = net
         self._dataset = dataset
         self._hooks = hooks
+        self.epoch_profile = {}
 
         self._extra_sources_warned = False
 
@@ -93,20 +96,27 @@ class MainLoop:
         :param stream_type: {train, valid, test}
         :return: epoch summary results
         """
-
         n_batches = 0
         summed_results = defaultdict(float)
 
-        for bid, batch in enumerate(stream):
+        while True:
+            try:
+                with Timer('read_batch_{}'.format(stream_type), self.epoch_profile):
+                    batch = next(stream)
+            except StopIteration:
+                break
+
             if self._net.skip_incomplete_batches:
                 if len(batch[list(batch.keys())[0]]) < self._net.batch_size:
+                    logging.debug('Incomplete batch skipped')
                     continue
 
-            n_batches += 1
-            batch_result = self._run_batch(train=train, batch=batch)
+            with Timer('eval_batch_{}'.format(stream_type), self.epoch_profile):
+                batch_result = self._run_batch(train=train, batch=batch)
 
-            for hook in self._hooks:
-                hook.after_batch(stream_type=stream_type, results=batch_result)
+            with Timer('after_batch_hooks_{}'.format(stream_type), self.epoch_profile):
+                for hook in self._hooks:
+                    hook.after_batch(stream_type=stream_type, results=batch_result)
 
             for name, value in batch_result.items():
                 try:
@@ -114,6 +124,8 @@ class MainLoop:
                 except Exception as e:
                     logging.error('Cannot sum results "%s"', name)
                     raise e
+
+            n_batches += 1
 
         for name in summed_results.keys():
             summed_results[name] /= n_batches
@@ -142,47 +154,32 @@ class MainLoop:
             hook.before_training()
 
         valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
-
-        if run_test_stream:
-            # logging.debug('%s', self.dataset.create_test_stream())
-            # logging.debug('%s', [method for method in dir(self.dataset) if callable(getattr(self.dataset, method))])
-            # quit()
-            try:
-                test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test')
-            except AttributeError as e:
-                logging.error('Dataset does not provide test stream even though it was specified in the config. Either'
-                              'implement `create_test_stream` method or delete `stream.test` section in the config.')
-                raise e
-        else:
-            test_results = None
+        test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
+            if run_test_stream else None
 
         for hook in self._hooks:
             hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
 
         while True:
+            self.epoch_profile = {}
             epoch_id += 1
 
             train_results = self.train_by_stream(stream=self._dataset.create_train_stream())
             valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
+            test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
+                if run_test_stream else None
 
-            if run_test_stream:
+            with Timer('after_epoch_hooks', self.epoch_profile):
                 try:
-                    test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test')
-                except AttributeError as e:
-                    logging.error(
-                        'Dataset does not provide test stream even though it was specified in the config. Either'
-                        'implement `create_test_stream` method or delete `stream.test` section in the config.')
-                    raise e
-            else:
-                test_results = None
+                    for hook in self._hooks:
+                        hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
+                                         test_results=test_results)
+                except TrainingTerminated as e:
+                    logging.info('Training terminated by a hook: %s', e)
+                    break
 
-            try:
-                for hook in self._hooks:
-                    hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
-                                     test_results=test_results)
-            except TrainingTerminated as e:
-                logging.info('Training terminated by a hook: %s', e)
-                break
+            for hook in self._hooks:
+                hook.after_epoch_profile(epoch_id=epoch_id, profile=self.epoch_profile)
 
         for hook in self._hooks:
             hook.after_training()

@@ -1,5 +1,6 @@
 from ..datasets.abstract_dataset import AbstractDataset
 from ..nets.abstract_net import AbstractNet
+from ..utils.profile import Timer
 
 
 class TrainingTerminated(Exception):
@@ -42,6 +43,19 @@ class AbstractHook:
     def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
                     test_results: AbstractDataset.Batch=None, **kwargs) -> None:
         """Train, valid and test results are dictionaries of summary statistics of the `epoch_id`-th epoch."""
+        pass
+
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, **kwargs) -> None:
+        """
+        This event provides opportunity to process time profile of the finished epoch.
+
+        Note: time of processing this event is not included in the profiled
+
+        :param epoch_id: finished epoch id
+        :param profile: dictionary of lists of event timings that were measured during the epoch.
+        :param kwargs: additional arguments
+        :return: None
+        """
         pass
 
     def after_training(self, **kwargs) -> None:

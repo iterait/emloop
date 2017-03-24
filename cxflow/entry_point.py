@@ -96,7 +96,7 @@ class EntryPoint:
             logging.debug('Constructing net instance')
             self._net = net_class(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
 
-    def _dump_config(self, name :str='config.yaml') -> str:
+    def _dump_config(self, name: str='config.yaml') -> str:
         """Save the YAML file."""
 
         dumped_config_f = path.join(self.output_dir, name)
