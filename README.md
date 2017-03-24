@@ -4,8 +4,9 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 
 ## Development Status
 
-- **Status**: Regular Project
-- **Master Developer**: Petr Bělohlávek
+- [![Build Status](https://gitlab.com/Cognexa/cxflow/badges/master/build.svg)](https://gitlab.com/Cognexa/cxflow/builds/)
+- [![Development Status](https://img.shields.io/badge/status-CX%20Regular-brightgreen.svg?style=flat)]()
+- [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
 For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example).
