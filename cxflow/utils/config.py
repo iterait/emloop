@@ -1,5 +1,4 @@
 import ast
-import logging
 import typing
 import yaml
 import ruamel.yaml
@@ -33,8 +32,6 @@ def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
         else:
             value = eval(typee)(value)
     except (Exception, AssertionError) as e:
-        logging.error('Couldn\'t convert argument %s of value %s to type %s. Original argument: "%s". Exception: %s',
-                      key, value, typee, arg, e)
         raise AttributeError(
             'Could not convert argument {} of value {} to type {}. Original argument: "{}". Exception: {}'.format(
                 key, value, typee, arg, e))
@@ -63,7 +60,6 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict
         conf[key] = value
 
     config = yaml.load(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
-    logging.debug('Loaded config: %s', config)
     return config
 
 

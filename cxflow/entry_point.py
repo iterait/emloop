@@ -26,18 +26,9 @@ class EntryPoint:
     """Entry point of the whole training. Should be used only via `cxflow` command."""
 
     @staticmethod
-    def create_output_dir(output_root: str, config: dict) -> str:
+    def create_output_dir(output_root: str, net_name: str) -> str:
         """Create output directory with proper name (if specified in the net config section)."""
-
-        name = 'UnknownNetName'
-        try:
-            name = config['net']['name']
-        except:
-            logging.warning('Net name not found in the config')
-
-        output_dir = path.join(output_root,'{}_{}_{}'.format(name,
-                                                             datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
-                                                             npr.random_integers(10000, 99999)))
+        output_dir = path.join(output_root,'{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f')))
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -138,6 +129,7 @@ class EntryPoint:
         try:
             logging.info('Loading config')
             config = load_config(config_file=config_file, additional_args=cli_options)
+            logging.debug('Loaded config: %s', config)
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
@@ -146,7 +138,12 @@ class EntryPoint:
             logging.info('Creating output dir')
 
             # create output dir
-            output_dir = EntryPoint.create_output_dir(output_root=output_root, config=config)
+            net_name = 'UnknownNetName'
+            if 'name' not in config['net']:
+                logging.warning('net.name not found in config, defaulting to: %s', net_name)
+            else:
+                net_name = config['net']['name']
+            output_dir = EntryPoint.create_output_dir(output_root=output_root, net_name=net_name)
 
             # create file logger
             file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
