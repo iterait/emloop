@@ -1,10 +1,10 @@
 #!/usr/bin/python3 -mentry_point
 
 from .main_loop import MainLoop
-from .utils.arg_parser import parse_arg
 from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook
 from .nets.abstract_net import AbstractNet
+from .utils.config import load_config, config_to_str, config_to_file
 
 import numpy.random as npr
 
@@ -13,12 +13,10 @@ from datetime import datetime
 import importlib
 import logging
 import os
-from os import path
 import sys
 import typing
-import yaml
-import ruamel.yaml
 import traceback
+from os import path
 
 # set up custom logging format
 _cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)s: %(message)s', datefmt='%H:%M:%S')
@@ -26,31 +24,6 @@ _cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module
 
 class EntryPoint:
     """Entry point of the whole training. Should be used only via `cxflow` command."""
-
-    @staticmethod
-    def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict:
-        """
-        Load config from `config_file` and apply CLI args `additional_args`.
-        :param additional_args: Additional args which may extend or override the config from file.
-        :return: configuration as dict
-        """
-
-        with open(config_file, 'r') as f:
-            config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
-
-        for key_full, value in [parse_arg(arg) for arg in additional_args]:
-            key_split = key_full.split('.')
-            key_prefix = key_split[:-1]
-            key = key_split[-1]
-
-            conf = self._config
-            for key_part in key_prefix:
-                conf = conf[key_part]
-            conf[key] = value
-
-        config = yaml.load(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
-        logging.debug('Loaded config: %s', config)
-        return config
 
     @staticmethod
     def create_output_dir(output_root: str, config: dict) -> str:
@@ -79,7 +52,7 @@ class EntryPoint:
         logging.debug('Loading dataset class')
         dataset_class = getattr(dataset_module, dataset_config['dataset_class'])
 
-        return dataset_class(config_str=EntryPoint.config_to_str({'dataset':dataset_config, 'stream':stream_config}))
+        return dataset_class(config_str=config_to_str({'dataset':dataset_config, 'stream':stream_config}))
 
     @staticmethod
     def create_network(net_config: dict, dataset: AbstractDataset, output_dir: str) -> AbstractNet:
@@ -113,30 +86,7 @@ class EntryPoint:
         return net
 
     @staticmethod
-    def config_to_file(config, output_dir: str, name: str= 'config.yaml') -> str:
-        """
-        Save the given config to the given path in yaml.
-        :param config: configuration dict
-        :param output_dir: target output directory
-        :param name: target filename
-        :return: target path
-        """
-        dumped_config_f = path.join(output_dir, name)
-        with open(dumped_config_f, 'w') as f:
-            yaml.dump(config, f)
-        return dumped_config_f
-
-    @staticmethod
-    def config_to_str(config: dict) -> str:
-        """
-        Return the given given config as yaml str.
-        :param config: configuration dict
-        :return: given configuration as yaml str
-        """
-        return yaml.dump(config)
-
-    @staticmethod
-    def construct_hook(config, net, hook_module: str, hook_class: str, **kwargs) -> AbstractHook:
+    def create_hook(config, net, hook_module: str, hook_class: str, **kwargs) -> AbstractHook:
         """
         Construct a hook.
 
@@ -158,21 +108,13 @@ class EntryPoint:
         return hook
 
     @staticmethod
-    def construct_hooks(config: dict, net: AbstractNet) -> typing.Iterable[AbstractHook]:
+    def create_hooks(config: dict, net: AbstractNet) -> typing.Iterable[AbstractHook]:
         """Construct hooks from the saved config. file."""
         hooks = []
         if 'hooks' in config:
-            logging.info('Creating hooks')
             for hook_conf in config['hooks']:
-                try:
-                    hook = EntryPoint.construct_hook(config, net, **hook_conf)
-                    hooks.append(hook)
-                except Exception as e:
-                    logging.error('Unexpected exception occurred when constructing hook with config: "%s".'
-                                  'Exception: %"', hook_conf, e)
-                    raise e
-        else:
-            logging.warning('No hooks found')
+                hook = EntryPoint.create_hook(config, net, **hook_conf)
+                hooks.append(hook)
 
         return hooks
 
@@ -194,32 +136,49 @@ class EntryPoint:
         """
 
         try:
-            config = EntryPoint.load_config(config_file=config_file, additional_args=cli_options)
+            logging.info('Loading config')
+            config = load_config(config_file=config_file, additional_args=cli_options)
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
-        output_dir = EntryPoint.create_output_dir(output_root=output_root, config=config)
+        try:
+            logging.info('Creating output dir')
 
-        # setup file handler
-        file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
-        file_handler.setFormatter(_cxflow_log_formatter)
-        logging.getLogger().addHandler(file_handler)
+            # create output dir
+            output_dir = EntryPoint.create_output_dir(output_root=output_root, config=config)
+
+            # create file logger
+            file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
+            file_handler.setFormatter(_cxflow_log_formatter)
+            logging.getLogger().addHandler(file_handler)
+
+            # dump config including CLI args
+            config_to_file(config=config, output_dir=output_dir)
+
+        except Exception as e:
+            logging.error('Failed to create output dir: %s\n%s', e, traceback.format_exc())
+            sys.exit(1)
 
         try:
+            logging.info('Creating dataset')
             dataset = EntryPoint.create_dataset(config['dataset'], config['stream'])
         except Exception as e:
             logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
+            logging.info('Creating network')
             net = EntryPoint.create_network(net_config=config['net'], dataset=dataset, output_dir=output_dir)
         except Exception as e:
             logging.error('Creating network failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
-            hooks = EntryPoint.construct_hooks(config=config, net=net)
+            logging.info('Creating hooks')
+            if 'hooks' not in config:
+                logging.warning('No hooks found')
+            hooks = EntryPoint.create_hooks(config=config, net=net)
         except Exception as e:
             logging.error('Creating hooks failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
@@ -244,7 +203,7 @@ class EntryPoint:
 
         logging.debug('Loading config')
         try:
-            config = EntryPoint.load_config(config_file=config_file, additional_args=[])
+            config = load_config(config_file=config_file, additional_args=[])
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
@@ -260,7 +219,7 @@ class EntryPoint:
         dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
 
 
-def entry_point() -> None:
+def init_entry_point() -> None:
     """
     cxflow entry point for training and dataset splitting.
     """
@@ -321,4 +280,4 @@ def entry_point() -> None:
 
 
 if __name__ == '__main__':
-    entry_point()
+    init_entry_point()
