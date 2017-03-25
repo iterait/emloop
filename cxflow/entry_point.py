@@ -260,7 +260,11 @@ class EntryPoint:
         dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
 
 
-def init_entry_point() -> None:
+def entry_point() -> None:
+    """
+    cxflow entry point for training and dataset splitting.
+    """
+
     # make sure the path contains the current working directory
     sys.path.insert(0, os.getcwd())
 
@@ -273,7 +277,7 @@ def init_entry_point() -> None:
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
 
-    # create crossval subparser
+    # create split subparser
     split_parser = subparsers.add_parser('split')
     split_parser.set_defaults(subcommand='split')
     split_parser.add_argument('config_file', help='path to the config file')
@@ -288,7 +292,7 @@ def init_entry_point() -> None:
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
 
-    # run entry-point method according to the proper subcommand
+    # show help if no subcommand was specified.
     if not hasattr(known_args, 'subcommand'):
         parser.print_help()
         quit(1)
@@ -317,4 +321,4 @@ def init_entry_point() -> None:
 
 
 if __name__ == '__main__':
-    init_entry_point()
+    entry_point()
