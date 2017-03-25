@@ -12,7 +12,6 @@ from argparse import ArgumentParser
 from datetime import datetime
 import importlib
 import logging
-from logging.handlers import RotatingFileHandler
 import os
 from os import path
 import sys
@@ -308,7 +307,7 @@ def init_entry_point() -> None:
                                                                      additional_args=unknown_args))
 
     # setup file handler
-    file_handler = RotatingFileHandler(path.join(output_dir, 'stderr.log'))
+    file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
