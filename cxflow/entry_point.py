@@ -2,7 +2,7 @@
 
 from .main_loop import MainLoop
 from .utils.arg_parser import parse_arg
-from .dataset_loader import DatasetLoader
+from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook
 from .nets.abstract_net import AbstractNet
 
@@ -25,11 +25,16 @@ import traceback
 class EntryPoint:
     """Entry point of the whole training. Should be used only via `cxflow` command."""
 
-    def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> dict:
-        """Load config from `config_file` and apply CLI args `additional_args`. The result is saved as `self.config`"""
+    @staticmethod
+    def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict:
+        """
+        Load config from `config_file` and apply CLI args `additional_args`.
+        :param additional_args: Additional args which may extend or override the config from file.
+        :return: configuration as dict
+        """
 
         with open(config_file, 'r') as f:
-            self._config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
+            config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
 
         for key_full, value in [parse_arg(arg) for arg in additional_args]:
             key_split = key_full.split('.')
@@ -41,16 +46,17 @@ class EntryPoint:
                 conf = conf[key_part]
             conf[key] = value
 
-        self._config = yaml.load(ruamel.yaml.dump(self._config, Dumper=ruamel.yaml.RoundTripDumper))
-        logging.debug('Loaded config: %s', self._config)
-        return self._config
+        config = yaml.load(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
+        logging.debug('Loaded config: %s', config)
+        return config
 
-    def create_output_dir(self, output_root: str) -> str:
+    @staticmethod
+    def create_output_dir(output_root: str, config: dict) -> str:
         """Create output directory with proper name (if specified in the net config section)."""
 
         name = 'UnknownNetName'
         try:
-            name = self._config['net']['name']
+            name = config['net']['name']
         except:
             logging.warning('Net name not found in the config')
 
@@ -60,51 +66,75 @@ class EntryPoint:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        self.output_dir = output_dir
         return output_dir
 
-    def _create_dataset(self) -> None:
+    @staticmethod
+    def create_dataset(dataset_config: dict, stream_config: dict) -> AbstractDataset:
         """Use `DatasetLoader` in order to load the proper dataset."""
-        data_loader = DatasetLoader(self._config, self.dumped_config_file)
-        self._dataset = data_loader.load_dataset()
+        logging.debug('Loading dataset module')
+        dataset_module = importlib.import_module(dataset_config['dataset_module'])
 
-    def _create_network(self) -> None:
+        logging.debug('Loading dataset class')
+        dataset_class = getattr(dataset_module, dataset_config['dataset_class'])
+
+        return dataset_class(config_str=EntryPoint.config_to_str({'dataset':dataset_config, 'stream':stream_config}))
+
+    @staticmethod
+    def create_network(net_config: dict, dataset: AbstractDataset, output_dir: str) -> AbstractNet:
         """
-        Use python reflection to construct the net.
-
-        Note that config must contain `net_module` and `net_class`.
+        Create network according to the given config.
+        Either create a new one, or load it from the checkpoint specified in net_config['restore_from'].
+        :param net_config: net configuration dict
+        :param dataset: AbstractDataset
+        :param output_dir: output directory to use for dumping checkpoints
+        :return: net
         """
 
-        logging.info('Creating net')
-
-        if 'restore_from' in self._config['net']:
-            logging.info('Restoring net from: "%s"', self._config['net']['restore_from'])
-            if 'net_module' in self._config['net'] or 'net_class' in self._config['net']:
+        if 'restore_from' in net_config:
+            logging.info('Restoring net from: "%s"', net_config['restore_from'])
+            if 'net_module' in net_config or 'net_class' in net_config:
                 logging.warning('`net_module` or `net_class` provided even though the net is restoring from "%s".'
                                 'Restoring anyway while ignoring these parameters. Consider removing them from config'
-                                'file.', self._config['net']['restore_from'])
+                                'file.', net_config['restore_from'])
 
-            self._net = AbstractNet(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
+            net = AbstractNet(dataset=dataset, log_dir=output_dir, **net_config)
         else:
             logging.info('Creating new net')
             logging.debug('Loading net module')
-            net_module = importlib.import_module(self._config['net']['net_module'])
+            net_module = importlib.import_module(net_config['net_module'])
 
             logging.debug('Loading net class')
-            net_class = getattr(net_module, self._config['net']['net_class'])
+            net_class = getattr(net_module, net_config['net_class'])
 
             logging.debug('Constructing net instance')
-            self._net = net_class(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
+            net = net_class(dataset=dataset, log_dir=output_dir, **net_config)
+        return net
 
-    def _dump_config(self, name: str='config.yaml') -> str:
-        """Save the YAML file."""
-
-        dumped_config_f = path.join(self.output_dir, name)
+    @staticmethod
+    def config_to_file(config, output_dir: str, name: str= 'config.yaml') -> str:
+        """
+        Save the given config to the given path in yaml.
+        :param config: configuration dict
+        :param output_dir: target output directory
+        :param name: target filename
+        :return: target path
+        """
+        dumped_config_f = path.join(output_dir, name)
         with open(dumped_config_f, 'w') as f:
-            yaml.dump(self._config, f)
+            yaml.dump(config, f)
         return dumped_config_f
 
-    def _construct_hook(self, hook_module: str, hook_class: str, **kwargs) -> AbstractHook:
+    @staticmethod
+    def config_to_str(config: dict) -> str:
+        """
+        Return the given given config as yaml str.
+        :param config: configuration dict
+        :return: given configuration as yaml str
+        """
+        return yaml.dump(config)
+
+    @staticmethod
+    def construct_hook(config, net, hook_module: str, hook_class: str, **kwargs) -> AbstractHook:
         """
         Construct a hook.
 
@@ -122,29 +152,30 @@ class EntryPoint:
         hook_class = getattr(hook_module, hook_class)
 
         logging.debug('Constructing hook')
-        hook = hook_class(net=self._net, config=self._config, **kwargs)
+        hook = hook_class(net=net, config=config, **kwargs)
         return hook
 
-    def _construct_hooks(self) -> typing.Iterable[AbstractHook]:
+    @staticmethod
+    def construct_hooks(config: dict, net: AbstractNet) -> typing.Iterable[AbstractHook]:
         """Construct hooks from the saved config. file."""
-
         hooks = []
-        if 'hooks' in self._config:
+        if 'hooks' in config:
             logging.info('Creating hooks')
-            for hook_conf in self._config['hooks']:
+            for hook_conf in config['hooks']:
                 try:
-                    hook = self._construct_hook(**hook_conf)
+                    hook = EntryPoint.construct_hook(config, net, **hook_conf)
                     hooks.append(hook)
                 except Exception as e:
                     logging.error('Unexpected exception occurred when constructing hook with config: "%s".'
                                   'Exception: %"', hook_conf, e)
                     raise e
-            return hooks
         else:
             logging.warning('No hooks found')
-            return []
 
-    def train(self, config_file: str, cli_options: typing.Iterable[str]) -> None:
+        return hooks
+
+    @staticmethod
+    def train(config_file: str, cli_options: typing.Iterable[str], output_dir: str) -> None:
         """
         Train method resposible for constring all required objects and training itself.
 
@@ -160,50 +191,40 @@ class EntryPoint:
         8. main loop is run
         """
 
-        self._net = None
-
         try:
-            self._load_config(config_file=config_file, additional_args=cli_options)
+            config = EntryPoint.load_config(config_file=config_file, additional_args=cli_options)
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
-            self.dumped_config_file = self._dump_config()
-        except Exception as e:
-            logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            self._create_dataset()
+            dataset = EntryPoint.create_dataset(config['dataset'], config['stream'])
         except Exception as e:
             logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
-            self._create_network()
+            net = EntryPoint.create_network(net_config=config['net'], dataset=dataset, output_dir=output_dir)
         except Exception as e:
             logging.error('Creating network failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
-            hooks = self._construct_hooks()
+            hooks = EntryPoint.construct_hooks(config=config, net=net)
         except Exception as e:
             logging.error('Creating hooks failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             logging.info('Creating main loop')
-            main_loop = MainLoop(net=self._net,
-                                 dataset=self._dataset,
-                                 hooks=hooks)
+            main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks)
         except Exception as e:
             logging.error('Creating main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         try:
             logging.info('Running the main loop')
-            main_loop.run(run_test_stream=('test' in self._config['stream']))
+            main_loop.run(run_test_stream=('test' in config['stream']))
         except Exception as e:
             logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
@@ -219,7 +240,7 @@ class EntryPoint:
             sys.exit(1)
 
         try:
-            self.dumped_config_file = self._dump_config()
+            self.dumped_config_file = self.config_to_file()
         except Exception as e:
             logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
@@ -282,7 +303,9 @@ def init_entry_point() -> None:
     # create entry point - this cannot be done earlier as the logger wasn't set up and this cannot be done later as
     # the logdir is required for file logger
     entry_point = EntryPoint()
-    output_dir = entry_point.create_output_dir(known_args.output_root)
+    output_dir = EntryPoint.create_output_dir(known_args.output_root,
+                                              EntryPoint.load_config(known_args.config_file,
+                                                                     additional_args=unknown_args))
 
     # setup file handler
     file_handler = RotatingFileHandler(path.join(output_dir, 'stderr.log'))
@@ -293,18 +316,14 @@ def init_entry_point() -> None:
     if not hasattr(known_args, 'subcommand'):
         parser.print_help()
         quit(1)
+
     if known_args.subcommand == 'train':
-        entry_point.train(config_file=known_args.config_file,
-                          cli_options=unknown_args)
+        EntryPoint.train(config_file=known_args.config_file, cli_options=unknown_args, output_dir=output_dir)
 
     elif known_args.subcommand == 'split':
         entry_point.split(config_file=known_args.config_file, num_splits=known_args.num_splits,
                           train_ratio=known_args.ratio[0], valid_ratio=known_args.ratio[1],
                           test_ratio=known_args.ratio[2])
-
-    else:
-        logging.error('Unrecognized subcommand: "%s". Please run `cxflow -h` for more info.', known_args.subcommand)
-        sys.exit(1)
 
 
 if __name__ == '__main__':
