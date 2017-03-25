@@ -20,6 +20,9 @@ import yaml
 import ruamel.yaml
 import traceback
 
+# set up custom logging format
+_cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)s: %(message)s', datefmt='%H:%M:%S')
+
 
 class EntryPoint:
     """Entry point of the whole training. Should be used only via `cxflow` command."""
@@ -174,7 +177,7 @@ class EntryPoint:
         return hooks
 
     @staticmethod
-    def train(config_file: str, cli_options: typing.Iterable[str], output_dir: str) -> None:
+    def train(config_file: str, cli_options: typing.Iterable[str], output_root: str) -> None:
         """
         Train method resposible for constring all required objects and training itself.
 
@@ -195,6 +198,13 @@ class EntryPoint:
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
+
+        output_dir = EntryPoint.create_output_dir(output_root=output_root, config=config)
+
+        # setup file handler
+        file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
+        file_handler.setFormatter(_cxflow_log_formatter)
+        logging.getLogger().addHandler(file_handler)
 
         try:
             dataset = EntryPoint.create_dataset(config['dataset'], config['stream'])
@@ -228,31 +238,26 @@ class EntryPoint:
             logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
-    def split(self, config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
+    @staticmethod
+    def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
         logging.info('Splitting to %d splits with ratios %f:%f:%f', num_splits, train_ratio, valid_ratio, test_ratio)
 
         logging.debug('Loading config')
         try:
-            self._load_config(config_file=config_file, additional_args=[])
+            config = EntryPoint.load_config(config_file=config_file, additional_args=[])
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
-        try:
-            self.dumped_config_file = self.config_to_file()
-        except Exception as e:
-            logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
         logging.debug('Creating dataset')
         try:
-            self._create_dataset()
+            dataset = EntryPoint.create_dataset(config['dataset'], config['stream'])
         except Exception as e:
             logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
 
         logging.debug('Splitting')
-        self._dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
+        dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
 
 
 def init_entry_point() -> None:
@@ -283,46 +288,32 @@ def init_entry_point() -> None:
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
 
-    # set up global logger
-    logger = logging.getLogger('')
-    logger.handlers = []  # remove default handlers
-    if known_args.verbose:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
-
-    # set up custom logging format
-    formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)s: %(message)s', datefmt='%H:%M:%S')
-
-    # set up STDERR handler
-    stderr_handler = logging.StreamHandler(sys.stderr)
-    stderr_handler.setFormatter(formatter)
-    logger.addHandler(stderr_handler)
-
-    # create entry point - this cannot be done earlier as the logger wasn't set up and this cannot be done later as
-    # the logdir is required for file logger
-    entry_point = EntryPoint()
-    output_dir = EntryPoint.create_output_dir(known_args.output_root,
-                                              EntryPoint.load_config(known_args.config_file,
-                                                                     additional_args=unknown_args))
-
-    # setup file handler
-    file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
     # run entry-point method according to the proper subcommand
     if not hasattr(known_args, 'subcommand'):
         parser.print_help()
         quit(1)
 
+    # set up global logger
+    logger = logging.getLogger('')
+    logger.setLevel(logging.DEBUG if known_args.verbose else logging.INFO)
+    logger.handlers = []  # remove default handlers
+
+    # set up STDERR handler
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(_cxflow_log_formatter)
+    logger.addHandler(stderr_handler)
+
     if known_args.subcommand == 'train':
-        EntryPoint.train(config_file=known_args.config_file, cli_options=unknown_args, output_dir=output_dir)
+        EntryPoint.train(config_file=known_args.config_file,
+                         cli_options=unknown_args,
+                         output_root=known_args.output_root)
 
     elif known_args.subcommand == 'split':
-        entry_point.split(config_file=known_args.config_file, num_splits=known_args.num_splits,
-                          train_ratio=known_args.ratio[0], valid_ratio=known_args.ratio[1],
-                          test_ratio=known_args.ratio[2])
+        EntryPoint.split(config_file=known_args.config_file,
+                         num_splits=known_args.num_splits,
+                         train_ratio=known_args.ratio[0],
+                         valid_ratio=known_args.ratio[1],
+                         test_ratio=known_args.ratio[2])
 
 
 if __name__ == '__main__':
