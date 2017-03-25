@@ -26,15 +26,6 @@ class EntryPoint:
     """Entry point of the whole training. Should be used only via `cxflow` command."""
 
     @staticmethod
-    def create_output_dir(output_root: str, net_name: str) -> str:
-        """Create output directory with proper name (if specified in the net config section)."""
-        output_dir = path.join(output_root,'{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f')))
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        return output_dir
-
-    @staticmethod
     def create_dataset(dataset_config: dict, stream_config: dict) -> AbstractDataset:
         """Use `DatasetLoader` in order to load the proper dataset."""
         logging.debug('Loading dataset module')
@@ -43,7 +34,7 @@ class EntryPoint:
         logging.debug('Loading dataset class')
         dataset_class = getattr(dataset_module, dataset_config['dataset_class'])
 
-        return dataset_class(config_str=config_to_str({'dataset':dataset_config, 'stream':stream_config}))
+        return dataset_class(config_str=config_to_str({'dataset': dataset_config, 'stream': stream_config}))
 
     @staticmethod
     def create_network(net_config: dict, dataset: AbstractDataset, output_dir: str) -> AbstractNet:
@@ -130,6 +121,12 @@ class EntryPoint:
             logging.info('Loading config')
             config = load_config(config_file=config_file, additional_args=cli_options)
             logging.debug('Loaded config: %s', config)
+
+            assert('net' in config)
+            assert('dataset' in config)
+            if 'hooks' not in config:
+                logging.warning('No hooks found in config')
+
         except Exception as e:
             logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
             sys.exit(1)
@@ -138,12 +135,15 @@ class EntryPoint:
             logging.info('Creating output dir')
 
             # create output dir
-            net_name = 'UnknownNetName'
+            net_name = 'NonameNet'
             if 'name' not in config['net']:
                 logging.warning('net.name not found in config, defaulting to: %s', net_name)
             else:
                 net_name = config['net']['name']
-            output_dir = EntryPoint.create_output_dir(output_root=output_root, net_name=net_name)
+            output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f'))
+            output_dir = path.join(output_root, output_dirname)
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
 
             # create file logger
             file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
@@ -173,8 +173,6 @@ class EntryPoint:
 
         try:
             logging.info('Creating hooks')
-            if 'hooks' not in config:
-                logging.warning('No hooks found')
             hooks = EntryPoint.create_hooks(config=config, net=net)
         except Exception as e:
             logging.error('Creating hooks failed: %s\n%s', e, traceback.format_exc())
