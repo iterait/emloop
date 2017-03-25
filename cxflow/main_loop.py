@@ -1,6 +1,6 @@
 from .datasets.abstract_dataset import AbstractDataset
 from .nets.abstract_net import AbstractNet
-from .hooks.abstract_hook import AbstractHook, TrainingTerminated
+from .hooks.abstract_hook import AbstractHook, TrainingTerminated       
 from .utils.profile import Timer
 
 from collections import defaultdict
