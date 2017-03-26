@@ -5,7 +5,7 @@ from .nets.abstract_net import AbstractNet
 from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook
 from .utils.config import load_config, config_to_str, config_to_file
-from .utils.loader import create_object
+from .utils.reflection import create_object
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -22,19 +22,19 @@ _cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module
 
 def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
     """
-    Load config from the given yaml file and extend/override it with the given CLI args
+    Load config from the given yaml file and extend/override it with the given CLI args.
     :param config_file: path to the config yaml file
     :param cli_options: additional args to extend/override the config
-    :return: dict configuration
+    :return: config dict
     """
     logging.info('Loading config')
     config = load_config(config_file=config_file, additional_args=cli_options)
-    logging.debug('Loaded config: %s', config)
+    logging.debug('\tLoaded config: %s', config)
 
     assert ('net' in config)
     assert ('dataset' in config)
     if 'hooks' not in config:
-        logging.warning('No hooks found in config')
+        logging.warning('\tNo hooks found in config')
 
     return config
 
@@ -42,8 +42,8 @@ def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> d
 def _train_create_output_dir(config: dict, output_root: str) -> str:
     """
     Create output_dir under the given output_root and
-        - dump the given config to the there
-        - register a file logger logging to this dir
+        - dump the given config to yaml file under this dir
+        - register a file logger logging to a file under this dir
     :param config: config to be dumped
     :param output_root: dir wherein output_dir shall be created
     :return: path to the created output_dir
@@ -53,13 +53,14 @@ def _train_create_output_dir(config: dict, output_root: str) -> str:
     # create output dir
     net_name = 'NonameNet'
     if 'name' not in config['net']:
-        logging.warning('net.name not found in config, defaulting to: %s', net_name)
+        logging.warning('\tnet.name not found in config, defaulting to: %s', net_name)
     else:
         net_name = config['net']['name']
     output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f'))
     output_dir = path.join(output_root, output_dirname)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    logging.info('\tOutput dir: %s', output_dir)
 
     # create file logger
     file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
@@ -88,12 +89,15 @@ def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     return create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
 
 
-def _train_create_net(config: dict, output_dir:str, dataset: AbstractDataset) -> AbstractNet:
+def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
     """
     Create a net object either from scratch of from the specified checkpoint.
 
-    To restore a net from a checkpoint,
-    one must provide config['net']['restore_from'] parameter with a path to the checkpoint.
+    -------------------------------------------------------
+    To restore a net from a checkpoint, one must provide config['net']['restore_from'] parameter
+    with a path to the checkpoint.
+    -------------------------------------------------------
+
     :param config: config dict with net config
     :param output_dir: path to the training output dir
     :param dataset: AbstractDataset object
@@ -124,6 +128,7 @@ def _train_create_hooks(config: dict, net: AbstractNet) -> typing.Iterable[Abstr
         for hook_config in config['hooks']:
             hooks.append(create_object(object_config=hook_config,
                                        prefix='hook_', net=net, config=config, **hook_config))
+            logging.debug('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
 
@@ -174,16 +179,20 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
         - train_log.txt with entry_point and main_loop logs (same as the stderr)
         - dumped yaml config
 
-    Additional outputs created by hooks or the dataset may include:
+    Additional outputs created by hooks, dataset or tensorflow may include:
         - dataset_log.txt with info about dataset/stream creation
         - model checkpoint(s)
         - tensorboard log file
+        - tensorflow event log
 
 
     :param config_file: path to the training yaml config
     :param cli_options: additional CLI arguments to override or extend the yaml config
     :param output_root: dir under which output_dir shall be created
     """
+
+    config = output_dir = dataset = net = hooks = main_loop = None
+
     try:
         config = _train_load_config(config_file=config_file, cli_options=cli_options)
     except Exception as e:
@@ -271,7 +280,7 @@ def entry_point() -> None:
     # add common arguments
     for p in [parser, train_parser, split_parser]:
         p.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
-        p.add_argument('-o', '--output-root', default='log', help='output directory')
+        p.add_argument('-o', '--output_root', default='log', help='output directory')
 
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
