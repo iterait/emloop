@@ -60,6 +60,8 @@ def _train_create_output_dir(config: dict, output_root: str) -> str:
     output_dir = path.join(output_root, output_dirname)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    else:
+        raise ValueError('Output dir {} already exists.'.format(output_dir))
     logging.info('\tOutput dir: %s', output_dir)
 
     # create file logger
@@ -77,7 +79,7 @@ def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     """
     Create a dataset object according to the given config.
 
-    Dataset, stream and output_dir configs are passed to the constructor.
+    Dataset, stream and output_dir configs are passed to the constructor in a single YAML-encoded string.
     :param config: config dict with dataset and stream configs
     :param output_dir: path to the training output dir
     :return: dataset object
@@ -153,7 +155,7 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
     The training procedure consists of the following steps:
     -------------------------------------------------------
     Step 1:
-        - Load yaml configuration and override or extend it with parameters passed in CLI arguments.
+        - Load yaml configuration and override or extend it with parameters passed in CLI arguments
         - Check if `net` and `dataset` configs are present
     Step 2:
         - Create output dir
@@ -280,7 +282,7 @@ def entry_point() -> None:
     # add common arguments
     for p in [parser, train_parser, split_parser]:
         p.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
-        p.add_argument('-o', '--output_root', default='log', help='output directory')
+        p.add_argument('-o', '--output-root', default='log', help='output directory')
 
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
