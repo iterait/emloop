@@ -18,7 +18,11 @@ class LoggingHook(AbstractHook):
         self._metrics_to_display = metrics_to_display
 
     def before_first_epoch(self, valid_results: dict, test_results: dict = None, ** kwargs) -> None:
-        logging.info('Before first epoch')
+        logging.info('')
+        logging.info('')
+        logging.info('--------------------')
+        logging.info(' Before first epoch')
+        logging.info('--------------------')
 
         for key in self._metrics_to_display:
             if key in valid_results:
@@ -35,7 +39,12 @@ class LoggingHook(AbstractHook):
     def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
                     test_results: AbstractDataset.Batch=None, **kwargs) -> None:
 
-        logging.info('After epoch %d', epoch_id)
+        msg = ' After epoch {} '.format(epoch_id)
+        logging.info('')
+        logging.info('')
+        logging.info('-'*len(msg))
+        logging.info(msg)
+        logging.info('-'*len(msg))
         for key in self._metrics_to_display:
             if key in train_results:
                 logging.info('\tTrain %s:\t%f', key, train_results[key])

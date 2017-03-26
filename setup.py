@@ -29,7 +29,7 @@ setup(name='cxflow',
       test_suite='cxflow.tests',
       entry_points={
           'console_scripts': [
-              'cxflow=cxflow.entry_point:init_entry_point',
+              'cxflow=cxflow.entry_point:entry_point',
               'cxgridsearch=cxflow.grid_search:init_grid_search',
           ]
       })
