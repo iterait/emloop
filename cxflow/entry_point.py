@@ -2,6 +2,8 @@
 
 from .main_loop import MainLoop
 from .nets.abstract_net import AbstractNet
+from .datasets.abstract_dataset import AbstractDataset
+from .hooks.abstract_hook import AbstractHook
 from .utils.config import load_config, config_to_str, config_to_file
 from .utils.loader import create_object
 
@@ -11,160 +13,227 @@ from os import path
 import logging
 import os
 import sys
-import typing
 import traceback
+import typing
 
 
-# set up custom logging format
-_cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)s: %(message)s', datefmt='%H:%M:%S')
+_cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s', datefmt='%H:%M:%S')
+
+
+def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
+    """
+    Load config from the given yaml file and extend/override it with the given CLI args
+    :param config_file: path to the config yaml file
+    :param cli_options: additional args to extend/override the config
+    :return: dict configuration
+    """
+    logging.info('Loading config')
+    config = load_config(config_file=config_file, additional_args=cli_options)
+    logging.debug('Loaded config: %s', config)
+
+    assert ('net' in config)
+    assert ('dataset' in config)
+    if 'hooks' not in config:
+        logging.warning('No hooks found in config')
+
+    return config
+
+
+def _train_create_output_dir(config: dict, output_root: str) -> str:
+    """
+    Create output_dir under the given output_root and
+        - dump the given config to the there
+        - register a file logger logging to this dir
+    :param config: config to be dumped
+    :param output_root: dir wherein output_dir shall be created
+    :return: path to the created output_dir
+    """
+    logging.info('Creating output dir')
+
+    # create output dir
+    net_name = 'NonameNet'
+    if 'name' not in config['net']:
+        logging.warning('net.name not found in config, defaulting to: %s', net_name)
+    else:
+        net_name = config['net']['name']
+    output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f'))
+    output_dir = path.join(output_root, output_dirname)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # create file logger
+    file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
+    file_handler.setFormatter(_cxflow_log_formatter)
+    logging.getLogger().addHandler(file_handler)
+
+    # dump config including CLI args
+    config_to_file(config=config, output_dir=output_dir)
+
+    return output_dir
+
+
+def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
+    """
+    Create a dataset object according to the given config.
+
+    Dataset, stream and output_dir configs are passed to the constructor.
+    :param config: config dict with dataset and stream configs
+    :param output_dir: path to the training output dir
+    :return: dataset object
+    """
+    logging.info('Creating dataset')
+    config_str = config_to_str({'dataset': config['dataset'],
+                                'stream': config['stream'],
+                                'output_dir': output_dir})
+    return create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
+
+
+def _train_create_net(config: dict, output_dir:str, dataset: AbstractDataset) -> AbstractNet:
+    """
+    Create a net object either from scratch of from the specified checkpoint.
+
+    To restore a net from a checkpoint,
+    one must provide config['net']['restore_from'] parameter with a path to the checkpoint.
+    :param config: config dict with net config
+    :param output_dir: path to the training output dir
+    :param dataset: AbstractDataset object
+    :return: net object
+    """
+    net_config = config['net']
+    if 'restore_from' in net_config:
+        logging.info('Restoring net from: "%s"', net_config['restore_from'])
+        if 'net_module' in net_config or 'net_class' in net_config:
+            logging.warning('`net_module` and `net_class` config parameters are provided yet ignored')
+        net = AbstractNet(dataset=dataset, log_dir=output_dir, **net_config)
+    else:
+        logging.info('Creating new net')
+        net = create_object(object_config=net_config, prefix='net_', dataset=dataset, log_dir=output_dir, **net_config)
+    return net
+
+
+def _train_create_hooks(config: dict, net: AbstractNet) -> typing.Iterable[AbstractHook]:
+    """
+    Create hooks specified in config['hooks'] list.
+    :param config: config dict
+    :param net: net object to be passed to the hooks
+    :return: list of hook objects
+    """
+    logging.info('Creating hooks')
+    hooks = []
+    if 'hooks' in config:
+        for hook_config in config['hooks']:
+            hooks.append(create_object(object_config=hook_config,
+                                       prefix='hook_', net=net, config=config, **hook_config))
+    return hooks
+
+
+def _train_fallback(message: str, e: Exception) -> None:
+    """
+    Fallback procedure when a training step fails.
+    :param message: message to be logged
+    :param e: Exception which caused the failure
+    """
+    logging.error(message, e, traceback.format_exc())
+    sys.exit(1)
 
 
 def train(config_file: str, cli_options: typing.Iterable[str], output_root: str) -> None:
     """
     Run cxflow training configured from the given file and cli_options.
-    Unique output dir for this training is created under the given output_root dir
-    wherein all the training outputs are saved.
-    :param config_file: path to the training yaml config
-    :param cli_options: additional CLI arguments to override or extend the yaml config
-    :param output_root: directory wherein output_dir is created
-    """
 
-    """
+    Unique output dir for this training is created under the given output_root dir
+    wherein all the training outputs are saved. The output dir name will be roughly [net.name]_[time].
+
+    -------------------------------------------------------
+    The training procedure consists of the following steps:
+    -------------------------------------------------------
     Step 1:
         - Load yaml configuration and override or extend it with parameters passed in CLI arguments.
         - Check if `net` and `dataset` configs are present
-    """
-    try:
-        logging.info('Loading config')
-        config = load_config(config_file=config_file, additional_args=cli_options)
-        logging.debug('Loaded config: %s', config)
-
-        assert ('net' in config)
-        assert ('dataset' in config)
-        if 'hooks' not in config:
-            logging.warning('No hooks found in config')
-    except Exception as e:
-        logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
-
-    """
     Step 2:
         - Create output dir
         - Create file logger under the output dir
         - Dump loaded config to the output dir
-    """
-    try:
-        logging.info('Creating output dir')
-
-        # create output dir
-        net_name = 'NonameNet'
-        if 'name' not in config['net']:
-            logging.warning('net.name not found in config, defaulting to: %s', net_name)
-        else:
-            net_name = config['net']['name']
-        output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f'))
-        output_dir = path.join(output_root, output_dirname)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        # create file logger
-        file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
-        file_handler.setFormatter(_cxflow_log_formatter)
-        logging.getLogger().addHandler(file_handler)
-
-        # dump config including CLI args
-        config_to_file(config=config, output_dir=output_dir)
-
-    except Exception as e:
-        logging.error('Failed to create output dir: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
-
-    """
     Step 3:
         - Create dataset
             - yaml string with `dataset`, `stream` and `log_dir` configs is passed to the dataset constructor
-    """
-    try:
-        logging.info('Creating dataset')
-        config_str = config_to_str({'dataset': config['dataset'],
-                                    'stream': config['stream'],
-                                    'output_dir': output_dir})
-        dataset = create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
-    except Exception as e:
-        logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
-
-    """
     Step 4:
         - Create network
             - Dataset, `log_dir` and net config is passed to the constructor
-    """
-    try:
-        logging.info('Creating network')
-        net_config = config['net']
-        if 'restore_from' in net_config:
-            logging.info('Restoring net from: "%s"', net_config['restore_from'])
-            if 'net_module' in net_config or 'net_class' in net_config:
-                logging.warning('`net_module` and `net_class` config parameters are provided yet ignored')
-            net = AbstractNet(dataset=dataset, log_dir=output_dir, **net_config)
-        else:
-            logging.info('Creating new net')
-            net = create_object(object_config=net_config,
-                                prefix='net_', dataset=dataset, log_dir=output_dir, **net_config)
-    except Exception as e:
-        logging.error('Creating network failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
-
-    """
     Step 5:
         - Create all the training hooks
+    Step 6:
+        - Create the MainLoop object
+    Step 7:
+        - Run the main loop
+    -------------------------------------------------------
+    If any of the steps fails, the training is terminated.
+    -------------------------------------------------------
+
+    After the training procedure finishes, the output dir will contain the following:
+        - train_log.txt with entry_point and main_loop logs (same as the stderr)
+        - dumped yaml config
+
+    Additional outputs created by hooks or the dataset may include:
+        - dataset_log.txt with info about dataset/stream creation
+        - model checkpoint(s)
+        - tensorboard log file
+
+
+    :param config_file: path to the training yaml config
+    :param cli_options: additional CLI arguments to override or extend the yaml config
+    :param output_root: dir under which output_dir shall be created
     """
     try:
-        logging.info('Creating hooks')
-        hooks = []
-        if 'hooks' in config:
-            for hook_config in config['hooks']:
-                hooks.append(create_object(object_config=hook_config,
-                                           prefix='hook_', net=net, config=config, **hook_config))
+        config = _train_load_config(config_file=config_file, cli_options=cli_options)
     except Exception as e:
-        logging.error('Creating hooks failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
+        _train_fallback('Loading config failed: %s\n%s', e)
 
-    """
-    Step 6:
-        - Create the main loop object
-    """
+    try:
+        output_dir = _train_create_output_dir(config=config, output_root=output_root)
+    except Exception as e:
+        _train_fallback('Failed to create output dir: %s\n%s', e)
+
+    try:
+        dataset = _train_create_dataset(config=config, output_dir=output_dir)
+    except Exception as e:
+        _train_fallback('Creating dataset failed: %s\n%s', e)
+
+    try:
+        net = _train_create_net(config=config, output_dir=output_dir, dataset=dataset)
+    except Exception as e:
+        _train_fallback('Creating network failed: %s\n%s', e)
+
+    try:
+        hooks = _train_create_hooks(config=config, net=net)
+    except Exception as e:
+        _train_fallback('Creating hooks failed: %s\n%s', e)
+
     try:
         logging.info('Creating main loop')
         main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks)
     except Exception as e:
-        logging.error('Creating main loop failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
+        _train_fallback('Creating main loop failed: %s\n%s', e)
 
-    """
-    Step 7:
-        - Run the main loop
-    """
     try:
         logging.info('Running the main loop')
         main_loop.run(run_test_stream=('test' in config['stream']))
     except Exception as e:
-        logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
+        _train_fallback('Running the main loop failed: %s\n%s', e)
 
 
 def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
     logging.info('Splitting to %d splits with ratios %f:%f:%f', num_splits, train_ratio, valid_ratio, test_ratio)
 
-    logging.info('Loading config')
     try:
+        logging.info('Loading config')
         config = load_config(config_file=config_file, additional_args=[])
     except Exception as e:
         logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
         sys.exit(1)
 
-    logging.info('Creating dataset')
     try:
+        logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
         dataset = create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
     except Exception as e:
@@ -175,7 +244,7 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
     dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
 
 
-def init_entry_point() -> None:
+def entry_point() -> None:
     """
     cxflow entry point for training and dataset splitting.
     """
@@ -236,4 +305,4 @@ def init_entry_point() -> None:
 
 
 if __name__ == '__main__':
-    init_entry_point()
+    entry_point()
