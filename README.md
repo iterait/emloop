@@ -27,10 +27,10 @@ List of Python package requirements is listed in `requirements.txt`.
 ## Installation
 Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is suggested, however, completely optional. 
 
-## Standard Installation
+### Standard Installation
 1. Install **cxflow** `$ pip install git+https://gitlab.com/Cognexa/cxflow.git`
 
-## Development Installation
+### Development Installation
 1. Clone the **cxflow** repository `$ git clone git@gitlab.com:Cognexa/cxflow.git`
 2. Enter the directory `$ cd cxflow`
 3. **Optional**: *install any specific version of packages (e.g. TensorFlow). If this step is skipped, the up-to-date version will be installed by default in the next step.*
