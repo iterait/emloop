@@ -14,13 +14,13 @@ class EpochStopperHookTest(TestCase):
         try:
             hook = EpochStopperHook(epoch_limit=10, net=None, config=None)
             hook.after_epoch(epoch_id=5)
-        except Exception:
+        except TrainingTerminated:
             self.fail('EpochStopperHook(10) raised at epoch 5')
 
         try:
             hook = EpochStopperHook(epoch_limit=10, net=None, config=None)
             hook.after_epoch(epoch_id=9)
-        except Exception:
+        except TrainingTerminated:
             self.fail('EpochStopperHook(10) raised at epoch 9')
 
     def test_raise(self):
