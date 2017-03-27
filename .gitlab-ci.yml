@@ -7,28 +7,28 @@
 test:ubuntu_TFlatest_python3.5:
   <<: *ubuntuCommon
   script:
-  - pip3 install -r requirements.txt
+  - pip3 install .
   - python3 setup.py test
 
 test:ubuntu_TF0.12_python3.5:
   <<: *ubuntuCommon
   script:
   - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp35-cp35m-linux_x86_64.whl
-  - pip3 install -r requirements.txt
+  - pip3 install .
   - python3 setup.py test
 
 test:ubuntu_TF0.11_python3.5:
   <<: *ubuntuCommon
   script:
   - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.11.0-cp35-cp35m-linux_x86_64.whl
-  - pip3 install -r requirements.txt
+  - pip3 install .
   - python3 setup.py test
 
 test:ubuntu_TF0.10_python3.5:
   <<: *ubuntuCommon
   script:
   - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.10.0-cp35-cp35m-linux_x86_64.whl
-  - pip3 install -r requirements.txt
+  - pip3 install .
   - python3 setup.py test
 
 .arch_common: &archCommon
@@ -39,5 +39,5 @@ test:arch_TF1.0_python3.6:
   image: pritunl/archlinux
   <<: *archCommon
   script:
-  - pip install -r requirements.txt
+  - pip install .
   - python setup.py test
