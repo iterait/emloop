@@ -6,9 +6,6 @@ import logging
 class ProfileHook(AbstractHook):
     """Summarize and log epoch profile."""
 
-    def __init__(self,  **kwargs):
-        super().__init__(**kwargs)
-
     def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, **kwargs) -> None:
 
         # time spent reading data from streams (train + valid + test)
