@@ -9,7 +9,7 @@ def _create_object(module_name: str, class_name: str, **kwargs):
     This mimics the following code:
     -----------------------------------------------------
     from module import class
-    class(**kwargs)
+    return class(**kwargs)
     -----------------------------------------------------
 
     :param module_name: module name
@@ -17,8 +17,8 @@ def _create_object(module_name: str, class_name: str, **kwargs):
     :param kwargs: kwargs to be passed to the object constructor
     :return: created object instance
     """
-    module = importlib.import_module(module_name)
-    _class = getattr(module, class_name)
+    _module = importlib.import_module(module_name)
+    _class = getattr(_module, class_name)
     return _class(**kwargs)
 
 
