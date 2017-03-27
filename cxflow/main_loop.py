@@ -1,11 +1,7 @@
 from .datasets.abstract_dataset import AbstractDataset
-
-from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .nets.abstract_net import AbstractNet
-
+from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils.profile import Timer
-
-import numpy as np
 
 from collections import defaultdict
 import logging

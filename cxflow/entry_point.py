@@ -1,241 +1,264 @@
 #!/usr/bin/python3 -mentry_point
 
 from .main_loop import MainLoop
-from .utils.arg_parser import parse_arg
-from .dataset_loader import DatasetLoader
-from .hooks.abstract_hook import AbstractHook
 from .nets.abstract_net import AbstractNet
-
-import numpy.random as npr
+from .datasets.abstract_dataset import AbstractDataset
+from .hooks.abstract_hook import AbstractHook
+from .utils.config import load_config, config_to_str, config_to_file
+from .utils.reflection import create_object
 
 from argparse import ArgumentParser
 from datetime import datetime
-import importlib
-import logging
-from logging.handlers import RotatingFileHandler
-import os
 from os import path
+import logging
+import os
 import sys
-import typing
-import yaml
-import ruamel.yaml
 import traceback
+import typing
 
 
-class EntryPoint:
-    """Entry point of the whole training. Should be used only via `cxflow` command."""
-
-    def _load_config(self, config_file: str, additional_args: typing.Iterable[str]) -> dict:
-        """Load config from `config_file` and apply CLI args `additional_args`. The result is saved as `self.config`"""
-
-        with open(config_file, 'r') as f:
-            self._config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
-
-        for key_full, value in [parse_arg(arg) for arg in additional_args]:
-            key_split = key_full.split('.')
-            key_prefix = key_split[:-1]
-            key = key_split[-1]
-
-            conf = self._config
-            for key_part in key_prefix:
-                conf = conf[key_part]
-            conf[key] = value
-
-        self._config = yaml.load(ruamel.yaml.dump(self._config, Dumper=ruamel.yaml.RoundTripDumper))
-        logging.debug('Loaded config: %s', self._config)
-        return self._config
-
-    def create_output_dir(self, output_root: str) -> str:
-        """Create output directory with proper name (if specified in the net config section)."""
-
-        name = 'UnknownNetName'
-        try:
-            name = self._config['net']['name']
-        except:
-            logging.warning('Net name not found in the config')
-
-        output_dir = path.join(output_root,'{}_{}_{}'.format(name,
-                                                             datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
-                                                             npr.random_integers(10000, 99999)))
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        self.output_dir = output_dir
-        return output_dir
-
-    def _create_dataset(self) -> None:
-        """Use `DatasetLoader` in order to load the proper dataset."""
-        data_loader = DatasetLoader(self._config, self.dumped_config_file)
-        self._dataset = data_loader.load_dataset()
-
-    def _create_network(self) -> None:
-        """
-        Use python reflection to construct the net.
-
-        Note that config must contain `net_module` and `net_class`.
-        """
-
-        logging.info('Creating net')
-
-        if 'restore_from' in self._config['net']:
-            logging.info('Restoring net from: "%s"', self._config['net']['restore_from'])
-            if 'net_module' in self._config['net'] or 'net_class' in self._config['net']:
-                logging.warning('`net_module` or `net_class` provided even though the net is restoring from "%s".'
-                                'Restoring anyway while ignoring these parameters. Consider removing them from config'
-                                'file.', self._config['net']['restore_from'])
-
-            self._net = AbstractNet(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
-        else:
-            logging.info('Creating new net')
-            logging.debug('Loading net module')
-            net_module = importlib.import_module(self._config['net']['net_module'])
-
-            logging.debug('Loading net class')
-            net_class = getattr(net_module, self._config['net']['net_class'])
-
-            logging.debug('Constructing net instance')
-            self._net = net_class(dataset=self._dataset, log_dir=self.output_dir, **self._config['net'])
-
-    def _dump_config(self, name: str='config.yaml') -> str:
-        """Save the YAML file."""
-
-        dumped_config_f = path.join(self.output_dir, name)
-        with open(dumped_config_f, 'w') as f:
-            yaml.dump(self._config, f)
-        return dumped_config_f
-
-    def _construct_hook(self, hook_module: str, hook_class: str, **kwargs) -> AbstractHook:
-        """
-        Construct a hook.
-
-        This is equivalent to
-        ```
-        from <hook_module> import <hook_class>
-        return <hook_class>(**kwargs)
-        ```
-        """
-
-        logging.debug('Loading hook module %s', hook_module)
-        hook_module = importlib.import_module(hook_module)
-
-        logging.debug('Loading hook class %s', hook_class)
-        hook_class = getattr(hook_module, hook_class)
-
-        logging.debug('Constructing hook')
-        hook = hook_class(net=self._net, config=self._config, **kwargs)
-        return hook
-
-    def _construct_hooks(self) -> typing.Iterable[AbstractHook]:
-        """Construct hooks from the saved config. file."""
-
-        hooks = []
-        if 'hooks' in self._config:
-            logging.info('Creating hooks')
-            for hook_conf in self._config['hooks']:
-                try:
-                    hook = self._construct_hook(**hook_conf)
-                    hooks.append(hook)
-                except Exception as e:
-                    logging.error('Unexpected exception occurred when constructing hook with config: "%s".'
-                                  'Exception: %"', hook_conf, e)
-                    raise e
-            return hooks
-        else:
-            logging.warning('No hooks found')
-            return []
-
-    def train(self, config_file: str, cli_options: typing.Iterable[str]) -> None:
-        """
-        Train method resposible for constring all required objects and training itself.
-
-        All arguments are passed via CLI arguments which should be in form of `key[:type]=value`.
-        Then the life cycle is as follows:
-        1. configuration file is loaded
-        2. CLI arguments are applied
-        3. final configuration is dumped
-        4. dataset is loaded
-        5. network is created
-        6. main loop hooks are created
-        7. main loop is created
-        8. main loop is run
-        """
-
-        self._net = None
-
-        try:
-            self._load_config(config_file=config_file, additional_args=cli_options)
-        except Exception as e:
-            logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            self.dumped_config_file = self._dump_config()
-        except Exception as e:
-            logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            self._create_dataset()
-        except Exception as e:
-            logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            self._create_network()
-        except Exception as e:
-            logging.error('Creating network failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            hooks = self._construct_hooks()
-        except Exception as e:
-            logging.error('Creating hooks failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            logging.info('Creating main loop')
-            main_loop = MainLoop(net=self._net,
-                                 dataset=self._dataset,
-                                 hooks=hooks)
-        except Exception as e:
-            logging.error('Creating main loop failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            logging.info('Running the main loop')
-            main_loop.run(run_test_stream=('test' in self._config['stream']))
-        except Exception as e:
-            logging.error('Running the main loop failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-    def split(self, config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
-        logging.info('Splitting to %d splits with ratios %f:%f:%f', num_splits, train_ratio, valid_ratio, test_ratio)
-
-        logging.debug('Loading config')
-        try:
-            self._load_config(config_file=config_file, additional_args=[])
-        except Exception as e:
-            logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        try:
-            self.dumped_config_file = self._dump_config()
-        except Exception as e:
-            logging.error('Saving modified config failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        logging.debug('Creating dataset')
-        try:
-            self._create_dataset()
-        except Exception as e:
-            logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
-            sys.exit(1)
-
-        logging.debug('Splitting')
-        self._dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
+_cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s', datefmt='%H:%M:%S')
 
 
-def init_entry_point() -> None:
+def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
+    """
+    Load config from the given yaml file and extend/override it with the given CLI args.
+    :param config_file: path to the config yaml file
+    :param cli_options: additional args to extend/override the config
+    :return: config dict
+    """
+    logging.info('Loading config')
+    config = load_config(config_file=config_file, additional_args=cli_options)
+    logging.debug('\tLoaded config: %s', config)
+
+    assert ('net' in config)
+    assert ('dataset' in config)
+    if 'hooks' not in config:
+        logging.warning('\tNo hooks found in config')
+
+    return config
+
+
+def _train_create_output_dir(config: dict, output_root: str) -> str:
+    """
+    Create output_dir under the given output_root and
+        - dump the given config to yaml file under this dir
+        - register a file logger logging to a file under this dir
+    :param config: config to be dumped
+    :param output_root: dir wherein output_dir shall be created
+    :return: path to the created output_dir
+    """
+    logging.info('Creating output dir')
+
+    # create output dir
+    net_name = 'NonameNet'
+    if 'name' not in config['net']:
+        logging.warning('\tnet.name not found in config, defaulting to: %s', net_name)
+    else:
+        net_name = config['net']['name']
+    output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f'))
+    output_dir = path.join(output_root, output_dirname)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    else:
+        raise ValueError('Output dir {} already exists.'.format(output_dir))
+    logging.info('\tOutput dir: %s', output_dir)
+
+    # create file logger
+    file_handler = logging.FileHandler(path.join(output_dir, 'train.log'))
+    file_handler.setFormatter(_cxflow_log_formatter)
+    logging.getLogger().addHandler(file_handler)
+
+    # dump config including CLI args
+    config_to_file(config=config, output_dir=output_dir)
+
+    return output_dir
+
+
+def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
+    """
+    Create a dataset object according to the given config.
+
+    Dataset, stream and output_dir configs are passed to the constructor in a single YAML-encoded string.
+    :param config: config dict with dataset and stream configs
+    :param output_dir: path to the training output dir
+    :return: dataset object
+    """
+    logging.info('Creating dataset')
+    config_str = config_to_str({'dataset': config['dataset'],
+                                'stream': config['stream'],
+                                'output_dir': output_dir})
+    return create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
+
+
+def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
+    """
+    Create a net object either from scratch of from the specified checkpoint.
+
+    -------------------------------------------------------
+    To restore a net from a checkpoint, one must provide config['net']['restore_from'] parameter
+    with a path to the checkpoint.
+    -------------------------------------------------------
+
+    :param config: config dict with net config
+    :param output_dir: path to the training output dir
+    :param dataset: AbstractDataset object
+    :return: net object
+    """
+    net_config = config['net']
+    if 'restore_from' in net_config:
+        logging.info('Restoring net from: "%s"', net_config['restore_from'])
+        if 'net_module' in net_config or 'net_class' in net_config:
+            logging.warning('`net_module` and `net_class` config parameters are provided yet ignored')
+        net = AbstractNet(dataset=dataset, log_dir=output_dir, **net_config)
+    else:
+        logging.info('Creating new net')
+        net = create_object(object_config=net_config, prefix='net_', dataset=dataset, log_dir=output_dir, **net_config)
+    return net
+
+
+def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset) -> typing.Iterable[AbstractHook]:
+    """
+    Create hooks specified in config['hooks'] list.
+    :param config: config dict
+    :param net: net object to be passed to the hooks
+    :param dataset: AbstractDataset object
+    :return: list of hook objects
+    """
+    logging.info('Creating hooks')
+    hooks = []
+    if 'hooks' in config:
+        for hook_config in config['hooks']:
+            hooks.append(create_object(object_config=hook_config, dataset=dataset,
+                                       prefix='hook_', net=net, config=config, **hook_config))
+            logging.debug('\t%s created', type(hooks[-1]).__name__)
+    return hooks
+
+
+def _fallback(message: str, e: Exception) -> None:
+    """
+    Fallback procedure when a training step fails.
+    :param message: message to be logged
+    :param e: Exception which caused the failure
+    """
+    logging.error('%s: %s\n%s', message, e, traceback.format_exc())
+    sys.exit(1)
+
+
+def train(config_file: str, cli_options: typing.Iterable[str], output_root: str) -> None:
+    """
+    Run cxflow training configured from the given file and cli_options.
+
+    Unique output dir for this training is created under the given output_root dir
+    wherein all the training outputs are saved. The output dir name will be roughly [net.name]_[time].
+
+    -------------------------------------------------------
+    The training procedure consists of the following steps:
+    -------------------------------------------------------
+    Step 1:
+        - Load yaml configuration and override or extend it with parameters passed in CLI arguments
+        - Check if `net` and `dataset` configs are present
+    Step 2:
+        - Create output dir
+        - Create file logger under the output dir
+        - Dump loaded config to the output dir
+    Step 3:
+        - Create dataset
+            - yaml string with `dataset`, `stream` and `log_dir` configs is passed to the dataset constructor
+    Step 4:
+        - Create network
+            - Dataset, `log_dir` and net config is passed to the constructor
+    Step 5:
+        - Create all the training hooks
+    Step 6:
+        - Create the MainLoop object
+    Step 7:
+        - Run the main loop
+    -------------------------------------------------------
+    If any of the steps fails, the training is terminated.
+    -------------------------------------------------------
+
+    After the training procedure finishes, the output dir will contain the following:
+        - train_log.txt with entry_point and main_loop logs (same as the stderr)
+        - dumped yaml config
+
+    Additional outputs created by hooks, dataset or tensorflow may include:
+        - dataset_log.txt with info about dataset/stream creation
+        - model checkpoint(s)
+        - tensorboard log file
+        - tensorflow event log
+
+
+    :param config_file: path to the training yaml config
+    :param cli_options: additional CLI arguments to override or extend the yaml config
+    :param output_root: dir under which output_dir shall be created
+    """
+
+    config = output_dir = dataset = net = hooks = main_loop = None
+
+    try:
+        config = _train_load_config(config_file=config_file, cli_options=cli_options)
+    except Exception as e:
+        _fallback('Loading config failed', e)
+
+    try:
+        output_dir = _train_create_output_dir(config=config, output_root=output_root)
+    except Exception as e:
+        _fallback('Failed to create output dir', e)
+
+    try:
+        dataset = _train_create_dataset(config=config, output_dir=output_dir)
+    except Exception as e:
+        _fallback('Creating dataset failed', e)
+
+    try:
+        net = _train_create_net(config=config, output_dir=output_dir, dataset=dataset)
+    except Exception as e:
+        _fallback('Creating network failed', e)
+
+    try:
+        hooks = _train_create_hooks(config=config, net=net, dataset=dataset)
+    except Exception as e:
+        _fallback('Creating hooks failed', e)
+
+    try:
+        logging.info('Creating main loop')
+        main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks)
+    except Exception as e:
+        _fallback('Creating main loop failed', e)
+
+    try:
+        logging.info('Running the main loop')
+        main_loop.run(run_test_stream=('test' in config['stream']))
+    except Exception as e:
+        _fallback('Running the main loop failed', e)
+
+
+def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
+    logging.info('Splitting to %d splits with ratios %f:%f:%f', num_splits, train_ratio, valid_ratio, test_ratio)
+
+    try:
+        logging.info('Loading config')
+        config = load_config(config_file=config_file, additional_args=[])
+    except Exception as e:
+        _fallback('Loading config failed', e)
+
+    try:
+        logging.info('Creating dataset')
+        config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
+        dataset = create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
+    except Exception as e:
+        _fallback('Creating dataset failed', e)
+
+    logging.info('Splitting')
+    dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
+
+
+def entry_point() -> None:
+    """
+    cxflow entry point for training and dataset splitting.
+    """
+
     # make sure the path contains the current working directory
     sys.path.insert(0, os.getcwd())
 
@@ -248,7 +271,7 @@ def init_entry_point() -> None:
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
 
-    # create crossval subparser
+    # create split subparser
     split_parser = subparsers.add_parser('split')
     split_parser.set_defaults(subcommand='split')
     split_parser.add_argument('config_file', help='path to the config file')
@@ -263,49 +286,33 @@ def init_entry_point() -> None:
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()
 
-    # set up global logger
-    logger = logging.getLogger('')
-    logger.handlers = []  # remove default handlers
-    if known_args.verbose:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
-
-    # set up custom logging format
-    formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)s: %(message)s', datefmt='%H:%M:%S')
-
-    # set up STDERR handler
-    stderr_handler = logging.StreamHandler(sys.stderr)
-    stderr_handler.setFormatter(formatter)
-    logger.addHandler(stderr_handler)
-
-    # create entry point - this cannot be done earlier as the logger wasn't set up and this cannot be done later as
-    # the logdir is required for file logger
-    entry_point = EntryPoint()
-    output_dir = entry_point.create_output_dir(known_args.output_root)
-
-    # setup file handler
-    file_handler = RotatingFileHandler(path.join(output_dir, 'stderr.log'))
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-    # run entry-point method according to the proper subcommand
+    # show help if no subcommand was specified.
     if not hasattr(known_args, 'subcommand'):
         parser.print_help()
         quit(1)
+
+    # set up global logger
+    logger = logging.getLogger('')
+    logger.setLevel(logging.DEBUG if known_args.verbose else logging.INFO)
+    logger.handlers = []  # remove default handlers
+
+    # set up STDERR handler
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(_cxflow_log_formatter)
+    logger.addHandler(stderr_handler)
+
     if known_args.subcommand == 'train':
-        entry_point.train(config_file=known_args.config_file,
-                          cli_options=unknown_args)
+        train(config_file=known_args.config_file,
+              cli_options=unknown_args,
+              output_root=known_args.output_root)
 
     elif known_args.subcommand == 'split':
-        entry_point.split(config_file=known_args.config_file, num_splits=known_args.num_splits,
-                          train_ratio=known_args.ratio[0], valid_ratio=known_args.ratio[1],
-                          test_ratio=known_args.ratio[2])
-
-    else:
-        logging.error('Unrecognized subcommand: "%s". Please run `cxflow -h` for more info.', known_args.subcommand)
-        sys.exit(1)
+        split(config_file=known_args.config_file,
+              num_splits=known_args.num_splits,
+              train_ratio=known_args.ratio[0],
+              valid_ratio=known_args.ratio[1],
+              test_ratio=known_args.ratio[2])
 
 
 if __name__ == '__main__':
-    init_entry_point()
+    entry_point()

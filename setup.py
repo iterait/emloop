@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='cxflow',
-      version='0.3',
+      version='0.5',
       description='Smart TensorFlow trainer',
       long_description='Trainer of TensorFlow models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
@@ -29,7 +29,7 @@ setup(name='cxflow',
       test_suite='cxflow.tests',
       entry_points={
           'console_scripts': [
-              'cxflow=cxflow.entry_point:init_entry_point',
+              'cxflow=cxflow.entry_point:entry_point',
               'cxgridsearch=cxflow.grid_search:init_grid_search',
           ]
       })

@@ -12,19 +12,18 @@ class EpochStopperHookTest(TestCase):
 
     def test_not_raise(self):
         try:
-            hook = EpochStopperHook(epoch_limit=10, net=None, config=None)
+            hook = EpochStopperHook(epoch_limit=10, net=None, config=None, dataset=None)
             hook.after_epoch(epoch_id=5)
         except TrainingTerminated:
             self.fail('EpochStopperHook(10) raised at epoch 5')
 
         try:
-            hook = EpochStopperHook(epoch_limit=10, net=None, config=None)
+            hook = EpochStopperHook(epoch_limit=10, net=None, config=None, dataset=None)
             hook.after_epoch(epoch_id=9)
         except TrainingTerminated:
             self.fail('EpochStopperHook(10) raised at epoch 9')
 
     def test_raise(self):
-
-        hook = EpochStopperHook(epoch_limit=10, net=None, config=None)
+        hook = EpochStopperHook(epoch_limit=10, net=None, config=None, dataset=None)
         self.assertRaises(TrainingTerminated, hook.after_epoch, 10)
         self.assertRaises(TrainingTerminated, hook.after_epoch, 20)

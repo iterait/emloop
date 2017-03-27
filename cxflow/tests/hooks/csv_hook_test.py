@@ -21,7 +21,8 @@ class CSVHookTest(TestCase):
     def test_csv_log(self):
         net = NetMocker()
         output_file = 'training.csv'
-        hook = CSVHook(net=net, output_file=output_file, metrics_to_display=['accuracy', 'loss'], config=None)
+        hook = CSVHook(net=net, output_file=output_file, metrics_to_display=['accuracy', 'loss'],
+                       config=None, dataset=None)
 
         hook.before_first_epoch(valid_results={'accuracy': 0.0, 'loss': 1.0},
                                 test_results={'accuracy': 0.1, 'loss': 0.9})

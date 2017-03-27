@@ -3,6 +3,7 @@ from ..datasets.abstract_dataset import AbstractDataset
 
 import logging
 import typing
+import sys
 
 
 class LoggingHook(AbstractHook):
@@ -18,7 +19,9 @@ class LoggingHook(AbstractHook):
         self._metrics_to_display = metrics_to_display
 
     def before_first_epoch(self, valid_results: dict, test_results: dict = None, ** kwargs) -> None:
-        logging.info('Before first epoch')
+
+        print('\n\n', file=sys.stderr)
+        logging.info(' Before first epoch')
 
         for key in self._metrics_to_display:
             if key in valid_results:
@@ -35,7 +38,9 @@ class LoggingHook(AbstractHook):
     def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
                     test_results: AbstractDataset.Batch=None, **kwargs) -> None:
 
-        logging.info('After epoch %d', epoch_id)
+        print('\n\n', file=sys.stderr)
+        logging.info('After epoch {}'.format(epoch_id))
+
         for key in self._metrics_to_display:
             if key in train_results:
                 logging.info('\tTrain %s:\t%f', key, train_results[key])

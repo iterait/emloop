@@ -12,7 +12,7 @@ class ResultHookTest(TestCase):
         super().__init__(*args, **kwargs)
 
     def test_result_with_train(self):
-        hook = ResultHook(metrics_to_log=['a', 'b'], log_train_results=True, net=None, config=None)
+        hook = ResultHook(metrics_to_log=['a', 'b'], log_train_results=True, net=None, config=None, dataset=None)
 
         hook.after_batch('train', {'a': np.array([0,1,2]), 'b': np.array([0,10,20]), 'c': np.array([1,1,1])})
         hook.after_batch('train', {'a': np.array([3,4,5]), 'b': np.array([30,40,50]), 'c': np.array([2,3,3])})
@@ -56,7 +56,7 @@ class ResultHookTest(TestCase):
         self.assertEqual(0, len(hook._test_buffer))
 
     def test_result_without_train(self):
-        hook = ResultHook(metrics_to_log=['a', 'b'], log_train_results=False, net=None, config=None)
+        hook = ResultHook(metrics_to_log=['a', 'b'], log_train_results=False, net=None, config=None, dataset=None)
 
         hook.after_batch('train', {'a': np.array([0,1,2]), 'b': np.array([0,10,20]), 'c': np.array([1,1,1])})
         hook.after_batch('train', {'a': np.array([3,4,5]), 'b': np.array([30,40,50]), 'c': np.array([2,3,3])})
