@@ -88,7 +88,7 @@ def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     config_str = config_to_str({'dataset': config['dataset'],
                                 'stream': config['stream'],
                                 'output_dir': output_dir})
-    return create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
+    return create_object(config_str, object_config=config['dataset'], prefix='dataset_')
 
 
 def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
