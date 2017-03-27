@@ -148,38 +148,40 @@ class MainLoop:
         :param run_test_stream: should the test stream be evaluated?
         """
 
-        epoch_id = 0
+        try:
+            epoch_id = 0
 
-        for hook in self._hooks:
-            hook.before_training()
+            for hook in self._hooks:
+                hook.before_training()
 
-        valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
-        test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
-            if run_test_stream else None
-
-        for hook in self._hooks:
-            hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
-
-        while True:
-            self.epoch_profile = {}
-            epoch_id += 1
-
-            train_results = self.train_by_stream(stream=self._dataset.create_train_stream())
             valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
             test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
                 if run_test_stream else None
 
-            with Timer('after_epoch_hooks', self.epoch_profile):
-                try:
+            for hook in self._hooks:
+                hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
+
+            while True:
+                self.epoch_profile = {}
+                epoch_id += 1
+
+                train_results = self.train_by_stream(stream=self._dataset.create_train_stream())
+                valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
+                test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
+                    if run_test_stream else None
+
+                with Timer('after_epoch_hooks', self.epoch_profile):
                     for hook in self._hooks:
                         hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
                                          test_results=test_results)
-                except TrainingTerminated as e:
-                    logging.info('Training terminated by a hook: %s', e)
-                    break
 
-            for hook in self._hooks:
-                hook.after_epoch_profile(epoch_id=epoch_id, profile=self.epoch_profile)
+                for hook in self._hooks:
+                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self.epoch_profile)
+
+        except TrainingTerminated as e:
+            logging.info('Training terminated by a hook: %s', e)
+        except KeyboardInterrupt:
+            logging.info('Training terminated by a keyboard interrupt')
 
         for hook in self._hooks:
             hook.after_training()
