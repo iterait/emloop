@@ -216,7 +216,7 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
         _train_fallback('Creating network failed: %s\n%s', e)
 
     try:
-        hooks = _train_create_hooks(config=config, net=net)
+        hooks = _train_create_hooks(config=config, net=net, dataset=dataset)
     except Exception as e:
         _train_fallback('Creating hooks failed: %s\n%s', e)
 
