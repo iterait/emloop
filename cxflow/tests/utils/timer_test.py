@@ -5,7 +5,7 @@ import time
 from unittest import TestCase
 
 
-class ParseArgumentsTest(TestCase):
+class TimerTest(TestCase):
     def __init__(self, *args, **kwargs):
         logging.getLogger().disabled = True
         super().__init__(*args, **kwargs)
