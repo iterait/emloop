@@ -20,7 +20,7 @@ class ClassificationInfoHookTest(TestCase):
 
     def test_classification_info(self):
         hook = ClassificationInfoHook(predicted_variable='predicted', gold_variable='gold', f1_average='macro',
-                                      net=None, config=None)
+                                      net=None, config=None, dataset=None)
 
         hook.after_batch('train', {'predicted': [0,0,0,1,2], 'gold': [0,0,0,0,2]})
         hook.after_batch('train', {'predicted': [0,0,1,1,2], 'gold': [0,1,2,0,1]})
