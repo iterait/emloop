@@ -30,8 +30,9 @@ Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is s
 1. Clone the **cxflow** repository `$ git clone git@gitlab.com:Cognexa/cxflow.git`
 2. Enter the directory `$ cd cxflow`
 3. **Optional**: *install any specific version of packages (e.g. TensorFlow). If this step is skipped, the up-to-date version will be installed by default in the next step.*
-4. Install **cxflow** dependencies `$ pip install -r requirements.txt`. If forced update of all previously installed packages is required, `-U` flag should be used.
-5. Install **cxflow** `$ pip install .`. For development purposes, an additional `-e` flag should be used.
+4. Install **cxflow**
+  - Developement version: `$ pip install -e .`
+  - Production version: `$ pip install git+https://gitlab.com/Cognexa/cxflow.git`
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
