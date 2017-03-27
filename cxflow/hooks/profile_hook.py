@@ -21,14 +21,14 @@ class ProfileHook(AbstractHook):
             hooks += sum(profile['after_batch_hooks_test'])
 
         # time spent evaluating valid + test
-        eval = sum(profile['eval_batch_valid'])
+        _eval = sum(profile['eval_batch_valid'])
         if 'eval_batch_valid' in profile:
-            eval += sum(profile['eval_batch_valid'])
+            _eval += sum(profile['eval_batch_valid'])
 
         # time spent training
         train = sum(profile['eval_batch_train'])
 
         logging.info('\tT read data:\t%f', read_data)
         logging.info('\tT train:\t%f', train)
-        logging.info('\tT valid+test:\t%f', eval)
+        logging.info('\tT valid+test:\t%f', _eval)
         logging.info('\tT hooks:\t%f', hooks)
