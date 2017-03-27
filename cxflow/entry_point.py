@@ -65,7 +65,7 @@ def _train_create_output_dir(config: dict, output_root: str) -> str:
     logging.info('\tOutput dir: %s', output_dir)
 
     # create file logger
-    file_handler = logging.FileHandler(path.join(output_dir, 'train_log.txt'))
+    file_handler = logging.FileHandler(path.join(output_dir, 'train.log'))
     file_handler.setFormatter(_cxflow_log_formatter)
     logging.getLogger().addHandler(file_handler)
 
