@@ -14,9 +14,10 @@ class ProfileHook(AbstractHook):
             read_data += sum(profile['read_batch_test'])
 
         # time spent processing hooks (after batch + after epoch for train + valid + test)
-        hooks = sum(profile['after_batch_hooks_train']) + \
-                sum(profile['after_batch_hooks_valid']) + \
-                sum(profile['after_epoch_hooks'])
+        hooks = (sum(profile['after_batch_hooks_train']) +
+                 sum(profile['after_batch_hooks_valid']) +
+                 sum(profile['after_epoch_hooks']))
+
         if 'after_batch_hooks_test' in profile:
             hooks += sum(profile['after_batch_hooks_test'])
 
