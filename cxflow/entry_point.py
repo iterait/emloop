@@ -122,6 +122,7 @@ def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset
     Create hooks specified in config['hooks'] list.
     :param config: config dict
     :param net: net object to be passed to the hooks
+    :param dataset: AbstractDataset object
     :return: list of hook objects
     """
     logging.info('Creating hooks')
@@ -134,13 +135,13 @@ def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset
     return hooks
 
 
-def _train_fallback(message: str, e: Exception) -> None:
+def _fallback(message: str, e: Exception) -> None:
     """
     Fallback procedure when a training step fails.
     :param message: message to be logged
     :param e: Exception which caused the failure
     """
-    logging.error(message, e, traceback.format_exc())
+    logging.error('%s: %s\n%s', message, e, traceback.format_exc())
     sys.exit(1)
 
 
@@ -198,39 +199,39 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
     try:
         config = _train_load_config(config_file=config_file, cli_options=cli_options)
     except Exception as e:
-        _train_fallback('Loading config failed: %s\n%s', e)
+        _fallback('Loading config failed', e)
 
     try:
         output_dir = _train_create_output_dir(config=config, output_root=output_root)
     except Exception as e:
-        _train_fallback('Failed to create output dir: %s\n%s', e)
+        _fallback('Failed to create output dir', e)
 
     try:
         dataset = _train_create_dataset(config=config, output_dir=output_dir)
     except Exception as e:
-        _train_fallback('Creating dataset failed: %s\n%s', e)
+        _fallback('Creating dataset failed', e)
 
     try:
         net = _train_create_net(config=config, output_dir=output_dir, dataset=dataset)
     except Exception as e:
-        _train_fallback('Creating network failed: %s\n%s', e)
+        _fallback('Creating network failed', e)
 
     try:
         hooks = _train_create_hooks(config=config, net=net, dataset=dataset)
     except Exception as e:
-        _train_fallback('Creating hooks failed: %s\n%s', e)
+        _fallback('Creating hooks failed', e)
 
     try:
         logging.info('Creating main loop')
         main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks)
     except Exception as e:
-        _train_fallback('Creating main loop failed: %s\n%s', e)
+        _fallback('Creating main loop failed', e)
 
     try:
         logging.info('Running the main loop')
         main_loop.run(run_test_stream=('test' in config['stream']))
     except Exception as e:
-        _train_fallback('Running the main loop failed: %s\n%s', e)
+        _fallback('Running the main loop failed', e)
 
 
 def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
@@ -240,16 +241,14 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
         logging.info('Loading config')
         config = load_config(config_file=config_file, additional_args=[])
     except Exception as e:
-        logging.error('Loading config failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
+        _fallback('Loading config failed', e)
 
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
         dataset = create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
     except Exception as e:
-        logging.error('Creating dataset failed: %s\n%s', e, traceback.format_exc())
-        sys.exit(1)
+        _fallback('Creating dataset failed', e)
 
     logging.info('Splitting')
     dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
