@@ -50,7 +50,7 @@ class TimerTest(TestCase):
         with Timer('sleep', log):
             time.sleep(sleep_time)
 
-        self.assertAlmostEqual(log['sleep'][0], sleep_time, places=2)
+        self.assertAlmostEqual(log['sleep'][0], sleep_time, places=1)
 
     def test_order(self):
         log = {}
@@ -60,4 +60,4 @@ class TimerTest(TestCase):
             with Timer('sleep', log):
                 time.sleep(i)
 
-            self.assertAlmostEqual(log['sleep'][i], i, places=2)
+            self.assertAlmostEqual(log['sleep'][i], i, places=1)
