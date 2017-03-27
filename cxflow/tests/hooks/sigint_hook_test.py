@@ -22,7 +22,7 @@ class SigintHookTest(TestCase):
 
     def test_before_training(self):
         try:
-            hook = SigintHook(net=None, config=None)
+            hook = SigintHook(net=None, config=None, dataset=None)
             os.kill(os.getpid(), signal.SIGINT)
             self.assertTrue(self._sigint_unhandled,
                             'SigintHook handles SIGINT before training')
@@ -31,7 +31,7 @@ class SigintHookTest(TestCase):
 
     def test_inside_training_no_raise(self):
         try:
-            hook = SigintHook(net=None, config=None)
+            hook = SigintHook(net=None, config=None, dataset=None)
             hook.before_training()
             os.kill(os.getpid(), signal.SIGINT)
             self.assertFalse(self._sigint_unhandled,
@@ -41,25 +41,24 @@ class SigintHookTest(TestCase):
             self.fail('SigintHook raised outside of after_batch()')
 
     def test_inside_training_raise(self):
-        raised = False;
+        raised = False
         try:
-            hook = SigintHook(net=None, config=None)
+            hook = SigintHook(net=None, config=None, dataset=None)
             hook.before_training()
             os.kill(os.getpid(), signal.SIGINT)
             hook.after_batch()
         except TrainingTerminated:
-            raised = True;
+            raised = True
         self.assertTrue(raised, 'SigintHook does not raise')
 
     def test_after_training(self):
         try:
-            hook = SigintHook(net=None, config=None)
+            hook = SigintHook(net=None, config=None, dataset=None)
             hook.before_training()
             hook.after_batch()
             hook.after_epoch(epoch_id=1, train_results=None, valid_results=None)
             hook.after_training()
             os.kill(os.getpid(), signal.SIGINT)
-            self.assertTrue(self._sigint_unhandled,
-                            'SigintHook handles SIGINT after training')
+            self.assertTrue(self._sigint_unhandled, 'SigintHook handles SIGINT after training')
         except TrainingTerminated:
-            self.assertTrue(raised, 'SigintHook raises after training')
+            self.fail('SigintHook raises after training')
