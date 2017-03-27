@@ -56,7 +56,7 @@ def _train_create_output_dir(config: dict, output_root: str) -> str:
         logging.warning('\tnet.name not found in config, defaulting to: %s', net_name)
     else:
         net_name = config['net']['name']
-    output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f'))
+    output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f'))
     output_dir = path.join(output_root, output_dirname)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
