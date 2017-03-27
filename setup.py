@@ -1,3 +1,4 @@
+from pip.req import parse_requirements
 from setuptools import setup
 
 setup(name='cxflow',
@@ -27,6 +28,7 @@ setup(name='cxflow',
       include_package_data=True,
       zip_safe=False,
       test_suite='cxflow.tests',
+      install_requires=[str(ir.req) for ir in parse_requirements('requirements.txt', session='hack')],
       entry_points={
           'console_scripts': [
               'cxflow=cxflow.entry_point:entry_point',

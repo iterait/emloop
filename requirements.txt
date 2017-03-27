@@ -6,6 +6,7 @@ pandas>=0.19.2
 scikit-learn>=0.18.1
 pytz>=2016.10
 ruamel.yaml>=0.13.14
+pip>=9.0.0
 
 # aur/      Less common system packages (usually with `python-` prefix)
 # ---------------------------------------------------------------------
@@ -15,5 +16,4 @@ tabulate>=0.7.7
 
 # pip       The previous options are not available or broken
 # ----------------------------------------------------------
-git+https://github.com/mila-udem/fuel.git
 typing>=3.5.3.0
