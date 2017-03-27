@@ -117,7 +117,7 @@ def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -
     return net
 
 
-def _train_create_hooks(config: dict, net: AbstractNet) -> typing.Iterable[AbstractHook]:
+def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset) -> typing.Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
@@ -128,7 +128,7 @@ def _train_create_hooks(config: dict, net: AbstractNet) -> typing.Iterable[Abstr
     hooks = []
     if 'hooks' in config:
         for hook_config in config['hooks']:
-            hooks.append(create_object(object_config=hook_config,
+            hooks.append(create_object(object_config=hook_config, dataset=dataset,
                                        prefix='hook_', net=net, config=config, **hook_config))
             logging.debug('\t%s created', type(hooks[-1]).__name__)
     return hooks

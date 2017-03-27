@@ -22,7 +22,7 @@ class AbstractHook:
     6) When the whole training is over, `after_training` is triggered.
     """
 
-    def __init__(self, net: AbstractNet, config: dict, **kwargs):
+    def __init__(self, net: AbstractNet, config: dict, dataset: AbstractDataset, **kwargs):
         pass
 
     def before_training(self, **kwargs) -> None:
