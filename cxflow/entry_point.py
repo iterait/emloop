@@ -88,7 +88,9 @@ def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     config_str = config_to_str({'dataset': config['dataset'],
                                 'stream': config['stream'],
                                 'output_dir': output_dir})
-    return create_object(config_str, object_config=config['dataset'], prefix='dataset_')
+    dataset = create_object(config_str, object_config=config['dataset'], prefix='dataset_')
+    logging.info('\t%s created', type(dataset).__name__)
+    return dataset
 
 
 def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
@@ -114,6 +116,7 @@ def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -
     else:
         logging.info('Creating new net')
         net = create_object(object_config=net_config, prefix='net_', dataset=dataset, log_dir=output_dir, **net_config)
+        logging.info('\t%s created', type(net).__name__)
     return net
 
 
@@ -131,7 +134,7 @@ def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset
         for hook_config in config['hooks']:
             hooks.append(create_object(object_config=hook_config, dataset=dataset,
                                        prefix='hook_', net=net, config=config, **hook_config))
-            logging.debug('\t%s created', type(hooks[-1]).__name__)
+            logging.info('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
 
