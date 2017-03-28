@@ -246,7 +246,7 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
-        dataset = create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
+        dataset = create_object(config_str, object_config=config['dataset'], prefix='dataset_')
     except Exception as e:
         _fallback('Creating dataset failed', e)
 
