@@ -80,4 +80,14 @@ class AbstractFuelDataset(metaclass=ABCMeta):
         :param kwargs: test stream kwargs
         :return: test stream iterator
         """
-        raise NotImplementedError('Dataset does not implement create test stream although it is required.')
+        raise NotImplementedError('Dataset does not implement create test stream method although it is now required.')
+
+    def split(self, num_splits: int, train: float, valid: float, test: float) -> None:
+        """
+        Perform cross-validation split with the given parameters.
+        :param num_splits: the number of train-valid splits to be created (sharing the test set)
+        :param train: portion of data to be split to train
+        :param valid: portion of data to be split to valid
+        :param test: portion of data to be split to test
+        """
+        raise NotImplementedError('Dataset does not implement split method although it is now required.')
