@@ -21,7 +21,7 @@ class MainLoop:
         self._net = net
         self._dataset = dataset
         self._hooks = hooks
-        self.epoch_profile = {}
+        self._epoch_profile = {}
 
         self._extra_sources_warned = False
 
@@ -97,7 +97,7 @@ class MainLoop:
 
         while True:
             try:
-                with Timer('read_batch_{}'.format(stream_type), self.epoch_profile):
+                with Timer('read_batch_{}'.format(stream_type), self._epoch_profile):
                     batch = next(stream)
             except StopIteration:
                 break
@@ -107,10 +107,10 @@ class MainLoop:
                     logging.debug('Incomplete batch skipped')
                     continue
 
-            with Timer('eval_batch_{}'.format(stream_type), self.epoch_profile):
+            with Timer('eval_batch_{}'.format(stream_type), self._epoch_profile):
                 batch_result = self._run_batch(train=train, batch=batch)
 
-            with Timer('after_batch_hooks_{}'.format(stream_type), self.epoch_profile):
+            with Timer('after_batch_hooks_{}'.format(stream_type), self._epoch_profile):
                 for hook in self._hooks:
                     hook.after_batch(stream_type=stream_type, results=batch_result)
 
@@ -158,7 +158,7 @@ class MainLoop:
                 hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
 
             while True:
-                self.epoch_profile = {}
+                self._epoch_profile = {}
                 epoch_id += 1
 
                 train_results = self.train_by_stream(stream=self._dataset.create_train_stream())
@@ -166,13 +166,13 @@ class MainLoop:
                 test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
                     if run_test_stream else None
 
-                with Timer('after_epoch_hooks', self.epoch_profile):
+                with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:
                         hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
                                          test_results=test_results)
 
                 for hook in self._hooks:
-                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self.epoch_profile)
+                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile)
 
         except TrainingTerminated as e:
             logging.info('Training terminated by a hook: %s', e)
