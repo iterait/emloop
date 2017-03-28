@@ -275,8 +275,8 @@ def entry_point() -> None:
     split_parser = subparsers.add_parser('split')
     split_parser.set_defaults(subcommand='split')
     split_parser.add_argument('config_file', help='path to the config file')
-    split_parser.add_argument('-n', '--num-splits', type=int, help='number of splits')
-    split_parser.add_argument('-r', '--ratio', type=int, nargs=3, help='train, valid and test ratios')
+    split_parser.add_argument('-n', '--num-splits', type=int, default=1, help='number of splits')
+    split_parser.add_argument('-r', '--ratio', type=int, nargs=3, required=True, help='train, valid and test ratios')
 
     # add common arguments
     for p in [parser, train_parser, split_parser]:
