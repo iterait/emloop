@@ -246,7 +246,7 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
-        dataset = create_object(object_config=config['dataset'], prefix='dataset_', config_str=config_str)
+        dataset = create_object(config_str, object_config=config['dataset'], prefix='dataset_')
     except Exception as e:
         _fallback('Creating dataset failed', e)
 
@@ -275,8 +275,8 @@ def entry_point() -> None:
     split_parser = subparsers.add_parser('split')
     split_parser.set_defaults(subcommand='split')
     split_parser.add_argument('config_file', help='path to the config file')
-    split_parser.add_argument('-n', '--num-splits', type=int, help='number of splits')
-    split_parser.add_argument('-r', '--ratio', type=int, nargs=3, help='train, valid and test ratios')
+    split_parser.add_argument('-n', '--num-splits', type=int, default=1, help='number of splits')
+    split_parser.add_argument('-r', '--ratio', type=int, nargs=3, required=True, help='train, valid and test ratios')
 
     # add common arguments
     for p in [parser, train_parser, split_parser]:
