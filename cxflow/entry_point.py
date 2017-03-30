@@ -5,7 +5,7 @@ from .nets.abstract_net import AbstractNet
 from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook
 from .utils.config import load_config, config_to_str, config_to_file
-from .utils.reflection import create_object
+from .utils.reflection import create_object_from_config
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -88,7 +88,8 @@ def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     config_str = config_to_str({'dataset': config['dataset'],
                                 'stream': config['stream'],
                                 'output_dir': output_dir})
-    dataset = create_object(config_str, object_config=config['dataset'], prefix='dataset_')
+
+    dataset = create_object_from_config(config['dataset'], args=(config_str,))
     logging.info('\t%s created', type(dataset).__name__)
     return dataset
 
@@ -115,7 +116,8 @@ def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -
         net = AbstractNet(dataset=dataset, log_dir=output_dir, **net_config)
     else:
         logging.info('Creating new net')
-        net = create_object(object_config=net_config, prefix='net_', dataset=dataset, log_dir=output_dir, **net_config)
+
+        net = create_object_from_config(net_config, kwargs={'dataset': dataset, 'log_dir': output_dir, **net_config})
         logging.info('\t%s created', type(net).__name__)
     return net
 
@@ -132,8 +134,8 @@ def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset
     hooks = []
     if 'hooks' in config:
         for hook_config in config['hooks']:
-            hooks.append(create_object(object_config=hook_config, dataset=dataset,
-                                       prefix='hook_', net=net, config=config, **hook_config))
+            hooks.append(create_object_from_config(hook_config, kwargs={'dataset': dataset, 'net': net,
+                                                                        'config': config, **hook_config}))
             logging.info('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
@@ -249,7 +251,7 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
-        dataset = create_object(config_str, object_config=config['dataset'], prefix='dataset_')
+        dataset = create_object_from_config(config['dataset'], args=(config_str,))
     except Exception as e:
         _fallback('Creating dataset failed', e)
 
