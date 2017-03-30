@@ -13,6 +13,7 @@ from os import path
 import logging
 import os
 import sys
+import tempfile
 import traceback
 import typing
 
@@ -39,7 +40,7 @@ def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> d
     return config
 
 
-def _train_create_output_dir(config: dict, output_root: str) -> str:
+def _train_create_output_dir(config: dict, output_root: str, default_net_name: str='NonameNet') -> str:
     """
     Create output_dir under the given output_root and
         - dump the given config to yaml file under this dir
@@ -51,17 +52,14 @@ def _train_create_output_dir(config: dict, output_root: str) -> str:
     logging.info('Creating output dir')
 
     # create output dir
-    net_name = 'NonameNet'
+    net_name = default_net_name
     if 'name' not in config['net']:
         logging.warning('\tnet.name not found in config, defaulting to: %s', net_name)
     else:
         net_name = config['net']['name']
-    output_dirname = '{}_{}'.format(net_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f'))
-    output_dir = path.join(output_root, output_dirname)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    else:
-        raise ValueError('Output dir {} already exists.'.format(output_dir))
+
+    output_dir = tempfile.mkdtemp(prefix='{}_{}_'.format(net_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S')),
+                                  dir=output_root)
     logging.info('\tOutput dir: %s', output_dir)
 
     # create file logger
