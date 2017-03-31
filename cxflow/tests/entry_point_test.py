@@ -1,4 +1,5 @@
-from cxflow.entry_point import _train_create_output_dir
+from cxflow.entry_point import _train_create_output_dir, _train_create_dataset, _train_load_config
+from cxflow.utils.config import config_to_file, load_config
 
 import logging
 import os
@@ -6,7 +7,12 @@ from os import path
 import tempfile
 from unittest import TestCase
 import shutil
+import yaml
 
+
+class DummyDataset:
+    def __init__(self, config_str):
+        self.config = yaml.load(config_str)
 
 class EntryPointTest(TestCase):
     def __init__(self, *args, **kwargs):
@@ -56,3 +62,41 @@ class EntryPointTest(TestCase):
         self.assertNotEqual(output_dir_1, output_dir_2)
         self.assertEqual(len(os.listdir(temp_dir)), 2)
         shutil.rmtree(temp_dir)
+
+    def test_train_create_dataset(self):
+        config = {'dataset': {'module': 'cxflow.tests.entry_point_test', 'class': 'DummyDataset', 'batch_size': 10},
+                  'stream': {'train': {'rotate': 20}}, 'hooks': [{'hook_name': 'should_not_be_included'}]}
+
+        expected_config = {'dataset': {'module': 'cxflow.tests.entry_point_test',
+                                       'class': 'DummyDataset', 'batch_size': 10},
+                           'stream': {'train': {'rotate': 20}}, 'output_dir': 'dummy_dir'}
+
+        dataset = _train_create_dataset(config=config, output_dir='dummy_dir')
+
+        self.assertTrue(isinstance(dataset, DummyDataset))
+        self.assertTrue(hasattr(dataset, 'config'))
+        self.assertDictEqual(dataset.config, expected_config)
+
+    def test_train_load_config(self):
+        temp_dir = tempfile.mkdtemp()
+
+        # test a config call with both dataset and net
+        good_config = {'dataset': None, 'net': None}
+        config_path = config_to_file(good_config, temp_dir)
+
+        # test assertion when config is incomplete
+        missing_net_config = {'dataset': None}
+        config_path2 = config_to_file(missing_net_config, temp_dir, 'config2.yaml')
+        self.assertRaises(AssertionError, _train_load_config, config_path2, [])
+
+        missing_dataset_config = {'dataset': None}
+        config_path3 = config_to_file(missing_dataset_config, temp_dir, 'config3.yaml')
+        self.assertRaises(AssertionError, _train_load_config, config_path3, [])
+
+        # test return value
+        returned_config = _train_load_config(config_path, [])
+        self.assertDictEqual(returned_config, load_config(config_path, []))
+        self.assertDictEqual(returned_config, good_config)
+
+        shutil.rmtree(temp_dir)
+
