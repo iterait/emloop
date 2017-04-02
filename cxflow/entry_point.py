@@ -58,10 +58,6 @@ def _train_create_output_dir(config: dict, output_root: str, default_net_name: s
     else:
         net_name = config['net']['name']
 
-    if not os.path.exists(output_root):
-        logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
-        os.makedirs(output_root)
-
     output_dir = tempfile.mkdtemp(prefix='{}_{}_'.format(net_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S')),
                                   dir=output_root)
     logging.info('\tOutput dir: %s', output_dir)
