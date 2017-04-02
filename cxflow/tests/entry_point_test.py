@@ -34,28 +34,6 @@ class EntryPointTest(TestCase):
 
         shutil.rmtree(temp_dir)
 
-    def test_create_output_dir_no_root(self):
-        # check that output root is created if it does not exist
-        temp_dir = tempfile.mkdtemp()
-        output_root = path.join(temp_dir, 'output_root')
-        name = 'my_name'
-        output_dir = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
-                                              output_root=output_root,
-                                              default_net_name='nothing')
-
-        # check that output_root exists and it is the only folder in temp_dir
-        self.assertEqual(len(os.listdir(temp_dir)), 1)
-        self.assertTrue(path.exists(output_root))
-        self.assertTrue(path.isdir(output_root))
-        # check that output_dir exists and it is the only folder in output_root
-        self.assertEqual(len(os.listdir(output_root)), 1)
-        self.assertEqual(output_dir, path.join(output_root, path.basename(output_dir)))
-        self.assertTrue(path.exists(output_dir))
-        self.assertTrue(path.isdir(output_dir))
-        self.assertTrue(name in output_dir)
-
-        shutil.rmtree(temp_dir)
-
     def test_train_create_output_dir_without_net_name(self):
         temp_dir = tempfile.mkdtemp()
         name = 'nothing'
