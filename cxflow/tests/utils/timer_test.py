@@ -1,16 +1,22 @@
-from cxflow.utils.profile import Timer
-
+"""
+Test module for profile utils (cxflow.utils.profile).
+"""
 import logging
 import time
 from unittest import TestCase
 
+from cxflow.utils.profile import Timer
+
 
 class TimerTest(TestCase):
+    """Test case for Timer profiling object."""
+
     def __init__(self, *args, **kwargs):
         logging.getLogger().disabled = True
         super().__init__(*args, **kwargs)
 
     def test_empty_timer(self):
+        """Test near zero measured time for no-op."""
         log = {}
         with Timer('noop', log):
             pass
@@ -20,17 +26,19 @@ class TimerTest(TestCase):
         self.assertAlmostEqual(log['noop'][0], 0, places=4)
 
     def test_appending(self):
+        """Test correct usage of the given profile."""
         log = {}
 
         n_iter = 100
 
-        for i in range(n_iter):
+        for _ in range(n_iter):
             with Timer('noop', log):
                 pass
 
         self.assertEqual(len(log['noop']), n_iter)
 
     def test_nested(self):
+        """Test nesting of Timer usage pattern."""
         log = {}
 
         with Timer('timerop', log):
@@ -43,6 +51,7 @@ class TimerTest(TestCase):
         self.assertGreater(log['timerop'][0], log['noop'][0])
 
     def test_time(self):
+        """Test reasonable precision in measuring time."""
         log = {}
 
         sleep_time = 1
@@ -53,6 +62,7 @@ class TimerTest(TestCase):
         self.assertAlmostEqual(log['sleep'][0], sleep_time, places=1)
 
     def test_order(self):
+        """Test correct order of measurements in the profile."""
         log = {}
 
         for i in range(3):

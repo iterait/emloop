@@ -1,24 +1,36 @@
 #!/usr/bin/python3 -mentry_point
+"""
+This module is cxflow framework entry point.
+
+The entry point shall be accessed from command line via `cxflow` command.
+
+At the moment cxflow allows to
+- train a network with `cxflow train ...`
+- split data to x-validation sets with `cxflow split ...`
+
+Run `cxflow -h` for details.
+"""
+import logging
+import sys
+import tempfile
+import traceback
+import typing
+import os
+from os import path
+from argparse import ArgumentParser
+from datetime import datetime
 
 from .main_loop import MainLoop
 from .nets.abstract_net import AbstractNet
+from .nets.tf_net import BaseTFNetRestore
 from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook
 from .utils.config import load_config, config_to_str, config_to_file
 from .utils.reflection import create_object_from_config
 
-from argparse import ArgumentParser
-from datetime import datetime
-from os import path
-import logging
-import os
-import sys
-import tempfile
-import traceback
-import typing
-
-
-_cxflow_log_formatter = logging.Formatter('%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s', datefmt='%H:%M:%S')
+CXFLOW_LOG_FORMAT_STR = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
+CXFLOW_LOG_DATE_FORMAT_STR = '%H:%M:%S'
+CXFLOW_LOG_FORMATTER = logging.Formatter(CXFLOW_LOG_FORMAT_STR, datefmt=CXFLOW_LOG_DATE_FORMAT_STR)
 
 
 def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
@@ -32,8 +44,8 @@ def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> d
     config = load_config(config_file=config_file, additional_args=cli_options)
     logging.debug('\tLoaded config: %s', config)
 
-    assert ('net' in config)
-    assert ('dataset' in config)
+    assert 'net' in config
+    assert 'dataset' in config
     if 'hooks' not in config:
         logging.warning('\tNo hooks found in config')
 
@@ -68,7 +80,7 @@ def _train_create_output_dir(config: dict, output_root: str, default_net_name: s
 
     # create file logger
     file_handler = logging.FileHandler(path.join(output_dir, 'train.log'))
-    file_handler.setFormatter(_cxflow_log_formatter)
+    file_handler.setFormatter(CXFLOW_LOG_FORMATTER)
     logging.getLogger().addHandler(file_handler)
 
     # dump config including CLI args
@@ -101,8 +113,11 @@ def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -
     Create a net object either from scratch of from the specified checkpoint.
 
     -------------------------------------------------------
-    To restore a net from a checkpoint, one must provide config['net']['restore_from'] parameter
-    with a path to the checkpoint.
+    cxflow allows the following scenarios
+    -------------------------------------------------------
+    1. Create net: specify net_module and net_class, do not specify restore_from
+    2. Restore net: specify restore_from, net_module and net_class is ignored
+    3. Custom restore net (e.g. fine-tunning): specify restore_from, restore_module and restore_class
     -------------------------------------------------------
 
     :param config: config dict with net config
@@ -111,20 +126,24 @@ def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -
     :return: net object
     """
     net_config = config['net']
+    net_kwargs = {'dataset':dataset, 'log_dir': output_dir, **net_config}
     if 'restore_from' in net_config:
-        logging.info('Restoring net from: "%s"', net_config['restore_from'])
-        if 'net_module' in net_config or 'net_class' in net_config:
-            logging.warning('`net_module` and `net_class` config parameters are provided yet ignored')
-        net = AbstractNet(dataset=dataset, log_dir=output_dir, **net_config)
+        logging.info('Restoring net')
+        try:
+            net = create_object_from_config(net_config, net_kwargs, key_prefix='restore_')
+            logging.info('\tNet restored with custom class')
+        except (AssertionError, ValueError, AttributeError, ImportError, TypeError) as _:
+            net = BaseTFNetRestore(**net_kwargs)
+            logging.info('\tNet restored with generic BaseTFNetRestore')
     else:
-        logging.info('Creating new net')
-
-        net = create_object_from_config(net_config, kwargs={'dataset': dataset, 'log_dir': output_dir, **net_config})
-        logging.info('\t%s created', type(net).__name__)
+        logging.info('Creating net')
+        net = create_object_from_config(net_config, kwargs=net_kwargs)
+    logging.info('\t%s created', type(net).__name__)
     return net
 
 
-def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset) -> typing.Iterable[AbstractHook]:
+def _train_create_hooks(config: dict, net: AbstractNet,
+                        dataset: AbstractDataset, output_dir: str) -> typing.Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
@@ -136,19 +155,19 @@ def _train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset
     hooks = []
     if 'hooks' in config:
         for hook_config in config['hooks']:
-            hooks.append(create_object_from_config(hook_config, kwargs={'dataset': dataset, 'net': net,
-                                                                        'config': config, **hook_config}))
+            hook_kwargs = {'dataset': dataset, 'net': net, 'output_dir': output_dir, 'config': config, **hook_config}
+            hooks.append(create_object_from_config(hook_config, kwargs=hook_kwargs))
             logging.info('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
 
-def _fallback(message: str, e: Exception) -> None:
+def _fallback(message: str, ex: Exception) -> None:
     """
     Fallback procedure when a training step fails.
     :param message: message to be logged
     :param e: Exception which caused the failure
     """
-    logging.error('%s: %s\n%s', message, e, traceback.format_exc())
+    logging.error('%s: %s\n%s', message, ex, traceback.format_exc())
     sys.exit(1)
 
 
@@ -205,57 +224,68 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
 
     try:
         config = _train_load_config(config_file=config_file, cli_options=cli_options)
-    except Exception as e:
-        _fallback('Loading config failed', e)
+    except Exception as ex:
+        _fallback('Loading config failed', ex)
 
     try:
         output_dir = _train_create_output_dir(config=config, output_root=output_root)
-    except Exception as e:
-        _fallback('Failed to create output dir', e)
+    except Exception as ex:
+        _fallback('Failed to create output dir', ex)
 
     try:
         dataset = _train_create_dataset(config=config, output_dir=output_dir)
-    except Exception as e:
-        _fallback('Creating dataset failed', e)
+    except Exception as ex:
+        _fallback('Creating dataset failed', ex)
 
     try:
         net = _train_create_net(config=config, output_dir=output_dir, dataset=dataset)
-    except Exception as e:
-        _fallback('Creating network failed', e)
+    except Exception as ex:
+        _fallback('Creating network failed', ex)
 
     try:
-        hooks = _train_create_hooks(config=config, net=net, dataset=dataset)
-    except Exception as e:
-        _fallback('Creating hooks failed', e)
+        hooks = _train_create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
+    except Exception as ex:
+        _fallback('Creating hooks failed', ex)
 
     try:
         logging.info('Creating main loop')
-        main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks)
-    except Exception as e:
-        _fallback('Creating main loop failed', e)
+        kwargs = config['main_loop'] if 'main_loop' in config else {}
+        main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks, **kwargs)
+    except Exception as ex:
+        _fallback('Creating main loop failed', ex)
 
     try:
         logging.info('Running the main loop')
         main_loop.run(run_test_stream=('test' in config['stream']))
-    except Exception as e:
-        _fallback('Running the main loop failed', e)
+    except Exception as ex:
+        _fallback('Running the main loop failed', ex)
 
 
-def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0):
+def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0) -> None:
+    """
+    Create dataset and call the split method with the given args.
+    :param config_file: path to the training yaml config
+    :param num_splits: number of x-val splits to be created
+    :param train_ratio: portion of data to be split to the train set
+    :param valid_ratio: portion of data to be split to the valid set
+    :param test_ratio: portion of data to be split to the test set
+    """
     logging.info('Splitting to %d splits with ratios %f:%f:%f', num_splits, train_ratio, valid_ratio, test_ratio)
+
+    config = dataset = None
 
     try:
         logging.info('Loading config')
         config = load_config(config_file=config_file, additional_args=[])
-    except Exception as e:
-        _fallback('Loading config failed', e)
+    except Exception as ex:
+        _fallback('Loading config failed', ex)
 
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
         dataset = create_object_from_config(config['dataset'], args=(config_str,))
-    except Exception as e:
-        _fallback('Creating dataset failed', e)
+    except Exception as ex:
+        _fallback('Creating dataset failed', ex)
 
     logging.info('Splitting')
     dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
@@ -270,8 +300,8 @@ def entry_point() -> None:
     sys.path.insert(0, os.getcwd())
 
     # create parser
-    parser = ArgumentParser('cxflow')
-    subparsers = parser.add_subparsers(help='cxflow modes')
+    main_parser = ArgumentParser('cxflow')
+    subparsers = main_parser.add_subparsers(help='cxflow modes')
 
     # create train subparser
     train_parser = subparsers.add_parser('train')
@@ -286,16 +316,16 @@ def entry_point() -> None:
     split_parser.add_argument('-r', '--ratio', type=int, nargs=3, required=True, help='train, valid and test ratios')
 
     # add common arguments
-    for p in [parser, train_parser, split_parser]:
-        p.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
-        p.add_argument('-o', '--output-root', default='log', help='output directory')
+    for parser in [main_parser, train_parser, split_parser]:
+        parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
+        parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
     # parse CLI arguments
-    known_args, unknown_args = parser.parse_known_args()
+    known_args, unknown_args = main_parser.parse_known_args()
 
     # show help if no subcommand was specified.
     if not hasattr(known_args, 'subcommand'):
-        parser.print_help()
+        main_parser.print_help()
         quit(1)
 
     # set up global logger
@@ -305,7 +335,7 @@ def entry_point() -> None:
 
     # set up STDERR handler
     stderr_handler = logging.StreamHandler(sys.stderr)
-    stderr_handler.setFormatter(_cxflow_log_formatter)
+    stderr_handler.setFormatter(CXFLOW_LOG_FORMATTER)
     logger.addHandler(stderr_handler)
 
     if known_args.subcommand == 'train':

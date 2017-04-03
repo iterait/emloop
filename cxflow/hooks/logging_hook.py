@@ -1,9 +1,9 @@
-from .abstract_hook import AbstractHook
-from ..datasets.abstract_dataset import AbstractDataset
-
 import logging
 import typing
 import sys
+
+from .abstract_hook import AbstractHook
+from ..datasets.abstract_dataset import AbstractDataset
 
 
 class LoggingHook(AbstractHook):
@@ -18,7 +18,7 @@ class LoggingHook(AbstractHook):
         super().__init__(**kwargs)
         self._metrics_to_display = metrics_to_display
 
-    def before_first_epoch(self, valid_results: dict, test_results: dict = None, ** kwargs) -> None:
+    def before_first_epoch(self, valid_results: dict, test_results: dict=None, **kwargs) -> None:
 
         print('\n\n', file=sys.stderr)
         logging.info(' Before first epoch')
@@ -39,7 +39,7 @@ class LoggingHook(AbstractHook):
                     test_results: AbstractDataset.Batch=None, **kwargs) -> None:
 
         print('\n\n', file=sys.stderr)
-        logging.info('After epoch {}'.format(epoch_id))
+        logging.info('After epoch %s', epoch_id)
 
         for key in self._metrics_to_display:
             if key in train_results:

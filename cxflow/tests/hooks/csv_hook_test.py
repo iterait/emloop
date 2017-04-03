@@ -1,27 +1,27 @@
-from cxflow.hooks.csv_hook import CSVHook
-
-import pandas as pd
-
+"""
+Test module for csv hook (cxflow.hooks.csv_hook).
+"""
 import logging
+import tempfile
+import shutil
 from os import path
 from unittest import TestCase
-import tempfile
 
-
-class NetMocker:
-    def __init__(self):
-        self.log_dir = tempfile.mkdtemp(prefix='csvhooktest', dir=tempfile.gettempdir())
+from cxflow.hooks.csv_hook import CSVHook
 
 
 class CSVHookTest(TestCase):
+    """Test case for csv hook."""
+
     def __init__(self, *args, **kwargs):
         logging.getLogger().disabled = True
         super().__init__(*args, **kwargs)
 
     def test_csv_log(self):
-        net = NetMocker()
+        """Test csv file being correctly dumped."""
         output_file = 'training.csv'
-        hook = CSVHook(net=net, output_file=output_file, metrics_to_display=['accuracy', 'loss'],
+        temp_dir = tempfile.mkdtemp(prefix='csvhooktest', dir=tempfile.gettempdir())
+        hook = CSVHook(net=None, output_file=output_file, output_dir=temp_dir, metrics_to_display=['accuracy', 'loss'],
                        config=None, dataset=None)
 
         hook.before_first_epoch(valid_results={'accuracy': 0.0, 'loss': 1.0},
@@ -42,7 +42,9 @@ class CSVHookTest(TestCase):
 2,0.5,0.6,0.7,0.4,0.3,0.2
 """
 
-        with open(path.join(net.log_dir, output_file), 'r') as f:
-            result = f.read()
+        with open(path.join(temp_dir, output_file), 'r') as file:
+            result = file.read()
 
         self.assertEqual(expected, result)
+
+        shutil.rmtree(temp_dir)

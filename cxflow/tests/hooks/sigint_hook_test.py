@@ -1,10 +1,13 @@
-from cxflow.hooks.sigint_hook import SigintHook
-from cxflow.hooks.abstract_hook import TrainingTerminated
-
+"""
+Test module for SigintHook (cxflow.hooks.sigint_hook).
+"""
 import logging
 import os
 import signal
 from unittest import TestCase
+
+from cxflow.hooks.sigint_hook import SigintHook
+from cxflow.hooks.abstract_hook import TrainingTerminated
 
 
 class SigintHookTest(TestCase):
@@ -22,10 +25,9 @@ class SigintHookTest(TestCase):
 
     def test_before_training(self):
         try:
-            hook = SigintHook(net=None, config=None, dataset=None)
+            SigintHook(net=None, config=None, dataset=None)
             os.kill(os.getpid(), signal.SIGINT)
-            self.assertTrue(self._sigint_unhandled,
-                            'SigintHook handles SIGINT before training')
+            self.assertTrue(self._sigint_unhandled, 'SigintHook handles SIGINT before training')
         except TrainingTerminated:
             self.fail('SigintHook raises before training')
 
@@ -34,8 +36,7 @@ class SigintHookTest(TestCase):
             hook = SigintHook(net=None, config=None, dataset=None)
             hook.before_training()
             os.kill(os.getpid(), signal.SIGINT)
-            self.assertFalse(self._sigint_unhandled,
-                             'SigintHook does not handle SIGINT while training')
+            self.assertFalse(self._sigint_unhandled, 'SigintHook does not handle SIGINT while training')
             # double SIGINT cannot be easily tested (it quits(1))
         except TrainingTerminated:
             self.fail('SigintHook raised outside of after_batch()')

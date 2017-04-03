@@ -1,8 +1,8 @@
+import typing
+from collections import defaultdict
+
 from .abstract_hook import AbstractHook
 from ..datasets.abstract_dataset import AbstractDataset
-
-from collections import defaultdict
-import typing
 
 
 class ResultHook(AbstractHook):
@@ -44,7 +44,7 @@ class ResultHook(AbstractHook):
         elif stream_type == 'test':
             self._save_partial_results(self._test_buffer, results)
         else:
-            raise ValueError('stream_type must be either train, valid or test. Instead, `%s` was'
+            raise ValueError('stream_type must be either train, valid or test. Instead, `{}` was'
                              'provided'.format(stream_type))
 
     def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,

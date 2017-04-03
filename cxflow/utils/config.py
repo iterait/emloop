@@ -1,8 +1,12 @@
+"""
+Config module provides util functions for loading and dumping yaml configurations.
+"""
 import ast
 import typing
+from os import path
+
 import yaml
 import ruamel.yaml
-from os import path
 
 
 def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
@@ -15,39 +19,40 @@ def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
 
     if ':' in arg:
         key = arg[:arg.index(':')]
-        typee = arg[arg.index(':') + 1:arg.index('=')]
+        type_ = arg[arg.index(':') + 1:arg.index('=')]
         value = arg[arg.index('=') + 1:]
     else:
         key = arg[:arg.index('=')]
-        typee = 'str'
+        type_ = 'str'
         value = arg[arg.index('=') + 1:]
 
     try:
-        if typee == 'ast':
+        if type_ == 'ast':
             value = ast.literal_eval(value)
-        elif typee == 'int':
+        elif type_ == 'int':
             value = int(float(value))
-        elif typee == 'bool':
+        elif type_ == 'bool':
             value = bool(int(value))
         else:
-            value = eval(typee)(value)
-    except (Exception, AssertionError) as e:
+            value = eval(type_)(value)
+    except (Exception, AssertionError) as ex:
         raise AttributeError(
-            'Could not convert argument {} of value {} to type {}. Original argument: "{}". Exception: {}'.format(
-                key, value, typee, arg, e))
+            'Could not convert argument `{}` of value `{}` to type `{}`. Original argument: `{}`.'.format(
+                key, value, type_, arg)) from ex
 
     return key, value
 
 
 def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict:
     """
-    Load config from `config_file` and apply CLI args `additional_args`.
-    :param additional_args: Additional args which may extend or override the config from file.
+    Load config from yaml `config_file` and extend/override it with the given `additional_args`.
+    :param config_file: path the yaml config file to be loaded
+    :param additional_args: additional args which may extend or override the config loaded from the file.
     :return: configuration as dict
     """
 
-    with open(config_file, 'r') as f:
-        config = ruamel.yaml.load(f, ruamel.yaml.RoundTripLoader)
+    with open(config_file, 'r') as file:
+        config = ruamel.yaml.load(file, ruamel.yaml.RoundTripLoader)
 
     for key_full, value in [parse_arg(arg) for arg in additional_args]:
         key_split = key_full.split('.')
@@ -63,7 +68,7 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict
     return config
 
 
-def config_to_file(config, output_dir: str, name: str= 'config.yaml') -> str:
+def config_to_file(config, output_dir: str, name: str='config.yaml') -> str:
     """
     Save the given config to the given path in yaml.
     :param config: configuration dict
@@ -72,8 +77,8 @@ def config_to_file(config, output_dir: str, name: str= 'config.yaml') -> str:
     :return: target path
     """
     dumped_config_f = path.join(output_dir, name)
-    with open(dumped_config_f, 'w') as f:
-        yaml.dump(config, f)
+    with open(dumped_config_f, 'w') as file:
+        yaml.dump(config, file)
     return dumped_config_f
 
 
