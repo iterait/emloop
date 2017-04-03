@@ -1,9 +1,9 @@
-from ..datasets.abstract_dataset import AbstractDataset
-from .abstract_hook import AbstractHook
+import typing
 
 from sklearn.metrics import precision_recall_fscore_support
 
-import typing
+from ..datasets.abstract_dataset import AbstractDataset
+from .abstract_hook import AbstractHook
 
 
 class ClassificationInfoHook(AbstractHook):

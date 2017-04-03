@@ -1,6 +1,6 @@
-from .abstract_hook import AbstractHook, TrainingTerminated
-
 import logging
+
+from .abstract_hook import AbstractHook, TrainingTerminated
 
 
 class EpochStopperHook(AbstractHook):

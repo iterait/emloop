@@ -1,88 +1,64 @@
+"""
+cxflow main loop for training nets.
+
+The MainLoop requires AbstractNet, AbstractDataset and a list of AbstractHooks.
+Having all that, it manages iterating through streams, training and hooks execution.
+"""
+import sys
+import logging
+import typing
+from collections import defaultdict
+
 from .datasets.abstract_dataset import AbstractDataset
 from .nets.abstract_net import AbstractNet
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils.profile import Timer
 
-from collections import defaultdict
-import logging
-import typing
-
 
 class MainLoop:
     """Train the network, manage hooks etc."""
 
-    def __init__(self, net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=[]):
+    def __init__(self, net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=(),
+                 on_unused_sources: str='warn', fixed_batch_size: int=None):
         """
         :param net: trained network
         :param dataset: loaded dataset
         :param hooks: list of hooks
+        :param on_unused_sources: action to take when stream provides unused sources {'ignore', 'warn', 'error'}
+        :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
         """
+        assert on_unused_sources in {'ignore', 'warn', 'error'}
 
         self._net = net
         self._dataset = dataset
         self._hooks = hooks
+        self._on_unused_sources = on_unused_sources
+        self._fixed_batch_size = fixed_batch_size
+        self._extra_sources_warned = False
         self._epoch_profile = {}
 
-        self._extra_sources_warned = False
-
-        if self._net.skip_incomplete_batches and not hasattr(self._net, 'batch_size'):
-            logging.error('Config does not contain `net.batch_size` even though `net.skip_incomplete_batches` is set '
-                          'to true. Either disable `net.skip_incomplete_batches` or set `net.batch_size`.')
-            raise ValueError('Invalid config')
-
-        if not self._net.skip_incomplete_batches and hasattr(self._net, 'batch_size'):
-            logging.warning('Config contains `net.batch_size` even though `net.skip_incomplete_batches` si set to '
-                            'false.' 'Note that `net.batch_size` has no effect since the batch sizes are set in '
-                            '`stream.<name>.batch_size`. Please consider removing `net.batch_size`.')
-
-    def _run_batch(self, train: bool, batch: AbstractDataset.Batch) -> AbstractDataset.Batch:
-        """Process a single batch (either train or eval)."""
-
+    def _check_sources(self, batch: typing.Dict[str, object]) -> None:
+        """
+        Check for unused and missing sources.
+        :param batch: batch to be checked
+        """
+        unused_sources = [source for source in batch.keys() if source not in self._net.input_names]
+        missing_sources = [source for source in self._net.input_names if source not in batch.keys()]
         # check stream sources
-        if set(self._net.io['in']) < set(batch.keys()):
-            if self._net.ignore_extra_sources:
-                if not self._extra_sources_warned:
-                    logging.warning('Some sources provided by the stream does not match net placeholders. This might '
-                                    'be an error. Ignoring. Set `net.ignore_extra_sources` to False in order to make '
-                                    'this' 'an error. Extra sources: %s', set(batch.keys()) - set(self._net.io['in']))
-                    self._extra_sources_warned = True
-            else:
-                logging.error('Some sources provided by the stream does not match net placeholders. Set'
-                              '`net.ignore_extra_sources` to True in order to ignore this error'
-                              'Extra sources: %s', set(batch.keys()) - set(self._net.io['in']))
-                raise ValueError()
+        if unused_sources:
+            if self._on_unused_sources == 'warn' and not self._extra_sources_warned:
+                logging.warning('Some sources provided by the stream do not match net placeholders. Set '
+                                '`main_loop.on_unused_sources` to `ignore` in order to suppress this warning. '
+                                'Extra sources: %s', unused_sources)
+                self._extra_sources_warned = True
+            elif self._on_unused_sources == 'error':
+                raise ValueError('Some sources provided by the stream do not match net placeholders. Set'
+                                 '`main_loop.on_unused_sources` to `warn` in order to suppress this error.\n'
+                                 'Extra sources: {}'.format(unused_sources))
 
-        elif set(self._net.io['in']) > set(batch.keys()):
-            logging.error('Stream does not provide all required sources. Missing sources: %s',
-                          set(self._net.io['in']) - set(batch.keys()))
-
-        # setup the feed dict
-        feed_dict = {}
-        for placeholder_name in self._net.io['in']:
-            try:
-                feed_dict[getattr(self._net, placeholder_name)] = batch[placeholder_name]
-            except AttributeError as e:
-                logging.error('Placeholder "%s" not found in the net. Make sure it is saved as an object property.',
-                              placeholder_name)
-                raise e
-
-        # setup fetches
-        fetches = [self._net.train_op] if train else []
-        for to_eval in self._net.io['out']:
-            try:
-                fetches.append(getattr(self._net, to_eval))
-            except AttributeError as e:
-                logging.error('Net does not contain a required output "%s". Make sure it is saved as an object'
-                              'property.', to_eval)
-
-        # run the computational graph for one batch
-        batch_res = self._net.session.run(fetches=fetches, feed_dict=feed_dict)
-
-        # zip the string names with results
-        if train:
-            return dict(zip(self._net.io['out'], batch_res[1:]))
-        else:
-            return dict(zip(self._net.io['out'], batch_res))
+        if missing_sources:
+            raise ValueError('Stream does not provide all required sources. Missing sources: {}'
+                             .format(missing_sources))
 
     def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_type: str) -> AbstractDataset.Batch:
         """
@@ -92,7 +68,7 @@ class MainLoop:
         :param stream_type: {train, valid, test}
         :return: epoch summary results
         """
-        n_batches = 0
+        processed_batch_count = 0
         summed_results = defaultdict(float)
 
         while True:
@@ -102,13 +78,15 @@ class MainLoop:
             except StopIteration:
                 break
 
-            if self._net.skip_incomplete_batches:
-                if len(batch[list(batch.keys())[0]]) < self._net.batch_size:
+            if self._fixed_batch_size:
+                if len(batch[list(batch.keys())[0]]) != self._fixed_batch_size:
                     logging.debug('Incomplete batch skipped')
                     continue
 
+            self._check_sources(batch)
+
             with Timer('eval_batch_{}'.format(stream_type), self._epoch_profile):
-                batch_result = self._run_batch(train=train, batch=batch)
+                batch_result = self._net.run(batch=batch, train=train)
 
             with Timer('after_batch_hooks_{}'.format(stream_type), self._epoch_profile):
                 for hook in self._hooks:
@@ -117,14 +95,16 @@ class MainLoop:
             for name, value in batch_result.items():
                 try:
                     summed_results[name] += value
-                except Exception as e:
-                    logging.error('Cannot sum results "%s"', name)
-                    raise e
+                except Exception as ex:
+                    raise ValueError('Cannot sum results `{}`'.format(name)) from ex
 
-            n_batches += 1
+            processed_batch_count += 1
+
+        if processed_batch_count == 0:
+            raise ValueError('No data in stream `{}`'.format(stream_type))
 
         for name in summed_results.keys():
-            summed_results[name] /= n_batches
+            summed_results[name] /= processed_batch_count
 
         return summed_results
 
@@ -174,10 +154,11 @@ class MainLoop:
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile)
 
-        except TrainingTerminated as e:
-            logging.info('Training terminated by a hook: %s', e)
+        except TrainingTerminated as ex:
+            logging.info('Training terminated by a hook: %s', ex)
         except KeyboardInterrupt:
-            logging.info('Training terminated by a keyboard interrupt')
+            logging.warning('Training terminated by a keyboard interrupt')
+            sys.exit(2)
 
         for hook in self._hooks:
             hook.after_training()

@@ -1,26 +1,36 @@
-from cxflow.entry_point import _train_create_output_dir, _train_create_dataset, _train_load_config
-from cxflow.utils.config import config_to_file, load_config
-
+"""
+Test module for cxflow entry point (entry_point.py)
+"""
 import logging
 import os
 from os import path
 import tempfile
 from unittest import TestCase
+
 import shutil
 import yaml
+
+from cxflow.entry_point import _train_create_output_dir, _train_create_dataset, _train_load_config
+from cxflow.utils.config import config_to_file, load_config
 
 
 class DummyDataset:
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
 
+
 class EntryPointTest(TestCase):
+    """Entry point functions test case."""
+
     def __init__(self, *args, **kwargs):
         logging.getLogger().disabled = True
         super().__init__(*args, **kwargs)
 
     def test_train_create_output_dir(self):
+        """Test output dir creating and correct naming."""
         temp_dir = tempfile.mkdtemp()
+
+        # test create output dir with specified net.name
         name = 'my_name'
         output_dir = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
                                               output_root=temp_dir,
@@ -32,6 +42,7 @@ class EntryPointTest(TestCase):
         self.assertTrue(path.isdir(output_dir))
         self.assertTrue(name in output_dir)
 
+        # cleanup
         shutil.rmtree(temp_dir)
 
     def test_create_output_dir_no_root(self):
@@ -56,8 +67,10 @@ class EntryPointTest(TestCase):
 
         shutil.rmtree(temp_dir)
 
-    def test_train_create_output_dir_without_net_name(self):
+    def test_create_output_dir_no_netname(self):
         temp_dir = tempfile.mkdtemp()
+
+        # test create output dir without specified net.name (default_net_name should be used)
         name = 'nothing'
         output_dir = _train_create_output_dir(config={'a': 'b', 'net': {}},
                                               output_root=temp_dir,
@@ -69,9 +82,11 @@ class EntryPointTest(TestCase):
         self.assertTrue(path.isdir(output_dir))
         self.assertTrue(name in output_dir)
 
+        # final cleanup
         shutil.rmtree(temp_dir)
 
     def test_different_dirs(self):
+        """Test output dir non-conflicting names with the same config."""
         temp_dir = tempfile.mkdtemp()
         name = 'my_name'
         output_dir_1 = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
@@ -86,6 +101,7 @@ class EntryPointTest(TestCase):
         shutil.rmtree(temp_dir)
 
     def test_train_create_dataset(self):
+        """Test correct config re-wrapping."""
         config = {'dataset': {'module': 'cxflow.tests.entry_point_test', 'class': 'DummyDataset', 'batch_size': 10},
                   'stream': {'train': {'rotate': 20}}, 'hooks': [{'hook_name': 'should_not_be_included'}]}
 
@@ -100,6 +116,7 @@ class EntryPointTest(TestCase):
         self.assertDictEqual(dataset.config, expected_config)
 
     def test_train_load_config(self):
+        """Test correct config loading."""
         temp_dir = tempfile.mkdtemp()
 
         # test a config call with both dataset and net

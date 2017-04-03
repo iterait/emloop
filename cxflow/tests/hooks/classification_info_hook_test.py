@@ -1,11 +1,11 @@
-from cxflow.hooks.classification_info_hook import ClassificationInfoHook
-
-import pandas as pd
-
+"""
+Test module for classification info hook (cxflow.hooks.classification_info_hook).
+"""
 import logging
-from os import path
-from unittest import TestCase
 import tempfile
+from unittest import TestCase
+
+from cxflow.hooks.classification_info_hook import ClassificationInfoHook
 
 
 class NetMocker:
@@ -22,23 +22,23 @@ class ClassificationInfoHookTest(TestCase):
         hook = ClassificationInfoHook(predicted_variable='predicted', gold_variable='gold', f1_average='macro',
                                       net=None, config=None, dataset=None)
 
-        hook.after_batch('train', {'predicted': [0,0,0,1,2], 'gold': [0,0,0,0,2]})
-        hook.after_batch('train', {'predicted': [0,0,1,1,2], 'gold': [0,1,2,0,1]})
+        hook.after_batch('train', {'predicted': [0, 0, 0, 1, 2], 'gold': [0, 0, 0, 0, 2]})
+        hook.after_batch('train', {'predicted': [0, 0, 1, 1, 2], 'gold': [0, 1, 2, 0, 1]})
 
-        hook.after_batch('valid', {'predicted': [1,1,0,1,2], 'gold': [1,0,0,0,2]})
-        hook.after_batch('valid', {'predicted': [0,2,1,1,2], 'gold': [0,1,1,0,1]})
+        hook.after_batch('valid', {'predicted': [1, 1, 0, 1, 2], 'gold': [1, 0, 0, 0, 2]})
+        hook.after_batch('valid', {'predicted': [0, 2, 1, 1, 2], 'gold': [0, 1, 1, 0, 1]})
 
-        hook.after_batch('test', {'predicted': [2,2,0,1,2], 'gold': [0,2,0,0,2]})
-        hook.after_batch('test', {'predicted': [0,2,1,1,2], 'gold': [2,2,2,0,1]})
+        hook.after_batch('test', {'predicted': [2, 2, 0, 1, 2], 'gold': [0, 2, 0, 0, 2]})
+        hook.after_batch('test', {'predicted': [0, 2, 1, 1, 2], 'gold': [2, 2, 2, 0, 1]})
 
-        self.assertListEqual([0,0,0,1,2,0,0,1,1,2], hook._train_predicted)
-        self.assertListEqual([0,0,0,0,2,0,1,2,0,1], hook._train_gold)
+        self.assertListEqual([0, 0, 0, 1, 2, 0, 0, 1, 1, 2], hook._train_predicted)
+        self.assertListEqual([0, 0, 0, 0, 2, 0, 1, 2, 0, 1], hook._train_gold)
 
-        self.assertListEqual([1,1,0,1,2,0,2,1,1,2], hook._valid_predicted)
-        self.assertListEqual([1,0,0,0,2,0,1,1,0,1], hook._valid_gold)
+        self.assertListEqual([1, 1, 0, 1, 2, 0, 2, 1, 1, 2], hook._valid_predicted)
+        self.assertListEqual([1, 0, 0, 0, 2, 0, 1, 1, 0, 1], hook._valid_gold)
 
-        self.assertListEqual([2,2,0,1,2,0,2,1,1,2], hook._test_predicted)
-        self.assertListEqual([0,2,0,0,2,2,2,2,0,1], hook._test_gold)
+        self.assertListEqual([2, 2, 0, 1, 2, 0, 2, 1, 1, 2], hook._test_predicted)
+        self.assertListEqual([0, 2, 0, 0, 2, 2, 2, 2, 0, 1], hook._test_gold)
 
         train_res = {'a': 'b'}
         valid_res = {'c': 'd'}

@@ -1,8 +1,8 @@
+import logging
+
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
 from ..datasets.abstract_dataset import AbstractDataset
-
-import logging
 
 
 class SaverHook(AbstractHook):
@@ -21,11 +21,11 @@ class SaverHook(AbstractHook):
         if epoch_id % self._save_every_n_epochs == 0:
             try:
                 logging.debug('Creating checkpoint')
-                save_path = self._net.save_checkpoint(name=str(epoch_id))
+                save_path = self._net.save(name_suffix=str(epoch_id))
                 logging.info('Created checkpoint: %s', save_path)
-            except Exception as e:
+            except Exception as ex:
                 logging.error('Checkpoint at epoch=%d not created because an unexpected exception occurred: %s',
-                              epoch_id, e)
+                              epoch_id, ex)
 
 
 class BestSaverHook(AbstractHook):
@@ -50,10 +50,10 @@ class BestSaverHook(AbstractHook):
     def _save_checkpoint(self):
         try:
             logging.debug('Creating checkpoint')
-            save_path = self._net.save_checkpoint(name=self._output_name)
+            save_path = self._net.save(name_suffix=self._output_name)
             logging.info('Created checkpoint: %s', save_path)
-        except Exception as e:
-            logging.error('Checkpoint not created because an unexpected exception occurred: %s', e)
+        except Exception as ex:
+            logging.error('Checkpoint not created because an unexpected exception occurred: %s', ex)
 
     def before_first_epoch(self, valid_results: AbstractDataset.Batch, **kwargs) -> None:
         self.best_metric = valid_results[self._metric]
@@ -69,5 +69,4 @@ class BestSaverHook(AbstractHook):
                 self.best_metric = valid_results[self._metric]
                 self._save_checkpoint()
         else:
-            logging.error('BestSaverHook support only {min,max} as a condition')
-            raise ValueError('BestSaverHook support only {min,max} as a condition')
+            raise ValueError('BestSaverHook supports only {min,max} as a condition')

@@ -1,7 +1,7 @@
-from .abstract_hook import AbstractHook, TrainingTerminated
-
 import logging
 import signal
+
+from .abstract_hook import AbstractHook, TrainingTerminated
 
 
 class SigintHook(AbstractHook):
@@ -11,6 +11,11 @@ class SigintHook(AbstractHook):
     On first sigint finish the current batch and terminate training politely, i.e. trigger all `after_training` hooks.
     On second sigint quit immediately with exit code 1
     """
+
+    def __init__(self, **kwargs):
+        self._num_sigints = 0
+        self._original_handler = None
+        super().__init__(**kwargs)
 
     def _sigint_handler(self, signum, frame):
         if self._num_sigints > 0:  # not the first sigint

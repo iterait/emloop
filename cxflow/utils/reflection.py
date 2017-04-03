@@ -1,3 +1,6 @@
+"""
+Module with handy functions which are able to create objects from module and class names.
+"""
 import importlib
 import typing
 from types import MappingProxyType
@@ -34,8 +37,8 @@ def create_object_from_config(config: typing.Dict[str, object], args: typing.Ite
         module_key = key_prefix + 'module'
         class_key = key_prefix + 'class'
 
-    assert(module_key in config)
-    assert(class_key in config)
+    assert module_key in config
+    assert class_key in config
 
     return create_object(module_name=config[module_key], class_name=config[class_key], args=args, kwargs=kwargs)
 
@@ -59,8 +62,8 @@ def create_object(module_name: str, class_name: str, args: typing.Iterable=(),
     :param kwargs: kwargs to be passed to the object constructor
     :return: created object instance
     """
-    assert(isinstance(module_name, str))
-    assert(isinstance(class_name, str))
+    assert isinstance(module_name, str)
+    assert isinstance(class_name, str)
 
     _module = importlib.import_module(module_name)
     _class = getattr(_module, class_name)

@@ -19,8 +19,6 @@ All operating systems are expected to be fully up-to-date.
 The following environments are supported and tested:
 - Python 3.6 with TensorFlow 1.0.1
 - Python 3.5 with TensorFlow 0.12.1
-- Python 3.5 with TensorFlow 0.11
-- Python 3.5 with TensorFlow 0.10
 
 List of Python package requirements is listed in `requirements.txt`.
 

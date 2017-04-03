@@ -12,7 +12,7 @@ pip>=9.0.0
 
 # aur/      Less common system packages (usually with `python-` prefix)
 # ---------------------------------------------------------------------
-tensorflow>=0.10.0
+tensorflow>=0.12.1
 rethinkdb>=2.3.0
 tabulate>=0.7.7
 

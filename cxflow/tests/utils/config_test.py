@@ -1,12 +1,12 @@
-from cxflow.utils.config import parse_arg, load_config, config_to_file, config_to_str
+import logging
+import tempfile
+import shutil
+from unittest import TestCase
+from os import path
 
 import yaml
 
-import logging
-from unittest import TestCase
-from os import path
-import tempfile
-import shutil
+from cxflow.utils.config import parse_arg, load_config, config_to_file, config_to_str
 
 
 class ConfigTestParseArg(TestCase):
@@ -68,14 +68,14 @@ class ConfigTestParseArg(TestCase):
                          ('stream.train.float_seed', [1, 3])]:
             try:
                 self.assertRaises(AttributeError, parse_arg, key+':bool='+str(val))
-            except Exception as e:
-                print(type(e))
+            except Exception as ex:
+                print(type(ex))
 
     def test_not_ast_type(self):
         for key, val in [('common.arch', "hello"), ('net.arch', '[12,3'), ('net.arch', '{"a": }')]:
-                self.assertRaises(AttributeError, parse_arg, key + ':ast=' + str(val))
+            self.assertRaises(AttributeError, parse_arg, key + ':ast=' + str(val))
 
-_anchorless_yaml = """
+_TEST_ANCHORLESS_YAML = """
 e:
   f: f
   h:
@@ -83,7 +83,7 @@ e:
     - k
 """
 
-_anchored_yaml = """
+_TEST_ANCHORED_YAML = """
 a: &anchor
   b: c
   d: 11
@@ -104,10 +104,11 @@ class ConfigTest(TestCase):
 
     def test_load_anchorless_config(self):
         temp_dir = tempfile.mkdtemp()
+
         f_name = path.join(temp_dir, 'conf.yaml')
 
-        with open(f_name, 'w') as f:
-            f.write(_anchorless_yaml)
+        with open(f_name, 'w') as file:
+            file.write(_TEST_ANCHORLESS_YAML)
 
         self.assertDictEqual(load_config(f_name, []), {'e': {'f': 'f', 'h': ['j', 'k']}})
         self.assertDictEqual(load_config(f_name, ['e.f:int=12']), {'e': {'f': 12, 'h': ['j', 'k']}})
@@ -119,8 +120,8 @@ class ConfigTest(TestCase):
         temp_dir = tempfile.mkdtemp()
         f_name = path.join(temp_dir, 'conf.yaml')
 
-        with open(f_name, 'w') as f:
-            f.write(_anchored_yaml)
+        with open(f_name, 'w') as file:
+            file.write(_TEST_ANCHORED_YAML)
 
         self.assertDictEqual(load_config(f_name, []), {'a': {'b': 'c', 'd': 11},
                                                        'e': {'f': 'f', 'h': ['j', 'k'], 'b': 'c', 'd': 11}})

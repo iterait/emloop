@@ -1,5 +1,7 @@
 #!/usr/bin/python3 -mgrid_search
-
+"""
+This module is deprecated. See issue #50 for details.
+"""
 import argparse
 import ast
 
@@ -8,9 +10,15 @@ import logging
 import os
 import sys
 
+from cxflow.entry_point import CXFLOW_LOG_FORMAT_STR
 
-def grid_search() -> None:
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
+def init_grid_search() -> None:
+    """
+    This method is deprecated. See issue #50 for details.
+    """
+    sys.path.insert(0, os.getcwd())
+    logging.basicConfig(format=CXFLOW_LOG_FORMAT_STR, level=logging.INFO)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('script', help='script to be grid-searched')
@@ -43,14 +51,9 @@ def grid_search() -> None:
     else:
         for command in commands:
             try:
-                ret_code = os.system(command)
-            except:
-                logging.error('Command failed: %s', command)
-
-
-def init_grid_search() -> None:
-    sys.path.insert(0, os.getcwd())
-    grid_search()
+                return_code = os.system(command)
+            except Exception as _:
+                logging.error('Command `%s` failed with exit code %s.', command, return_code)
 
 
 if __name__ == '__main__':

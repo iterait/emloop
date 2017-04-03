@@ -1,3 +1,8 @@
+"""
+This module contains AbstractDataset concept.
+
+At the moment it is for typing only.
+"""
 from abc import abstractmethod
 import typing
 

@@ -1,6 +1,7 @@
+import logging
+
 from .abstract_hook import AbstractHook
 from ..utils.profile import Timer
-import logging
 
 
 class ProfileHook(AbstractHook):

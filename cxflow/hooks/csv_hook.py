@@ -1,34 +1,33 @@
+import logging
+import typing
+from os import path
+
 from .abstract_hook import AbstractHook
 from ..nets.abstract_net import AbstractNet
 from ..datasets.abstract_dataset import AbstractDataset
-
-import logging
-from os import path
-import typing
 
 
 class CSVHook(AbstractHook):
     """Log training results to .csv, which will be saved to `net.log_dir`."""
 
-    def __init__(self, net: AbstractNet, metrics_to_display: typing.Iterable[str],
+    def __init__(self, net: AbstractNet, metrics_to_display: typing.Iterable[str], output_dir: str,
                  output_file: str="training.csv", **kwargs):
         """
         :param net: trained network
         :param metrics_to_display: list of names of statistics that will be logged
         :param output_file: name of the output file
         """
-
         super().__init__(net=net, **kwargs)
         self._metrics_to_display = metrics_to_display
-        self._file = path.join(net.log_dir, output_file)
+        self._file_path = path.join(output_dir, output_file)
 
-        logging.info('Saving training log to "%s"', self._file)
+        logging.info('Saving training log to "%s"', self._file_path)
 
-        with open(self._file, 'w') as f:
+        with open(self._file_path, 'w') as file:
             header = '"epoch_id",' +\
                      ','.join(['"train_{0}","valid_{0}","test_{0}"'.format(metric) for metric in metrics_to_display]) +\
                      '\n'
-            f.write(header)
+            file.write(header)
 
     def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
                            **kwargs) -> None:
@@ -52,9 +51,9 @@ class CSVHook(AbstractHook):
             else:
                 result_row.append('')
 
-        with open(self._file, 'a') as f:
-            row = ','.join(map(str, result_row))
-            f.write(row + '\n')
+        with open(self._file_path, 'a') as file:
+            row = ','.join([str(col) for col in result_row])
+            file.write(row + '\n')
 
     def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
                     test_results: AbstractDataset.Batch=None, **kwargs) -> None:
@@ -83,6 +82,6 @@ class CSVHook(AbstractHook):
             else:
                 result_row.append('')
 
-        with open(self._file, 'a') as f:
-            row = ','.join(map(str, result_row))
-            f.write(row + '\n')
+        with open(self._file_path, 'a') as file:
+            row = ','.join([str(col) for col in result_row])
+            file.write(row + '\n')
