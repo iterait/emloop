@@ -38,18 +38,21 @@ class SecondDummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
 
 
 class DummyNetWithKwargs(DummyNet):  # pylint: disable=too-few-public-methods
-    """Dummy restore net which saves kwargs to self.kwargs."""
+    """Dummy net which saves kwargs to self.kwargs."""
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__(**kwargs)
 
     def _create_net(self, **kwargs):
+        # create dummy train op and variable
         super()._create_net()
+
+        # initialize the dummy variable in order to allow saving
         self.session.run(tf.global_variables_initializer())
 
 
 class DummyNetRestore(DummyNetWithKwargs):  # pylint: disable=too-few-public-methods
-    """Dummy restore net which saves ."""
+    """Dummy restore net."""
     pass
 
 
