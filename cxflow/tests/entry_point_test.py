@@ -10,7 +10,7 @@ from unittest import TestCase
 import shutil
 import yaml
 
-from cxflow.entry_point import _train_create_output_dir, _train_create_dataset, _train_load_config
+from cxflow.entry_point import train_create_output_dir, train_create_dataset, train_load_config
 from cxflow.utils.config import config_to_file, load_config
 
 
@@ -32,9 +32,9 @@ class EntryPointTest(TestCase):
 
         # test create output dir with specified net.name
         name = 'my_name'
-        output_dir = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
-                                              output_root=temp_dir,
-                                              default_net_name='nothing')
+        output_dir = train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
+                                             output_root=temp_dir,
+                                             default_net_name='nothing')
 
         self.assertEqual(len(os.listdir(temp_dir)), 1)
         self.assertEqual(output_dir, path.join(temp_dir, os.listdir(temp_dir)[0]))
@@ -50,9 +50,9 @@ class EntryPointTest(TestCase):
         temp_dir = tempfile.mkdtemp()
         output_root = path.join(temp_dir, 'output_root')
         name = 'my_name'
-        output_dir = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
-                                              output_root=output_root,
-                                              default_net_name='nothing')
+        output_dir = train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
+                                             output_root=output_root,
+                                             default_net_name='nothing')
 
         # check that output_root exists and it is the only folder in temp_dir
         self.assertEqual(len(os.listdir(temp_dir)), 1)
@@ -72,9 +72,9 @@ class EntryPointTest(TestCase):
 
         # test create output dir without specified net.name (default_net_name should be used)
         name = 'nothing'
-        output_dir = _train_create_output_dir(config={'a': 'b', 'net': {}},
-                                              output_root=temp_dir,
-                                              default_net_name=name)
+        output_dir = train_create_output_dir(config={'a': 'b', 'net': {}},
+                                             output_root=temp_dir,
+                                             default_net_name=name)
 
         self.assertEqual(len(os.listdir(temp_dir)), 1)
         self.assertEqual(output_dir, path.join(temp_dir, os.listdir(temp_dir)[0]))
@@ -89,12 +89,12 @@ class EntryPointTest(TestCase):
         """Test output dir non-conflicting names with the same config."""
         temp_dir = tempfile.mkdtemp()
         name = 'my_name'
-        output_dir_1 = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
-                                                output_root=temp_dir,
-                                                default_net_name='nothing')
-        output_dir_2 = _train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
-                                                output_root=temp_dir,
-                                                default_net_name='nothing')
+        output_dir_1 = train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
+                                               output_root=temp_dir,
+                                               default_net_name='nothing')
+        output_dir_2 = train_create_output_dir(config={'a': 'b', 'net': {'name': name}},
+                                               output_root=temp_dir,
+                                               default_net_name='nothing')
 
         self.assertNotEqual(output_dir_1, output_dir_2)
         self.assertEqual(len(os.listdir(temp_dir)), 2)
@@ -109,7 +109,7 @@ class EntryPointTest(TestCase):
                                        'class': 'DummyDataset', 'batch_size': 10},
                            'stream': {'train': {'rotate': 20}}, 'output_dir': 'dummy_dir'}
 
-        dataset = _train_create_dataset(config=config, output_dir='dummy_dir')
+        dataset = train_create_dataset(config=config, output_dir='dummy_dir')
 
         self.assertTrue(isinstance(dataset, DummyDataset))
         self.assertTrue(hasattr(dataset, 'config'))
@@ -126,14 +126,14 @@ class EntryPointTest(TestCase):
         # test assertion when config is incomplete
         missing_net_config = {'dataset': None}
         config_path2 = config_to_file(missing_net_config, temp_dir, 'config2.yaml')
-        self.assertRaises(AssertionError, _train_load_config, config_path2, [])
+        self.assertRaises(AssertionError, train_load_config, config_path2, [])
 
         missing_dataset_config = {'dataset': None}
         config_path3 = config_to_file(missing_dataset_config, temp_dir, 'config3.yaml')
-        self.assertRaises(AssertionError, _train_load_config, config_path3, [])
+        self.assertRaises(AssertionError, train_load_config, config_path3, [])
 
         # test return value
-        returned_config = _train_load_config(config_path, [])
+        returned_config = train_load_config(config_path, [])
         self.assertDictEqual(returned_config, load_config(config_path, []))
         self.assertDictEqual(returned_config, good_config)
 

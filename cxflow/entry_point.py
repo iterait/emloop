@@ -33,7 +33,7 @@ CXFLOW_LOG_DATE_FORMAT_STR = '%H:%M:%S'
 CXFLOW_LOG_FORMATTER = logging.Formatter(CXFLOW_LOG_FORMAT_STR, datefmt=CXFLOW_LOG_DATE_FORMAT_STR)
 
 
-def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
+def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
     """
     Load config from the given yaml file and extend/override it with the given CLI args.
     :param config_file: path to the config yaml file
@@ -52,7 +52,7 @@ def _train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> d
     return config
 
 
-def _train_create_output_dir(config: dict, output_root: str, default_net_name: str='NonameNet') -> str:
+def train_create_output_dir(config: dict, output_root: str, default_net_name: str= 'NonameNet') -> str:
     """
     Create output_dir under the given output_root and
         - dump the given config to yaml file under this dir
@@ -89,7 +89,7 @@ def _train_create_output_dir(config: dict, output_root: str, default_net_name: s
     return output_dir
 
 
-def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
+def train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     """
     Create a dataset object according to the given config.
 
@@ -108,7 +108,7 @@ def _train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     return dataset
 
 
-def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
+def train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
     """
     Create a net object either from scratch of from the specified checkpoint.
 
@@ -142,8 +142,8 @@ def _train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -
     return net
 
 
-def _train_create_hooks(config: dict, net: AbstractNet,
-                        dataset: AbstractDataset, output_dir: str) -> typing.Iterable[AbstractHook]:
+def train_create_hooks(config: dict, net: AbstractNet,
+                       dataset: AbstractDataset, output_dir: str) -> typing.Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
@@ -161,7 +161,7 @@ def _train_create_hooks(config: dict, net: AbstractNet,
     return hooks
 
 
-def _fallback(message: str, ex: Exception) -> None:
+def fallback(message: str, ex: Exception) -> None:
     """
     Fallback procedure when a training step fails.
     :param message: message to be logged
@@ -223,42 +223,42 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
     config = output_dir = dataset = net = hooks = main_loop = None
 
     try:
-        config = _train_load_config(config_file=config_file, cli_options=cli_options)
+        config = train_load_config(config_file=config_file, cli_options=cli_options)
     except Exception as ex:
-        _fallback('Loading config failed', ex)
+        fallback('Loading config failed', ex)
 
     try:
-        output_dir = _train_create_output_dir(config=config, output_root=output_root)
+        output_dir = train_create_output_dir(config=config, output_root=output_root)
     except Exception as ex:
-        _fallback('Failed to create output dir', ex)
+        fallback('Failed to create output dir', ex)
 
     try:
-        dataset = _train_create_dataset(config=config, output_dir=output_dir)
+        dataset = train_create_dataset(config=config, output_dir=output_dir)
     except Exception as ex:
-        _fallback('Creating dataset failed', ex)
+        fallback('Creating dataset failed', ex)
 
     try:
-        net = _train_create_net(config=config, output_dir=output_dir, dataset=dataset)
+        net = train_create_net(config=config, output_dir=output_dir, dataset=dataset)
     except Exception as ex:
-        _fallback('Creating network failed', ex)
+        fallback('Creating network failed', ex)
 
     try:
-        hooks = _train_create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
+        hooks = train_create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
     except Exception as ex:
-        _fallback('Creating hooks failed', ex)
+        fallback('Creating hooks failed', ex)
 
     try:
         logging.info('Creating main loop')
         kwargs = config['main_loop'] if 'main_loop' in config else {}
         main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks, **kwargs)
     except Exception as ex:
-        _fallback('Creating main loop failed', ex)
+        fallback('Creating main loop failed', ex)
 
     try:
         logging.info('Running the main loop')
         main_loop.run(run_test_stream=('test' in config['stream']))
     except Exception as ex:
-        _fallback('Running the main loop failed', ex)
+        fallback('Running the main loop failed', ex)
 
 
 def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: float, test_ratio: float=0) -> None:
@@ -278,14 +278,14 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
         logging.info('Loading config')
         config = load_config(config_file=config_file, additional_args=[])
     except Exception as ex:
-        _fallback('Loading config failed', ex)
+        fallback('Loading config failed', ex)
 
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
         dataset = create_object_from_config(config['dataset'], args=(config_str,))
     except Exception as ex:
-        _fallback('Creating dataset failed', ex)
+        fallback('Creating dataset failed', ex)
 
     logging.info('Splitting')
     dataset.split(num_splits, train_ratio, valid_ratio, test_ratio)
