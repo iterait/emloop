@@ -52,13 +52,14 @@ def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> di
     return config
 
 
-def train_create_output_dir(config: dict, output_root: str, default_net_name: str= 'NonameNet') -> str:
+def train_create_output_dir(config: dict, output_root: str, default_net_name: str='NonameNet') -> str:
     """
     Create output_dir under the given output_root and
         - dump the given config to yaml file under this dir
         - register a file logger logging to a file under this dir
     :param config: config to be dumped
     :param output_root: dir wherein output_dir shall be created
+    :param default_net_name: name to be used when `net.name` is not found in the config
     :return: path to the created output_dir
     """
     logging.info('Creating output dir')
@@ -142,13 +143,14 @@ def train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) ->
     return net
 
 
-def train_create_hooks(config: dict, net: AbstractNet,
-                       dataset: AbstractDataset, output_dir: str) -> typing.Iterable[AbstractHook]:
+def train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
+                       output_dir: str) -> typing.Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
     :param net: net object to be passed to the hooks
     :param dataset: AbstractDataset object
+    :param output_dir: training output dir available to the hooks
     :return: list of hook objects
     """
     logging.info('Creating hooks')
