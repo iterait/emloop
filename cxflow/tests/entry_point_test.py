@@ -4,13 +4,18 @@ Test module for cxflow entry point (entry_point.py)
 import logging
 import os
 from os import path
+from copy import deepcopy
 
 import yaml
+import tensorflow as tf
 
-from cxflow.entry_point import train_create_output_dir, train_create_dataset, train_load_config, train_create_hooks
+from cxflow.entry_point import train_create_output_dir, train_create_dataset, train_load_config, train_create_hooks,\
+    train_create_net
 from cxflow.utils.config import config_to_file, load_config
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.tests.test_core import CXTestCaseWithDir
+from cxflow.tests.test_core import CXTestCaseWithDirAndNet
+from cxflow.nets.tf_net import BaseTFNetRestore
+from cxflow.tests.nets.tf_net_test import DummyNet
 
 
 class DummyDataset:  # pylint: disable=too-few-public-methods
@@ -32,7 +37,23 @@ class SecondDummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
     pass
 
 
-class EntryPointTest(CXTestCaseWithDir):
+class DummyNetWithKwargs(DummyNet):  # pylint: disable=too-few-public-methods
+    """Dummy restore net which saves kwargs to self.kwargs."""
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        super().__init__(**kwargs)
+
+    def _create_net(self, **kwargs):
+        super()._create_net()
+        self.session.run(tf.global_variables_initializer())
+
+
+class DummyNetRestore(DummyNetWithKwargs):  # pylint: disable=too-few-public-methods
+    """Dummy restore net which saves ."""
+    pass
+
+
+class EntryPointTest(CXTestCaseWithDirAndNet):
     """Entry point functions test case."""
 
     def __init__(self, *args, **kwargs):
@@ -150,7 +171,7 @@ class EntryPointTest(CXTestCaseWithDir):
 
         self.assertEqual(len(hooks), 1)
         self.assertTrue(isinstance(hook, DummyHook))
-        for key in ['dataset', 'net', 'output_dir', 'additional_arg']:
+        for key in expected_kwargs.keys():
             self.assertIn(key, kwargs)
             self.assertEqual(expected_kwargs[key], kwargs[key])
 
@@ -165,3 +186,38 @@ class EntryPointTest(CXTestCaseWithDir):
         self.assertEqual(len(hooks2), 2)
         self.assertTrue(isinstance(hooks2[0], DummyHook))
         self.assertTrue(isinstance(hooks2[1], SecondDummyHook))
+
+    def test_train_create_net(self):
+        """Test if net is created correctly."""
+
+        # test correct kwargs passing
+        config = {'net': {'net_module': 'cxflow.tests.entry_point_test',
+                          'net_class': 'DummyNetWithKwargs',
+                          'io': {'in': [], 'out': []}}}
+        dataset = 'dataset_placeholder'
+        expected_kwargs = {'dataset': dataset, 'log_dir': self.tmpdir, **config['net']}
+        net = train_create_net(config=config, output_dir=self.tmpdir, dataset=dataset)
+        checkpoint_path = net.save('dummy')
+
+        kwargs = net.kwargs
+        for key in expected_kwargs.keys():
+            self.assertIn(key, kwargs)
+            self.assertEqual(expected_kwargs[key], kwargs[key])
+        tf.reset_default_graph()
+
+        # test net restore without custom restore class
+        restore_config = deepcopy(config)
+        restore_config['net']['restore_from'] = checkpoint_path
+        restored_net = train_create_net(config=restore_config, output_dir=self.tmpdir+'_restored', dataset=dataset)
+
+        self.assertTrue(isinstance(restored_net, BaseTFNetRestore))
+        tf.reset_default_graph()
+
+        # test net restore with custom restore class
+        custom_restore_config = deepcopy(config)
+        custom_restore_config['net']['restore_from'] = checkpoint_path
+        custom_restore_config['net']['restore_module'] = 'cxflow.tests.entry_point_test'
+        custom_restore_config['net']['restore_class'] = 'DummyNetRestore'
+        restored_net = train_create_net(custom_restore_config, output_dir=self.tmpdir+'_restored', dataset=dataset)
+
+        self.assertTrue(isinstance(restored_net, DummyNetRestore))

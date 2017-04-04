@@ -131,7 +131,7 @@ def train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) ->
     if 'restore_from' in net_config:
         logging.info('Restoring net')
         try:
-            net = create_object_from_config(net_config, net_kwargs, key_prefix='restore_')
+            net = create_object_from_config(net_config, kwargs=net_kwargs, key_prefix='restore_')
             logging.info('\tNet restored with custom class')
         except (AssertionError, ValueError, AttributeError, ImportError, TypeError) as _:
             net = BaseTFNetRestore(**net_kwargs)
