@@ -25,7 +25,7 @@ class DummyDataset:  # pylint: disable=too-few-public-methods
 
 
 class DummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
-    """Dummy dataset which save its **kwargs to self.kwargs."""
+    """Dummy hook which save its **kwargs to self.kwargs."""
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -44,7 +44,7 @@ class DummyNetWithKwargs(DummyNet):  # pylint: disable=too-few-public-methods
         super().__init__(**kwargs)
 
     def _create_net(self, **kwargs):
-        # create dummy train op and variable
+        # create a dummy train op and variable
         super()._create_net()
 
         # initialize the dummy variable in order to allow saving
@@ -96,7 +96,7 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         self.assertTrue(path.isdir(output_dir))
         self.assertTrue(name in output_dir)
 
-    def test_create_output_dir_no_netname(self):
+    def test_create_output_dir_noname(self):
         """Test create output dir without specified net.name (default_net_name should be used)."""
         name = 'nothing'
         output_dir = train_create_output_dir(config={'a': 'b', 'net': {}},
