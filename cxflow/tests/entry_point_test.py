@@ -7,15 +7,29 @@ from os import path
 
 import yaml
 
-from cxflow.entry_point import train_create_output_dir, train_create_dataset, train_load_config
+from cxflow.entry_point import train_create_output_dir, train_create_dataset, train_load_config, train_create_hooks
 from cxflow.utils.config import config_to_file, load_config
+from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
-class DummyDataset:
+class DummyDataset:  # pylint: disable=too-few-public-methods
     """Dummy dataset which loads the given config to self.config."""
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
+
+
+class DummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
+    """Dummy dataset which save its **kwargs to self.kwargs."""
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        super().__init__(**kwargs)
+
+
+class SecondDummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
+    """Second dummy dataset which does nothing."""
+    pass
 
 
 class EntryPointTest(CXTestCaseWithDir):
@@ -120,3 +134,34 @@ class EntryPointTest(CXTestCaseWithDir):
         self.assertDictEqual(returned_config, load_config(config_path, []))
         self.assertDictEqual(returned_config, good_config)
 
+    def test_create_hooks(self):
+        """Test hooks creation in train_create_hooks."""
+
+        # test correct kwargs passing
+        config = {'hooks': [{'hook_module': 'cxflow.tests.entry_point_test',
+                             'hook_class':'DummyHook',
+                             'additional_arg': 10}]}
+        dataset = 'dataset_placeholder'
+        net = 'net_placeholder'
+        expected_kwargs = {'dataset': dataset, 'net': net, 'output_dir': self.tmpdir, 'additional_arg': 10}
+        hooks = train_create_hooks(config=config, dataset=dataset, net=net, output_dir=self.tmpdir)
+        hook = hooks[0]
+        kwargs = hook.kwargs
+
+        self.assertEqual(len(hooks), 1)
+        self.assertTrue(isinstance(hook, DummyHook))
+        for key in ['dataset', 'net', 'output_dir', 'additional_arg']:
+            self.assertIn(key, kwargs)
+            self.assertEqual(expected_kwargs[key], kwargs[key])
+
+        # test correct hook order
+        two_hooks_config = {'hooks': [{'hook_module': 'cxflow.tests.entry_point_test',
+                                       'hook_class': 'DummyHook',
+                                       'additional_arg': 10},
+                                      {'hook_module': 'cxflow.tests.entry_point_test',
+                                       'hook_class': 'SecondDummyHook'}]}
+        hooks2 = train_create_hooks(config=two_hooks_config, dataset=dataset, net=net, output_dir=self.tmpdir)
+
+        self.assertEqual(len(hooks2), 2)
+        self.assertTrue(isinstance(hooks2[0], DummyHook))
+        self.assertTrue(isinstance(hooks2[1], SecondDummyHook))
