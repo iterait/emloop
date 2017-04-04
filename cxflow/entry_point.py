@@ -127,7 +127,7 @@ def train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) ->
     :return: net object
     """
     net_config = config['net']
-    net_kwargs = {'dataset':dataset, 'log_dir': output_dir, **net_config}
+    net_kwargs = {'dataset': dataset, 'log_dir': output_dir, **net_config}
     if 'restore_from' in net_config:
         logging.info('Restoring net')
         try:
