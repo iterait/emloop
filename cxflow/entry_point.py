@@ -52,7 +52,7 @@ def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> di
     return config
 
 
-def train_create_output_dir(config: dict, output_root: str, default_net_name: str='NonameNet') -> str:
+def create_output_dir(config: dict, output_root: str, default_net_name: str= 'NonameNet') -> str:
     """
     Create output_dir under the given output_root and
         - dump the given config to yaml file under this dir
@@ -90,7 +90,7 @@ def train_create_output_dir(config: dict, output_root: str, default_net_name: st
     return output_dir
 
 
-def train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
+def create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     """
     Create a dataset object according to the given config.
 
@@ -109,7 +109,7 @@ def train_create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     return dataset
 
 
-def train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
+def create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> AbstractNet:
     """
     Create a net object either from scratch of from the specified checkpoint.
 
@@ -143,8 +143,8 @@ def train_create_net(config: dict, output_dir: str, dataset: AbstractDataset) ->
     return net
 
 
-def train_create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
-                       output_dir: str) -> typing.Iterable[AbstractHook]:
+def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
+                 output_dir: str) -> typing.Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
@@ -230,22 +230,22 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
         fallback('Loading config failed', ex)
 
     try:
-        output_dir = train_create_output_dir(config=config, output_root=output_root)
+        output_dir = create_output_dir(config=config, output_root=output_root)
     except Exception as ex:
         fallback('Failed to create output dir', ex)
 
     try:
-        dataset = train_create_dataset(config=config, output_dir=output_dir)
+        dataset = create_dataset(config=config, output_dir=output_dir)
     except Exception as ex:
         fallback('Creating dataset failed', ex)
 
     try:
-        net = train_create_net(config=config, output_dir=output_dir, dataset=dataset)
+        net = create_net(config=config, output_dir=output_dir, dataset=dataset)
     except Exception as ex:
         fallback('Creating network failed', ex)
 
     try:
-        hooks = train_create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
+        hooks = create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
     except Exception as ex:
         fallback('Creating hooks failed', ex)
 
