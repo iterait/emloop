@@ -2,8 +2,6 @@
 Test module for base tensorflow nets (cxflow.nets.tf_net).
 """
 import logging
-import tempfile
-import shutil
 from unittest import TestCase
 from os import path
 
@@ -11,6 +9,7 @@ import tensorflow as tf
 import numpy as np
 
 from cxflow.nets.tf_net import BaseTFNet, BaseTFNetRestore, create_optimizer
+from cxflow.tests.test_core import CXTestCaseWithDirAndNet
 
 
 class DummyNet(BaseTFNet):
@@ -216,7 +215,7 @@ class BasetTFNetTest(TestCase):
         tf.reset_default_graph()
 
 
-class BasetTFNetRestoreTest(TestCase):
+class BasetTFNetRestoreTest(CXTestCaseWithDirAndNet):
     """
     Test case for BaseTFNetRestore.
 
@@ -228,7 +227,7 @@ class BasetTFNetRestoreTest(TestCase):
         logging.getLogger().disabled = True
         super().__init__(*args, **kwargs)
 
-    def test_restore(self, *args, **kwargs):
+    def test_restore(self):
         """Test net saving and restoring."""
 
         # test net saving
@@ -255,12 +254,3 @@ class BasetTFNetRestoreTest(TestCase):
         var = restored_net.graph.get_tensor_by_name('var:0')
         var_value = var.eval(session=restored_net.session)
         self.assertTrue(np.allclose(saved_var_value, var_value))
-
-    def setUp(self):
-        self.tmpdir = tempfile.mkdtemp()
-        pass
-
-    def tearDown(self):
-        """Reset tf graph and remove the tempdir after every test."""
-        shutil.rmtree(self.tmpdir)
-        tf.reset_default_graph()

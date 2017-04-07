@@ -1,52 +1,53 @@
 """
 Test module for reflection utils (cxflow.utils.reflection).
 """
-import logging
-from unittest import TestCase
+import sys
+import os
 
-from cxflow.utils.reflection import create_object, create_object_from_config
+from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module
+from cxflow.tests.test_core import CXTestCaseWithDir
 
 
-class SimpleClass:  # pylint: disable=too-few-public-methods
+class SimpleClass:  # pylint: disable=missing-docstring
     pass
 
 
-class ClassWithArg:  # pylint: disable=too-few-public-methods
+class DuplicateClass:  # pylint: disable=missing-docstring
+    pass
+
+
+class ClassWithArg:  # pylint: disable=missing-docstring
     def __init__(self, x):
         self.ex = x
 
 
-class ClassWithArgs:  # pylint: disable=too-few-public-methods
+class ClassWithArgs:  # pylint: disable=missing-docstring
     def __init__(self, x, *args):
         self.ex = x
         self.args = args
 
 
-class ClassWithKwargs:  # pylint: disable=too-few-public-methods
+class ClassWithKwargs:  # pylint: disable=missing-docstring
     def __init__(self, x, **kwargs):
         self.ex = x
         self.kwargs = kwargs
 
 
-class ClassWithArgsAndKwargs:  # pylint: disable=too-few-public-methods
+class ClassWithArgsAndKwargs:  # pylint: disable=missing-docstring
     def __init__(self, x, *args, **kwargs):
         self.ex = x
         self.args = args
         self.kwargs = kwargs
 
 
-class ClassWithArgsAndKwargsOnly:  # pylint: disable=too-few-public-methods
+class ClassWithArgsAndKwargsOnly:  # pylint: disable=missing-docstring
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
 
 
-class ReflectionTest(TestCase):
-    """Test case for create object methods."""
-
-    def __init__(self, *args, **kwargs):
-        logging.getLogger().disabled = True
-        super().__init__(*args, **kwargs)
+class ReflectionTest(CXTestCaseWithDir):
+    """Test case for the reflection util functions."""
 
     def test_create_object(self):
         """Test base create object function."""
@@ -139,3 +140,51 @@ class ReflectionTest(TestCase):
         self.assertRaises(ValueError, create_object_from_config, missing_module_config)
         missing_class_config = {'my_module': module_name}
         self.assertRaises(ValueError, create_object_from_config, missing_class_config)
+
+    def test_find_class_module(self):
+        """Test finding class module."""
+
+        # test correct setup
+        matched_modules, erroneous_modules = find_class_module('cxflow.tests.utils', 'SimpleClass')
+        self.assertListEqual(matched_modules, ['cxflow.tests.utils.reflection_test'])
+        self.assertListEqual(erroneous_modules, [])
+
+        # test non-existent class
+        matched_modules2, erroneous_modules2 = find_class_module('cxflow.tests.utils', 'DoesNotExists')
+        self.assertListEqual(matched_modules2, [])
+        self.assertListEqual(erroneous_modules2, [])
+
+        # test multiple matches
+        matched_modules3, erroneous_modules3 = find_class_module('cxflow.tests.utils', 'DuplicateClass')
+        self.assertCountEqual(matched_modules3, ['cxflow.tests.utils.reflection_test',
+                                                 'cxflow.tests.utils.dummy_module'])
+        self.assertListEqual(erroneous_modules3, [])
+
+    def test_find_class_module_errors(self):
+        """Test erroneous modules handling in find_class_module function."""
+
+        # create dummy module hierarchy
+        module_name = 'my_dummy_module'
+        valid_submodule_name = 'my_valid_submodule'
+        invalid_submodule_name = 'my_invalid_submodule'
+        module_path = os.path.join(self.tmpdir, module_name)
+
+        os.mkdir(module_path)
+        with open(os.path.join(module_path, '__init__.py'), 'w') as file:
+            file.write('\n')
+        with open(os.path.join(module_path, invalid_submodule_name+'.py'), 'w') as file:
+            file.write('import ANonExistentModule\n')
+        with open(os.path.join(module_path, valid_submodule_name+'.py'), 'w') as file:
+            file.write('class MyClass:\n    pass\n')
+
+        sys.path.append(self.tmpdir)
+
+        matched_modules, erroneous_modules = find_class_module(module_name, 'MyClass')
+
+        # test if the correct module is returned despite the erroneous module
+        self.assertListEqual(matched_modules, [module_name+'.'+valid_submodule_name])
+
+        # test if the erroneous module is returned correctly
+        self.assertEqual(len(erroneous_modules), 1)
+        self.assertEqual(erroneous_modules[0][0], module_name+'.'+invalid_submodule_name)
+        self.assertIsInstance(erroneous_modules[0][1], ImportError)

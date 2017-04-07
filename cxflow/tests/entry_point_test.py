@@ -9,21 +9,23 @@ from copy import deepcopy
 import yaml
 import tensorflow as tf
 
-from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net
+from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net, \
+    get_class_module
 from cxflow.utils.config import config_to_file, load_config
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.tests.test_core import CXTestCaseWithDirAndNet
 from cxflow.nets.tf_net import BaseTFNetRestore
 from cxflow.tests.nets.tf_net_test import DummyNet
+from cxflow.hooks.profile_hook import ProfileHook
 
 
-class DummyDataset:  # pylint: disable=too-few-public-methods
+class DummyDataset:
     """Dummy dataset which loads the given config to self.config."""
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
 
 
-class DummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
+class DummyHook(AbstractHook):
     """Dummy hook which save its **kwargs to self.kwargs."""
 
     def __init__(self, **kwargs):
@@ -31,12 +33,12 @@ class DummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
         super().__init__(**kwargs)
 
 
-class SecondDummyHook(AbstractHook):  # pylint: disable=too-few-public-methods
+class SecondDummyHook(AbstractHook):
     """Second dummy dataset which does nothing."""
     pass
 
 
-class DummyNetWithKwargs(DummyNet):  # pylint: disable=too-few-public-methods
+class DummyNetWithKwargs(DummyNet):
     """Dummy net which saves kwargs to self.kwargs."""
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -50,7 +52,7 @@ class DummyNetWithKwargs(DummyNet):  # pylint: disable=too-few-public-methods
         self.session.run(tf.global_variables_initializer())
 
 
-class DummyNetRestore(DummyNetWithKwargs):  # pylint: disable=too-few-public-methods
+class DummyNetRestore(DummyNetWithKwargs):
     """Dummy restore net."""
     pass
 
@@ -161,8 +163,8 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         """Test hooks creation in train_create_hooks."""
 
         # test correct kwargs passing
-        config = {'hooks': [{'hook_module': 'cxflow.tests.entry_point_test',
-                             'hook_class':'DummyHook',
+        config = {'hooks': [{'module': 'cxflow.tests.entry_point_test',
+                             'class':'DummyHook',
                              'additional_arg': 10}]}
         dataset = 'dataset_placeholder'
         net = 'net_placeholder'
@@ -178,23 +180,35 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
             self.assertEqual(expected_kwargs[key], kwargs[key])
 
         # test correct hook order
-        two_hooks_config = {'hooks': [{'hook_module': 'cxflow.tests.entry_point_test',
-                                       'hook_class': 'DummyHook',
+        two_hooks_config = {'hooks': [{'module': 'cxflow.tests.entry_point_test',
+                                       'class': 'DummyHook',
                                        'additional_arg': 10},
-                                      {'hook_module': 'cxflow.tests.entry_point_test',
-                                       'hook_class': 'SecondDummyHook'}]}
+                                      {'module': 'cxflow.tests.entry_point_test',
+                                       'class': 'SecondDummyHook'}]}
         hooks2 = create_hooks(config=two_hooks_config, dataset=dataset, net=net, output_dir=self.tmpdir)
 
         self.assertEqual(len(hooks2), 2)
         self.assertTrue(isinstance(hooks2[0], DummyHook))
         self.assertTrue(isinstance(hooks2[1], SecondDummyHook))
 
+        # test auto module
+        auto_module_hooks_config = {'hooks': [{'class': 'ProfileHook'}]}
+        hooks3 = create_hooks(config=auto_module_hooks_config, dataset=dataset, net=net, output_dir=self.tmpdir)
+
+        self.assertEqual(len(hooks3), 1)
+        self.assertTrue(isinstance(hooks3[0], ProfileHook))
+
+        # test bad auto module
+        bad_hooks_config = {'hooks': [{'class': 'IDoNotExist'}]}
+        self.assertRaises(ValueError, create_hooks,
+                          config=bad_hooks_config, dataset=dataset, net=net, output_dir=self.tmpdir)
+
     def test_create_net(self):
         """Test if net is created correctly."""
 
         # test correct kwargs passing
-        config = {'net': {'net_module': 'cxflow.tests.entry_point_test',
-                          'net_class': 'DummyNetWithKwargs',
+        config = {'net': {'module': 'cxflow.tests.entry_point_test',
+                          'class': 'DummyNetWithKwargs',
                           'io': {'in': [], 'out': []}}}
         dataset = 'dataset_placeholder'
         expected_kwargs = {'dataset': dataset, 'log_dir': self.tmpdir, **config['net']}
@@ -223,3 +237,19 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         restored_net = create_net(custom_restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
 
         self.assertTrue(isinstance(restored_net, DummyNetRestore))
+
+    def test_get_class_module(self):
+        """Test if get_class_module method wraps the `utils.reflection.find_class_module` method correctly."""
+
+        # test if the module is returned directly
+        module = get_class_module('cxflow.hooks', 'ProfileHook')
+        expected_module = 'cxflow.hooks.profile_hook'
+        self.assertEqual(module, expected_module)
+
+        # test if None is returned when the class is not found
+        module2 = get_class_module('cxflow.hooks', 'IDoNotExist')
+        expected_module2 = None
+        self.assertEqual(module2, expected_module2)
+
+        # test if exception is raised when multiple modules are matched
+        self.assertRaises(ValueError, get_class_module, 'cxflow.tests.utils', 'DuplicateClass')
