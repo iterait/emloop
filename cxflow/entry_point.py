@@ -26,11 +26,43 @@ from .nets.tf_net import BaseTFNetRestore
 from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook
 from .utils.config import load_config, config_to_str, config_to_file
-from .utils.reflection import create_object_from_config
+from .utils.reflection import create_object_from_config, find_class_module
 
 CXFLOW_LOG_FORMAT_STR = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
 CXFLOW_LOG_DATE_FORMAT_STR = '%H:%M:%S'
 CXFLOW_LOG_FORMATTER = logging.Formatter(CXFLOW_LOG_FORMAT_STR, datefmt=CXFLOW_LOG_DATE_FORMAT_STR)
+
+CXFLOW_HOOKS_MODULE = 'cxflow.hooks'
+
+
+def get_class_module(module_name: str, class_name: str) -> str:
+    """
+    Get a sub-module of the given module which has the given class.
+
+    This method wraps `utils.reflection.find_class_module method` with the following behavior:
+
+    - raise error when multiple sub-modules are found
+    - return None when no sub-module is found
+    - warn about non-searchable sub-modules
+
+    :param module_name: module to be searched
+    :param class_name: searched class name
+    :return: sub-module with the searched class or None
+    """
+    matched_modules, erroneous_modules = find_class_module(module_name, class_name)
+
+    for submodule, error in erroneous_modules:
+        logging.warning('Could not inspect sub-module `%s` due to `%s` '
+                        'when searching for `%s` in sub-modules of `%s`.',
+                        submodule, type(error).__name__, class_name, module_name)
+
+    if len(matched_modules) == 1:
+        return matched_modules[0]
+    if len(matched_modules) > 1:
+        raise ValueError('Found more than one sub-module when searching for `%s` in sub-modules of `%s`. '
+                         'Please specify the module explicitly. Found sub-modules: `%s`',
+                         class_name, module_name, matched_modules)
+    return None
 
 
 def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
@@ -52,7 +84,7 @@ def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> di
     return config
 
 
-def create_output_dir(config: dict, output_root: str, default_net_name: str= 'NonameNet') -> str:
+def create_output_dir(config: dict, output_root: str, default_net_name: str='NonameNet') -> str:
     """
     Create output_dir under the given output_root and
         - dump the given config to yaml file under this dir
@@ -157,6 +189,17 @@ def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
     hooks = []
     if 'hooks' in config:
         for hook_config in config['hooks']:
+            assert 'class' in hook_config
+            if 'module' not in hook_config:
+                hook_module = get_class_module(CXFLOW_HOOKS_MODULE, hook_config['class'])
+                if hook_module is not None:
+                    logging.debug('\tFound hook module `%s` for class `%s`', hook_module, hook_config['class'])
+                    hook_config['module'] = hook_module
+                else:
+                    raise ValueError('Can`t find hook module for hook class `{}`. '
+                                     'Make sure it is defined under `{}` sub-modules.'
+                                     .format(hook_config['class'], CXFLOW_HOOKS_MODULE))
+
             hook_kwargs = {'dataset': dataset, 'net': net, 'output_dir': output_dir, 'config': config, **hook_config}
             hooks.append(create_object_from_config(hook_config, kwargs=hook_kwargs))
             logging.info('\t%s created', type(hooks[-1]).__name__)
@@ -167,7 +210,7 @@ def fallback(message: str, ex: Exception) -> None:
     """
     Fallback procedure when a training step fails.
     :param message: message to be logged
-    :param e: Exception which caused the failure
+    :param ex: Exception which caused the failure
     """
     logging.error('%s: %s\n%s', message, ex, traceback.format_exc())
     sys.exit(1)
