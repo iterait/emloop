@@ -31,7 +31,8 @@ def create_object_from_config(config: Dict[str, object], args: Iterable=(),
         class_matches = [key for key in config.keys() if 'class' in key]
 
         if not (len(module_matches) == 1 and len(class_matches) == 1):
-            raise ValueError('Failed to deduce module and class names keys. Please provide key_prefix')
+            raise ValueError('Failed to deduce module and class names keys from config `{}`. Please provide key_prefix'
+                             .format(config))
 
         module_key = module_matches[0]
         class_key = class_matches[0]
