@@ -201,7 +201,7 @@ def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
                                      .format(hook_config['class'], CXFLOW_HOOKS_MODULE))
 
             hook_kwargs = {'dataset': dataset, 'net': net, 'output_dir': output_dir, 'config': config, **hook_config}
-            hooks.append(create_object_from_config(hook_config, kwargs=hook_kwargs))
+            hooks.append(create_object_from_config(hook_config, kwargs=hook_kwargs, key_prefix=''))
             logging.info('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
