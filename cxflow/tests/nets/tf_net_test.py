@@ -107,16 +107,19 @@ class BasetTFNetTest(TestCase):
     def test_init_asserts(self):
         """Test if the init arguments are correctly asserted."""
 
-        good_io = {'in': [], 'out': []}
+        good_io = {'in': [], 'out': ['dummy']}
         DummyNet(dataset=None, log_dir='', io=good_io)
         tf.reset_default_graph()
 
         # test assertion on missing in/out
-        missing_in = {'out': []}
+        missing_in = {'out': ['dummy']}
         missing_out = {'in': []}
+        empty_out = {'in': [], 'out': []}
         self.assertRaises(AssertionError, DummyNet, dataset=None, log_dir='', io=missing_in)
         tf.reset_default_graph()
         self.assertRaises(AssertionError, DummyNet, dataset=None, log_dir='', io=missing_out)
+        tf.reset_default_graph()
+        self.assertRaises(AssertionError, DummyNet, dataset=None, log_dir='', io=empty_out)
         tf.reset_default_graph()
 
         # test assertion on negative thread count
@@ -127,7 +130,7 @@ class BasetTFNetTest(TestCase):
     def test_finding_train_op(self):
         """Test finding train op in graph."""
 
-        good_io = {'in': [], 'out': []}
+        good_io = {'in': [], 'out': ['dummy']}
 
         # test whether train_op is found correctly
         trainop_net = TrainOpNet(dataset=None, log_dir='', io=good_io)
