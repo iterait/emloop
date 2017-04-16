@@ -1,90 +1,63 @@
-import typing
+from typing import Iterable, Tuple
 
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
-from ..datasets.abstract_dataset import AbstractDataset
 from .abstract_hook import AbstractHook
+from .accumulating_hook import AccumulatingHook
 
 
-class ClassificationInfoHook(AbstractHook):
-    """Provides basic classification statistics such as fscore, recall and precision."""
+class ClassificationInfoHook(AccumulatingHook):
+    """
+    Accumulate the specified prediction and gold variables
+    and compute their classification statistics after each epoch.
 
-    def __init__(self, predicted_variable: str, gold_variable: str, f1_average: str, **kwargs):
+    In particular, accuracy, precisions, recalls and fscores are computed and saved to epoch data.
+
+    -------------------------------------------------------
+    Example usage in config
+    -------------------------------------------------------
+    # compute and save classification statistics between net output `prediction` and stream source `labels`
+    hooks:
+      - class: ClassificationInfoHook
+        predicted_variable: prediction
+        gold_variable: labels
+    -------------------------------------------------------
+    """
+
+    def __init__(self, predicted_variable: str, gold_variable: str, f1_average: str=None, **kwargs):
         """
-        Note that `predicted_variable` and `gold_variable` must be included in evaluated variables.
         :param predicted_variable: name of the predicted variable.
         :param gold_variable: name of the gold variable
         :param f1_average: averaging type {micro, macro, weighted, samples} defined by
                            `sklearn.metrics.precision_recall_fscore_support`
         """
-        super().__init__(**kwargs)
+        super().__init__(variables=[predicted_variable, gold_variable], **kwargs)
 
         self._predicted_variable = predicted_variable
         self._gold_variable = gold_variable
         self._f1_average = f1_average
 
-        self._reset()
+    def _get_metrics(self, gold: list, predicted: list) \
+            -> Tuple[float, Iterable[float], Iterable[float], Iterable[float]]:
+        """Compute accuracy, precision, recall and fscore."""
 
-    def _reset(self):
-        """Reset all predicted and ground truth buffers."""
-        self._train_predicted = []
-        self._train_gold = []
-        self._valid_predicted = []
-        self._valid_gold = []
-        self._test_predicted = []
-        self._test_gold = []
+        precision, recall, fscore, _ = precision_recall_fscore_support(gold, predicted, average=self._f1_average)
+        accuracy = accuracy_score(gold, predicted, normalize=True)
+        return accuracy, precision, recall, fscore
 
-    def after_batch(self, stream_type: str, results: AbstractDataset.Batch, **kwargs) -> None:
-        """Save predicted and gold classes of this batch."""
-        if stream_type == 'train':
-            self._train_predicted += list(results[self._predicted_variable])
-            self._train_gold += list(results[self._gold_variable])
-        elif stream_type == 'valid':
-            self._valid_predicted += list(results[self._predicted_variable])
-            self._valid_gold += list(results[self._gold_variable])
-        elif stream_type == 'test':
-            self._test_predicted += list(results[self._predicted_variable])
-            self._test_gold += list(results[self._gold_variable])
-        else:
-            raise ValueError('stream_type must be either train, valid or test')
+    def _save_metrics(self, epoch_data: AbstractHook.EpochData) -> None:
+        """Compute the classification statistics from the accumulator and save the results to the given epoch data."""
 
-    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
-                           **kwargs) -> None:
-        """Add precision, recall and fscore to the valid and test results."""
+        for stream_name in epoch_data.keys():
+            # variables are already checked in the AccumulatingHook; hence, we do not check them here
+            metrics = self._get_metrics(self._accumulator[stream_name][self._gold_variable],
+                                        self._accumulator[stream_name][self._predicted_variable])
 
-        valid_precision, valid_recall, valid_fscore, _ = self._get_results(self._valid_gold, self._valid_predicted)
-        valid_results['precision'] = valid_precision
-        valid_results['recall'] = valid_recall
-        valid_results['fscore'] = valid_fscore
+            stream_data = epoch_data[stream_name]
+            stream_data['accuracy'], stream_data['precision'], stream_data['recall'], stream_data['fscore'] = metrics
 
-        test_precision, test_recall, test_fscore, _ = self._get_results(self._test_gold, self._test_predicted)
-        test_results['precision'] = test_precision
-        test_results['recall'] = test_recall
-        test_results['fscore'] = test_fscore
+    def after_epoch(self, epoch_data: AbstractHook.EpochData, **kwargs) -> None:
+        """Compute and save the classification statistics and reset the accumulator."""
+        self._save_metrics(epoch_data)
+        super().after_epoch(**kwargs)
 
-        self._reset()
-
-    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
-                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
-        """Add precision, recall and fscore to the train, valid and test results."""
-
-        train_precision, train_recall, train_fscore, _ = self._get_results(self._train_gold, self._train_predicted)
-        train_results['precision'] = train_precision
-        train_results['recall'] = train_recall
-        train_results['fscore'] = train_fscore
-
-        valid_precision, valid_recall, valid_fscore, _ = self._get_results(self._valid_gold, self._valid_predicted)
-        valid_results['precision'] = valid_precision
-        valid_results['recall'] = valid_recall
-        valid_results['fscore'] = valid_fscore
-
-        test_precision, test_recall, test_fscore, _ = self._get_results(self._test_gold, self._test_predicted)
-        test_results['precision'] = test_precision
-        test_results['recall'] = test_recall
-        test_results['fscore'] = test_fscore
-
-        self._reset()
-
-    def _get_results(self, gold: list, predicted: list) -> typing.Tuple[float, float, float, float]:
-        """Compute precision, recall, fscore and support."""
-        return precision_recall_fscore_support(gold, predicted, average=self._f1_average)

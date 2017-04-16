@@ -40,6 +40,11 @@ Please refer to repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mn
 
 In addition, `cxgridsearch` command is installed.
 
+## Tutorials
+The following tutorials serve as a gentle introduction to the cxflow framework:
+
+- [cxflow hooks](hooks/README.md)
+
 ## Testing
 Unit tests might be run by `$ python setup.py test`.
 

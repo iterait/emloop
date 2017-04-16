@@ -3,9 +3,17 @@ This module defines AbstractHook from which all the custom hooks shall be derive
 
 Furthermore, TrainingTerminated exception is defined.
 """
+
+import typing
+import logging
+import inspect
+
 from ..datasets.abstract_dataset import AbstractDataset
-from ..nets.abstract_net import AbstractNet
 from ..utils.profile import Timer
+
+
+# Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.
+CXF_HOOK_INIT_ARGS = {'net', 'dataset', 'output_dir'}
 
 
 class TrainingTerminated(Exception):
@@ -20,65 +28,47 @@ class AbstractHook:
     The hook lifecycle of hook is as follows:
     1) The hook is constructed `__init__`.
     2) `before_training` is triggered.
-    3) The valid/test dataset is iterated and their results are pushed to `before_first_epoch`.
-       This "epoch" is referred as zero.
-    4) After each batch, regardless the stream type, `after_batch` is triggered.
-    5) After an epoch is over, the summary statistics are passed to `after_epoch` together with epoch_id.
-    6) When the whole training is over, `after_training` is triggered.
+    3) After each batch, regardless the stream type, `after_batch` is triggered.
+    4) After an epoch is over, the summary statistics are passed to `after_epoch` together with `epoch_id`.
+       The summary statistics (epoch_data) are mutable and each hook might add new information.
+    5) When the whole training is over, `after_training` is triggered.
     """
 
-    def __init__(self, net: AbstractNet, config: dict, dataset: AbstractDataset, **kwargs):
-        """
-        Create hook.
-        :param net: net to be trained
-        :param config: hook config dict
-        :param dataset: dataset to be trained with
-        :param kwargs: additional kwargs
-        """
-        pass
+    EpochData = typing.NewType('EpochData', typing.Mapping[str, AbstractDataset.Batch])
 
-    def before_training(self, **kwargs) -> None:
+    def __init__(self, **kwargs):
+        """
+        Check for unrecognized arguments and warn about them.
+        :param kwargs: kwargs not recognized in the child hook
+        """
+        for key in kwargs.keys():
+            if key not in CXF_HOOK_INIT_ARGS:
+                logging.warning('Argument `%s` was not recognized by `%s`. Recognized arguments are `%s`.',
+                                key, type(self).__name__, list(inspect.signature(type(self)).parameters.keys()))
+
+    def before_training(self) -> None:
         """
         Before training event.
 
         No data were processed at this moment.
 
         This is called exactly once during the training.
-
-        :param kwargs: additional event kwargs
         """
         pass
 
-    def before_first_epoch(self, valid_results: AbstractDataset.Batch, test_results: AbstractDataset.Batch=None,
-                           **kwargs) -> None:
-        """
-        Before first epoch event.
-
-        Test and Valid streams were already evaluated and their results are aggregated in valid and test results.
-
-        This is called exactly once during the training.
-
-        :param valid_results: averaged results from the valid stream
-        :param test_results: averaged results from the test stream
-        :param kwargs: additional event kwargs
-        """
-        pass
-
-    def after_batch(self, stream_type: str, results: AbstractDataset.Batch, **kwargs) -> None:
+    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
         """
         After batch event.
 
         This event is triggered after every processed batch regardless of stream type.
         Batch results are available in results argument.
 
-        :param stream_type: one of {'train', 'valid', 'test'}
-        :param results: batch results
-        :param kwargs: additional event kwargs
+        :param stream_name: type of the stream (usually train/valid/test or any other)
+        :param batch_data: batch inputs and net outputs
         """
         pass
 
-    def after_epoch(self, epoch_id: int, train_results: AbstractDataset.Batch, valid_results: AbstractDataset.Batch,
-                    test_results: AbstractDataset.Batch=None, **kwargs) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         """
         After epoch event.
 
@@ -86,14 +76,11 @@ class AbstractHook:
         in aggregated (averaged) form. For any other aggregation method, one must manually handle `after_batch` events.
 
         :param epoch_id: finished epoch id
-        :param train_results: averaged results from train stream
-        :param valid_results: averaged results from valid stream
-        :param test_results: averaged results from test stream
-        :param kwargs: additional event kwargs
+        :param epoch_data: epoch data flowing through all hooks
         """
         pass
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, **kwargs) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
         """
         After epoch profile event.
 
@@ -105,18 +92,15 @@ class AbstractHook:
 
         :param epoch_id: finished epoch id
         :param profile: dictionary of lists of event timings that were measured during the epoch.
-        :param kwargs: additional event arguments
         """
         pass
 
-    def after_training(self, **kwargs) -> None:
+    def after_training(self) -> None:
         """
         After training event.
 
         This event is called after the training finished either naturally or thanks to an interrupt.
 
         This is called exactly once during the training.
-
-        :param kwargs: additional event kwargs
         """
         pass
