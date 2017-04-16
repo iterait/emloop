@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 
-from cxflow.entry_point import CXFLOW_LOG_FORMAT_STR
+from cxflow.entry_point import CXF_LOG_FORMAT
 
 
 def init_grid_search() -> None:
@@ -18,7 +18,7 @@ def init_grid_search() -> None:
     This method is deprecated. See issue #50 for details.
     """
     sys.path.insert(0, os.getcwd())
-    logging.basicConfig(format=CXFLOW_LOG_FORMAT_STR, level=logging.INFO)
+    logging.basicConfig(format=CXF_LOG_FORMAT, level=logging.INFO)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('script', help='script to be grid-searched')

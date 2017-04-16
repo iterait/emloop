@@ -1,19 +1,14 @@
 """
 Test module for profile utils (cxflow.utils.profile).
 """
-import logging
 import time
-from unittest import TestCase
 
+from cxflow.tests.test_core import CXTestCase
 from cxflow.utils.profile import Timer
 
 
-class TimerTest(TestCase):
+class TimerTest(CXTestCase):
     """Test case for Timer profiling object."""
-
-    def __init__(self, *args, **kwargs):
-        logging.getLogger().disabled = True
-        super().__init__(*args, **kwargs)
 
     def test_empty_timer(self):
         """Test near zero measured time for no-op."""

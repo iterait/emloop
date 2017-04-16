@@ -2,7 +2,6 @@
 Test module for base tensorflow nets (cxflow.nets.tf_net).
 """
 import logging
-from unittest import TestCase
 from os import path
 
 import tensorflow as tf
@@ -94,15 +93,12 @@ class TrainableNet(BaseTFNet):
         self.session.run(tf.global_variables_initializer())
 
 
-class BasetTFNetTest(TestCase):
+class BasetTFNetTest(CXTestCaseWithDirAndNet):
     """
     Test case for BaseTFNet.
 
     Note: do not forget to reset the default graph after every net creation!
     """
-    def __init__(self, *args, **kwargs):
-        logging.getLogger().disabled = True
-        super().__init__(*args, **kwargs)
 
     def test_init_asserts(self):
         """Test if the init arguments are correctly asserted."""
@@ -207,12 +203,6 @@ class BasetTFNetTest(TestCase):
             trainable_net.run(batch, train=True)
         after_value = trainable_net.var.eval(session=trainable_net.session)
         self.assertTrue(np.allclose([0]*10, after_value))
-
-        # cleanup of trainable_net
-
-    def tearDown(self):
-        """Reset tf graph after every test."""
-        tf.reset_default_graph()
 
 
 class BasetTFNetRestoreTest(CXTestCaseWithDirAndNet):

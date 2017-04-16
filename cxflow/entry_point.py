@@ -24,15 +24,17 @@ from .main_loop import MainLoop
 from .nets.abstract_net import AbstractNet
 from .nets.tf_net import BaseTFNetRestore
 from .datasets.abstract_dataset import AbstractDataset
-from .hooks.abstract_hook import AbstractHook
+from .hooks.abstract_hook import AbstractHook, CXF_HOOK_INIT_ARGS
 from .utils.config import load_config, config_to_str, config_to_file
 from .utils.reflection import create_object_from_config, find_class_module
 
-CXFLOW_LOG_FORMAT_STR = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
-CXFLOW_LOG_DATE_FORMAT_STR = '%H:%M:%S'
-CXFLOW_LOG_FORMATTER = logging.Formatter(CXFLOW_LOG_FORMAT_STR, datefmt=CXFLOW_LOG_DATE_FORMAT_STR)
+# cxflow logging formats and formatter.
+CXF_LOG_FORMAT = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
+CXF_LOG_DATE_FORMAT = '%H:%M:%S'
+CXF_LOG_FORMATTER = logging.Formatter(CXF_LOG_FORMAT, datefmt=CXF_LOG_DATE_FORMAT)
 
-CXFLOW_HOOKS_MODULE = 'cxflow.hooks'
+# Module with standard cxflow hooks (as would be used in import).
+CXF_HOOKS_MODULE = 'cxflow.hooks'
 
 
 def get_class_module(module_name: str, class_name: str) -> str:
@@ -113,7 +115,7 @@ def create_output_dir(config: dict, output_root: str, default_net_name: str='Non
 
     # create file logger
     file_handler = logging.FileHandler(path.join(output_dir, 'train.log'))
-    file_handler.setFormatter(CXFLOW_LOG_FORMATTER)
+    file_handler.setFormatter(CXF_LOG_FORMATTER)
     logging.getLogger().addHandler(file_handler)
 
     # dump config including CLI args
@@ -126,15 +128,13 @@ def create_dataset(config: dict, output_dir: str) -> AbstractDataset:
     """
     Create a dataset object according to the given config.
 
-    Dataset, stream and output_dir configs are passed to the constructor in a single YAML-encoded string.
-    :param config: config dict with dataset and stream configs
+    Dataset and output_dir configs are passed to the constructor in a single YAML-encoded string.
+    :param config: config dict with dataset config
     :param output_dir: path to the training output dir
     :return: dataset object
     """
     logging.info('Creating dataset')
-    config_str = config_to_str({'dataset': config['dataset'],
-                                'stream': config['stream'],
-                                'output_dir': output_dir})
+    config_str = config_to_str({'dataset': config['dataset'], 'output_dir': output_dir})
 
     dataset = create_object_from_config(config['dataset'], args=(config_str,))
     logging.info('\t%s created', type(dataset).__name__)
@@ -190,18 +190,35 @@ def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
     if 'hooks' in config:
         for hook_config in config['hooks']:
             assert 'class' in hook_config
+            for key in CXF_HOOK_INIT_ARGS:
+                if key in hook_config:
+                    raise KeyError('Name `{}` is reserved in the hook config. Use a different name.'.format(key))
+
+            # find the hook module if not specified
             if 'module' not in hook_config:
-                hook_module = get_class_module(CXFLOW_HOOKS_MODULE, hook_config['class'])
+                hook_module = get_class_module(CXF_HOOKS_MODULE, hook_config['class'])
                 if hook_module is not None:
                     logging.debug('\tFound hook module `%s` for class `%s`', hook_module, hook_config['class'])
                     hook_config['module'] = hook_module
                 else:
                     raise ValueError('Can`t find hook module for hook class `{}`. '
                                      'Make sure it is defined under `{}` sub-modules.'
-                                     .format(hook_config['class'], CXFLOW_HOOKS_MODULE))
+                                     .format(hook_config['class'], CXF_HOOKS_MODULE))
+            # create hook kwargs
+            hook_config_to_pass = hook_config.copy()
+            hook_config_to_pass.pop('module')
+            hook_config_to_pass.pop('class')
+            hook_kwargs = {'dataset': dataset, 'net': net, 'output_dir': output_dir, **hook_config_to_pass}
+            for key in CXF_HOOK_INIT_ARGS:
+                assert key in hook_kwargs
 
-            hook_kwargs = {'dataset': dataset, 'net': net, 'output_dir': output_dir, 'config': config, **hook_config}
-            hooks.append(create_object_from_config(hook_config, kwargs=hook_kwargs, key_prefix=''))
+            # create new hook
+            try:
+                hook = create_object_from_config(hook_config, kwargs=hook_kwargs, key_prefix='')
+            except (ValueError, KeyError, TypeError, NameError, AttributeError, AssertionError, ImportError) as ex:
+                logging.error('\tFailed to create a hook from config `%s`', hook_config)
+                raise ex
+            hooks.append(hook)
             logging.info('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
@@ -235,7 +252,7 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
         - Dump loaded config to the output dir
     Step 3:
         - Create dataset
-            - yaml string with `dataset`, `stream` and `log_dir` configs is passed to the dataset constructor
+            - yaml string with `dataset` and `log_dir` configs is passed to the dataset constructor
     Step 4:
         - Create network
             - Dataset, `log_dir` and net config is passed to the constructor
@@ -301,7 +318,7 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
 
     try:
         logging.info('Running the main loop')
-        main_loop.run(run_test_stream=('test' in config['stream']))
+        main_loop.run()
     except Exception as ex:
         fallback('Running the main loop failed', ex)
 
@@ -380,7 +397,7 @@ def entry_point() -> None:
 
     # set up STDERR handler
     stderr_handler = logging.StreamHandler(sys.stderr)
-    stderr_handler.setFormatter(CXFLOW_LOG_FORMATTER)
+    stderr_handler.setFormatter(CXF_LOG_FORMATTER)
     logger.addHandler(stderr_handler)
 
     if known_args.subcommand == 'train':

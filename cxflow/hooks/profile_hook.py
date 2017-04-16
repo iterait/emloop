@@ -5,9 +5,20 @@ from ..utils.profile import Timer
 
 
 class ProfileHook(AbstractHook):
-    """Summarize and log epoch profile."""
+    """
+    Summarize and log epoch profile.
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, **kwargs) -> None:
+    -------------------------------------------------------
+    Example usage in config
+    -------------------------------------------------------
+    # log all the variables
+    hooks:
+      - class: ProfileHook
+    -------------------------------------------------------
+    """
+
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
+        """Summarize and log the given epoch profile."""
 
         # time spent reading data from streams (train + valid + test)
         read_data = sum(profile['read_batch_train']) + sum(profile['read_batch_valid'])
