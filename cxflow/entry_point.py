@@ -26,7 +26,7 @@ from .nets.tf_net import BaseTFNetRestore
 from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook, CXF_HOOK_INIT_ARGS
 from .utils.config import load_config, config_to_str, config_to_file
-from .utils.reflection import create_object_from_config, find_class_module
+from .utils.reflection import create_object_from_config, get_class_module
 
 # cxflow logging formats and formatter.
 CXF_LOG_FORMAT = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
@@ -35,36 +35,6 @@ CXF_LOG_FORMATTER = logging.Formatter(CXF_LOG_FORMAT, datefmt=CXF_LOG_DATE_FORMA
 
 # Module with standard cxflow hooks (as would be used in import).
 CXF_HOOKS_MODULE = 'cxflow.hooks'
-
-
-def get_class_module(module_name: str, class_name: str) -> str:
-    """
-    Get a sub-module of the given module which has the given class.
-
-    This method wraps `utils.reflection.find_class_module method` with the following behavior:
-
-    - raise error when multiple sub-modules are found
-    - return None when no sub-module is found
-    - warn about non-searchable sub-modules
-
-    :param module_name: module to be searched
-    :param class_name: searched class name
-    :return: sub-module with the searched class or None
-    """
-    matched_modules, erroneous_modules = find_class_module(module_name, class_name)
-
-    for submodule, error in erroneous_modules:
-        logging.warning('Could not inspect sub-module `%s` due to `%s` '
-                        'when searching for `%s` in sub-modules of `%s`.',
-                        submodule, type(error).__name__, class_name, module_name)
-
-    if len(matched_modules) == 1:
-        return matched_modules[0]
-    if len(matched_modules) > 1:
-        raise ValueError('Found more than one sub-module when searching for `%s` in sub-modules of `%s`. '
-                         'Please specify the module explicitly. Found sub-modules: `%s`',
-                         class_name, module_name, matched_modules)
-    return None
 
 
 def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:

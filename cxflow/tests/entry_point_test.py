@@ -9,8 +9,7 @@ from copy import deepcopy
 import yaml
 import tensorflow as tf
 
-from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net, \
-    get_class_module
+from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net
 from cxflow.utils.config import config_to_file, load_config
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.tests.test_core import CXTestCaseWithDirAndNet
@@ -236,19 +235,3 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         restored_net = create_net(custom_restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
 
         self.assertTrue(isinstance(restored_net, DummyNetRestore))
-
-    def test_get_class_module(self):
-        """Test if get_class_module method wraps the `utils.reflection.find_class_module` method correctly."""
-
-        # test if the module is returned directly
-        module = get_class_module('cxflow.hooks', 'ProfileHook')
-        expected_module = 'cxflow.hooks.profile_hook'
-        self.assertEqual(module, expected_module)
-
-        # test if None is returned when the class is not found
-        module2 = get_class_module('cxflow.hooks', 'IDoNotExist')
-        expected_module2 = None
-        self.assertEqual(module2, expected_module2)
-
-        # test if exception is raised when multiple modules are matched
-        self.assertRaises(ValueError, get_class_module, 'cxflow.tests.utils', 'DuplicateClass')

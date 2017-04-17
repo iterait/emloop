@@ -1,17 +1,18 @@
 """
 Module with handy functions which are able to create objects from module and class names.
 """
+import logging
 import importlib
 import pkgutil
 
 from types import MappingProxyType
-from typing import Tuple, List, Dict, Iterable
+from typing import Tuple, List, Dict, Iterable, Any, Optional
 
 _EMPTY_DICT = MappingProxyType({})
 
 
-def create_object_from_config(config: Dict[str, object], args: Iterable=(),
-                              kwargs: Dict[str, object]=_EMPTY_DICT, key_prefix: str=None):
+def create_object_from_config(config: Dict[str, Any], args: Iterable=(),
+                              kwargs: Dict[str, Any]=_EMPTY_DICT, key_prefix: str=None):
     """
     Create an object instance according to the given config.
 
@@ -46,7 +47,7 @@ def create_object_from_config(config: Dict[str, object], args: Iterable=(),
     return create_object(module_name=config[module_key], class_name=config[class_key], args=args, kwargs=kwargs)
 
 
-def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: Dict[str, object]=_EMPTY_DICT):
+def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: Dict[str, Any]=_EMPTY_DICT):
     """
     Create an object instance of the given class from the given module.
     Args and kwargs are passed to the constructor.
@@ -98,3 +99,41 @@ def find_class_module(module_name: str, class_name: str) -> Tuple[List[str], Lis
         except Exception as ex:
             erroneous_submodules.append((submodule_name, ex))
     return matched_submodules, erroneous_submodules
+
+
+def get_class_module(module_name: str, class_name: str) -> Optional[str]:
+    """
+    Get a sub-module of the given module which has the given class.
+
+    This method wraps `utils.reflection.find_class_module method` with the following behavior:
+
+    - raise error when multiple sub-modules with different classes with the same name are found
+    - return None when no sub-module is found
+    - warn about non-searchable sub-modules
+
+    NOTE: This function logs!
+
+    :param module_name: module to be searched
+    :param class_name: searched class name
+    :return: sub-module with the searched class or None
+    """
+    matched_modules, erroneous_modules = find_class_module(module_name, class_name)
+
+    for submodule, error in erroneous_modules:
+        logging.warning('Could not inspect sub-module `%s` due to `%s` '
+                        'when searching for `%s` in sub-modules of `%s`.',
+                        submodule, type(error).__name__, class_name, module_name)
+
+    if len(matched_modules) == 1:
+        return matched_modules[0]
+    if len(matched_modules) > 1:
+        # check if all the module attributes point to the same class
+        first_class = getattr(importlib.import_module(matched_modules[0]), class_name)
+        for matched_module in matched_modules:
+            another_class = getattr(importlib.import_module(matched_module), class_name)
+            if another_class is not first_class:
+                raise ValueError('Found more than one sub-module when searching for `{}` in sub-modules of `{}`. '
+                                 'Please specify the module explicitly. Found sub-modules: `{}`'
+                                 .format(class_name, module_name, matched_modules))
+        return matched_modules[0]
+    return None
