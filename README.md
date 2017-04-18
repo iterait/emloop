@@ -9,7 +9,7 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 - [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
-For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example).
+For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/cxMNIST).
 
 ## Requirements
 The officially supported operating system is [Arch Linux](https://www.archlinux.org).
