@@ -43,7 +43,7 @@ In addition, `cxgridsearch` command is installed.
 ## Tutorials
 The following tutorials serve as a gentle introduction to the cxflow framework:
 
-- [cxflow hooks](hooks/README.md)
+- [cxflow hooks](cxflow/hooks/README.md)
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.
