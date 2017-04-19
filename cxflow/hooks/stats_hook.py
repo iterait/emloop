@@ -1,3 +1,6 @@
+"""
+Module with a hook capable of computing accumulated variable statistics such as mean or median.
+"""
 from collections import OrderedDict
 from typing import Iterable, Mapping
 

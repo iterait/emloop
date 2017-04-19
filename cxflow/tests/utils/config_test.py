@@ -33,9 +33,7 @@ class ConfigTestParseArg(CXTestCase):
             self.assertTupleEqual((key, val), (parsed_key, parsed_val))
             self.assertEqual(type(parsed_val), int)
 
-        parsed_key, parsed_val = parse_arg('common.batch_size:int=12.7')
-        self.assertTupleEqual(('common.batch_size', 12), (parsed_key, parsed_val))
-        self.assertEqual(type(parsed_val), int)
+        self.assertRaises(ValueError, parse_arg, 'common.batch_size:int=12.7')
 
     def test_float_type(self):
         """Test float type."""
@@ -62,26 +60,23 @@ class ConfigTestParseArg(CXTestCase):
     def test_not_int_type(self):
         """Test parse_arg raises on bad int value."""
         for key, val in [('common.batch_size', "ahoj"), ('stream.train.seed', [1, 2])]:
-            self.assertRaises(AttributeError, parse_arg, key+':int='+str(val))
+            self.assertRaises(ValueError, parse_arg, key+':int='+str(val))
 
     def test_not_float_type(self):
         """Test parse_arg raises on bad float value."""
         for key, val in [('common.some_number', True), ('net.dropout', "hello"), ('stream.train.float_seed', [1, 2])]:
-            self.assertRaises(AttributeError, parse_arg, key+':float='+str(val))
+            self.assertRaises(ValueError, parse_arg, key+':float='+str(val))
 
     def test_not_bool_type(self):
         """Test parse_arg raises on bad boolean value."""
         for key, val in [('common.quiet', "hello"), ('net.dropout', 0.2), ('stream.train.float_seed', 13),
                          ('stream.train.float_seed', [1, 3])]:
-            try:
-                self.assertRaises(AttributeError, parse_arg, key+':bool='+str(val))
-            except Exception as ex:
-                print(type(ex))
+            self.assertRaises(ValueError, parse_arg, key+':bool='+str(val))
 
     def test_not_ast_type(self):
         """Test parse_arg raises on bad ast value."""
         for key, val in [('common.arch', "hello"), ('net.arch', '[12,3'), ('net.arch', '{"a": }')]:
-            self.assertRaises(AttributeError, parse_arg, key + ':ast=' + str(val))
+            self.assertRaises(ValueError, parse_arg, key + ':ast=' + str(val))
 
 _TEST_ANCHORLESS_YAML = """
 e:
@@ -109,6 +104,7 @@ class ConfigTest(CXTestCaseWithDir):
     """Test case for load_config, config_to_file and config_to_str functions."""
 
     def test_load_anchorless_config(self):
+        """Test loading of a config without yaml anchors."""
 
         f_name = path.join(self.tmpdir, 'conf.yaml')
 
@@ -120,6 +116,7 @@ class ConfigTest(CXTestCaseWithDir):
         self.assertDictEqual(load_config(f_name, ['e.x:int=12']), {'e': {'f': 'f', 'h': ['j', 'k'], 'x': 12}})
 
     def test_load_anchored_config(self):
+        """Test loading of a config with yaml anchors."""
         f_name = path.join(self.tmpdir, 'conf.yaml')
 
         with open(f_name, 'w') as file:
@@ -133,6 +130,7 @@ class ConfigTest(CXTestCaseWithDir):
                              {'a': {'b': 'c', 'd': 11}, 'e': {'f': 'f', 'h': ['j', 'k'], 'b': 19, 'd': 11}})
 
     def test_dump_config(self):
+        """Test config_to_file and config_to_str function."""
 
         config = {'e': {'f': 'f', 'h': ['j', 'k']}}
 

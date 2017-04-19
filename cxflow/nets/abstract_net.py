@@ -1,3 +1,6 @@
+"""
+This module contains the definition of a net trainable in cxflow framework.
+"""
 from abc import abstractmethod, ABCMeta
 from typing import Iterable, Mapping
 

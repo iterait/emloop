@@ -1,3 +1,6 @@
+"""
+Module with a hook which stops the training after the specified number of epochs.
+"""
 import logging
 
 from .abstract_hook import AbstractHook, TrainingTerminated

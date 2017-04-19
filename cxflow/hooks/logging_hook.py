@@ -1,3 +1,6 @@
+"""
+Module with standard logging hook.
+"""
 import logging
 import sys
 from typing import Iterable
@@ -53,7 +56,7 @@ class LoggingHook(AbstractHook):
 
         :param epoch_data: epoch data to be logged
 
-        Raise:
+        Raises:
             KeyError: if the specified variable is not found in the stream
             TypeError: if the variable value is of unsupported type and on_unknown_type is set to `error`
         """

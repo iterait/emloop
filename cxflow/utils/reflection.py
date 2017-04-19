@@ -73,13 +73,14 @@ def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: 
     return _class(*args, **kwargs)
 
 
-def list_submodules(module_name: str) -> List[str]:
+def list_submodules(module_name: str) -> List[str]:   # pylint: disable=invalid-sequence-index
     """List full names of all the submodules in the given module."""
     _module = importlib.import_module(module_name)
     return [module_name+'.'+submodule_name for _, submodule_name, _ in pkgutil.iter_modules(_module.__path__)]
 
 
-def find_class_module(module_name: str, class_name: str) -> Tuple[List[str], List[Tuple[str, Exception]]]:
+def find_class_module(module_name: str, class_name: str) \
+        -> Tuple[List[str], List[Tuple[str, Exception]]]:   # pylint: disable=invalid-sequence-index
     """
     Find sub-modules of the given module that contain the given class.
 
@@ -96,7 +97,7 @@ def find_class_module(module_name: str, class_name: str) -> Tuple[List[str], Lis
             submodule = importlib.import_module(submodule_name)
             if hasattr(submodule, class_name):
                 matched_submodules.append(submodule_name)
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             erroneous_submodules.append((submodule_name, ex))
     return matched_submodules, erroneous_submodules
 

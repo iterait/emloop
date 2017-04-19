@@ -1,3 +1,6 @@
+"""
+Module with the SigintHook which allows to stop the training properly when a sigint is caught.
+"""
 import logging
 import signal
 
