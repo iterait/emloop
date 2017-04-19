@@ -2,7 +2,7 @@ from pip.req import parse_requirements
 from setuptools import setup
 
 setup(name='cxflow',
-      version='0.5',
+      version='0.6',
       description='Smart TensorFlow trainer',
       long_description='Trainer of TensorFlow models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',

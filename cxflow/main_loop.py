@@ -7,7 +7,7 @@ Having all that, it manages iterating through streams, training and hooks execut
 import sys
 import logging
 import typing
-from collections import defaultdict
+from collections import OrderedDict
 
 from .datasets.abstract_dataset import AbstractDataset
 from .nets.abstract_net import AbstractNet
@@ -18,16 +18,20 @@ from .utils.profile import Timer
 class MainLoop:
     """Train the network, manage hooks etc."""
 
+    UNUSED_SOURCE_ACTIONS = {'ignore', 'warn', 'error'}
+
     def __init__(self, net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=(),
-                 on_unused_sources: str='warn', fixed_batch_size: int=None):
+                 extra_streams: typing.List[str]=(), on_unused_sources: str='warn', fixed_batch_size: int=None,
+                 skip_zeroth_epoch=False):
         """
         :param net: trained network
         :param dataset: loaded dataset
-        :param hooks: list of hooks
+        :param hooks: a sequence of hooks
+        :param extra_streams: a sequence of additional stream names to be evaluated
         :param on_unused_sources: action to take when stream provides unused sources {'ignore', 'warn', 'error'}
         :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
         """
-        assert on_unused_sources in {'ignore', 'warn', 'error'}
+        assert on_unused_sources in MainLoop.UNUSED_SOURCE_ACTIONS
 
         self._net = net
         self._dataset = dataset
@@ -36,6 +40,12 @@ class MainLoop:
         self._fixed_batch_size = fixed_batch_size
         self._extra_sources_warned = False
         self._epoch_profile = {}
+        self._extra_streams = extra_streams
+        self._skip_zeroth_epoch = skip_zeroth_epoch
+
+    def _create_epoch_data(self):
+        """Create empty epoch data double dict."""
+        return OrderedDict({stream_name: OrderedDict() for stream_name in ['train'] + list(self._extra_streams)})
 
     def _check_sources(self, batch: typing.Dict[str, object]) -> None:
         """
@@ -60,96 +70,81 @@ class MainLoop:
             raise ValueError('Stream does not provide all required sources. Missing sources: {}'
                              .format(missing_sources))
 
-    def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_type: str) -> AbstractDataset.Batch:
+    def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_name: str) -> None:
         """
         Iterate through the stream
         :param stream: Iterable stream
         :param train: if set to true, the network will be trained
-        :param stream_type: {train, valid, test}
-        :return: epoch summary results
+        :param stream_name: {train} or any specified
         """
-        processed_batch_count = 0
-        summed_results = defaultdict(float)
-
         while True:
             try:
-                with Timer('read_batch_{}'.format(stream_type), self._epoch_profile):
-                    batch = next(stream)
+                with Timer('read_batch_{}'.format(stream_name), self._epoch_profile):
+                    batch_input = next(stream)
             except StopIteration:
                 break
 
             if self._fixed_batch_size:
-                if len(batch[list(batch.keys())[0]]) != self._fixed_batch_size:
+                if len(batch_input[list(batch_input.keys())[0]]) != self._fixed_batch_size:
                     logging.debug('Incomplete batch skipped')
                     continue
 
-            self._check_sources(batch)
+            self._check_sources(batch_input)
 
-            with Timer('eval_batch_{}'.format(stream_type), self._epoch_profile):
-                batch_result = self._net.run(batch=batch, train=train)
+            with Timer('eval_batch_{}'.format(stream_name), self._epoch_profile):
+                batch_output = self._net.run(batch=batch_input, train=train)
 
-            with Timer('after_batch_hooks_{}'.format(stream_type), self._epoch_profile):
+            assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
+
+            with Timer('after_batch_hooks_{}'.format(stream_name), self._epoch_profile):
                 for hook in self._hooks:
-                    hook.after_batch(stream_type=stream_type, results=batch_result)
+                    hook.after_batch(stream_name=stream_name, batch_data={**batch_input, **batch_output})
 
-            for name, value in batch_result.items():
-                try:
-                    summed_results[name] += value
-                except Exception as ex:
-                    raise ValueError('Cannot sum results `{}`'.format(name)) from ex
+    def train_by_stream(self, stream: AbstractDataset.Stream) -> None:
+        """Train the network with the given stream."""
 
-            processed_batch_count += 1
+        self._run_epoch(stream=stream, train=True, stream_name='train')
 
-        if processed_batch_count == 0:
-            raise ValueError('No data in stream `{}`'.format(stream_type))
+    def evaluate_stream(self, stream: AbstractDataset.Stream, stream_name: str) -> None:
+        """Evaluate the network with the given stream."""
 
-        for name in summed_results.keys():
-            summed_results[name] /= processed_batch_count
+        self._run_epoch(stream=stream, train=False, stream_name=stream_name)
 
-        return summed_results
-
-    def train_by_stream(self, stream: AbstractDataset.Stream) -> AbstractDataset.Batch:
-        """Given a stream and batch size, train the network on this stream."""
-
-        return self._run_epoch(stream=stream, train=True, stream_type='train')
-
-    def evaluate_stream(self, stream: AbstractDataset.Stream, stream_type: str) -> AbstractDataset.Batch:
-        """Given a stream and batch size, evaluate the network on this stream."""
-
-        return self._run_epoch(stream=stream, train=False, stream_type=stream_type)
-
-    def run(self, run_test_stream: bool) -> None:
-        """
-        Start the main loop
-        :param run_test_stream: should the test stream be evaluated?
-        """
+    def run(self) -> None:
+        """Start the main loop."""
 
         try:
             epoch_id = 0
 
+            # Before training
             for hook in self._hooks:
                 hook.before_training()
 
-            valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
-            test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
-                if run_test_stream else None
+            # After zeroth epoch (no training)
+            if not self._skip_zeroth_epoch:
+                for extra_stream in self._extra_streams+['train']:
+                    create_stream_function = getattr(self._dataset, 'create_{}_stream'.format(extra_stream))
+                    self.evaluate_stream(stream=create_stream_function(), stream_name=extra_stream)
 
-            for hook in self._hooks:
-                hook.before_first_epoch(valid_results=valid_results, test_results=test_results)
+                epoch_data = self._create_epoch_data()
+                for hook in self._hooks:
+                    hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
 
+            # Training loop - after epoch, after epoch profile
             while True:
-                self._epoch_profile = {}
                 epoch_id += 1
+                self._epoch_profile = {}
+                epoch_data = OrderedDict({stream_name: OrderedDict()
+                                          for stream_name in ['train']+list(self._extra_streams)})
 
-                train_results = self.train_by_stream(stream=self._dataset.create_train_stream())
-                valid_results = self.evaluate_stream(stream=self._dataset.create_valid_stream(), stream_type='valid')
-                test_results = self.evaluate_stream(stream=self._dataset.create_test_stream(), stream_type='test') \
-                    if run_test_stream else None
+                self.train_by_stream(stream=self._dataset.create_train_stream())
+                for extra_stream in self._extra_streams:
+                    create_stream_function = getattr(self._dataset, 'create_{}_stream'.format(extra_stream))
+                    self.evaluate_stream(stream=create_stream_function(), stream_name=extra_stream)
 
                 with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:
-                        hook.after_epoch(epoch_id=epoch_id, train_results=train_results, valid_results=valid_results,
-                                         test_results=test_results)
+                        hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
 
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile)
@@ -160,5 +155,6 @@ class MainLoop:
             logging.warning('Training terminated by a keyboard interrupt')
             sys.exit(2)
 
+        # After training
         for hook in self._hooks:
             hook.after_training()

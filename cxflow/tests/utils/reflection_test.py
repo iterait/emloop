@@ -4,7 +4,7 @@ Test module for reflection utils (cxflow.utils.reflection).
 import sys
 import os
 
-from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module
+from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module, get_class_module
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
@@ -13,6 +13,11 @@ class SimpleClass:  # pylint: disable=missing-docstring
 
 
 class DuplicateClass:  # pylint: disable=missing-docstring
+    pass
+
+
+class ImportedClass:  # pylint: disable=missing-docstring
+    # this class is imported in cxflow.tests.utils.dummy_module
     pass
 
 
@@ -54,11 +59,8 @@ class ReflectionTest(CXTestCaseWithDir):
         module_name = 'cxflow.tests.utils.reflection_test'
 
         # test type
-        try:
-            obj0 = create_object(module_name=module_name, class_name='SimpleClass')
-            self.assertEqual(type(obj0), SimpleClass)
-        except:
-            self.fail()
+        obj0 = create_object(module_name=module_name, class_name='SimpleClass')
+        self.assertEqual(type(obj0), SimpleClass)
 
         obj = create_object(module_name=module_name, class_name='ClassWithArg', args=(12,))
         self.assertEqual(type(obj), ClassWithArg)
@@ -188,3 +190,25 @@ class ReflectionTest(CXTestCaseWithDir):
         self.assertEqual(len(erroneous_modules), 1)
         self.assertEqual(erroneous_modules[0][0], module_name+'.'+invalid_submodule_name)
         self.assertIsInstance(erroneous_modules[0][1], ImportError)
+
+    def test_get_class_module(self):
+        """Test if get_class_module method wraps the `utils.reflection.find_class_module` method correctly."""
+
+        # test if the module is returned directly
+        module = get_class_module('cxflow.hooks', 'ProfileHook')
+        expected_module = 'cxflow.hooks.profile_hook'
+        self.assertEqual(module, expected_module)
+
+        # test if None is returned when the class is not found
+        module2 = get_class_module('cxflow.hooks', 'IDoNotExist')
+        expected_module2 = None
+        self.assertEqual(module2, expected_module2)
+
+        # test if exception is raised when multiple modules are matched
+        self.assertRaises(ValueError, get_class_module, 'cxflow.tests.utils', 'DuplicateClass')
+
+        # test if any of valid sub-modules is returned if their attribute points to the same class
+        # e.g. one sub-module imports a class from another sub-module
+        module3 = get_class_module('cxflow.tests.utils', 'ImportedClass')
+        possible_submodules = {'cxflow.tests.utils.reflection_test', 'cxflow.tests.utils.dummy_module'}
+        self.assertIn(module3, possible_submodules)

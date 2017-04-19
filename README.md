@@ -9,7 +9,7 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 - [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
-For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example).
+For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/cxMNIST).
 
 ## Requirements
 The officially supported operating system is [Arch Linux](https://www.archlinux.org).
@@ -39,6 +39,11 @@ The installation process installs `cxflow` command which might be used simply fr
 Please refer to repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example) for more information.
 
 In addition, `cxgridsearch` command is installed.
+
+## Tutorials
+The following tutorials serve as a gentle introduction to the cxflow framework:
+
+- [cxflow hooks](cxflow/hooks/README.md)
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.

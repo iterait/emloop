@@ -3,43 +3,44 @@ This module contains AbstractDataset concept.
 
 At the moment it is for typing only.
 """
-from abc import abstractmethod
-import typing
+from typing import Mapping, Iterable, Any, NewType
 
 
 class AbstractDataset:
     """
-    cxflow dataset concept.
+    This concept prescribes the API that is required from every cxflow dataset.
 
-    This is rather documentation-purpose class and it should not be inherited.
+    Every cxflow dataset has to:
+        - have a constructor which takes yaml string config
+        - have a create_train_stream method which provides the iterator thought the train stream batches
+
+    Additionally, one may implement any create_[stream_name]_stream method
+    in order to make [stream_name] stream available in the cxflow main_loop.
     """
 
-    Batch = typing.NewType('Batch', typing.Mapping[str, typing.Any])
-    Stream = typing.NewType('Stream', typing.Iterable[Batch])
+    Batch = NewType('Batch', Mapping[str, Iterable[Any]])
+    Stream = NewType('Stream', Iterable[Batch])
 
-    @abstractmethod
-    def create_train_stream(self) -> Stream:
-        """Return a train iterator which provides a mapping (source name -> value)."""
+    def __init__(self, config_str: str):
+        """
+        Create new dataset configured with the given yaml string (obligatory).
+        The configuration must contain 'dataset' entry and may contain 'output_dir' entry.
+        :param config_str: yaml string config
+        """
         pass
 
-    @abstractmethod
+    def create_train_stream(self) -> Stream:
+        """Return a train stream iterator (obligatory)."""
+        pass
+
     def create_valid_stream(self) -> Stream:
-        """Return a valid iterator which provides a mapping (source name -> value)."""
+        """Return a valid stream iterator."""
         pass
 
     def create_test_stream(self) -> Stream:
-        """
-        Return a test iterator which provides a mapping (source name -> value).
-
-        This method is not mandatory.
-        """
+        """Return a test stream iterator."""
         pass
 
-    @abstractmethod
     def split(self, num_splits: int, train: float, valid: float, test: float):
-        """
-        Perform cross-val split.
-
-        This method is not mandatory.
-        """
+        """Perform cross-validation split."""
         pass
