@@ -42,7 +42,6 @@ from tensorflow.python import pywrap_tensorflow
 from tensorflow.python.client import session
 from tensorflow.python.framework import graph_util
 from tensorflow.python.framework import importer
-from tensorflow.python.platform import app
 from tensorflow.python.platform import gfile
 from tensorflow.python.training import saver as saver_lib
 
