@@ -1,3 +1,6 @@
+"""
+Module with csv logging hook.
+"""
 import logging
 import os
 from os import path
@@ -35,7 +38,8 @@ class CSVHook(AbstractHook):
     UNKNOWN_TYPE_ACTIONS = {'error', 'warn', 'default'}
     MISSING_VARIABLE_ACTIONS = {'error', 'warn', 'default'}
 
-    def __init__(self, output_dir: str, output_file: str="training.csv", delimiter: str=',',
+    def __init__(self,  # pylint: disable=too-many-arguments
+                 output_dir: str, output_file: str="training.csv", delimiter: str=',',
                  default_value: str='', variables: Iterable[str]=None, on_unknown_type: str='default',
                  on_missing_variable: str='error', **kwargs):
         """

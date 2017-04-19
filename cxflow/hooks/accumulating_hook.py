@@ -1,3 +1,6 @@
+"""
+Module with batch data accumulating hook.
+"""
 import typing
 from collections import defaultdict
 

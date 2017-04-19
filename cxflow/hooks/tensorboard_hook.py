@@ -1,3 +1,6 @@
+"""
+Module with a tensorboard logging hook.
+"""
 import logging
 
 import numpy as np

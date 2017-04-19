@@ -52,7 +52,7 @@ def init_grid_search() -> None:
         for command in commands:
             try:
                 return_code = os.system(command)
-            except Exception as _:
+            except Exception as _:  # pylint: disable=broad-except
                 logging.error('Command `%s` failed with exit code %s.', command, return_code)
 
 

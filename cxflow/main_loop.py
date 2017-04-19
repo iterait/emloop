@@ -15,13 +15,15 @@ from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils.profile import Timer
 
 
-class MainLoop:
+class MainLoop:   # pylint: disable=too-many-instance-attributes
     """Train the network, manage hooks etc."""
 
     UNUSED_SOURCE_ACTIONS = {'ignore', 'warn', 'error'}
 
-    def __init__(self, net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=(),
-                 extra_streams: typing.List[str]=(), on_unused_sources: str='warn', fixed_batch_size: int=None,
+    def __init__(self,   # pylint: disable=too-many-arguments
+                 net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=(),
+                 extra_streams: typing.List[str]=(),    # pylint: disable=invalid-sequence-index
+                 on_unused_sources: str='warn', fixed_batch_size: int=None,
                  skip_zeroth_epoch=False):
         """
         :param net: trained network

@@ -29,7 +29,6 @@ def create_optimizer(optimizer_config: Dict[str, Any]):
     :param optimizer_config: dict with at least `class` and `learning_rate` entries
     :return: optimizer
     """
-    # TODO (adam) this function is not tested
     assert 'learning_rate' in optimizer_config
     assert 'class' in optimizer_config
     kwargs = optimizer_config.copy()
@@ -61,15 +60,15 @@ def create_activation(activation_name: str) -> Callable[[tf.Tensor], tf.Tensor]:
     raise NotImplementedError
 
 
-class BaseTFNet(AbstractNet, metaclass=ABCMeta):
+class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-instance-attributes
     """
     Base tensorflow network enforcing uniform net API which is trainable in cxflow main loop.
 
     All tf nets should be derived from this class and override _create_net method.
     """
 
-    def __init__(self, dataset: AbstractDataset, log_dir: str, io: dict,
-                 device: str='/cpu:0', threads: int=4, **kwargs):
+    def __init__(self,   # pylint: disable=too-many-arguments
+                 dataset: AbstractDataset, log_dir: str, io: dict, device: str='/cpu:0', threads: int=4, **kwargs):
         """
         Create new cxflow trainable tf net.
 
@@ -124,12 +123,12 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):
         self._saver = tf.train.Saver()
 
     @property
-    def input_names(self) -> List[str]:
+    def input_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
         """List of tf tensor names listed as net inputs."""
         return self._input_names
 
     @property
-    def output_names(self) -> List[str]:
+    def output_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
         """List of tf tensor names listed as net outputs."""
         return self._output_names
 
