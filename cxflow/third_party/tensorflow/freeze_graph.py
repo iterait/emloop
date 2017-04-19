@@ -23,14 +23,7 @@ It's useful to do this when we need to load a single file in C++, especially in
 environments like mobile or embedded where we may not have access to the
 RestoreTensor ops and file loading calls that they rely on.
 
-An example of command-line usage is:
-bazel build tensorflow/python/tools:freeze_graph && \
-bazel-bin/tensorflow/python/tools/freeze_graph \
---input_graph=some_graph_def.pb \
---input_checkpoint=model.ckpt-8361242 \
---output_graph=/tmp/frozen_graph.pb --output_node_names=softmax
-
-You can also look at freeze_graph_test.py for an example of how to use it.
+You can look at freeze_graph_test.py for an example of how to use it.
 
 """
 from __future__ import absolute_import
@@ -52,8 +45,6 @@ from tensorflow.python.framework import importer
 from tensorflow.python.platform import app
 from tensorflow.python.platform import gfile
 from tensorflow.python.training import saver as saver_lib
-
-FLAGS = None
 
 
 def freeze_graph(input_graph,
@@ -137,79 +128,3 @@ def freeze_graph(input_graph,
   with gfile.GFile(output_graph, "wb") as f:
     f.write(output_graph_def.SerializeToString())
   logging.debug('%d ops in the final graph." % len(output_graph_def.node)')
-
-
-def main(unused_args):
-  freeze_graph(FLAGS.input_graph, FLAGS.input_saver, FLAGS.input_binary,
-               FLAGS.input_checkpoint, FLAGS.output_node_names,
-               FLAGS.restore_op_name, FLAGS.filename_tensor_name,
-               FLAGS.output_graph, FLAGS.clear_devices, FLAGS.initializer_nodes,
-               FLAGS.variable_names_blacklist)
-
-
-if __name__ == "__main__":
-  parser = argparse.ArgumentParser()
-  parser.register("type", "bool", lambda v: v.lower() == "true")
-  parser.add_argument(
-      "--input_graph",
-      type=str,
-      default="",
-      help="TensorFlow \'GraphDef\' file to load.")
-  parser.add_argument(
-      "--input_saver",
-      type=str,
-      default="",
-      help="TensorFlow saver file to load.")
-  parser.add_argument(
-      "--input_checkpoint",
-      type=str,
-      default="",
-      help="TensorFlow variables file to load.")
-  parser.add_argument(
-      "--output_graph",
-      type=str,
-      default="",
-      help="Output \'GraphDef\' file name.")
-  parser.add_argument(
-      "--input_binary",
-      nargs="?",
-      const=True,
-      type="bool",
-      default=False,
-      help="Whether the input files are in binary format.")
-  parser.add_argument(
-      "--output_node_names",
-      type=str,
-      default="",
-      help="The name of the output nodes, comma separated.")
-  parser.add_argument(
-      "--restore_op_name",
-      type=str,
-      default="save/restore_all",
-      help="The name of the master restore operator.")
-  parser.add_argument(
-      "--filename_tensor_name",
-      type=str,
-      default="save/Const:0",
-      help="The name of the tensor holding the save path.")
-  parser.add_argument(
-      "--clear_devices",
-      nargs="?",
-      const=True,
-      type="bool",
-      default=True,
-      help="Whether to remove device specifications.")
-  parser.add_argument(
-      "--initializer_nodes",
-      type=str,
-      default="",
-      help="comma separated list of initializer nodes to run before freezing.")
-  parser.add_argument(
-      "--variable_names_blacklist",
-      type=str,
-      default="",
-      help="""\
-      comma separated list of variables to skip converting to constants\
-      """)
-  FLAGS, unparsed = parser.parse_known_args()
-  app.run(main=main, argv=[sys.argv[0]] + unparsed)
