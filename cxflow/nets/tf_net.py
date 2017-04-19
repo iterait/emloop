@@ -204,16 +204,17 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):
         tf.train.write_graph(self._session.graph_def, '', graph_path, as_text=False)
         self._saver.save(self._session, checkpoint_path)
 
-        freeze_graph(input_graph=graph_path,
-                     input_saver='',
-                     input_binary=True,
-                     input_checkpoint=checkpoint_path,
-                     output_node_names=','.join(self._output_names),
-                     restore_op_name='',
-                     filename_tensor_name='',
-                     output_graph=frozen_graph_path,
-                     clear_devices=True,
-                     initializer_nodes='')
+        with tf.Graph().as_default():
+            freeze_graph(input_graph=graph_path,
+                         input_saver='',
+                         input_binary=True,
+                         input_checkpoint=checkpoint_path,
+                         output_node_names=','.join(self._output_names),
+                         restore_op_name='',
+                         filename_tensor_name='',
+                         output_graph=frozen_graph_path,
+                         clear_devices=True,
+                         initializer_nodes='')
 
         return checkpoint_path
 
