@@ -207,7 +207,7 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         # test correct kwargs passing
         config = {'net': {'module': 'cxflow.tests.entry_point_test',
                           'class': 'DummyNetWithKwargs',
-                          'io': {'in': [], 'out': []}}}
+                          'io': {'in': [], 'out': ['dummy']}}}
         dataset = 'dataset_placeholder'
         expected_kwargs = {'dataset': dataset, 'log_dir': self.tmpdir, **config['net']}
         net = create_net(config=config, output_dir=self.tmpdir, dataset=dataset)

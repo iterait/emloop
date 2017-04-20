@@ -14,6 +14,7 @@ from typing import Dict, Callable, List, Mapping, Any
 import tensorflow as tf
 
 from ..datasets.abstract_dataset import AbstractDataset
+from ..third_party.tensorflow.freeze_graph import freeze_graph
 from ..utils.reflection import create_object_from_config, get_class_module
 from .abstract_net import AbstractNet
 
@@ -74,13 +75,14 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-in
 
         :param dataset: dataset to be trained with
         :param log_dir: path to the logging directory (wherein models should be saved)
-        :param io: net `in`put and `out`put names
+        :param io: net `in`put and `out`put names; `out`put names cannot be empty
         :param device: tf device to be trained on
         :param threads: number of threads to be used by tf
         :param kwargs: additional kwargs which are passed to the _create_net method
         """
         assert 'in' in io
         assert 'out' in io
+        assert io['out']
         assert threads > 0
 
         self._dataset = dataset
@@ -194,7 +196,19 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-in
         :param name_suffix: saved checkpoint name suffix
         :return: path to the saved checkpoint
         """
-        checkpoint_path = self._saver.save(self._session, path.join(self._log_dir, 'model_{}.ckpt'.format(name_suffix)))
+        graph_path = path.join(self._log_dir, 'model_{}.graph'.format(name_suffix))
+        checkpoint_path = path.join(self._log_dir, 'model_{}.ckpt'.format(name_suffix))
+        frozen_graph_path = path.join(self._log_dir, 'model_{}.pb'.format(name_suffix))
+
+        tf.train.write_graph(self._session.graph_def, '', graph_path, as_text=False)
+        self._saver.save(self._session, checkpoint_path)
+
+        with tf.Graph().as_default():
+            freeze_graph(input_graph=graph_path,
+                         input_checkpoint=checkpoint_path,
+                         output_node_names=self._output_names,
+                         output_graph=frozen_graph_path)
+
         return checkpoint_path
 
     @abstractmethod

@@ -10,18 +10,11 @@ test:ubuntu_TFlatest_python3.5:
   - pip3 install .
   - python3 setup.py test
 
-test:ubuntu_TF0.12_python3.5:
-  <<: *ubuntuCommon
-  script:
-  - pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.12.1-cp35-cp35m-linux_x86_64.whl
-  - pip3 install .
-  - python3 setup.py test
-
 .arch_common: &archCommon
   before_script:
   - pacman -S --noconfirm python python-pip git base-devel
 
-test:arch_TF1.0_python3.6:
+test:arch_TFlatest_python3.6:
   image: pritunl/archlinux
   <<: *archCommon
   script:
