@@ -10,6 +10,7 @@ from cxflow.hooks.abstract_hook import TrainingTerminated
 
 
 class SigintHookTest(CXTestCase):
+    """Test case for SigintHook."""
 
     def _sigint_handler(self, *_):
         self._sigint_unhandled = True

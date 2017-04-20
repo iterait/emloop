@@ -3,7 +3,6 @@ This module defines AbstractHook from which all the custom hooks shall be derive
 
 Furthermore, TrainingTerminated exception is defined.
 """
-
 import typing
 import logging
 import inspect

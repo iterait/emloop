@@ -4,9 +4,10 @@ Config module provides util functions for loading and dumping yaml configuration
 import ast
 import typing
 from os import path
+from distutils.util import strtobool
 
 import yaml
-import ruamel.yaml
+import ruamel.yaml  # pylint: disable=import-error
 
 
 def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
@@ -30,15 +31,19 @@ def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
         if type_ == 'ast':
             value = ast.literal_eval(value)
         elif type_ == 'int':
-            value = int(float(value))
+            value = int(value)
+        elif type_ == 'float':
+            value = float(value)  # pylint: disable=redefined-variable-type
         elif type_ == 'bool':
-            value = bool(int(value))
+            value = strtobool(value) == 1
+        elif type_ == 'str':
+            pass
         else:
-            value = eval(type_)(value)
-    except (Exception, AssertionError) as ex:
-        raise AttributeError(
-            'Could not convert argument `{}` of value `{}` to type `{}`. Original argument: `{}`.'.format(
-                key, value, type_, arg)) from ex
+            raise ValueError('Argument type `{}` is not recognized. '
+                             'Recognized types are `[ast, int, float, bool, str]`'.format(type_))
+    except (ValueError, SyntaxError) as ex:
+        raise ValueError('Could not convert argument `{}` of value `{}` to type `{}`. '
+                         'Original argument: `{}`.'.format(key, value, type_, arg)) from ex
 
     return key, value
 

@@ -1,3 +1,6 @@
+"""
+Module with a hook computing epoch statistics for classification tasks.
+"""
 from typing import Iterable, Tuple
 
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score

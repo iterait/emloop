@@ -14,7 +14,7 @@ import logging
 import sys
 import tempfile
 import traceback
-import typing
+from typing import Iterable
 import os
 from os import path
 from argparse import ArgumentParser
@@ -37,7 +37,7 @@ CXF_LOG_FORMATTER = logging.Formatter(CXF_LOG_FORMAT, datefmt=CXF_LOG_DATE_FORMA
 CXF_HOOKS_MODULE = 'cxflow.hooks'
 
 
-def train_load_config(config_file: str, cli_options: typing.Iterable[str]) -> dict:
+def train_load_config(config_file: str, cli_options: Iterable[str]) -> dict:
     """
     Load config from the given yaml file and extend/override it with the given CLI args.
     :param config_file: path to the config yaml file
@@ -145,8 +145,7 @@ def create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> Abstr
     return net
 
 
-def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset,
-                 output_dir: str) -> typing.Iterable[AbstractHook]:
+def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset, output_dir: str) -> Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
@@ -203,7 +202,7 @@ def fallback(message: str, ex: Exception) -> None:
     sys.exit(1)
 
 
-def train(config_file: str, cli_options: typing.Iterable[str], output_root: str) -> None:
+def train(config_file: str, cli_options: Iterable[str], output_root: str) -> None:
     """
     Run cxflow training configured from the given file and cli_options.
 
@@ -256,40 +255,40 @@ def train(config_file: str, cli_options: typing.Iterable[str], output_root: str)
 
     try:
         config = train_load_config(config_file=config_file, cli_options=cli_options)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Loading config failed', ex)
 
     try:
         output_dir = create_output_dir(config=config, output_root=output_root)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Failed to create output dir', ex)
 
     try:
         dataset = create_dataset(config=config, output_dir=output_dir)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating dataset failed', ex)
 
     try:
         net = create_net(config=config, output_dir=output_dir, dataset=dataset)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating network failed', ex)
 
     try:
         hooks = create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating hooks failed', ex)
 
     try:
         logging.info('Creating main loop')
         kwargs = config['main_loop'] if 'main_loop' in config else {}
         main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks, **kwargs)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating main loop failed', ex)
 
     try:
         logging.info('Running the main loop')
         main_loop.run()
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Running the main loop failed', ex)
 
 
@@ -309,14 +308,14 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
     try:
         logging.info('Loading config')
         config = load_config(config_file=config_file, additional_args=[])
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Loading config failed', ex)
 
     try:
         logging.info('Creating dataset')
         config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
         dataset = create_object_from_config(config['dataset'], args=(config_str,))
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating dataset failed', ex)
 
     logging.info('Splitting')

@@ -29,15 +29,15 @@ class AbstractDataset:
         """
         pass
 
-    def create_train_stream(self) -> Stream:
+    def create_train_stream(self) -> Stream:  # pylint: disable=undefined-variable
         """Return a train stream iterator (obligatory)."""
         pass
 
-    def create_valid_stream(self) -> Stream:
+    def create_valid_stream(self) -> Stream:  # pylint: disable=undefined-variable
         """Return a valid stream iterator."""
         pass
 
-    def create_test_stream(self) -> Stream:
+    def create_test_stream(self) -> Stream:  # pylint: disable=undefined-variable
         """Return a test stream iterator."""
         pass
 

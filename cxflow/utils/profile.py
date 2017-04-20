@@ -20,7 +20,8 @@ class Timer(object):
         pass
     -------------------------------------------------------
     """
-    TimeProfile = typing.NewType('TimeProfile', typing.Dict[str, typing.List[float]])
+    TimeProfile = typing.NewType('TimeProfile',
+                                 typing.Dict[str, typing.List[float]])   # pylint: disable=invalid-sequence-index
 
     def __init__(self, name: str, profile: TimeProfile):
         """

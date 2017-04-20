@@ -1,3 +1,6 @@
+"""
+Module with hooks saving the trained model under certain criteria.
+"""
 import logging
 
 import numpy as np
@@ -31,7 +34,8 @@ class SaverHook(AbstractHook):
         """
         :param net: trained net
         :param save_every_n_epochs: how often is the model saved
-        :param on_save_failure: action to be taken when model fails to save itself, one of {'error', 'warn', 'ignore'}
+        :param on_save_failure: action to be taken when model fails to save itself;
+               one of SaverHook.SAVE_FAILURE_ACTIONS
         """
         assert on_save_failure in SaverHook.SAVE_FAILURE_ACTIONS
 
@@ -41,16 +45,26 @@ class SaverHook(AbstractHook):
         self._on_save_failure = on_save_failure
 
     def after_epoch(self, epoch_id: int, **_) -> None:
+        """Save the model if epoch_id is divisible by self._save_every_n_epochs."""
         if epoch_id % self._save_every_n_epochs == 0:
             SaverHook.save_model(net=self._net, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
 
     @staticmethod
     def save_model(net: AbstractNet, name_suffix: str, on_failure: str) -> None:
+        """
+        Save the given net with the given name_suffix. On failure, take the specified action.
+        :param net: the net to be saved
+        :param name_suffix: name to be used for saving
+        :param on_failure: action to be taken on failure; one of SaverHook.SAVE_FAILURE_ACTIONS
+
+        Raises:
+            IOError: on save failure and on_failure='error'
+        """
         try:
             logging.debug('Saving the model')
             save_path = net.save(name_suffix)
             logging.info('Model saved to: %s', save_path)
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             if on_failure == 'error':
                 raise IOError('Failed to save the model.') from ex
             elif on_failure == 'warn':
@@ -79,7 +93,8 @@ class BestSaverHook(AbstractHook):
 
     CONDITIONS = {'min', 'max'}
 
-    def __init__(self, net: AbstractNet, variable: str='loss', condition: str='min', stream: str='valid',
+    def __init__(self,  # pylint: disable=too-many-arguments
+                 net: AbstractNet, variable: str='loss', condition: str='min', stream: str='valid',
                  aggregation: str='mean', output_name: str='best', on_save_failure: str='error', **kwargs):
         """
         Example: metric=loss, condition=min -> saved the model when the loss is best so far (on `stream`).
@@ -110,7 +125,7 @@ class BestSaverHook(AbstractHook):
         """
         Retrieve the value of the monitored variable from the given epoch data.
 
-        Raise:
+        Raises:
             KeyError: if any of the specified stream, variable or aggregation is not present in the epoch data.
             TypeError: if the variable value is not a dict when aggregation is specified
             ValueError: if the variable value is not a scalar

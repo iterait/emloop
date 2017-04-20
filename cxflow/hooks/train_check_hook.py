@@ -1,3 +1,6 @@
+"""
+Module with a hook that checks if the specified variable reached the expected level.
+"""
 import numpy as np
 
 from cxflow.hooks.abstract_hook import AbstractHook, TrainingTerminated

@@ -1,3 +1,6 @@
+"""
+Module with a hook which reports the time profile data in the stanard logging.
+"""
 import logging
 
 from .abstract_hook import AbstractHook

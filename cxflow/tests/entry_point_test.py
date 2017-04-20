@@ -213,7 +213,7 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         net = create_net(config=config, output_dir=self.tmpdir, dataset=dataset)
         checkpoint_path = net.save('dummy')
 
-        kwargs = net.kwargs
+        kwargs = net.kwargs  # pylint: disable=no-member
         for key in expected_kwargs.keys():
             self.assertIn(key, kwargs)
             self.assertEqual(expected_kwargs[key], kwargs[key])
