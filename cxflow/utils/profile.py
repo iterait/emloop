@@ -7,7 +7,7 @@ import timeit
 import typing
 
 
-class Timer(object):
+class Timer:
     """
     Simple helper which is able to measure execution time of python code.
 
@@ -42,7 +42,6 @@ class Timer(object):
     def __exit__(self, *args):
         """
         Stop measuring time and append the time span from _start to _end to the _profile under the _name entry.
-        :param args: additional args
         """
         if not self._start:
             raise ValueError('Timer was ended but not started.')

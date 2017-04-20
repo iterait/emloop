@@ -205,15 +205,9 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-in
 
         with tf.Graph().as_default():
             freeze_graph(input_graph=graph_path,
-                         input_saver='',
-                         input_binary=True,
                          input_checkpoint=checkpoint_path,
-                         output_node_names=','.join(self._output_names),
-                         restore_op_name='',
-                         filename_tensor_name='',
-                         output_graph=frozen_graph_path,
-                         clear_devices=True,
-                         initializer_nodes='')
+                         output_node_names=self._output_names,
+                         output_graph=frozen_graph_path)
 
         return checkpoint_path
 
