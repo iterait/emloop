@@ -28,7 +28,8 @@ setup(name='cxflow',
                 'cxflow.datasets',
                 'cxflow.hooks',
                 'cxflow.nets',
-                'cxflow.utils'
+                'cxflow.utils',
+                'cxflow.third_party'
       ],
       include_package_data=True,
       zip_safe=False,
