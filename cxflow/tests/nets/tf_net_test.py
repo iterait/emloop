@@ -1,7 +1,7 @@
 """
 Test module for base tensorflow nets (cxflow.nets.tf_net).
 """
-import logging
+import os
 from os import path
 
 import tensorflow as tf
@@ -216,9 +216,6 @@ class BasetTFNetRestoreTest(CXTestCaseWithDirAndNet):
 
     Note: do not forget to reset the default graph after every net creation!
     """
-    def __init__(self, *args, **kwargs):
-        logging.getLogger().disabled = True
-        super().__init__(*args, **kwargs)
 
     def test_restore(self):
         """Test net saving and restoring."""
@@ -247,3 +244,28 @@ class BasetTFNetRestoreTest(CXTestCaseWithDirAndNet):
         var = restored_net.graph.get_tensor_by_name('var:0')
         var_value = var.eval(session=restored_net.session)
         self.assertTrue(np.allclose(saved_var_value, var_value))
+
+
+class TFBaseNetSaverTest(CXTestCaseWithDirAndNet):
+    """
+    Test case for correct usage of tensorflow saver in BaseTFNet.
+    """
+
+    def test_keep_checkpoints(self):
+        """
+        Test if the checkpoints are kept.
+
+        This is regression test for issue #71 (tensorflow saver is keeping only the last 5 checkpoints).
+        """
+        dummy_net = SimpleNet(dataset=None, log_dir=self.tmpdir, io={'in': [], 'out': ['output']})
+
+        checkpoints = []
+        for i in range(20):
+            checkpoints.append(dummy_net.save(str(i)))
+
+        for checkpoint in checkpoints:
+            self.assertTrue(path.exists(checkpoint+'.index'))
+            self.assertTrue(path.exists(checkpoint+'.meta'))
+            data_prefix = path.basename(checkpoint)+'.data'
+            data_files = [file for file in os.listdir(path.dirname(checkpoint)) if file.startswith(data_prefix)]
+            self.assertGreater(len(data_files), 0)
