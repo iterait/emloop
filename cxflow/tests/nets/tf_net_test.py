@@ -245,6 +245,26 @@ class BasetTFNetRestoreTest(CXTestCaseWithDirAndNet):
         var_value = var.eval(session=restored_net.session)
         self.assertTrue(np.allclose(saved_var_value, var_value))
 
+    def test_restore_and_train(self):
+        """Test net training after restoring."""
+
+        # save a net that is not trained
+        trainable_io = {'in': ['input', 'target'], 'out': ['output']}
+        trainable_net = TrainableNet(dataset=None, log_dir=self.tmpdir, io=trainable_io)
+        checkpoint_path = trainable_net.save('')
+        tf.reset_default_graph()
+
+        # restored the net
+        restored_net = BaseTFNetRestore(dataset=None, log_dir='', io=trainable_io, restore_from=checkpoint_path)
+
+        # test whether it can be trained
+        batch = {'input': [[1] * 10], 'target': [[0] * 10]}
+        for _ in range(1000):
+            restored_net.run(batch, train=True)
+
+        after_value = restored_net.graph.get_tensor_by_name('var:0').eval(session=restored_net.session)
+        self.assertTrue(np.allclose([0]*10, after_value))
+
 
 class TFBaseNetSaverTest(CXTestCaseWithDirAndNet):
     """
