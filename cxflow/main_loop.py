@@ -136,8 +136,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             while True:
                 epoch_id += 1
                 self._epoch_profile = {}
-                epoch_data = OrderedDict({stream_name: OrderedDict()
-                                          for stream_name in ['train']+list(self._extra_streams)})
+                epoch_data = OrderedDict([(stream_name, OrderedDict())
+                                          for stream_name in ['train']+list(self._extra_streams)])
 
                 self.train_by_stream(stream=self._dataset.create_train_stream())
                 for extra_stream in self._extra_streams:
