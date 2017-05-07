@@ -43,11 +43,12 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._extra_sources_warned = False
         self._epoch_profile = {}
         self._extra_streams = extra_streams
+        self._all_streams = list(self._extra_streams) + ['train']
         self._skip_zeroth_epoch = skip_zeroth_epoch
 
     def _create_epoch_data(self):
         """Create empty epoch data double dict."""
-        return OrderedDict({stream_name: OrderedDict() for stream_name in ['train'] + list(self._extra_streams)})
+        return OrderedDict([(stream_name, OrderedDict()) for stream_name in self._all_streams])
 
     def _check_sources(self, batch: typing.Dict[str, object]) -> None:
         """
@@ -80,10 +81,13 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         :param stream_name: {train} or any specified
         """
         while True:
+            event_name = 'read_batch_{}'.format(stream_name)
             try:
-                with Timer('read_batch_{}'.format(stream_name), self._epoch_profile):
+                with Timer(event_name, self._epoch_profile):
                     batch_input = next(stream)
             except StopIteration:
+                # remove the last recorded event which is created by the StopIteration exception
+                self._epoch_profile[event_name].pop()
                 break
 
             if self._fixed_batch_size:
@@ -95,7 +99,6 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
 
             with Timer('eval_batch_{}'.format(stream_name), self._epoch_profile):
                 batch_output = self._net.run(batch=batch_input, train=train)
-
             assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
 
             with Timer('after_batch_hooks_{}'.format(stream_name), self._epoch_profile):
@@ -112,37 +115,50 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
 
         self._run_epoch(stream=stream, train=False, stream_name=stream_name)
 
+    def get_stream(self, stream_name: str) -> AbstractDataset.Stream:
+        """
+        Get a stream iterator with the given name.
+
+        :param stream_name: name of the stream
+
+        Raises:
+            AttributeError: if the dataset does not provide the function creating the stream
+        """
+        try:
+            stream_fn_name = 'create_{}_stream'.format(stream_name)
+            return getattr(self._dataset, stream_fn_name)()
+        except AttributeError as ex:
+            raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
+                                 'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
+
     def run(self) -> None:
-        """Start the main loop."""
+        """Run the main loop."""
 
         try:
             epoch_id = 0
 
-            # Before training
+            # Initialization: before_training
             for hook in self._hooks:
                 hook.before_training()
 
-            # After zeroth epoch (no training)
+            # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
-                for extra_stream in self._extra_streams+['train']:
-                    create_stream_function = getattr(self._dataset, 'create_{}_stream'.format(extra_stream))
-                    self.evaluate_stream(stream=create_stream_function(), stream_name=extra_stream)
+                for stream_name in self._all_streams:
+                    self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
 
                 epoch_data = self._create_epoch_data()
                 for hook in self._hooks:
                     hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
 
-            # Training loop - after epoch, after epoch profile
+            # Training loop: after_epoch, after_epoch_profile
             while True:
                 epoch_id += 1
                 self._epoch_profile = {}
-                epoch_data = OrderedDict([(stream_name, OrderedDict())
-                                          for stream_name in ['train']+list(self._extra_streams)])
+                epoch_data = self._create_epoch_data()
 
                 self.train_by_stream(stream=self._dataset.create_train_stream())
-                for extra_stream in self._extra_streams:
-                    create_stream_function = getattr(self._dataset, 'create_{}_stream'.format(extra_stream))
-                    self.evaluate_stream(stream=create_stream_function(), stream_name=extra_stream)
+                for stream_name in self._extra_streams:
+                    self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
 
                 with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:
@@ -157,6 +173,6 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             logging.warning('Training terminated by a keyboard interrupt')
             sys.exit(2)
 
-        # After training
+        # After training: after_training
         for hook in self._hooks:
             hook.after_training()

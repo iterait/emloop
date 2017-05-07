@@ -1,7 +1,6 @@
 """
 Test module for cxflow entry point (entry_point.py)
 """
-import logging
 import os
 from os import path
 from copy import deepcopy
@@ -58,10 +57,6 @@ class DummyNetRestore(DummyNetWithKwargs):
 
 class EntryPointTest(CXTestCaseWithDirAndNet):
     """Entry point functions test case."""
-
-    def __init__(self, *args, **kwargs):
-        logging.getLogger().disabled = True
-        super().__init__(*args, **kwargs)
 
     def test_create_output_dir(self):
         """Test output dir creating and correct naming."""
