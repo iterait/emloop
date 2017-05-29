@@ -8,7 +8,7 @@ from copy import deepcopy
 import yaml
 import tensorflow as tf
 
-from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net
+from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net, split
 from cxflow.utils.config import config_to_file, load_config
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.tests.test_core import CXTestCaseWithDirAndNet
@@ -21,6 +21,20 @@ class DummyDataset:
     """Dummy dataset which loads the given config to self.config."""
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
+
+
+class SplitDataset:
+    """Simple dataset which records its split method calls."""
+
+    def __init__(self, _):
+        _SPLIT_DATASET_INSTANCES.append(self)
+        self.split_calls = []
+
+    def split(self, num_splits: int, train: float, valid: float, test: float):
+        """Record the call arguments."""
+        self.split_calls.append({'n': num_splits, 'tr': train, 'v': valid, 'te': test})
+
+_SPLIT_DATASET_INSTANCES = []
 
 
 class DummyHook(AbstractHook):
@@ -230,3 +244,15 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         restored_net = create_net(custom_restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
 
         self.assertTrue(isinstance(restored_net, DummyNetRestore))
+
+    def test_split(self):
+        """Test if split creates the dataset and calls the split function properly."""
+        config = {'dataset': {'module': 'cxflow.tests.entry_point_test', 'class': 'SplitDataset'}}
+        config_file = config_to_file(config, self.tmpdir, 'config.yaml')
+        split(config_file, 7, 5, 3, 1)
+
+        self.assertEqual(len(_SPLIT_DATASET_INSTANCES), 1)
+        dataset = _SPLIT_DATASET_INSTANCES[0]
+        self.assertIsInstance(dataset, SplitDataset)
+        self.assertEqual(len(dataset.split_calls), 1)
+        self.assertDictEqual(dataset.split_calls[0], {'n': 7, 'tr': 5, 'v': 3, 'te': 1})

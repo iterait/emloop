@@ -14,7 +14,7 @@ import logging
 import sys
 import tempfile
 import traceback
-from typing import Iterable
+from typing import Iterable, Optional
 import os
 from os import path
 from argparse import ArgumentParser
@@ -94,19 +94,20 @@ def create_output_dir(config: dict, output_root: str, default_net_name: str='Non
     return output_dir
 
 
-def create_dataset(config: dict, output_dir: str) -> AbstractDataset:
+def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractDataset:
     """
     Create a dataset object according to the given config.
 
     Dataset and output_dir configs are passed to the constructor in a single YAML-encoded string.
     :param config: config dict with dataset config
-    :param output_dir: path to the training output dir
+    :param output_dir: path to the training output dir or None
     :return: dataset object
     """
     logging.info('Creating dataset')
-    config_str = config_to_str({'dataset': config['dataset'], 'output_dir': output_dir})
-
-    dataset = create_object_from_config(config['dataset'], args=(config_str,))
+    dataset_config = {'dataset': config['dataset']}
+    if output_dir:
+        dataset_config['output_dir'] = output_dir
+    dataset = create_object_from_config(config['dataset'], args=(config_to_str(dataset_config),))
     logging.info('\t%s created', type(dataset).__name__)
     return dataset
 
@@ -313,8 +314,7 @@ def split(config_file: str, num_splits: int, train_ratio: float, valid_ratio: fl
 
     try:
         logging.info('Creating dataset')
-        config_str = config_to_str({'dataset': config['dataset'], 'stream': config['stream']})
-        dataset = create_object_from_config(config['dataset'], args=(config_str,))
+        dataset = create_dataset(config)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating dataset failed', ex)
 
