@@ -15,7 +15,7 @@ test:ubuntu_TFlatest_python3.5:
   - pacman -S --noconfirm python python-pip git base-devel
 
 test:arch_TFlatest_python3.6:
-  image: pritunl/archlinux
+  image: pritunl/archlinux:2017-05-13
   <<: *archCommon
   script:
   - pip install .
