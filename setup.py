@@ -38,7 +38,6 @@ setup(name='cxflow',
       install_requires=[str(ir.req) for ir in parse_requirements('requirements.txt', session='hack')],
       entry_points={
           'console_scripts': [
-              'cxflow=cxflow.entry_point:entry_point',
-              'cxgridsearch=cxflow.grid_search:init_grid_search',
+              'cxflow=cxflow.entry_point:entry_point'
           ]
       })

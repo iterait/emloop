@@ -10,6 +10,7 @@ At the moment cxflow allows to
 
 Run `cxflow -h` for details.
 """
+
 import logging
 import sys
 import tempfile
@@ -27,6 +28,7 @@ from .datasets.abstract_dataset import AbstractDataset
 from .hooks.abstract_hook import AbstractHook, CXF_HOOK_INIT_ARGS
 from .utils.config import load_config, config_to_str, config_to_file
 from .utils.reflection import create_object_from_config, get_class_module
+from .utils.grid_search import grid_search
 
 # cxflow logging formats and formatter.
 CXF_LOG_FORMAT = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
@@ -351,6 +353,15 @@ def entry_point() -> None:
         parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
         parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
+    # create grid-search subparser
+    gridsearch_parser = subparsers.add_parser('gridsearch')
+    gridsearch_parser.set_defaults(subcommand='gridsearch')
+    gridsearch_parser.add_argument('script', help='Script to be grid-searched')
+    gridsearch_parser.add_argument('params', nargs='*', help='Params to be tested. Format: name:type=[value1,value2].'
+                                                             'Type is optional')
+    gridsearch_parser.add_argument('--dry-run', action='store_true', help='Print commands instead of executing them'
+                                                                          'right away')
+
     # parse CLI arguments
     known_args, unknown_args = main_parser.parse_known_args()
 
@@ -380,6 +391,11 @@ def entry_point() -> None:
               train_ratio=known_args.ratio[0],
               valid_ratio=known_args.ratio[1],
               test_ratio=known_args.ratio[2])
+
+    elif known_args.subcommand == 'gridsearch':
+        grid_search(script=known_args.script,
+                    params=known_args.params,
+                    dry_run=known_args.dry_run)
 
 
 if __name__ == '__main__':
