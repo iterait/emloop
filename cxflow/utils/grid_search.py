@@ -4,7 +4,7 @@ This module handles grid search,
 """
 
 import ast
-
+from collections import OrderedDict
 import itertools
 import logging
 import subprocess
@@ -20,7 +20,7 @@ def _build_grid_search_commands(script: str, params: typing.Iterable[str]) -> ty
                    'text_param:str=["hello", "cio"]'.
     """
 
-    param_space = {}
+    param_space = OrderedDict()
     for arg in params:
         assert '=' in arg
 
