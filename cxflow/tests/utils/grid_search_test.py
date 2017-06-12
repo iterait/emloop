@@ -19,6 +19,7 @@ class GridSearchTest(CXTestCase):
         params = _build_grid_search_commands(script=' '.join(script),
                                              params=['param1:int=[{}]'.format(', '.join(param1)),
                                                      'param2=[{}]'.format(', '.join(param2))])
+
         self.assertCountEqual(params,
                               [['echo', 'fixed_param', 'param1:int="1"', 'param2="hello"'],
                                ['echo', 'fixed_param', 'param1:int="2"', 'param2="hello"'],
