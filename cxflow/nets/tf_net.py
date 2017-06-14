@@ -122,6 +122,7 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-in
                     self._tensors[tensor_name] = tensor
 
         logging.debug('Creating Saver')
+        self._saver = tf.train.Saver(max_to_keep=100000000)
 
     @property
     def input_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
@@ -201,7 +202,7 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-in
 
         tf.train.write_graph(self._session.graph_def, '', graph_path, as_text=False)
 
-        tf.train.Saver().save(self._session, checkpoint_path)
+        self._saver.save(self._session, checkpoint_path)
 
         with tf.Graph().as_default():
             freeze_graph(input_graph=graph_path,
