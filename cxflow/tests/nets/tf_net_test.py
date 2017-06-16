@@ -2,6 +2,8 @@
 Test module for base tensorflow nets (cxflow.nets.tf_net).
 """
 import os
+import tempfile
+import shutil
 from os import path
 
 import tensorflow as tf
@@ -289,3 +291,64 @@ class TFBaseNetSaverTest(CXTestCaseWithDirAndNet):
             data_prefix = path.basename(checkpoint)+'.data'
             data_files = [file for file in os.listdir(path.dirname(checkpoint)) if file.startswith(data_prefix)]
             self.assertGreater(len(data_files), 0)
+
+
+class TFBaseNetManagementTest(CXTestCaseWithDirAndNet):
+    """
+    Test case for correct management of tf graphs and sessions.
+    """
+
+    def test_two_nets_created(self):
+        """
+        Test if one can create and train two BaseTFNets.
+
+        This is regression test for issue #83 (One can not create and use more than one instance of BaseTFNet).
+        """
+
+        trainable_io = {'in': ['input', 'target'], 'out': ['output']}
+        net1 = TrainableNet(dataset=None, log_dir='', io=trainable_io)
+        net2 = TrainableNet(dataset=None, log_dir='', io=trainable_io)
+        batch = {'input': [[1]*10], 'target': [[0]*10]}
+
+        # test if one can train one net while the other remains intact
+        for _ in range(1000):
+            net1.run(batch, train=True)
+        trained_value = net1.var.eval(session=net1.session)
+        self.assertTrue(np.allclose([0]*10, trained_value))
+        default_value = net2.var.eval(session=net2.session)
+        self.assertTrue(np.allclose([2]*10, default_value))
+
+        # test if one can train the other net
+        for _ in range(1000):
+            net2.run(batch, train=True)
+        trained_value2 = net2.var.eval(session=net2.session)
+        self.assertTrue(np.allclose([0] * 10, trained_value2))
+
+    def test_two_nets_restored(self):
+        """
+        Test if one can restore and use two BaseTFNets.
+
+        This is regression test for issue #83 (One can not create and use more than one instance of BaseTFNet).
+        """
+        tmpdir2 = tempfile.mkdtemp()
+
+        trainable_io = {'in': ['input', 'target'], 'out': ['output']}
+        net1 = TrainableNet(dataset=None, log_dir=self.tmpdir, io=trainable_io)
+        net2 = TrainableNet(dataset=None, log_dir=tmpdir2, io=trainable_io)
+        batch = {'input': [[1] * 10], 'target': [[0] * 10]}
+        for _ in range(1000):
+            net1.run(batch, train=True)
+
+        checkpoint_path1 = net1.save('')
+        checkpoint_path2 = net2.save('')
+
+        # test if one can restore two nets and use them at the same time
+        restored_net1 = BaseTFNetRestore(dataset=None, log_dir='', io=trainable_io, restore_from=checkpoint_path1)
+        restored_net2 = BaseTFNetRestore(dataset=None, log_dir='', io=trainable_io, restore_from=checkpoint_path2)
+
+        trained_value = restored_net1.graph.get_tensor_by_name('var:0').eval(session=restored_net1.session)
+        self.assertTrue(np.allclose([0]*10, trained_value))
+        default_value = restored_net2.graph.get_tensor_by_name('var:0').eval(session=restored_net2.session)
+        self.assertTrue(np.allclose([2]*10, default_value))
+
+        shutil.rmtree(tmpdir2)

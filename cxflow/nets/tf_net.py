@@ -88,41 +88,44 @@ class BaseTFNet(AbstractNet, metaclass=ABCMeta):   # pylint: disable=too-many-in
         self._dataset = dataset
         self._log_dir = log_dir
         self._train_op = None
-        self._graph = None
+        self._graph = self._saver = None
         self._input_names = io['in']
         self._output_names = io['out']
         self._tensors = {}
 
         with tf.device(device):
             logging.debug('Creating session')
+            self._graph = tf.Graph()
             self._session = tf.Session(config=tf.ConfigProto(inter_op_parallelism_threads=threads,
                                                              intra_op_parallelism_threads=threads,
-                                                             allow_soft_placement=True))
+                                                             allow_soft_placement=True),
+                                       graph=self._graph)
 
-            logging.debug('Creating net')
-            self._create_net(**kwargs)
+            with self._graph.as_default():
+                logging.debug('Creating net')
+                self._create_net(**kwargs)
 
-            logging.debug('Finding train_op in the created graph')
-            self._graph = tf.get_default_graph()
-            try:
-                self._train_op = self._graph.get_operation_by_name('train_op')
-            except (KeyError, ValueError, TypeError) as ex:
-                raise ValueError('Cannot find train op in graph. Train op must be named `train_op`.') from ex
-
-            logging.debug('Finding io tensors in the created graph')
-            for tensor_name in set(self._input_names + self._output_names):
-                full_name = tensor_name + ':0'
+                logging.debug('Finding train_op in the created graph')
                 try:
-                    tensor = self._graph.get_tensor_by_name(full_name)
+                    self._train_op = self._graph.get_operation_by_name('train_op')
                 except (KeyError, ValueError, TypeError) as ex:
-                    raise ValueError('Tensor `{}` defined as input/output was not found. It has to be named `{}`.'
-                                     .format(tensor_name, full_name)) from ex
+                    raise ValueError('Cannot find train op in graph. Train op must be named `train_op`.') from ex
 
-                if tensor_name not in self._tensors:
-                    self._tensors[tensor_name] = tensor
+                logging.debug('Finding io tensors in the created graph')
+                for tensor_name in set(self._input_names + self._output_names):
+                    full_name = tensor_name + ':0'
+                    try:
+                        tensor = self._graph.get_tensor_by_name(full_name)
+                    except (KeyError, ValueError, TypeError) as ex:
+                        raise ValueError('Tensor `{}` defined as input/output was not found. It has to be named `{}`.'
+                                         .format(tensor_name, full_name)) from ex
 
-        logging.debug('Creating Saver')
-        self._saver = tf.train.Saver(max_to_keep=100000000)
+                    if tensor_name not in self._tensors:
+                        self._tensors[tensor_name] = tensor
+
+                if not self._saver:
+                    logging.debug('Creating Saver')
+                    self._saver = tf.train.Saver(max_to_keep=100000000)
 
     @property
     def input_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
@@ -242,6 +245,6 @@ class BaseTFNetRestore(BaseTFNet):
         :param kwargs: additional **kwargs are ignored
         """
         logging.debug('Loading meta graph')
-        saver = tf.train.import_meta_graph(restore_from + '.meta')
+        self._saver = tf.train.import_meta_graph(restore_from + '.meta')
         logging.debug('Restoring model')
-        saver.restore(self._session, restore_from)
+        self._saver.restore(self._session, restore_from)
