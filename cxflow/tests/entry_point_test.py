@@ -4,17 +4,16 @@ Test module for cxflow entry point (entry_point.py)
 import os
 from os import path
 from copy import deepcopy
+from typing import Mapping, List
 
 import yaml
-import tensorflow as tf
 
+from cxflow import AbstractNet
 from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net, split
-from cxflow.utils.config import config_to_file, load_config
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.tests.test_core import CXTestCaseWithDirAndNet
-from cxflow.nets.tf_net import BaseTFNetRestore
-from cxflow.tests.nets.tf_net_test import DummyNet
 from cxflow.hooks.profile_hook import ProfileHook
+from cxflow.tests.test_core import CXTestCaseWithDir
+from cxflow.utils.config import config_to_file, load_config
 
 
 class DummyDataset:
@@ -50,18 +49,36 @@ class SecondDummyHook(AbstractHook):
     pass
 
 
+class DummyNet(AbstractNet):
+    """Dummy net which serves as a placeholder instead of regular net implementation."""
+    def __init__(self, io: dict, **kwargs):  #pylint: disable=unused-argument
+        self._input_names = io['in']
+        self._output_names = io['out']
+
+    def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
+        return {o: i for i, o in enumerate(self._output_names)}
+
+    def save(self, name_suffix: str) -> str:
+        pass
+
+    @property
+    def input_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
+        return self._input_names
+
+    @property
+    def output_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
+        return self._output_names
+
+
 class DummyNetWithKwargs(DummyNet):
     """Dummy net which saves kwargs to self.kwargs."""
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__(**kwargs)
 
-    def _create_net(self, **kwargs):
+    def _create_net(self, **kwargs):  #pylint: disable=unused-argument
         # create a dummy train op and variable
-        super()._create_net()
-
-        # initialize the dummy variable in order to allow saving
-        self.session.run(tf.global_variables_initializer())
+        pass
 
 
 class DummyNetRestore(DummyNetWithKwargs):
@@ -69,7 +86,7 @@ class DummyNetRestore(DummyNetWithKwargs):
     pass
 
 
-class EntryPointTest(CXTestCaseWithDirAndNet):
+class EntryPointTest(CXTestCaseWithDir):
     """Entry point functions test case."""
 
     def test_create_output_dir(self):
@@ -182,7 +199,7 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
 
         self.assertEqual(len(hooks), 1)
         self.assertTrue(isinstance(hook, DummyHook))
-        for key in expected_kwargs.keys():
+        for key in expected_kwargs:
             self.assertIn(key, kwargs)
             self.assertEqual(expected_kwargs[key], kwargs[key])
 
@@ -226,17 +243,17 @@ class EntryPointTest(CXTestCaseWithDirAndNet):
         for key in expected_kwargs.keys():
             self.assertIn(key, kwargs)
             self.assertEqual(expected_kwargs[key], kwargs[key])
-        tf.reset_default_graph()
 
+        # See issue #50 and #51
         # test net restore without custom restore class
-        restore_config = deepcopy(config)
-        restore_config['net']['restore_from'] = checkpoint_path
-        restored_net = create_net(config=restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
+        # restore_config = deepcopy(config)
+        # restore_config['net']['restore_from'] = checkpoint_path
+        # restored_net = create_net(config=restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
+        #
+        # self.assertTrue(isinstance(restored_net, BaseTFNetRestore))
+        # tf.reset_default_graph()
 
-        self.assertTrue(isinstance(restored_net, BaseTFNetRestore))
-        tf.reset_default_graph()
-
-        # test net restore with custom restore class
+        # # test net restore with custom restore class
         custom_restore_config = deepcopy(config)
         custom_restore_config['net']['restore_from'] = checkpoint_path
         custom_restore_config['net']['restore_module'] = 'cxflow.tests.entry_point_test'

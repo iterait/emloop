@@ -2,18 +2,17 @@
 Test module for the main loop (cxflow.main_loop).
 """
 import time
-from typing import Mapping
 from collections import defaultdict
+from typing import Mapping, List
 
 import numpy as np
 
-from .test_core import CXTestCaseWithDirAndNet
-from .nets.tf_net_test import TrainableNet
-from cxflow.main_loop import MainLoop
+from cxflow import AbstractNet, MainLoop, AbstractDataset
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.hooks.epoch_stopper_hook import EpochStopperHook
-from cxflow.datasets.abstract_dataset import AbstractDataset
 from cxflow.utils.profile import Timer
+
+from .test_core import CXTestCaseWithDir
 
 _READ_DATA_SLEEP_S = 0.1
 _AFTER_BATCH_SLEEP_S = 0.2
@@ -64,9 +63,6 @@ class SimpleDataset(AbstractDataset):
 
 class ExtendedDataset(SimpleDataset):
     """SimpleDataset extension with additional 'unused' source in the train stream."""
-
-    def __init__(self):
-        super().__init__()
 
     def create_train_stream(self) -> AbstractDataset.Stream:
         self.train_used = True
@@ -169,6 +165,29 @@ class EpochDataConsumer(AbstractHook):
         assert epoch_data['train']['my_variable'] == _EPOCH_DATA_VAR_VALUE
 
 
+class TrainableNet(AbstractNet):
+    """Simple trainable net"""
+    def __init__(self, io: dict, **kwargs):  #pylint: disable=unused-argument
+        self._input_names = io['in']
+        self._output_names = io['out']
+
+    def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
+        return {o: i for i, o in enumerate(self._output_names)}
+
+    def save(self, name_suffix: str) -> str:
+        pass
+
+    @property
+    def input_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
+        """List of tf tensor names listed as net inputs."""
+        return self._input_names
+
+    @property
+    def output_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
+        """List of tf tensor names listed as net outputs."""
+        return self._output_names
+
+
 class DelayedNet(TrainableNet):
     """Trainable net which sleeps briefly when processing a batch allowing to measure the net eval time."""
 
@@ -192,7 +211,7 @@ class RecordingNet(TrainableNet):
         return outputs
 
 
-class MainLoopTest(CXTestCaseWithDirAndNet):
+class MainLoopTest(CXTestCaseWithDir):
     """MainLoop test case."""
 
     def create_main_loop(self,  # pylint: disable=too-many-arguments
@@ -364,27 +383,16 @@ class MainLoopTest(CXTestCaseWithDirAndNet):
             for stream_name in ['train', 'valid', 'test']:
                 self.assertIn(prefix+stream_name, profile4)
 
-    def test_net_training(self):
-        """Test the net is being trained properly."""
-        net, _, mainloop = self.create_main_loop(epochs=100)
-        mainloop.run()
-        after_value = net.graph.get_tensor_by_name('var:0').eval(session=net.session)
-        self.assertTrue(np.allclose([0]*10, after_value, atol=0.01))
-
     def test_zeroth_epoch(self):
         """Test the net is not trained in the zeroth epoch."""
         data_recording_hook = DataRecordingHook()
-        net, _, mainloop = self.create_main_loop(epochs=0, extra_hooks=[data_recording_hook], skip_zeroth_epoch=False)
+        _, _, mainloop = self.create_main_loop(epochs=0, extra_hooks=[data_recording_hook], skip_zeroth_epoch=False)
         mainloop.run()
 
         # check if we actually iterated through the train stream
         self.assertListEqual(data_recording_hook.epoch_ids, [0])
         self.assertIn('train', data_recording_hook.batch_data)
         self.assertEqual(len(data_recording_hook.batch_data['train']), _DATASET_ITERS)
-
-        # check if the variable is not updated
-        after_value = net.graph.get_tensor_by_name('var:0').eval(session=net.session)
-        self.assertTrue(np.allclose([2]*10, after_value))
 
     def test_on_unused_sources(self):
         """Test error is raised when on_unused_inputs='error'."""
