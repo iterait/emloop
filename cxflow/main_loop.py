@@ -9,7 +9,7 @@ import logging
 import typing
 from collections import OrderedDict
 
-from .datasets.abstract_dataset import AbstractDataset
+from .datasets import AbstractDataset
 from .nets.abstract_net import AbstractNet
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils.profile import Timer
@@ -21,10 +21,12 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
     UNUSED_SOURCE_ACTIONS = {'ignore', 'warn', 'error'}
 
     def __init__(self,   # pylint: disable=too-many-arguments
-                 net: AbstractNet, dataset: AbstractDataset, hooks: typing.Iterable[AbstractHook]=(),
-                 extra_streams: typing.List[str]=(),    # pylint: disable=invalid-sequence-index
-                 on_unused_sources: str='warn', fixed_batch_size: int=None,
-                 skip_zeroth_epoch=False):
+                 net: AbstractNet, dataset: AbstractDataset,
+                 hooks: typing.Iterable[AbstractHook]=(),
+                 extra_streams: typing.List[str]=(),  # pylint: disable=invalid-sequence-index
+                 on_unused_sources: str = 'warn',
+                 fixed_batch_size: int = None,
+                 skip_zeroth_epoch: bool = False):
         """
         :param net: trained network
         :param dataset: loaded dataset

@@ -7,7 +7,7 @@ import typing
 import logging
 import inspect
 
-from ..datasets.abstract_dataset import AbstractDataset
+from ..datasets import AbstractDataset
 from ..utils.profile import Timer
 
 
@@ -40,7 +40,7 @@ class AbstractHook:
         Check for unrecognized arguments and warn about them.
         :param kwargs: kwargs not recognized in the child hook
         """
-        for key in kwargs.keys():
+        for key in kwargs:
             if key not in CXF_HOOK_INIT_ARGS:
                 logging.warning('Argument `%s` was not recognized by `%s`. Recognized arguments are `%s`.',
                                 key, type(self).__name__, list(inspect.signature(type(self)).parameters.keys()))

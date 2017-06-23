@@ -29,9 +29,8 @@ setup(name='cxflow',
                 'cxflow.hooks',
                 'cxflow.nets',
                 'cxflow.utils',
-                'cxflow.third_party',
-                'cxflow.third_party.tensorflow'
-      ],
+                'cxflow.tests'
+                ],
       include_package_data=True,
       zip_safe=False,
       test_suite='cxflow.tests',

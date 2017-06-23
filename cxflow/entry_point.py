@@ -12,23 +12,22 @@ Run `cxflow -h` for details.
 """
 
 import logging
+import os
+from os import path
 import sys
 import tempfile
 import traceback
-from typing import Iterable, Optional
-import os
-from os import path
 from argparse import ArgumentParser
 from datetime import datetime
+from typing import Iterable, Optional
 
+from .datasets import AbstractDataset
+from .hooks.abstract_hook import AbstractHook, CXF_HOOK_INIT_ARGS
 from .main_loop import MainLoop
 from .nets.abstract_net import AbstractNet
-from .nets.tf_net import BaseTFNetRestore
-from .datasets.abstract_dataset import AbstractDataset
-from .hooks.abstract_hook import AbstractHook, CXF_HOOK_INIT_ARGS
 from .utils.config import load_config, config_to_str, config_to_file
-from .utils.reflection import create_object_from_config, get_class_module
 from .utils.grid_search import grid_search
+from .utils.reflection import create_object_from_config, get_class_module
 
 # cxflow logging formats and formatter.
 CXF_LOG_FORMAT = '%(asctime)s: %(levelname)-8s@%(module)-15s: %(message)s'
@@ -139,8 +138,10 @@ def create_net(config: dict, output_dir: str, dataset: AbstractDataset) -> Abstr
             net = create_object_from_config(net_config, kwargs=net_kwargs, key_prefix='restore_')
             logging.info('\tNet restored with custom class')
         except (AssertionError, ValueError, AttributeError, ImportError, TypeError) as _:
-            net = BaseTFNetRestore(**net_kwargs)
-            logging.info('\tNet restored with generic BaseTFNetRestore')
+            logging.error('Cannot restore without net module and class specification.')
+            # See issue #50 and #51
+            # net = BaseTFNetRestore(**net_kwargs)
+            # logging.info('\tNet restored with generic BaseTFNetRestore')
     else:
         logging.info('Creating net')
         net = create_object_from_config(net_config, kwargs=net_kwargs)

@@ -6,8 +6,6 @@ import shutil
 import tempfile
 from unittest import TestCase
 
-import tensorflow as tf
-
 
 class CXTestCase(TestCase):
     """Base cxflow test case which disables logging."""
@@ -33,16 +31,3 @@ class CXTestCaseWithDir(CXTestCase):
     def tearDown(self):
         """Remove the respective temp dir after every test method."""
         shutil.rmtree(self.tmpdir)
-
-
-class CXTestCaseWithDirAndNet(CXTestCaseWithDir):
-    """Cxflow test case with temp dir and tf cleanup."""
-
-    def __init__(self, *args, **kwargs):
-        """Create a new test case."""
-        super().__init__(*args, **kwargs)
-
-    def tearDown(self):
-        """Reset default tf graph after every test method."""
-        tf.reset_default_graph()
-        super().tearDown()

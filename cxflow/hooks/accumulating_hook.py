@@ -5,7 +5,7 @@ import typing
 from collections import defaultdict
 
 from .abstract_hook import AbstractHook
-from ..datasets.abstract_dataset import AbstractDataset
+from ..datasets import AbstractDataset
 
 
 class AccumulatingHook(AbstractHook):

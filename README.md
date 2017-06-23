@@ -1,6 +1,6 @@
 # cxflow
 
-This is an official repository of **cxflow** - a smart manager and personal trainer of TensorFlow models.
+This is an official repository of **cxflow** - a smart manager and personal trainer of various deep learning models.
 
 ## Development Status
 
@@ -9,16 +9,16 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 - [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
-For example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/cxMNIST).
+For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/cxMNIST).
 
 ## Requirements
 The officially supported operating system is [Arch Linux](https://www.archlinux.org).
-In addition, **cxflow** is tested on [Ubuntu 16.10](http://releases.ubuntu.com/16.10).
-All operating systems are expected to be fully up-to-date.
+In addition, **cxflow** is tested on [Ubuntu 16.04 LTS](http://releases.ubuntu.com/16.04) and [Ubuntu 17.04](http://releases.ubuntu.com/17.04).
+Please note that all operating systems are expected to be fully up-to-date.
 
 The following environments are supported and tested:
-- Python 3.6 with TensorFlow 1.0.1 (Arch Linux)
-- Python 3.5 with TensorFlow 1.0.1 (Ubuntu 16.10)
+- Python 3.6 with TensorFlow 1.1 (Arch Linux)
+- Python 3.5 with TensorFlow 1.1 (Ubuntu 16.04 LTS and Ubuntu 17.04)
 
 List of Python package requirements is listed in `requirements.txt`.
 
@@ -31,19 +31,26 @@ Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is s
 ### Development Installation
 1. Clone the **cxflow** repository `$ git clone git@gitlab.com:Cognexa/cxflow.git`
 2. Enter the directory `$ cd cxflow`
-3. **Optional**: *Install some of the required of packages (e.g. TensorFlow) using your system package manager. If this step is skipped, the up-to-date version will be installed from PyPI in the next step.*
+3. **Optional**: *Install some of the required of packages (e.g. TensorFlow).
 4. Install **cxflow**: `$ pip install -e .`
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
 Please refer to repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example) for more information.
 
-In addition, `cxgridsearch` command is installed.
-
 ## Tutorials
 The following tutorials serve as a gentle introduction to the cxflow framework:
-
+- [introduction](tutorial)
 - [cxflow hooks](cxflow/hooks/README.md)
+
+## Extensions
+**cxflow** is meant to be extremely lightweight.
+For that reason the whole functionality is divided into various extensions with separate dependencies.
+
+## Officially Supported Extensions
+
+- [cxflow-tensorflow](https://gitlab.com/Cognexa/cxflow-tensorflow) - TensorFlow support
+- [cxflow-scikit](https://gitlab.com/Cognexa/cxflow-scikit) - scientific computations and statistics
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.
