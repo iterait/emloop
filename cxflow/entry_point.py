@@ -1,4 +1,3 @@
-#!/usr/bin/python3 -mentry_point
 """
 This module is cxflow framework entry point.
 
