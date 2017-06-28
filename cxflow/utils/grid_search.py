@@ -1,4 +1,3 @@
-#!/usr/bin/python3 -mgrid_search
 """
 This module handles grid search,
 """
