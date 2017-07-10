@@ -1,0 +1,15 @@
+FROM cognexa/archlinux
+MAINTAINER Cognexa Solutions s.r.o. <docker@cognexa.com>
+
+# copy the repository to the docker environment
+COPY . cxflow
+WORKDIR cxflow
+
+# install dependencies
+RUN pacman --noconfirm -S python \
+                          python-pip \
+                          base-devel
+
+# install cxflow
+RUN pip3 install . && \
+    python3 setup.py test
