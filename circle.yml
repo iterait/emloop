@@ -5,4 +5,5 @@ machine:
 test:
   override:
     - docker info
-    - docker build --rm=false -t cxflow -f Dockerfiles/archlinux .
+    - docker build --rm=false -t cxflow-archlinux -f Dockerfiles/archlinux .
+    - docker build --rm=false -t cxflow-ubuntu -f Dockerfiles/ubuntu .
