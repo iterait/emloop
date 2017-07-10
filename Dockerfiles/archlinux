@@ -1,4 +1,4 @@
-FROM cognexa/archlinux
+FROM pritunl/archlinux
 MAINTAINER Cognexa Solutions s.r.o. <docker@cognexa.com>
 
 # copy the repository to the docker environment
