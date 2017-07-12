@@ -12,15 +12,11 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://github.com/Cognexa/cxMNIST).
 
 ## Requirements
-The officially supported operating system is [Arch Linux](https://www.archlinux.org).
-In addition, **cxflow** is tested on [Ubuntu 16.10](http://releases.ubuntu.com/16.10).
-Please note that all operating systems are expected to be fully up-to-date.
+Officially supported operating systems are [Arch Linux](https://www.archlinux.org), the latest
+[Ubuntu LTS release](http://releases.ubuntu.com/), and the latest [Ubuntu rolling release](http://releases.ubuntu.com/).
+Please note that all operating systems are expected to be fully up-to-date with the latest TensorFlow and Python 3.
 
-The following environments are supported and tested:
-- Python 3.6 with TensorFlow 1.2 (Arch Linux)
-- Python 3.5 with TensorFlow 1.2 (Ubuntu 16.10)
-
-List of Python package requirements is listed in `requirements.txt`.
+The list of Python package requirements is listed in `requirements.txt`.
 
 ## Installation
 Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is suggested, however, completely optional. 

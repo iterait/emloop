@@ -29,9 +29,9 @@ references:
 
 jobs:
 
-  test_ubuntu16.04:
+  test_ubuntu_latest:
     docker:
-      - image: ubuntu:16.04
+      - image: ubuntu:latest
     working_directory: ~/cxflow
     steps:
       - *ubuntu_deps
@@ -39,19 +39,9 @@ jobs:
       - *install
       - *test
 
-  test_ubuntu16.10:
+  test_ubuntu_rolling:
     docker:
-      - image: ubuntu:16.10
-    working_directory: ~/cxflow
-    steps:
-      - *ubuntu_deps
-      - checkout
-      - *install
-      - *test
-
-  test_ubuntu17.04:
-    docker:
-      - image: ubuntu:17.04
+      - image: ubuntu:rolling
     working_directory: ~/cxflow
     steps:
       - *ubuntu_deps
@@ -74,7 +64,6 @@ workflows:
   version: 2
   test-matrix:
     jobs:
-      - test_ubuntu16.04
-      - test_ubuntu16.10
-      - test_ubuntu17.04
+      - test_ubuntu_latest
+      - test_ubuntu_rolling
       - test_archlinux
