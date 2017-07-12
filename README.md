@@ -13,12 +13,12 @@ For a quick example usage of **cxflow** please refer to a dedicated repository [
 
 ## Requirements
 The officially supported operating system is [Arch Linux](https://www.archlinux.org).
-In addition, **cxflow** is tested on [Ubuntu 16.04 LTS](http://releases.ubuntu.com/16.04) and [Ubuntu 17.04](http://releases.ubuntu.com/17.04).
+In addition, **cxflow** is tested on [Ubuntu 16.10](http://releases.ubuntu.com/16.10).
 Please note that all operating systems are expected to be fully up-to-date.
 
 The following environments are supported and tested:
-- Python 3.6 with TensorFlow 1.1 (Arch Linux)
-- Python 3.5 with TensorFlow 1.1 (Ubuntu 16.04 LTS and Ubuntu 17.04)
+- Python 3.6 with TensorFlow 1.2 (Arch Linux)
+- Python 3.5 with TensorFlow 1.2 (Ubuntu 16.10)
 
 List of Python package requirements is listed in `requirements.txt`.
 
@@ -26,17 +26,17 @@ List of Python package requirements is listed in `requirements.txt`.
 Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is suggested, however, completely optional. 
 
 ### Standard Installation
-1. Install **cxflow** `$ pip install git+https://gitlab.com/Cognexa/cxflow.git`
+1. Install **cxflow** `$ pip install git+git@github.com:Cognexa/cxflow.git`
 
 ### Development Installation
-1. Clone the **cxflow** repository `$ git clone git@gitlab.com:Cognexa/cxflow.git`
+1. Clone the **cxflow** repository `$ git clone git@github.com:Cognexa/cxflow.git`
 2. Enter the directory `$ cd cxflow`
 3. **Optional**: *Install some of the required of packages (e.g. TensorFlow).
 4. Install **cxflow**: `$ pip install -e .`
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
-Please refer to repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example) for more information.
+Please refer to repository [Cognexa/cxMNIST](https://gitlab.com/Cognexa/cxMNIST) for more information.
 
 ## Tutorials
 The following tutorials serve as a gentle introduction to the cxflow framework:
