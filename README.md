@@ -26,17 +26,17 @@ List of Python package requirements is listed in `requirements.txt`.
 Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is suggested, however, completely optional. 
 
 ### Standard Installation
-1. Install **cxflow** `$ pip install git+https://gitlab.com/Cognexa/cxflow.git`
+1. Install **cxflow** `$ pip install git+git@github.com:Cognexa/cxflow.git`
 
 ### Development Installation
-1. Clone the **cxflow** repository `$ git clone git@gitlab.com:Cognexa/cxflow.git`
+1. Clone the **cxflow** repository `$ git clone git@github.com:Cognexa/cxflow.git`
 2. Enter the directory `$ cd cxflow`
 3. **Optional**: *Install some of the required of packages (e.g. TensorFlow).
 4. Install **cxflow**: `$ pip install -e .`
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
-Please refer to repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/mnist-example) for more information.
+Please refer to repository [Cognexa/cxMNIST](https://gitlab.com/Cognexa/cxMNIST) for more information.
 
 ## Tutorials
 The following tutorials serve as a gentle introduction to the cxflow framework:
