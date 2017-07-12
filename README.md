@@ -13,12 +13,12 @@ For a quick example usage of **cxflow** please refer to a dedicated repository [
 
 ## Requirements
 The officially supported operating system is [Arch Linux](https://www.archlinux.org).
-In addition, **cxflow** is tested on [Ubuntu 16.04 LTS](http://releases.ubuntu.com/16.04) and [Ubuntu 17.04](http://releases.ubuntu.com/17.04).
+In addition, **cxflow** is tested on [Ubuntu 16.10](http://releases.ubuntu.com/16.10).
 Please note that all operating systems are expected to be fully up-to-date.
 
 The following environments are supported and tested:
-- Python 3.6 with TensorFlow 1.1 (Arch Linux)
-- Python 3.5 with TensorFlow 1.1 (Ubuntu 16.04 LTS and Ubuntu 17.04)
+- Python 3.6 with TensorFlow 1.2 (Arch Linux)
+- Python 3.5 with TensorFlow 1.2 (Ubuntu 16.10)
 
 List of Python package requirements is listed in `requirements.txt`.
 
