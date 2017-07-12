@@ -96,7 +96,7 @@ Next, method for saving the data must be defined.
 Finally, `run` method must be implemented which handles the processing of a single batch.
 
 While `AbstractNet` is very general, from now on we will focus on TensorFlow nets only.
-For that purpose, [cxflow-tensorflow](https://gitlab.com/Cognexa/cxflow-tensorflow) must be installed, which 
+For that purpose, [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) must be installed, which 
 provides `cxflow_tf.BaseTFNet`.
 In this tutorial, we will extend this one.
 
@@ -270,7 +270,7 @@ Even TensorFlow isn't mandatory (but it is pretty easy to demonstrate cxflow on 
 
 ## Conclusion
 We demonstrated a solution to a simple task.
-More real-world problem - MNIST - lies in its [own repository](https://gitlab.com/Cognexa/cxMNIST).
+More real-world problem - MNIST - lies in its [own repository](https://github.com/Cognexa/cxMNIST).
 
 Next steps
 

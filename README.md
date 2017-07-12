@@ -9,7 +9,7 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 - [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
-For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/cxMNIST).
+For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://github.com/Cognexa/cxMNIST).
 
 ## Requirements
 The officially supported operating system is [Arch Linux](https://www.archlinux.org).
@@ -36,7 +36,7 @@ Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is s
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
-Please refer to repository [Cognexa/cxMNIST](https://gitlab.com/Cognexa/cxMNIST) for more information.
+Please refer to repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST) for more information.
 
 ## Tutorials
 The following tutorials serve as a gentle introduction to the cxflow framework:
@@ -49,8 +49,8 @@ For that reason the whole functionality is divided into various extensions with 
 
 ## Officially Supported Extensions
 
-- [cxflow-tensorflow](https://gitlab.com/Cognexa/cxflow-tensorflow) - TensorFlow support
-- [cxflow-scikit](https://gitlab.com/Cognexa/cxflow-scikit) - scientific computations and statistics
+- [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) - TensorFlow support
+- [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.

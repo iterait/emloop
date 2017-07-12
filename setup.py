@@ -20,7 +20,7 @@ setup(name='cxflow',
         'Programming Language :: Python :: 3.6'
       ],
       keywords='tensorflow wrapper',
-      url='https://gitlab.com/Cognexa/cxflow',
+      url='https://github.com/Cognexa/cxflow',
       author='Petr Belohlavek',
       author_email='me@petrbel.cz',
       license='MIT',
