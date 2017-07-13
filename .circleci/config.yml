@@ -27,6 +27,12 @@ references:
       command: |
         python3 setup.py test
 
+  deploy: &deploy
+    deploy:
+      name: PyPi deploy
+      command: /circle-build-package.sh
+
+
 jobs:
 
   test_ubuntu_latest:
@@ -38,6 +44,7 @@ jobs:
       - checkout
       - *install
       - *test
+      - *deploy
 
   test_ubuntu_rolling:
     docker:
