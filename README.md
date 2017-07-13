@@ -9,18 +9,14 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 - [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
-For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://gitlab.com/Cognexa/cxMNIST).
+For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://github.com/Cognexa/cxMNIST).
 
 ## Requirements
-The officially supported operating system is [Arch Linux](https://www.archlinux.org).
-In addition, **cxflow** is tested on [Ubuntu 16.10](http://releases.ubuntu.com/16.10).
-Please note that all operating systems are expected to be fully up-to-date.
+Officially supported operating systems are [Arch Linux](https://www.archlinux.org), the latest
+[Ubuntu LTS release](http://releases.ubuntu.com/), and the latest [Ubuntu rolling release](http://releases.ubuntu.com/).
+Please note that all operating systems are expected to be fully up-to-date with the latest TensorFlow and Python 3.
 
-The following environments are supported and tested:
-- Python 3.6 with TensorFlow 1.2 (Arch Linux)
-- Python 3.5 with TensorFlow 1.2 (Ubuntu 16.10)
-
-List of Python package requirements is listed in `requirements.txt`.
+The list of Python package requirements is listed in `requirements.txt`.
 
 ## Installation
 Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is suggested, however, completely optional. 
@@ -36,7 +32,7 @@ Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is s
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
-Please refer to repository [Cognexa/cxMNIST](https://gitlab.com/Cognexa/cxMNIST) for more information.
+Please refer to repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST) for more information.
 
 ## Tutorials
 The following tutorials serve as a gentle introduction to the cxflow framework:
@@ -49,8 +45,8 @@ For that reason the whole functionality is divided into various extensions with 
 
 ## Officially Supported Extensions
 
-- [cxflow-tensorflow](https://gitlab.com/Cognexa/cxflow-tensorflow) - TensorFlow support
-- [cxflow-scikit](https://gitlab.com/Cognexa/cxflow-scikit) - scientific computations and statistics
+- [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) - TensorFlow support
+- [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.
