@@ -29,8 +29,8 @@ references:
 
   deploy: &deploy
     deploy:
-      name: PyPi deploy
-      command: /circle-build-package.sh
+      name: PyPI deploy
+      command: ./.circle_pypi_deploy.sh
 
 
 jobs:
