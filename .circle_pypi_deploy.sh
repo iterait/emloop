@@ -14,9 +14,8 @@ fi
 echo "[distutils]" > ~/.pypirc
 echo "index-servers = pypi" >> ~/.pypirc
 echo "[pypi]" >> ~/.pypirc
-echo "repository=https://pypi.python.org/pypi" >> ~/.pypirc
-echo "username=$PYPI_USER" >> ~/.pypirc
-echo "password=$PYPI_PASS" >> ~/.pypirc
+echo "username:$PYPI_USER" >> ~/.pypirc
+echo "password:$PYPI_PASS" >> ~/.pypirc
 echo "[metadata]" >> ~/.pypirc
 echo "description-file = README.md" >> ~/.pypirc
 
