@@ -19,4 +19,4 @@ echo "password=$PYPI_PASS" >> ~/.pypirc
 echo "[metadata]" >> ~/.pypirc
 echo "description-file = README.md" >> ~/.pypirc
 
-python3 setup.py sdist upload -r pypi
+python3 setup.py sdist bdist_wheel upload -r pypi
