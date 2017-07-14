@@ -1,13 +1,4 @@
-# common/   System packages (usually with `python-` prefix)
-# ---------------------------------------------------------
 numpy>=1.12.0
 pyaml>=3.12
 ruamel.yaml>=0.13.14
-pip>=9.0.0
-
-# aur/      Less common system packages (usually with `python-` prefix)
-# ---------------------------------------------------------------------
-
-# pip       The previous options are not available or broken
-# ----------------------------------------------------------
 typing>=3.5.3.0
