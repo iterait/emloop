@@ -30,7 +30,9 @@ references:
   deploy: &deploy
     deploy:
       name: PyPI deploy
-      command: ./.circle_pypi_deploy.sh
+      command: |
+        pip3 install wheel setuptools --upgrade
+        ./.circle_pypi_deploy.sh
 
 
 jobs:
