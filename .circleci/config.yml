@@ -44,7 +44,6 @@ jobs:
       - checkout
       - *install
       - *test
-      - *deploy
 
   test_ubuntu_rolling:
     docker:
@@ -65,6 +64,7 @@ jobs:
       - checkout
       - *install
       - *test
+      - *deploy
 
 workflows:
 
