@@ -20,26 +20,28 @@ class CSVHookTest(CXTestCase):
 
     def get_epoch_data(self):
 
-        epoch_data = collections.OrderedDict({
-            'train': collections.OrderedDict({
-                'accuracy': 1,
-                'precision': np.ones(_EXAMPLES),
-                'loss': collections.OrderedDict({'mean': 1}),
-                'omitted': 0
-            }),
-            'test': collections.OrderedDict({
-                'accuracy': 2,
-                'precision': 2 * np.ones(_EXAMPLES),
-                'loss': collections.OrderedDict({'mean': 2}),
-                'omitted': 0
-            }),
-            'valid': collections.OrderedDict({
-                'accuracy': 3,
-                'precision': 3 * np.ones(_EXAMPLES),
-                'loss': collections.OrderedDict({'mean': 3}),
-                'omitted': 0
-            }),
-        })
+        epoch_data = collections.OrderedDict([
+            ('train', collections.OrderedDict([
+                ('accuracy', 1),
+                ('precision', np.ones(_EXAMPLES)),
+                ('loss', collections.OrderedDict([('mean', 1)])),
+                ('omitted', 0)])
+            ),
+
+            ('test', collections.OrderedDict([
+                ('accuracy', 2),
+                ('precision', 2 * np.ones(_EXAMPLES)),
+                ('loss', collections.OrderedDict([('mean', 2)])),
+                ('omitted', 0)])
+            ),
+
+            ('valid', collections.OrderedDict([
+                ('accuracy', 3),
+                ('precision', 3 * np.ones(_EXAMPLES)),
+                ('loss', collections.OrderedDict([('mean', 3)])),
+                ('omitted', 0)])
+            )
+        ])
 
         return epoch_data
 
@@ -95,10 +97,8 @@ class CSVHookTest(CXTestCase):
                                 'test_accuracy', 'test_precision', 'test_loss',
                                 'valid_accuracy', 'valid_precision', 'valid_loss']
 
-        # count of columns must be correct and also their names must be correct
-        # order of columns can be arbitrary
-        self.assertEqual(collections.Counter(valid_header_columns),
-                         collections.Counter(tested_header_columns))
+        self.assertEqual(valid_header_columns,
+                         tested_header_columns)
 
 
 
