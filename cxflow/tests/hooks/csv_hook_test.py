@@ -15,54 +15,48 @@ _EXAMPLES = 5
 _VARIABLES = ['accuracy', 'precision', 'loss']
 
 
+def _get_epoch_data():
+    epoch_data = collections.OrderedDict([
+        ('train', collections.OrderedDict([
+            ('accuracy', 1),
+            ('precision', np.ones(_EXAMPLES)),
+            ('loss', collections.OrderedDict([('mean', 1)])),
+            ('omitted', 0)])),
+        ('test', collections.OrderedDict([
+            ('accuracy', 2),
+            ('precision', 2 * np.ones(_EXAMPLES)),
+            ('loss', collections.OrderedDict([('mean', 2)])),
+            ('omitted', 0)])),
+        ('valid', collections.OrderedDict([
+            ('accuracy', 3),
+            ('precision', 3 * np.ones(_EXAMPLES)),
+            ('loss', collections.OrderedDict([('mean', 3)])),
+            ('omitted', 0)]))
+    ])
+    return epoch_data
+
+
 class CSVHookTest(CXTestCase):
     """Test case for CSVHook."""
-
-    def get_epoch_data(self):
-        epoch_data = collections.OrderedDict([
-            ('train', collections.OrderedDict([
-                ('accuracy', 1),
-                ('precision', np.ones(_EXAMPLES)),
-                ('loss', collections.OrderedDict([('mean', 1)])),
-                ('omitted', 0)])
-            ),
-
-            ('test', collections.OrderedDict([
-                ('accuracy', 2),
-                ('precision', 2 * np.ones(_EXAMPLES)),
-                ('loss', collections.OrderedDict([('mean', 2)])),
-                ('omitted', 0)])
-            ),
-
-            ('valid', collections.OrderedDict([
-                ('accuracy', 3),
-                ('precision', 3 * np.ones(_EXAMPLES)),
-                ('loss', collections.OrderedDict([('mean', 3)])),
-                ('omitted', 0)])
-            )
-        ])
-
-        return epoch_data
 
     def test_init_hook(self):
         """Test correct hook initialization."""
 
         output_file = tempfile.NamedTemporaryFile().name
 
-        hook = CSVHook(output_dir="", output_file=output_file, variables=_VARIABLES)
+        hook = CSVHook(output_dir="", output_file=output_file,
+                       variables=_VARIABLES)
 
         self.assertEqual(hook._variables, _VARIABLES)
         self.assertTrue(os.path.isfile(output_file))
 
         with self.assertRaises(AssertionError):
-            hook = CSVHook(output_dir="", output_file=output_file,
-                           on_unknown_type='raise')
+            CSVHook(output_dir="", output_file=output_file,
+                    on_unknown_type='raise')
 
         with self.assertRaises(AssertionError):
-            hook = CSVHook(output_dir="", output_file=output_file,
-                           on_missing_variable='raise')
-
-
+            CSVHook(output_dir="", output_file=output_file,
+                    on_missing_variable='raise')
 
     def test_write_header(self):
         """Test writing a correct header to csv file."""
@@ -71,7 +65,7 @@ class CSVHookTest(CXTestCase):
         delimiter = ";"
         hook = CSVHook(output_dir="", output_file=output_file,
                        variables=_VARIABLES, delimiter=delimiter)
-        epoch_data = self.get_epoch_data()
+        epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
 
         with open(output_file, 'r') as f:
@@ -87,13 +81,15 @@ class CSVHookTest(CXTestCase):
         self.assertEqual(tested_header_columns[0], '"epoch_id"')
         tested_header_columns = tested_header_columns[1:]
 
-        valid_header_columns = ['train_accuracy', 'train_precision', 'train_loss',
-                                'test_accuracy', 'test_precision', 'test_loss',
-                                'valid_accuracy', 'valid_precision', 'valid_loss']
+        valid_header_columns = ['train_accuracy', 'train_precision',
+                                'train_loss',
+                                'test_accuracy', 'test_precision',
+                                'test_loss',
+                                'valid_accuracy', 'valid_precision',
+                                'valid_loss']
 
         self.assertEqual(valid_header_columns,
                          tested_header_columns)
-
 
     def test_write_row(self):
         """Test writing one row to csv file."""
@@ -104,7 +100,7 @@ class CSVHookTest(CXTestCase):
         hook = CSVHook(output_dir="", output_file=output_file,
                        variables=_VARIABLES, delimiter=delimiter,
                        default_value=default_value)
-        epoch_data = self.get_epoch_data()
+        epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
 
         epoch_id = 6
@@ -129,13 +125,13 @@ class CSVHookTest(CXTestCase):
 
         variables = _VARIABLES + ['missing']
         output_file = tempfile.NamedTemporaryFile().name
-        hook = CSVHook(output_dir="", output_file=output_file, variables=variables, on_missing_variable='error')
-        epoch_data = self.get_epoch_data()
+        hook = CSVHook(output_dir="", output_file=output_file,
+                       variables=variables, on_missing_variable='error')
+        epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
         epoch_id = 6
         with self.assertRaises(KeyError):
             hook._write_row(epoch_id, epoch_data)
-
 
     def test_raise_unknown_type(self):
         """
@@ -144,8 +140,9 @@ class CSVHookTest(CXTestCase):
         """
 
         output_file = tempfile.NamedTemporaryFile().name
-        hook = CSVHook(output_dir="", output_file=output_file, on_unknown_type='error')
-        epoch_data = self.get_epoch_data()
+        hook = CSVHook(output_dir="", output_file=output_file,
+                       on_unknown_type='error')
+        epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
         epoch_id = 6
         with self.assertRaises(ValueError):
@@ -158,8 +155,10 @@ class CSVHookTest(CXTestCase):
         """
 
         output_file = tempfile.NamedTemporaryFile().name
-        hook = CSVHook(output_dir="", output_file=output_file)
-        epoch_data = self.get_epoch_data()
+        delimiter = "|"
+        hook = CSVHook(output_dir="", output_file=output_file,
+                       delimiter=delimiter, variables=_VARIABLES)
+        epoch_data = _get_epoch_data()
 
         hook.after_epoch(6, epoch_data)
         hook.after_epoch(7, epoch_data)
@@ -167,10 +166,13 @@ class CSVHookTest(CXTestCase):
         with open(output_file) as f:
             content = f.readlines()
 
-        header = content[0]
-        row1 = content[1]
-        row2 = content[2]
-
         self.assertEqual(len(content), 3)
-        self.assertNotEqual(header, row1)
-        self.assertNotEqual(header, row2)
+        header = content[0]
+
+        for i, epoch_id in enumerate(['6', '7']):
+            row = content[i + 1]
+            self.assertNotEqual(header, row)
+            self.assertEqual(row[-1], "\n")
+            row = row[:-1]
+            valid_row = [epoch_id, '1', '', '1', '2', '', '2', '3', '', '3']
+            self.assertEqual(valid_row, row.split(delimiter))
