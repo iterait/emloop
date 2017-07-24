@@ -1,6 +1,10 @@
 cxflow
 ======
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Table of Contents:
+
 *cxflow* is a smart manager for deep learning model.
 With *cxflow* you can easily define reusable components which enhance your future development.
 
