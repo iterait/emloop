@@ -9,7 +9,7 @@ Check out our *10 minutes* example tutorial. Then, definitely see the *advanced 
 Installation
 ------------
 
-Install cxflow by running:
+Install *cxflow* by running:
 
     pip install cxflow
 
@@ -20,8 +20,8 @@ Optionally, install additional plugins by running:
 Contribute
 ----------
 
-- Issue Tracker: http://github.com/Cognexa/cxflow/issues
-- Source Code: http://github.com/Cognexa/cxflow
+- Issue Tracker: https://github.com/Cognexa/cxflow/issues
+- Source Code: https://github.com/Cognexa/cxflow
 
 Support
 -------
