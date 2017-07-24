@@ -1,21 +1,23 @@
 cxflow
 ======
 
-*cxflow* is a smart manager for deep learning model.
-With *cxflow* you can easily define reusable components which enhance your future development.
+Cxflow is a smart manager for deep learning model.
+With cxflow you can easily define reusable components which enhance your future development.
 
-Check out our *10 minutes* example tutorial. Then, definitely see the *advanced section*.
+Check out our `10 minutes <tutorial.html>`_ example tutorial.
+Then, definitely see the `advanced section <advanced.html>`_
 
-Installation
-------------
 
-Install *cxflow* by running:
+Table of Contents
+-----------------
 
-    pip install cxflow
+.. toctree::
+   :maxdepth: 1
 
-Optionally, install additional plugins by running:
-
-    pip install cxflow-[plugin-name]
+   introduction
+   getting_started
+   tutorial
+   advanced
 
 Contribute
 ----------

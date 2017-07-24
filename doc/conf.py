@@ -102,15 +102,18 @@ html_static_path = ['_static']
 #
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-html_sidebars = {
-    '**': [
-        'index.html',
-        'tutorial.html',
-        #'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-        #'donate.html',
-    ]
-}
+
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
+
+# html_sidebars = {
+#     '**': [
+#         'index.html',
+#         'tutorial.html',
+#         'relations.html',  # needs 'show_related': True theme option to display
+#         'searchbox.html',
+#         'donate.html',
+#     ]
+# }
 
 
 # -- Options for HTMLHelp output ------------------------------------------
