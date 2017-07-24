@@ -40,16 +40,16 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+# source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
 project = 'cxflow'
-copyright = '2017, Petr Belohlavek'
-author = 'Petr Belohlavek'
+copyright = '2017, Cognexa Solutions s.r.o.'
+author = 'Petr Belohlavek, Adam Blazek, Filip Matzner'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -104,11 +104,11 @@ html_static_path = ['_static']
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',  # needs 'show_related': True theme option to display
+        'index.html',
+        'tutorial.html',
+        #'relations.html',  # needs 'show_related': True theme option to display
         'searchbox.html',
-        'donate.html',
+        #'donate.html',
     ]
 }
 
