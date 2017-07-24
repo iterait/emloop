@@ -2,7 +2,7 @@ cxflow
 ======
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Table of Contents:
 
 *cxflow* is a smart manager for deep learning model.
