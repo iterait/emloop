@@ -1,13 +1,10 @@
 # cxflow
+[![CircleCI](https://circleci.com/gh/Cognexa/cxflow/tree/master.svg?style=shield)](https://circleci.com/gh/Cognexa/cxflow/tree/master)
+[![Development Status](https://img.shields.io/badge/status-CX%20Regular-brightgreen.svg?style=flat)]()
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)]()
+[![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 This is an official repository of **cxflow** - a smart manager and personal trainer of various deep learning models.
-
-## Development Status
-
-- [![CircleCI](https://circleci.com/gh/Cognexa/cxflow/tree/master.svg?style=shield)](https://circleci.com/gh/Cognexa/cxflow/tree/master)
-- [![Development Status](https://img.shields.io/badge/status-CX%20Regular-brightgreen.svg?style=flat)]()
-- [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)]()
-- [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
 For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://github.com/Cognexa/cxMNIST).
