@@ -6,6 +6,7 @@ This is an official repository of **cxflow** - a smart manager and personal trai
 
 - [![CircleCI](https://circleci.com/gh/Cognexa/cxflow/tree/master.svg?style=shield)](https://circleci.com/gh/Cognexa/cxflow/tree/master)
 - [![Development Status](https://img.shields.io/badge/status-CX%20Regular-brightgreen.svg?style=flat)]()
+- [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)]()
 - [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 ## Example
@@ -19,23 +20,19 @@ Please note that all operating systems are expected to be fully up-to-date with 
 The list of Python package requirements is listed in `requirements.txt`.
 
 ## Installation
-Installation to a [virtualenv](https://docs.python.org/3/library/venv.html) is suggested, however, completely optional. 
-
-### Standard Installation
-1. Install **cxflow** `$ pip install git+git@github.com:Cognexa/cxflow.git`
-
-### Development Installation
-1. Clone the **cxflow** repository `$ git clone git@github.com:Cognexa/cxflow.git`
-2. Enter the directory `$ cd cxflow`
-3. **Optional**: *Install some of the required of packages (e.g. TensorFlow).
-4. Install **cxflow**: `$ pip install -e .`
+**cxfow** is available at official PyPI repository; hence, the recommended installation is with `pip`:
+```
+pip install cxflow
+```
 
 ## Usage
 The installation process installs `cxflow` command which might be used simply from the command line.
 Please refer to repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST) for more information.
 
-## Tutorials
-The following tutorials serve as a gentle introduction to the cxflow framework:
+## Docs & tutorials
+The documentation and tutorials are yet to be done.
+
+So far, the following documents are available:
 - [introduction](tutorial)
 - [cxflow hooks](cxflow/hooks/README.md)
 
@@ -43,10 +40,11 @@ The following tutorials serve as a gentle introduction to the cxflow framework:
 **cxflow** is meant to be extremely lightweight.
 For that reason the whole functionality is divided into various extensions with separate dependencies.
 
-## Officially Supported Extensions
+At the moment we support the following extensions:
 
 - [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) - TensorFlow support
 - [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
+- [cxflow-rethinkdb](https://github.com/Cognexa/cxflow-rethinkdb) - rethinkDB hook for training management with noSQL (experimental)
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.
