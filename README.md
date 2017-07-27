@@ -17,7 +17,7 @@ Please note that all operating systems are expected to be fully up-to-date with 
 The list of Python package requirements is listed in `requirements.txt`.
 
 ## Installation
-**cxfow** is available at official PyPI repository; hence, the recommended installation is with `pip`:
+**cxflow** is available through the official PyPI repository; hence, the recommended installation is with `pip`:
 ```
 pip install cxflow
 ```
@@ -26,7 +26,7 @@ pip install cxflow
 The installation process installs `cxflow` command which might be used simply from the command line.
 Please refer to repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST) for more information.
 
-## Docs & tutorials
+## Docs & Tutorials
 The documentation and tutorials are yet to be done.
 
 So far, the following documents are available:
@@ -41,7 +41,7 @@ At the moment we support the following extensions:
 
 - [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) - TensorFlow support
 - [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
-- [cxflow-rethinkdb](https://github.com/Cognexa/cxflow-rethinkdb) - rethinkDB hook for training management with noSQL (experimental)
+- [cxflow-rethinkdb](https://github.com/Cognexa/cxflow-rethinkdb) - RethinkDB hook for training management with NoSQL (experimental)
 
 ## Testing
 Unit tests might be run by `$ python setup.py test`.
