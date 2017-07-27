@@ -1,7 +1,7 @@
 cxflow
 ======
 
-Cxflow is a smart manager for deep learning model.
+Cxflow is a smart manager for deep learning models.
 With cxflow you can easily define reusable components which enhance your future development.
 
 Check out our `10 minutes <tutorial.html>`_ example tutorial.
@@ -14,7 +14,6 @@ Table of Contents
 .. toctree::
    :maxdepth: 1
 
-   introduction
    getting_started
    tutorial
    advanced
