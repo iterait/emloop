@@ -19,7 +19,7 @@ setup(name='cxflow',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6'
       ],
-      keywords='neural-networks training framework',
+      keywords='neural networks training framework',
       url='https://github.com/cognexa/cxflow',
       author='Cognexa Solutions s.r.o.',
       author_email='info@cognexa.com',
