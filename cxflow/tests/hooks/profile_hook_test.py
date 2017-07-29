@@ -25,7 +25,7 @@ class ProfileHookTest(CXTestCase):
         """Test profile handling with only train stream."""
         hook = ProfileHook()
 
-        hook.after_epoch_profile(1, {'read_batch_train': [1, 2, 3],
+        hook.after_epoch_profile(1, {'read_data_train': [1, 2, 3],
                                      'after_batch_hooks_train': [4, 0, 0],
                                      'after_epoch_hooks': [5],
                                      'eval_batch_train': [6, 7, 8]}, [])
