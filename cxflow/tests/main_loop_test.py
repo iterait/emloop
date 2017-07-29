@@ -144,7 +144,7 @@ class SaveProfileHook(AbstractHook):
         super().__init__()
         self.profile = None
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
         """Save the profile to self.profile."""
         self.profile = profile
 
