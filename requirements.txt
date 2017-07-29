@@ -2,3 +2,4 @@ numpy>=1.12.0
 pyaml>=3.12
 ruamel.yaml>=0.13.14
 typing>=3.5.3.0
+testfixtures>=5.1.1
