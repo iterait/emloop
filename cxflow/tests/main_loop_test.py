@@ -3,7 +3,7 @@ Test module for the main loop (cxflow.main_loop).
 """
 import time
 from collections import defaultdict
-from typing import Mapping, List
+from typing import Mapping, List, Iterable
 
 import numpy as np
 
@@ -103,7 +103,7 @@ class EventRecordingHook(AbstractHook):
         self.after_epoch_events.append(self._event_id)
         self._event_id += 1
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
         self.after_epoch_profile_events.append(self._event_id)
         self._event_id += 1
 

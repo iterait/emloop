@@ -2,6 +2,7 @@
 Module with a hook which reports the time profile data in the stanard logging.
 """
 import logging
+from typing import Iterable
 
 from .abstract_hook import AbstractHook
 from ..utils.profile import Timer
@@ -20,7 +21,7 @@ class ProfileHook(AbstractHook):
     -------------------------------------------------------
     """
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
         """Summarize and log the given epoch profile."""
 
         # time spent reading data from streams (train + valid + test)

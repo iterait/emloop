@@ -3,9 +3,9 @@ This module defines AbstractHook from which all the custom hooks shall be derive
 
 Furthermore, TrainingTerminated exception is defined.
 """
-import typing
 import logging
 import inspect
+from typing import Iterable, NewType, Mapping
 
 from ..datasets import AbstractDataset
 from ..utils.profile import Timer
@@ -33,7 +33,7 @@ class AbstractHook:
     5) When the whole training is over, `after_training` is triggered.
     """
 
-    EpochData = typing.NewType('EpochData', typing.Mapping[str, AbstractDataset.Batch])
+    EpochData = NewType('EpochData', Mapping[str, AbstractDataset.Batch])
 
     def __init__(self, **kwargs):
         """
@@ -79,7 +79,7 @@ class AbstractHook:
         """
         pass
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
         """
         After epoch profile event.
 
@@ -91,6 +91,7 @@ class AbstractHook:
 
         :param epoch_id: finished epoch id
         :param profile: dictionary of lists of event timings that were measured during the epoch.
+        :param extra_streams: enumeration of additional stream names
         """
         pass
 
