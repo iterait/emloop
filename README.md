@@ -1,18 +1,23 @@
 # cxflow
 [![CircleCI](https://circleci.com/gh/Cognexa/cxflow/tree/master.svg?style=shield)](https://circleci.com/gh/Cognexa/cxflow/tree/master)
 [![Development Status](https://img.shields.io/badge/status-CX%20Regular-brightgreen.svg?style=flat)]()
-[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)]()
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
 This is an official repository of **cxflow** - a smart manager and personal trainer of various deep learning models.
 
 ## Example
-For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/mnist-example](https://github.com/Cognexa/cxMNIST).
+For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST).
 
 ## Requirements
-Officially supported operating systems are [Arch Linux](https://www.archlinux.org), the latest
-[Ubuntu LTS release](http://releases.ubuntu.com/), and the latest [Ubuntu rolling release](http://releases.ubuntu.com/).
-Please note that all operating systems are expected to be fully up-to-date with the latest TensorFlow and Python 3.
+Supported operating systems:
+- [Arch Linux](https://www.archlinux.org)
+- The latest [Ubuntu LTS release](http://releases.ubuntu.com)
+- [Ubuntu rolling release](http://releases.ubuntu.com).
+
+Supported Python interpreters:
+- Python 3.5+
+- Python 3.6+
 
 The list of Python package requirements is listed in `requirements.txt`.
 
@@ -43,8 +48,5 @@ At the moment we support the following extensions:
 - [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
 - [cxflow-rethinkdb](https://github.com/Cognexa/cxflow-rethinkdb) - RethinkDB hook for training management with NoSQL (experimental)
 
-## Testing
-Unit tests might be run by `$ python setup.py test`.
-
-## License
-MIT License
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
