@@ -167,7 +167,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                         hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
 
                 for hook in self._hooks:
-                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile)
+                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
+                                             extra_streams=self._extra_streams)
 
         except TrainingTerminated as ex:
             logging.info('Training terminated by a hook: %s', ex)
