@@ -2,7 +2,7 @@ from pip.req import parse_requirements
 from setuptools import setup
 
 setup(name='cxflow',
-      version='0.6.6',
+      version='0.7.0',
       description='Smart neural network trainer',
       long_description='Trainer of neural network models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
@@ -19,10 +19,10 @@ setup(name='cxflow',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6'
       ],
-      keywords='neural-networks training framework',
+      keywords='neural networks training framework',
       url='https://github.com/cognexa/cxflow',
-      author='Petr Belohlavek',
-      author_email='petr.belohlavek@cognexa.com',
+      author='Cognexa Solutions s.r.o.',
+      author_email='info@cognexa.com',
       license='MIT',
       packages=['cxflow',
                 'cxflow.datasets',

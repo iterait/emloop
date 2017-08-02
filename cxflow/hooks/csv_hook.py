@@ -60,7 +60,7 @@ class CSVHook(AbstractHook):
         self._variables = variables
         self._streams = None
         self._on_unknown_type = on_unknown_type
-        self._on_missing_variable = on_unknown_type
+        self._on_missing_variable = on_missing_variable
         self._delimiter = delimiter
         self._default_value = default_value
         self._header_written = False
@@ -69,33 +69,6 @@ class CSVHook(AbstractHook):
 
         os.mknod(self._file_path)
         logging.debug('CSV output file "%s"', self._file_path)
-
-    def _get_column_name_parts(self, epoch_data: AbstractHook.EpochData):
-        """
-        Get all .csv columns (in form of [stream, variable, aggregation]
-        :param epoch_data: epoch data
-        """
-
-        column_name_parts = []
-        variables = None
-        for stream_name, stream_data in epoch_data.items():
-            variables = variables or self._variables or stream_data.keys()
-
-            for variable in variables:
-                if variable in stream_data.keys():
-                    value = stream_data[variable]
-                    if isinstance(value, dict):  # third level (aggregations)
-                        column_name_parts += [[stream_name, variable, aggr] for aggr in value]
-                    else:
-                        column_name_parts.append([stream_name, variable])
-                else:
-                    err_message = 'Variable `{}` not found in stream `{}`.'.format(variable, stream_name)
-                    if self._on_missing_variable == 'error':
-                        raise TypeError(err_message)
-                    elif self._on_missing_variable == 'warn':
-                        logging.warning(err_message)
-
-        return column_name_parts
 
     def _write_header(self, epoch_data: AbstractHook.EpochData):
         """
