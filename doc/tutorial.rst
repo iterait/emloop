@@ -16,7 +16,7 @@ we will describe how should those reusable modules look like on a simple example
 Task
 ====
 
-The tutorial will be demonstrated on a simple task called _majority_.
+The tutorial will be demonstrated on a simple task called *majority*.
 Given a vector of N bits, which bit is in majority?
 
 Example:
