@@ -22,6 +22,7 @@ Given a vector of N bits, which bit is in majority?
 Example:
 
 .. code-block::
+
    00101 -> 0
    00000 -> 0
    10101 -> 1
