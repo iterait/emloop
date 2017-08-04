@@ -31,7 +31,7 @@ Example:
 Dataset
 =======
 
-The very first step in any machine learning taks is to load and process the data.
+The very first step in any machine learning task is to load and process the data.
 Every `cxflow` dataset is expected to extend the `cxflow.datasets.AbstractDataset` 
 and to have the following properties:
 
@@ -97,13 +97,75 @@ Note that by this design, the training and testing streams do not overlap, hence
 use the training stream for training and the testing stream for the independent estimation
 of the model performance.
 
-
 Model
 =====
 
-Let us define the model using a simple `TensorFlow <https://www.tensorflow.org/>`_,
-`CNTK <https://cntk.ai/>`_ graph.
-TODO
+After the data are loaded, processed and ready to be used, we have to define the model
+to be trained.
+Let us define the model using a simple `TensorFlow <https://www.tensorflow.org/>`_ graph.
+To make this process simpler, we will use the official 
+`cxflow-tensorflow <https://github.com/Cognexa/cxflow-tensorflow>`_ package, that provides
+a basic tensorflow integration to cxflow. Please install this package before you proceed
+with this tutorial.
+
+In cxflow, every tensorflow-based model is a python class expected to
+extend the `cxflow_tf.BaseTFNet`. Let us define a class called `MajorityNet`:
+
+.. code-block:: python
+
+    import logging
+    import tensorflow as tf
+    import tensorflow.contrib.keras as K
+    from cxflow_tf import BaseTFNet, create_optimizer
+
+
+    class MajorityNet(BaseTFNet):
+
+        def _create_net(self, optimizer, hidden, **kwargs):
+
+            logging.debug('Constructing placeholders')
+            x = tf.placeholder(dtype=tf.float32, shape=[None, 11], name='x')
+            y = tf.placeholder(dtype=tf.float32, shape=[None], name='y')
+
+            logging.debug('Constructing MLP')
+            hidden_activations = K.layers.Dense(hidden)(x)
+            y_hat = K.layers.Dense(1)(hidden_activations)[:, 0]
+
+            logging.debug('Constructing squared errors')
+            sq_err = tf.pow(y - y_hat, 2)
+
+            logging.debug('Constructing loss')
+            loss = tf.reduce_mean(sq_err)
+
+            logging.debug('Constructing training operation')
+            create_optimizer(optimizer).minimize(loss, name='train_op')
+
+            logging.debug('Constructing predictions (argmax)')
+            predictions = tf.greater_equal(y_hat, 0.5, name='predictions')
+
+            logging.debug('Constructing accuracy')
+            tf.reduce_mean(tf.cast(tf.equal(predictions, tf.cast(y, tf.bool)), tf.float32, name='accuracy'))
+
+            logging.debug('Variable initilization')
+            self._session.run(tf.global_variables_initializer())
+            self._session.run(tf.local_variables_initializer())
+
+The only method that is really necessary to implement is the `_create_net`. In our case,
+the `_create_net` method creates a simple MLP with the following nodes:
+
+#. Placeholders *x* and *y* corresponding to the *x* and *y* batch from the stream.
+#. Variable `train_op` denoting the operation performing the training. This operation
+   is called by `cxflow` during training.
+#. Variable `predictions` denoting the output of the network, i.e., the supposed bit in majority.
+#. Variable `accuracy` denoting the fraction of correct predictions in the current batch.
+
+The `_create_net` method can accept arbitrary arguments - in our case, we accept the
+optimization algorithm to be used and the number of hidden units.
+Let us ignore the origin of these parameters for a while and address it in the
+Configuration section. For now, let's simply assume they are set correctly.
+
+Note that naming the variables correctly and consistently is mandatory - we will 
+use the names in the next section.
 
 Configuration
 =============
