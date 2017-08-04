@@ -162,11 +162,7 @@ the `_create_net` method creates a simple MLP with the following nodes:
 
 The `_create_net` method can accept arbitrary arguments - in our case, we accept the
 optimization algorithm to be used and the number of hidden units.
-Let us ignore the origin of these parameters for a while and address it in the
-Configuration section. For now, let's simply assume they are set correctly.
-
-Note that naming the variables correctly and consistently is mandatory - we will 
-use the names in the next section.
+We will describe the origin of these parameters in the next section.
 
 Configuration
 =============
