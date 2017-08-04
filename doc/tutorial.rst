@@ -153,7 +153,7 @@ extend the `cxflow_tf.BaseTFNet`. Let us define a class called `MajorityNet`:
 The only method that is really necessary to implement is the `_create_net`. In our case,
 the `_create_net` method creates a simple MLP with the following nodes:
 
-#. Placeholders *x* and *y* corresponding to the *x* and *y* batch from the stream.
+#. Placeholders *x* and *y* corresponding to a single *x* and *y* batch from the stream.
 #. Variable `train_op` denoting the operation performing the training. This operation
    is called by `cxflow` during training.
 #. Variable `predictions` denoting the output of the network, i.e., the supposed bit in majority.
