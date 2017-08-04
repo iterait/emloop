@@ -43,6 +43,7 @@ and to have the following properties:
 For our purposes, let us create a class called `MajorityDataset`:
 
 .. code-block:: python
+
     from cxflow.datasets import AbstractDataset
     import numpy.random as npr
 
