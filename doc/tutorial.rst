@@ -144,7 +144,8 @@ extend the `cxflow_tf.BaseTFNet`. Let us define a class called `MajorityNet`:
             predictions = tf.greater_equal(y_hat, 0.5, name='predictions')
 
             logging.debug('Constructing accuracy')
-            tf.reduce_mean(tf.cast(tf.equal(predictions, tf.cast(y, tf.bool)), tf.float32, name='accuracy'))
+            tf.reduce_mean(tf.cast(tf.equal(predictions, tf.cast(y, tf.bool)),
+                                   tf.float32, name='accuracy'))
 
             logging.debug('Variable initilization')
             self._session.run(tf.global_variables_initializer())
