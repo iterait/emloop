@@ -6,26 +6,26 @@ from testfixtures import LogCapture
 from cxflow.tests.test_core import CXTestCase
 from cxflow.hooks import ProfileHook
 
-_TRAIN_ONLY_PROFILE = {'read_data_train': [1.12, 2, 3],
+_TRAIN_ONLY_PROFILE = {'read_batch_train': [1.12, 2, 3],
                        'after_batch_hooks_train': [4, 0, 0.4],
                        'eval_batch_train': [6, 7.9, 8],
                        'after_epoch_hooks': [5.4]}
 
-_TRAIN_AND_VALID_PROFILE = {'read_data_train': [1.001, 2, 3],
+_TRAIN_AND_VALID_PROFILE = {'read_batch_train': [1.001, 2, 3],
                             'after_batch_hooks_train': [4, 0, 0],
                             'eval_batch_train': [6, 7, 8.54],
-                            'read_data_valid': [3, 5, 6],
+                            'read_batch_valid': [3, 5, 6],
                             'after_batch_hooks_valid': [1, 1.11, 1],
                             'eval_batch_valid': [0, 1, 2],
                             'after_epoch_hooks': [5.3]}
 
-_TRAIN_TEST_AND_VALID_PROFILE = {'read_data_train': [1.001, 2, 3],
+_TRAIN_TEST_AND_VALID_PROFILE = {'read_batch_train': [1.001, 2, 3],
                                  'after_batch_hooks_train': [4, 0, 0],
                                  'eval_batch_train': [6, 7, 8.54],
-                                 'read_data_valid': [3, 5, 6],
+                                 'read_batch_valid': [3, 5, 6],
                                  'after_batch_hooks_valid': [1, 1.11, 1],
                                  'eval_batch_valid': [0, 1, 2],
-                                 'read_data_test': [1.1, 1.11, 1.111],
+                                 'read_batch_test': [1.1, 1.11, 1.111],
                                  'after_batch_hooks_test': [2.2, 2.22, 2.222],
                                  'eval_batch_test': [3.3, 3.33, 3.333],
                                  'after_epoch_hooks': [5.3]}

@@ -22,7 +22,7 @@ class ProfileHook(AbstractHook):
     -------------------------------------------------------
     """
 
-    def after_epoch_profile(self, _, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
         """
         Summarize and log the given epoch profile.
 
@@ -40,7 +40,7 @@ class ProfileHook(AbstractHook):
         hooks_total = sum(profile['after_epoch_hooks'])
 
         for stream_name in chain(extra_streams, ['train']):
-            read_data_total += sum(profile['read_data_' + stream_name])
+            read_data_total += sum(profile['read_batch_' + stream_name])
             hooks_total += sum(profile['after_batch_hooks_' + stream_name])
             if stream_name != 'train':
                 eval_total += sum(profile['eval_batch_' + stream_name])
