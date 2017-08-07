@@ -45,17 +45,17 @@ class SimpleDataset(AbstractDataset):
             self._iter += 1
             yield batch
 
-    def create_train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> AbstractDataset.Stream:
         self.train_used = True
         for batch in self.stream('train'):
             yield batch
 
-    def create_valid_stream(self) -> AbstractDataset.Stream:
+    def valid_stream(self) -> AbstractDataset.Stream:
         self.valid_used = True
         for batch in self.stream('valid'):
             yield batch
 
-    def create_test_stream(self) -> AbstractDataset.Stream:
+    def test_stream(self) -> AbstractDataset.Stream:
         self.test_used = True
         for batch in self.stream('test'):
             yield batch
@@ -64,7 +64,7 @@ class SimpleDataset(AbstractDataset):
 class ExtendedDataset(SimpleDataset):
     """SimpleDataset extension with additional 'unused' source in the train stream."""
 
-    def create_train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> AbstractDataset.Stream:
         self.train_used = True
         for _ in range(self.iters):
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape), 'unused': np.zeros(self.shape)}
@@ -73,7 +73,7 @@ class ExtendedDataset(SimpleDataset):
 class DelayedDataset(SimpleDataset):
     """SimpleDataset extension which sleeps briefly before each train batch allowing to measure the data read time."""
 
-    def create_train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> AbstractDataset.Stream:
         for _ in range(self.iters):
             time.sleep(_READ_DATA_SLEEP_S)
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape)}

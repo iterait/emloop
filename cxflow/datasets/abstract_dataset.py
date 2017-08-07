@@ -12,9 +12,9 @@ class AbstractDataset:
 
     Every cxflow dataset has to:
         - have a constructor which takes yaml string config
-        - have a create_train_stream method which provides the iterator thought the train stream batches
+        - have a train_stream method which provides the iterator thought the train stream batches
 
-    Additionally, one may implement any create_[stream_name]_stream method
+    Additionally, one may implement any [stream_name]_stream method
     in order to make [stream_name] stream available in the cxflow main_loop.
     """
 
@@ -29,7 +29,7 @@ class AbstractDataset:
         """
         pass
 
-    def create_train_stream(self) -> Stream:  # pylint: disable=undefined-variable
+    def train_stream(self) -> Stream:  # pylint: disable=undefined-variable
         """Return a train stream iterator (obligatory)."""
         pass
 

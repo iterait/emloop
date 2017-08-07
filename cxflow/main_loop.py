@@ -127,7 +127,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             AttributeError: if the dataset does not provide the function creating the stream
         """
         try:
-            stream_fn_name = 'create_{}_stream'.format(stream_name)
+            stream_fn_name = '{}_stream'.format(stream_name)
             return getattr(self._dataset, stream_fn_name)()
         except AttributeError as ex:
             raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
@@ -158,7 +158,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 self._epoch_profile = {}
                 epoch_data = self._create_epoch_data()
 
-                self.train_by_stream(stream=self._dataset.create_train_stream())
+                self.train_by_stream(stream=self._dataset.train_stream())
                 for stream_name in self._extra_streams:
                     self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
 
