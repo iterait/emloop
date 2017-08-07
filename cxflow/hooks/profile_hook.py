@@ -2,6 +2,8 @@
 Module with a hook which reports the time profile data in the stanard logging.
 """
 import logging
+from itertools import chain
+from typing import Iterable
 
 from .abstract_hook import AbstractHook
 from ..utils.profile import Timer
@@ -20,31 +22,30 @@ class ProfileHook(AbstractHook):
     -------------------------------------------------------
     """
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile) -> None:
-        """Summarize and log the given epoch profile."""
+    def after_epoch_profile(self, epoch_id, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
+        """
+        Summarize and log the given epoch profile.
 
-        # time spent reading data from streams (train + valid + test)
-        read_data = sum(profile['read_batch_train']) + sum(profile['read_batch_valid'])
-        if 'read_batch_test' in profile:
-            read_data += sum(profile['read_batch_test'])
+        The profile is expected to contain at least:
+            - `read_data_train`, `eval_batch_train` and `after_batch_hooks_train` entries produced by the train stream
+            - `after_epoch_hooks` entry
 
-        # time spent processing hooks (after batch + after epoch for train + valid + test)
-        hooks = (sum(profile['after_batch_hooks_train']) +
-                 sum(profile['after_batch_hooks_valid']) +
-                 sum(profile['after_epoch_hooks']))
+        :param profile: epoch timings profile
+        :param extra_streams: enumeration of additiona stream names
+        """
 
-        if 'after_batch_hooks_test' in profile:
-            hooks += sum(profile['after_batch_hooks_test'])
+        read_data_total = 0
+        eval_total = 0
+        train_total = sum(profile['eval_batch_train'])
+        hooks_total = sum(profile['after_epoch_hooks'])
 
-        # time spent evaluating valid + test
-        _eval = sum(profile['eval_batch_valid'])
-        if 'eval_batch_valid' in profile:
-            _eval += sum(profile['eval_batch_valid'])
+        for stream_name in chain(extra_streams, ['train']):
+            read_data_total += sum(profile['read_batch_' + stream_name])
+            hooks_total += sum(profile['after_batch_hooks_' + stream_name])
+            if stream_name != 'train':
+                eval_total += sum(profile['eval_batch_' + stream_name])
 
-        # time spent training
-        train = sum(profile['eval_batch_train'])
-
-        logging.info('\tT read data:\t%f', read_data)
-        logging.info('\tT train:\t%f', train)
-        logging.info('\tT valid+test:\t%f', _eval)
-        logging.info('\tT hooks:\t%f', hooks)
+        logging.info('\tT read data:\t%f', read_data_total)
+        logging.info('\tT train:\t%f', train_total)
+        logging.info('\tT eval:\t%f', eval_total)
+        logging.info('\tT hooks:\t%f', hooks_total)
