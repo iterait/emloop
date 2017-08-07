@@ -153,8 +153,8 @@ class EntryPointTest(CXTestCaseWithDir):
         config = {'dataset': {'module': 'cxflow.tests.entry_point_test', 'class': 'DummyDataset', 'batch_size': 10},
                   'stream': {'train': {'rotate': 20}}, 'hooks': [{'hook_name': 'should_not_be_included'}]}
 
-        expected_config = {'dataset': {'module': 'cxflow.tests.entry_point_test',
-                                       'class': 'DummyDataset', 'batch_size': 10}, 'output_dir': 'dummy_dir'}
+        expected_config = {'module': 'cxflow.tests.entry_point_test',
+                           'class': 'DummyDataset', 'batch_size': 10, 'output_dir': 'dummy_dir'}
 
         dataset = create_dataset(config=config, output_dir='dummy_dir')
 

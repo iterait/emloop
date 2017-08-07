@@ -25,12 +25,7 @@ class BaseDataset(metaclass=ABCMeta):
         :param config_str: dataset configuration as yaml string
         """
         config = yaml.load(config_str)
-
-        assert 'dataset' in config
-
-        output_dir = config['output_dir'] if 'output_dir' in config else None
-
-        self._init_with_kwargs(output_dir=output_dir, **config['dataset'])
+        self._init_with_kwargs(**config)
 
     @abstractmethod
     def _init_with_kwargs(self, output_dir, **kwargs):
