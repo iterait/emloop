@@ -33,14 +33,6 @@ class AbstractDataset:
         """Return a train stream iterator (obligatory)."""
         pass
 
-    def create_valid_stream(self) -> Stream:  # pylint: disable=undefined-variable
-        """Return a valid stream iterator."""
-        pass
-
-    def create_test_stream(self) -> Stream:  # pylint: disable=undefined-variable
-        """Return a test stream iterator."""
-        pass
-
     def split(self, num_splits: int, train: float, valid: float, test: float):
         """Perform cross-validation split."""
         pass

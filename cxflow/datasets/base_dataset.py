@@ -15,7 +15,7 @@ class BaseDataset(metaclass=ABCMeta):
     In the inherited class, one should:
         - override the _init_with_kwargs method insead of __init__
         - override the create_train_stream method
-        - override any additional create_[stream_name]_stream method in order to make [stream_name] stream available
+        - add any additional create_[stream_name]_stream method in order to make [stream_name] stream available
     """
 
     def __init__(self, config_str: str):
@@ -46,14 +46,6 @@ class BaseDataset(metaclass=ABCMeta):
     def create_train_stream(self) -> AbstractDataset.Stream:
         """Get the train stream iterator."""
         raise NotImplementedError('Dataset does not implement obligatory create_train_stream method.')
-
-    def create_valid_stream(self) -> AbstractDataset.Stream:
-        """Get the valid stream iterator."""
-        raise NotImplementedError('Dataset does not implement create_valid_stream method although it is now required.')
-
-    def create_test_stream(self) -> AbstractDataset.Stream:
-        """Get the test stream iterator."""
-        raise NotImplementedError('Dataset does not implement create_test_stream method although it is now required.')
 
     def split(self, num_splits: int, train: float, valid: float, test: float) -> None:
         """
