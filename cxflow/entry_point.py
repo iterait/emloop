@@ -46,7 +46,7 @@ def train_load_config(config_file: str, cli_options: Iterable[str]) -> dict:
     """
     logging.info('Loading config')
     config = load_config(config_file=config_file, additional_args=cli_options)
-    logging.debug('\tLoaded config: %s', config)
+    logging.debug('\tLoaded config: %s', "\n{}".format(config_to_str(config)))
 
     assert 'net' in config
     assert 'dataset' in config
