@@ -187,6 +187,14 @@ class TrainableNet(AbstractNet):
         """List of tf tensor names listed as net outputs."""
         return self._output_names
 
+    @property
+    def restore_fallback_module(self) -> str:
+        return ''
+
+    @property
+    def restore_fallback_class(self) -> str:
+        return ''
+
 
 class DelayedNet(TrainableNet):
     """Trainable net which sleeps briefly when processing a batch allowing to measure the net eval time."""
@@ -243,7 +251,7 @@ class MainLoopTest(CXTestCaseWithDir):
         """Test event counts and order."""
         recording_hook = EventRecordingHook()
         _, _, mainloop = self.create_main_loop(epochs=3, extra_hooks=[recording_hook])
-        mainloop.run()
+        mainloop.run_training()
 
         before_training = [1]
         first_epoch_batches = list(range(2, 2+_DATASET_ITERS))
@@ -272,7 +280,7 @@ class MainLoopTest(CXTestCaseWithDir):
         recording_hook = DataRecordingHook()
         net, dataset, mainloop = self.create_main_loop(epochs=3, net_class=RecordingNet,
                                                        extra_hooks=[recording_hook], extra_streams=['valid'])
-        mainloop.run()
+        mainloop.run_training()
 
         # check the epoch ids
         self.assertListEqual(recording_hook.epoch_ids, [1, 2, 3])
@@ -323,21 +331,21 @@ class MainLoopTest(CXTestCaseWithDir):
         """Test if the streams are used only when specified."""
         # test if the train stream is used by default
         _, dataset, mainloop = self.create_main_loop()
-        mainloop.run()
+        mainloop.run_training()
         self.assertTrue(dataset.train_used)
         self.assertFalse(dataset.valid_used)
         self.assertFalse(dataset.test_used)
 
         # test if the valid stream is used when specified
         _, dataset2, mainloop2 = self.create_main_loop(extra_streams=['valid'])
-        mainloop2.run()
+        mainloop2.run_training()
         self.assertTrue(dataset2.train_used)
         self.assertTrue(dataset2.valid_used)
         self.assertFalse(dataset2.test_used)
 
         # test an exception is raised when a stream that is not available is specified
         _, _, mainloop3 = self.create_main_loop(extra_streams=['another'])
-        self.assertRaises(AttributeError, mainloop3.run)
+        self.assertRaises(AttributeError, mainloop3.run_training)
 
     def test_profiling(self):
         """Test if the mainloop is profiled correctly."""
@@ -345,7 +353,7 @@ class MainLoopTest(CXTestCaseWithDir):
         # data read profiling
         profile_hook = SaveProfileHook()
         _, _, mainloop = self.create_main_loop(epochs=2, extra_hooks=[profile_hook], dataset=DelayedDataset())
-        mainloop.run()
+        mainloop.run_training()
         profile = profile_hook.profile
 
         self.assertIn('read_batch_train', profile)
@@ -354,7 +362,7 @@ class MainLoopTest(CXTestCaseWithDir):
         # hook profiling
         profile_hook2 = SaveProfileHook()
         _, _, mainloop2 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook2, DelayedHook()])
-        mainloop2.run()
+        mainloop2.run_training()
         profile2 = profile_hook2.profile
 
         self.assertIn('after_batch_hooks_train', profile2)
@@ -368,7 +376,7 @@ class MainLoopTest(CXTestCaseWithDir):
         profile_hook3 = SaveProfileHook()
         _, _, mainloop3 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook3], net_class=DelayedNet)
 
-        mainloop3.run()
+        mainloop3.run_training()
         profile3 = profile_hook3.profile
 
         self.assertIn('eval_batch_train', profile3)
@@ -377,7 +385,7 @@ class MainLoopTest(CXTestCaseWithDir):
         # multiple streams profiling
         profile_hook4 = SaveProfileHook()
         _, _, mainloop4 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook4], extra_streams=['valid', 'test'])
-        mainloop4.run()
+        mainloop4.run_training()
         profile4 = profile_hook4.profile
         for prefix in ['eval_batch_', 'read_batch_', 'after_batch_hooks_']:
             for stream_name in ['train', 'valid', 'test']:
@@ -387,7 +395,7 @@ class MainLoopTest(CXTestCaseWithDir):
         """Test the net is not trained in the zeroth epoch."""
         data_recording_hook = DataRecordingHook()
         _, _, mainloop = self.create_main_loop(epochs=0, extra_hooks=[data_recording_hook], skip_zeroth_epoch=False)
-        mainloop.run()
+        mainloop.run_training()
 
         # check if we actually iterated through the train stream
         self.assertListEqual(data_recording_hook.epoch_ids, [0])
@@ -398,21 +406,21 @@ class MainLoopTest(CXTestCaseWithDir):
         """Test error is raised when on_unused_inputs='error'."""
         _, _, mainloop = self.create_main_loop(epochs=3, on_unused_sources='error')
         # this should not raise an error
-        mainloop.run()
+        mainloop.run_training()
 
         _, _, mainloop2 = self.create_main_loop(epochs=3, dataset=ExtendedDataset(), on_unused_sources='error')
-        self.assertRaises(ValueError, mainloop2.run)
+        self.assertRaises(ValueError, mainloop2.run_training)
 
         _, _, mainloop3 = self.create_main_loop(epochs=3, dataset=ExtendedDataset(), on_unused_sources='ignore')
-        mainloop3.run()
+        mainloop3.run_training()
 
     def test_epoch_data(self):
         """Test correct epoch_data handling."""
 
         # test if the epoch data is passed between hooks
         _, _, mainloop = self.create_main_loop(epochs=3, extra_hooks=[EpochDataProducer(), EpochDataConsumer()])
-        mainloop.run()
+        mainloop.run_training()
 
         # test wrong hook order
         _, _, mainloop2 = self.create_main_loop(epochs=3, extra_hooks=[EpochDataConsumer(), EpochDataProducer()])
-        self.assertRaises(AssertionError, mainloop2.run)
+        self.assertRaises(AssertionError, mainloop2.run_training)

@@ -1,5 +1,5 @@
 """
-Test module for cxflow entry point (entry_point.py)
+Test module for cxflow common functions (cli/common.py).
 """
 import os
 from os import path
@@ -9,31 +9,16 @@ from typing import Mapping, List
 import yaml
 
 from cxflow import AbstractNet
-from cxflow.entry_point import create_output_dir, create_dataset, train_load_config, create_hooks, create_net, split
+from cxflow.cli.common import create_output_dir, create_dataset, create_hooks, create_net
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.hooks.profile_hook import ProfileHook
 from cxflow.tests.test_core import CXTestCaseWithDir
-from cxflow.utils.config import config_to_file, load_config
 
 
 class DummyDataset:
     """Dummy dataset which loads the given config to self.config."""
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
-
-
-class SplitDataset:
-    """Simple dataset which records its split method calls."""
-
-    def __init__(self, _):
-        _SPLIT_DATASET_INSTANCES.append(self)
-        self.split_calls = []
-
-    def split(self, num_splits: int, train: float, valid: float, test: float):
-        """Record the call arguments."""
-        self.split_calls.append({'n': num_splits, 'tr': train, 'v': valid, 'te': test})
-
-_SPLIT_DATASET_INSTANCES = []
 
 
 class DummyHook(AbstractHook):
@@ -54,6 +39,7 @@ class DummyNet(AbstractNet):
     def __init__(self, io: dict, **kwargs):  #pylint: disable=unused-argument
         self._input_names = io['in']
         self._output_names = io['out']
+        super().__init__(**kwargs)
 
     def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
         return {o: i for i, o in enumerate(self._output_names)}
@@ -69,6 +55,14 @@ class DummyNet(AbstractNet):
     def output_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
         return self._output_names
 
+    @property
+    def restore_fallback_module(self) -> str:
+        return ''
+
+    @property
+    def restore_fallback_class(self) -> str:
+        return ''
+
 
 class DummyNetWithKwargs(DummyNet):
     """Dummy net which saves kwargs to self.kwargs."""
@@ -81,13 +75,15 @@ class DummyNetWithKwargs(DummyNet):
         pass
 
 
-class DummyNetRestore(DummyNetWithKwargs):
-    """Dummy restore net."""
+class DummyNetWithKwargs2(DummyNetWithKwargs):
+    """Direct inheritor of `DummyNetWithKwargs`.
+
+    For restoring purposes only."""
     pass
 
 
-class EntryPointTest(CXTestCaseWithDir):
-    """Entry point functions test case."""
+class CLICommonTest(CXTestCaseWithDir):
+    """cli common test case."""
 
     def test_create_output_dir(self):
         """Test output dir creating and correct naming."""
@@ -150,10 +146,10 @@ class EntryPointTest(CXTestCaseWithDir):
 
     def test_create_dataset(self):
         """Test correct config re-wrapping."""
-        config = {'dataset': {'module': 'cxflow.tests.entry_point_test', 'class': 'DummyDataset', 'batch_size': 10},
+        config = {'dataset': {'module': 'cxflow.tests.cli.common_test', 'class': 'DummyDataset', 'batch_size': 10},
                   'stream': {'train': {'rotate': 20}}, 'hooks': [{'hook_name': 'should_not_be_included'}]}
 
-        expected_config = {'module': 'cxflow.tests.entry_point_test',
+        expected_config = {'module': 'cxflow.tests.cli.common_test',
                            'class': 'DummyDataset', 'batch_size': 10, 'output_dir': 'dummy_dir'}
 
         dataset = create_dataset(config=config, output_dir='dummy_dir')
@@ -162,32 +158,11 @@ class EntryPointTest(CXTestCaseWithDir):
         self.assertTrue(hasattr(dataset, 'config'))
         self.assertDictEqual(dataset.config, expected_config)
 
-    def test_train_load_config(self):
-        """Test correct config loading."""
-
-        # test a config call with both dataset and net
-        good_config = {'dataset': None, 'net': None}
-        config_path = config_to_file(good_config, self.tmpdir)
-
-        # test assertion when config is incomplete
-        missing_net_config = {'dataset': None}
-        config_path2 = config_to_file(missing_net_config, self.tmpdir, 'config2.yaml')
-        self.assertRaises(AssertionError, train_load_config, config_path2, [])
-
-        missing_dataset_config = {'dataset': None}
-        config_path3 = config_to_file(missing_dataset_config, self.tmpdir, 'config3.yaml')
-        self.assertRaises(AssertionError, train_load_config, config_path3, [])
-
-        # test return value
-        returned_config = train_load_config(config_path, [])
-        self.assertDictEqual(returned_config, load_config(config_path, []))
-        self.assertDictEqual(returned_config, good_config)
-
     def test_create_hooks(self):
         """Test hooks creation in train_create_hooks."""
 
         # test correct kwargs passing
-        config = {'hooks': [{'module': 'cxflow.tests.entry_point_test',
+        config = {'hooks': [{'module': 'cxflow.tests.cli.common_test',
                              'class':'DummyHook',
                              'additional_arg': 10}]}
         dataset = 'dataset_placeholder'
@@ -204,10 +179,10 @@ class EntryPointTest(CXTestCaseWithDir):
             self.assertEqual(expected_kwargs[key], kwargs[key])
 
         # test correct hook order
-        two_hooks_config = {'hooks': [{'module': 'cxflow.tests.entry_point_test',
+        two_hooks_config = {'hooks': [{'module': 'cxflow.tests.cli.common_test',
                                        'class': 'DummyHook',
                                        'additional_arg': 10},
-                                      {'module': 'cxflow.tests.entry_point_test',
+                                      {'module': 'cxflow.tests.cli.common_test',
                                        'class': 'SecondDummyHook'}]}
         hooks2 = create_hooks(config=two_hooks_config, dataset=dataset, net=net, output_dir=self.tmpdir)
 
@@ -231,7 +206,7 @@ class EntryPointTest(CXTestCaseWithDir):
         """Test if net is created correctly."""
 
         # test correct kwargs passing
-        config = {'net': {'module': 'cxflow.tests.entry_point_test',
+        config = {'net': {'module': 'cxflow.tests.cli.common_test',
                           'class': 'DummyNetWithKwargs',
                           'io': {'in': [], 'out': ['dummy']}}}
         dataset = 'dataset_placeholder'
@@ -240,36 +215,23 @@ class EntryPointTest(CXTestCaseWithDir):
         checkpoint_path = net.save('dummy')
 
         kwargs = net.kwargs  # pylint: disable=no-member
+        del expected_kwargs['module']
+        del expected_kwargs['class']
+
         for key in expected_kwargs.keys():
             self.assertIn(key, kwargs)
             self.assertEqual(expected_kwargs[key], kwargs[key])
 
-        # See issue #50 and #51
-        # test net restore without custom restore class
-        # restore_config = deepcopy(config)
-        # restore_config['net']['restore_from'] = checkpoint_path
-        # restored_net = create_net(config=restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
-        #
-        # self.assertTrue(isinstance(restored_net, BaseTFNetRestore))
-        # tf.reset_default_graph()
+        # test restoring when the net class is found
+        restored_net = create_net(config=config, output_dir=self.tmpdir + '_restored', dataset=dataset,
+                                  restore_from=self.tmpdir)
+        self.assertTrue(isinstance(restored_net, DummyNetWithKwargs))
 
-        # # test net restore with custom restore class
-        custom_restore_config = deepcopy(config)
-        custom_restore_config['net']['restore_from'] = checkpoint_path
-        custom_restore_config['net']['restore_module'] = 'cxflow.tests.entry_point_test'
-        custom_restore_config['net']['restore_class'] = 'DummyNetRestore'
-        restored_net = create_net(custom_restore_config, output_dir=self.tmpdir + '_restored', dataset=dataset)
-
-        self.assertTrue(isinstance(restored_net, DummyNetRestore))
-
-    def test_split(self):
-        """Test if split creates the dataset and calls the split function properly."""
-        config = {'dataset': {'module': 'cxflow.tests.entry_point_test', 'class': 'SplitDataset'}}
-        config_file = config_to_file(config, self.tmpdir, 'config.yaml')
-        split(config_file, 7, 5, 3, 1)
-
-        self.assertEqual(len(_SPLIT_DATASET_INSTANCES), 1)
-        dataset = _SPLIT_DATASET_INSTANCES[0]
-        self.assertIsInstance(dataset, SplitDataset)
-        self.assertEqual(len(dataset.split_calls), 1)
-        self.assertDictEqual(dataset.split_calls[0], {'n': 7, 'tr': 5, 'v': 3, 'te': 1})
+        # test restoring when the net class is not found
+        new_config = deepcopy(config)
+        new_config['net']['class'] = 'IDontExist'
+        new_config['net']['restore_fallback_module'] = 'cxflow.tests.cli.common_test'
+        new_config['net']['restore_fallback_class'] = 'DummyNetWithKwargs2'
+        restored_net = create_net(config=new_config, output_dir=self.tmpdir + '_restored', dataset=dataset,
+                                  restore_from=self.tmpdir)
+        self.assertTrue(isinstance(restored_net, DummyNetWithKwargs2))

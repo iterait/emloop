@@ -27,7 +27,7 @@ def create_object_from_config(config: Dict[str, Any], args: Iterable=(),
     :param key_prefix: module and class names key prefix
     :return: created object instance
     """
-    if not key_prefix:
+    if key_prefix is None:
         module_matches = [key for key in config.keys() if 'module' in key]
         class_matches = [key for key in config.keys() if 'class' in key]
 

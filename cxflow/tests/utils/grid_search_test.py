@@ -2,8 +2,8 @@
 Test module for config utils functions (cxflow.utils.grid_search).
 """
 
+from cxflow.cli.grid_search import _build_grid_search_commands
 from cxflow.tests.test_core import CXTestCase
-from cxflow.utils.grid_search import _build_grid_search_commands
 
 
 class GridSearchTest(CXTestCase):

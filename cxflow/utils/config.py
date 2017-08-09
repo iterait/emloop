@@ -9,6 +9,7 @@ from distutils.util import strtobool
 import yaml
 import ruamel.yaml  # pylint: disable=import-error
 
+from ..constants import CXF_CONFIG_FILE
 
 def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     """
@@ -73,7 +74,7 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict
     return config
 
 
-def config_to_file(config, output_dir: str, name: str='config.yaml') -> str:
+def config_to_file(config, output_dir: str, name: str=CXF_CONFIG_FILE) -> str:
     """
     Save the given config to the given path in yaml.
     :param config: configuration dict
