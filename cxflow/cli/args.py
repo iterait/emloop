@@ -16,16 +16,16 @@ def get_cxflow_arg_parser() -> ArgumentParser:
     resume_parser.set_defaults(subcommand='resume')
     resume_parser.add_argument('config_path', help='path to the config file or the directory in which it is stored')
     resume_parser.add_argument('restore_from', nargs='?', default=None,
-                               help='path passed to the net constructor (backend-specific); usually a directory in '
-                                    'which the trained model is stored')
+                               help='information passed to the net constructor (backend-specific); usually a directory '
+                                    'in which the trained model is stored')
 
     # create predict subparser
     predict_parser = subparsers.add_parser('predict')
     predict_parser.set_defaults(subcommand='predict')
     predict_parser.add_argument('config_path', help='path to the config file or the directory in which it is stored')
     predict_parser.add_argument('restore_from', nargs='?', default=None,
-                                help='path passed to the net constructor (backend-specific); usually a directory in '
-                                     'which the trained model is stored')
+                                help='information passed to the net constructor (backend-specific); usually a '
+                                     'directory in which the trained model is stored')
 
     # create split subparser
     split_parser = subparsers.add_parser('split')

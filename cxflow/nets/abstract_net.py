@@ -6,6 +6,7 @@ from typing import Iterable, Mapping, Optional
 
 from ..datasets import AbstractDataset
 
+
 class AbstractNet(metaclass=ABCMeta):
     """
     Abstract neural network which exposes input and output names, run and save methods.
@@ -14,6 +15,17 @@ class AbstractNet(metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self, dataset: Optional[AbstractDataset], log_dir: str, restore_from: Optional[str]=None, **kwargs):
+        """
+        Net constructor interface.
+
+        Additional parameters (currently covered by `**kwargs`) are passed according to the configuration `net` section.
+
+        :param dataset: Dataset object.
+        :param log_dir: Existing directory in which all output files should be stored.
+        :param restore_from: Information passed to the net constructor (backend-specific); usually a directory in which
+                             the trained model is stored.
+        :param kwargs: Configuration section `net`.
+        """
         pass
 
     @property
