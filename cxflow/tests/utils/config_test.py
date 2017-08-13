@@ -7,6 +7,7 @@ import yaml
 
 from cxflow.tests.test_core import CXTestCase, CXTestCaseWithDir
 from cxflow.utils.config import parse_arg, load_config, config_to_file, config_to_str
+from cxflow.constants import CXF_CONFIG_FILE
 
 
 class ConfigTestParseArg(CXTestCase):
@@ -78,6 +79,7 @@ class ConfigTestParseArg(CXTestCase):
         for key, val in [('common.arch', "hello"), ('net.arch', '[12,3'), ('net.arch', '{"a": }')]:
             self.assertRaises(ValueError, parse_arg, key + ':ast=' + str(val))
 
+
 _TEST_ANCHORLESS_YAML = """
 e:
   f: f
@@ -85,6 +87,7 @@ e:
     - j
     - k
 """
+
 
 _TEST_ANCHORED_YAML = """
 a: &anchor
@@ -135,7 +138,7 @@ class ConfigTest(CXTestCaseWithDir):
         config = {'e': {'f': 'f', 'h': ['j', 'k']}}
 
         # test if the return path is correct and re-loading does not change the config
-        config_path = config_to_file(config, output_dir=self.tmpdir)
+        config_path = config_to_file(config, output_dir=self.tmpdir, name=CXF_CONFIG_FILE)
         self.assertTrue(path.exists(config_path))
         self.assertDictEqual(load_config(config_path, []), config)
 

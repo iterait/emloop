@@ -19,6 +19,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
     """Train the network, manage hooks etc."""
 
     UNUSED_SOURCE_ACTIONS = {'ignore', 'warn', 'error'}
+    TRAIN_STREAM = 'train'
+    PREDICT_STREAM = 'predict'
 
     def __init__(self,   # pylint: disable=too-many-arguments
                  net: AbstractNet, dataset: AbstractDataset,
@@ -44,13 +46,13 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._fixed_batch_size = fixed_batch_size
         self._extra_sources_warned = False
         self._epoch_profile = {}
-        self._extra_streams = extra_streams
-        self._all_streams = list(self._extra_streams) + ['train']
+        self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
 
     def _create_epoch_data(self):
         """Create empty epoch data double dict."""
-        return OrderedDict([(stream_name, OrderedDict()) for stream_name in self._all_streams])
+        return OrderedDict([(stream_name, OrderedDict())
+                            for stream_name in self._extra_streams + [MainLoop.TRAIN_STREAM]])
 
     def _check_sources(self, batch: typing.Dict[str, object]) -> None:
         """
@@ -133,24 +135,33 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
                                  'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
 
-    def run(self) -> None:
-        """Run the main loop."""
+    def _run_zeroth_epoch(self, streams: typing.Iterable[str]) -> None:
+        """
+        Run zeroth epoch on the specified streams.
+        :param streams: iterable of streams to be evaluated
+        """
+
+        # Initialization: before_training
+        for hook in self._hooks:
+            hook.before_training()
+
+        # Zeroth epoch: after_epoch
+        if not self._skip_zeroth_epoch:
+            for stream_name in streams:
+                self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
+
+            epoch_data = self._create_epoch_data()
+            for hook in self._hooks:
+                hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
+
+    def run_training(self) -> None:
+        """Run the main loop in the training mode."""
+
+        logging.debug('Training started')
 
         try:
             epoch_id = 0
-
-            # Initialization: before_training
-            for hook in self._hooks:
-                hook.before_training()
-
-            # Zeroth epoch: after_epoch
-            if not self._skip_zeroth_epoch:
-                for stream_name in self._all_streams:
-                    self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
-
-                epoch_data = self._create_epoch_data()
-                for hook in self._hooks:
-                    hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
+            self._run_zeroth_epoch(self._extra_streams + [MainLoop.TRAIN_STREAM])
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
@@ -169,7 +180,25 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
                                              extra_streams=self._extra_streams)
+                logging.info('Epochs done: %s', epoch_id)
 
+        except TrainingTerminated as ex:
+            logging.info('Training terminated by a hook: %s', ex)
+        except KeyboardInterrupt:
+            logging.warning('Training terminated by a keyboard interrupt')
+            sys.exit(2)
+
+        # After training: after_training
+        for hook in self._hooks:
+            hook.after_training()
+
+    def run_prediction(self) -> None:
+        """Run the main loop for in the prediction mode."""
+
+        logging.debug('Prediction started')
+
+        try:
+            self._run_zeroth_epoch(self._extra_streams + [MainLoop.PREDICT_STREAM])
         except TrainingTerminated as ex:
             logging.info('Training terminated by a hook: %s', ex)
         except KeyboardInterrupt:

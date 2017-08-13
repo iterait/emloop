@@ -48,7 +48,7 @@ def grid_search(script: str, params: typing.Iterable[str], dry_run: bool=False) 
     :param script: String of command prefix, e.g. `cxflow train -v -o log`.
     :param params: Iterable collection of strings in standard cxflow param form, e.g. 'numerical_param:int=[1, 2]' or
                    'text_param:str=["hello", "cio"]'.
-    :param dry_run: If set to true, the built commands will only printed instead of executed.
+    :param dry_run: If set to true, the built commands will only be printed instead of executed.
     """
 
     commands = _build_grid_search_commands(script=script, params=params)
