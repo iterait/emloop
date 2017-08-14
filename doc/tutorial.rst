@@ -40,10 +40,10 @@ and to have the following properties:
    be used for training and optionally testing.
 #. **Training stream** must be implemented. Training stream is an iterable which provides
    batches of the training data. The implementation of the training stream is provided in
-   `create_train_stream` method.
+   `train_stream` method.
 #. Analogously, the dataset might contain **additional streams** such as validation or test
-   streams. These are implemented in `create_<name>_stream` methods (e.g.,
-   `create_test_stream`). While additional streams are not mandatory, implementing at
+   streams. These are implemented in `<name>_stream` methods (e.g.,
+   `test_stream`). While additional streams are not mandatory, implementing at
    least the test stream is strongly suggested.
 #. Finally, the dataset might contain `split()` method which is responsible for correct
    data splitting to training and testing subsets. This will be described in detail in
@@ -53,16 +53,13 @@ For our purposes, let us create a class called `MajorityDataset`:
 
 .. code-block:: python
 
-    from cxflow.datasets import AbstractDataset
+    from cxflow.datasets import BaseDataset
     import numpy.random as npr
 
 
-    class MajorityDataset(AbstractDataset):
-        def __init__(self, config: str):
-            super().__init__(config)
-            N = 500
-            dim = 11
-            self.batch_size = 4
+    class MajorityDataset(BaseDataset):
+        def _init_with_kwargs(self, N: int, dim: int, batch_size: int, **kwargs):
+            self.batch_size = batch_size
 
             x = npr.random_integers(0, 1, N*dim).reshape(N, dim)
             y = x.sum(axis=1) > int(dim/2)
@@ -70,29 +67,69 @@ For our purposes, let us create a class called `MajorityDataset`:
             self.train_x, self.train_y = x[:int(.8*N)], y[:int(.8*N)]
             self.test_x, self.test_y = x[int(.8*N):], y[int(.8*N):]
 
-        def create_train_stream(self):
+        def train_stream(self):
             for i in range(0, len(self.train_x), self.batch_size):
                 yield {'x': self.train_x[i: i+self.batch_size],
                        'y': self.train_y[i: i+self.batch_size]}
 
-        def create_test_stream(self):
+        def test_stream(self):
             for i in range(0, len(self.test_x), self.batch_size):
                 yield {'x': self.test_x[i: i+self.batch_size],
                        'y': self.test_y[i: i+self.batch_size]}
 
 Let us describe the functionality of our `MajorityDataset` step by step.
-In the constructor, the dataset randomly generates a dataset of 500 vectors of ones and
-zeros (variable *x*). For each of those vectors, it calculates the correct
-answer (variable *y*). Finaly, it splits the dataset to training and testing data
-in the ratio of 8:2 (this would be better done in an extra `split` function, but
-we have omitted this for the sake of simplicity).
-Note that we ignore the configuration completely.
+Let's begin with `_init_with_kwargs` method.
+The method is called from the dataset constructor automatically and is passed the appropriate
+parameters.
+In our cases, we need `N` (number of examples in total), `dim` (dimension of the generated data)
+and `batch_size` (how big our batches will be).
+We explain the origin of these parameters later in the tutorial.
+For now, let's assume we get them magically.
 
-To iterate over the training data, there is a `create_train_stream` function. This function
-returns an iterator over batches. Each batch is a dictionary with keys *x* and *y*, where
-the value of *x* is a list of four training vectors and the value of *y* is the list of
-the four correct answers. Similarly, there is a `create_test_stream` function that iterates
-over the testing data. Iteration over the whole dataset is called an epoch.
+The method randomly generates a dataset of `N` vectors of ones and zeros (variable `x`).
+For each of those vectors, it calculates the correct answer (variable `y`).
+Finaly, it splits the dataset to training and testing data in the ratio of 8:2
+(this would be better done in an extra `split` function, but we have omitted this for
+the sake of simplicity).
+
+To sum up, when the dataset is constructed, it features four attributes (`train_x`,
+`train_y`, `test_x` and `test_y`)
+that represent the loaded data.
+Note that it is completely valid option to rename them as desired.
+In real-world cases, we usually don't want to generate our data randomly.
+Instead, we can simply load them from file (e.g. `.csv`) or database.
+
+To iterate over the training data, there is a `train_stream` function.
+This function returns an iterator over batches.
+Each *batch* is a dictionary with keys `x` and `y`, where the value of `x` is a list of
+`batch_size` training vectors and the value of `y` is the list of the `batch_size` correct answers.
+
+A batch (with `batch_size=4`) representing the example above looks like this:
+
+.. code-block:: python
+
+    {
+        'x': [
+            [0,0,1,0,1],
+            [0,0,0,0,0],
+            [1,0,1,0,1],
+            [1,1,1,0,0]
+        ],
+        'y': [
+            0,
+            0,
+            1,
+            1
+        ]
+    }
+
+Similarly, there is a `test_stream` function that iterates over the testing data.
+
+Iteration over the whole dataset is called an *epoch*.
+We train our machine learning models by iterating through the training stream for a single
+or multiple epochs.
+The test stream is used only for the model performance estimation.
+
 Note that by this design, the training and testing streams do not overlap, hence we might
 use the training stream for training and the testing stream for the independent estimation
 of the model performance.
@@ -105,18 +142,20 @@ to be trained.
 Let us define the model using a simple `TensorFlow <https://www.tensorflow.org/>`_ graph.
 To make this process simpler, we will use the official 
 `cxflow-tensorflow <https://github.com/Cognexa/cxflow-tensorflow>`_ package, that provides
-a basic tensorflow integration to cxflow. Please install this package before you proceed
+a basic TensorFlow integration to cxflow. Please install this package before you proceed
 with this tutorial.
 
 In cxflow, every tensorflow-based model is a python class expected to
-extend the `cxflow_tf.BaseTFNet`. Let us define a class called `MajorityNet`:
+extend the `cxflow_tensorflow.BaseModel`.
+
+Let us define a class called `MajorityNet`.
 
 .. code-block:: python
 
     import logging
     import tensorflow as tf
     import tensorflow.contrib.keras as K
-    from cxflow_tf import BaseTFNet, create_optimizer
+    from cxflow_tensorflow import BaseModel, create_optimizer
 
 
     class MajorityNet(BaseTFNet):
@@ -135,7 +174,7 @@ extend the `cxflow_tf.BaseTFNet`. Let us define a class called `MajorityNet`:
             sq_err = tf.pow(y - y_hat, 2)
 
             logging.debug('Constructing loss')
-            loss = tf.reduce_mean(sq_err)
+            loss = tf.reduce_mean(sq_err, name='loss')
 
             logging.debug('Constructing training operation')
             create_optimizer(optimizer).minimize(loss, name='train_op')
@@ -151,20 +190,200 @@ extend the `cxflow_tf.BaseTFNet`. Let us define a class called `MajorityNet`:
             self._session.run(tf.global_variables_initializer())
             self._session.run(tf.local_variables_initializer())
 
-The only method that is really necessary to implement is the `_create_net`. In our case,
-the `_create_net` method creates a simple MLP with the following nodes:
+
+When implementing a custom model, make sure it extend the `cxflow.AbstractModel` class.
+As described above, this tutorial focuses only on TensorFlow model, hence extending
+`cxflow_tensorflow.BaseModel` is a good idea.
+
+The only method that is really necessary to implement is `_create_model`.
+In our case, `_create_model` method creates a simple MLP.
+If you know TensorFlow a little bit, it should be easy to understand what is going on.
+
+To be precise, the model registred the following computational graph nodes:
 
 #. Placeholders *x* and *y* corresponding to a single *x* and *y* batch from the stream.
 #. Variable `train_op` denoting the operation performing the training. This operation
    is called by `cxflow` during training.
+#. Variable `loss` denoting the mean square error of the model.
 #. Variable `predictions` denoting the output of the network, i.e., the supposed bit in majority.
 #. Variable `accuracy` denoting the fraction of correct predictions in the current batch.
 
-The `_create_net` method can accept arbitrary arguments - in our case, we accept the
+Note that the registration of the nodes is done by the node naming.
+The variables that are not named explicitely will not be accessible in the future.
+
+The `_create_model` method can accept arbitrary arguments - in our case, we accept the
 optimization algorithm to be used and the number of hidden units.
 We will describe the origin of these parameters in the next section.
 
 Configuration
 =============
 
-TODO
+Configuration of the training is a key and final part of our tutorial.
+The configuration (aka *config*) defines which dataset will be used as the data source
+and which model will be employed for training.
+
+It is in form of YAML document.
+Feel free to use JSON instead, but YAML makes a lot of thing easier.
+
+The YAML document consists of four fundamental sections.
+
+#. dataset
+#. model
+#. main_loop
+#. hooks
+
+Let's dig in to them one by one.
+
+Dataset
+-------
+
+In our case, we only need to tell cxflow which dataset to use.
+This is done by specifying `module` and `class` of the dataset.
+In addition, we specify the parameters of the dataset (those ones required in dataset's
+`_init_with_kwargs` method).
+
+.. code-block:: yaml
+
+    dataset:
+      module: datasets.majority_dataset
+      class: MajorityDataset
+      N: 500
+      dim: 11
+      batch_size: 4
+
+We can pass arbitrary other constants to the dataset as they will be hidden in the `**kwargs`
+of the dataset `_init_with_kwargs` method.
+
+**Note:** The whole `dataset` section will be passed as a string-encoded YAML to the dataset constructor.
+In the case of using `cxflow.BaseDataset`, the YAML is automatically decoded and the individual
+variables are passed to `_init_with_kwargs` method.
+
+Model
+-----
+
+Similarly, the model is defined in the `net` section.
+In our case, we want to specify `module` and `class` of the model together with `optimizer` and
+`hidden` as required from the model's `_create_net` method.
+In addition, we specify the network `name` which will be used for logging directory creation.
+
+In addition, we have to specify which variables are the network inputs and which variables
+are on the output.
+This is done by `inputs` and `outputs` config items.
+Note that (in case of TensorFlow) the specified inputs and outputs must match the named variables
+in the network.
+
+.. code-block:: yaml
+
+    model:
+      module: models.majority_net
+      class: MajorityNet
+
+      name: MajorityExample
+
+      optimizer:
+        module: tensorflow.python.training.adam
+        class: AdamOptimizer
+        learning_rate: 0.001
+      hidden: 100
+
+      inputs: [x, y]
+      outputs: [accuracy, predictions, loss]
+
+Main Loop
+---------
+
+As the model training is executed in epochs, it is naturally implemented as a loop.
+This loop (`cxflow.MainLoop`) can be configured, e.g. in addition to the `train` stream,
+additional streams might be specified.
+In our case, we also want to evaluate the `test` stream.
+
+Note: the streams are named by the dataset methods they are created in.
+That is, `test_stream` method defines the `test` stream, which can be registred as it
+follows from the example.
+
+.. code-block:: yaml
+
+    main_loop:
+      extra_streams: [test]
+
+Hooks
+-----
+Hooks are actions which happen on some events, e.g. after each batch or epoch.
+Hooks represent an advanced topic which is covered in the following parts of the cxflow
+tutorial.
+
+For now, we simply use the following config snippet in order to register few hooks.
+
+.. code-block:: yaml
+
+    hooks:
+      - class: StatsHook
+        variables:
+          loss: [mean, std]
+          accuracy: [mean]
+
+      - class: LoggingHook
+      - class: SigintHook
+
+      - class: EpochStopperHook
+        epoch_limit: 10
+
+As it might be observed, we register four hooks.
+The first one computes various statistics, e.g. `loss` will be provided with its mean and
+standard deviation.
+`accuracy` will be provided with mean only.
+
+The second hook is the logging hook which simply logs everything it gets.
+
+The third hook makes sure the training stops correctly on sigint signal.
+
+The final hook stops the training after 10 epochs.
+
+Using cxflow
+============
+
+Once the classes and config are implemented, the training might begin.
+Let's try it with
+
+.. code-block:: bash
+
+    cxflow train configs/majority.yaml
+
+A lot of output is presented.
+The first section described the creation of the components.
+The second part presents the output of the hooks.
+Our logging hook is the one which produces the information after each epoch.
+Now we can easily watch the progress of the training.
+
+After the training is finished, note that `log/MajorityExample_*` is created.
+This is the logging directory in which everything cxflow produced is stored.
+Various artefacts (such as saved models) and configuration is saved there.
+
+Let's register one more hook which saves the currently best model based on the test stream.
+
+.. code-block:: yaml
+
+      - class: BestSaverHook
+
+When we run the training again, we see that the newly created output directory contains
+the saved model.
+
+Let's continue training from this model.
+
+.. code-block:: bash
+
+    cxflow resume log/MajorityExample_<some-suffix>
+
+Simple as that.
+
+In case the model is finalized and is desired to be used in the production, it is extremely
+easy to do so.
+**Note:** the dataset must implement `predict_stream` method.
+In addition, the net inputs and outputs should be modified in the configuration as, in production,
+we don't know the `y` so we are unable to compute `loss` correctly.
+
+.. code-block:: bash
+
+    cxflow predict log/MajorityExample_<some-suffix>
+
+We cover the production evironment in the following tutorials.
