@@ -37,7 +37,7 @@ class AccumulatingHook(AbstractHook):
         Extend the accumulated variables with the given batch data.
 
         :param stream_name: stream name; `train` or any other...
-        :param batch_data: batch data = stream sources + net outputs
+        :param batch_data: batch data = stream sources + model outputs
 
         Raise:
             KeyError: if the variables to be aggregated are missing

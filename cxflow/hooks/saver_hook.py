@@ -6,7 +6,7 @@ import logging
 import numpy as np
 
 from .abstract_hook import AbstractHook
-from ..nets.abstract_net import AbstractNet
+from ..models.abstract_model import AbstractModel
 
 
 class SaverHook(AbstractHook):
@@ -30,30 +30,30 @@ class SaverHook(AbstractHook):
 
     SAVE_FAILURE_ACTIONS = {'error', 'warn', 'ignore'}
 
-    def __init__(self, net: AbstractNet, save_every_n_epochs: int=1, on_save_failure: str='error', **kwargs):
+    def __init__(self, model: AbstractModel, save_every_n_epochs: int=1, on_save_failure: str='error', **kwargs):
         """
-        :param net: trained net
+        :param model: trained model
         :param save_every_n_epochs: how often is the model saved
         :param on_save_failure: action to be taken when model fails to save itself;
                one of SaverHook.SAVE_FAILURE_ACTIONS
         """
         assert on_save_failure in SaverHook.SAVE_FAILURE_ACTIONS
 
-        super().__init__(net=net, **kwargs)
-        self._net = net
+        super().__init__(model=model, **kwargs)
+        self._model = model
         self._save_every_n_epochs = save_every_n_epochs
         self._on_save_failure = on_save_failure
 
     def after_epoch(self, epoch_id: int, **_) -> None:
         """Save the model if epoch_id is divisible by self._save_every_n_epochs."""
         if epoch_id % self._save_every_n_epochs == 0:
-            SaverHook.save_model(net=self._net, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
+            SaverHook.save_model(model=self._model, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
 
     @staticmethod
-    def save_model(net: AbstractNet, name_suffix: str, on_failure: str) -> None:
+    def save_model(model: AbstractModel, name_suffix: str, on_failure: str) -> None:
         """
-        Save the given net with the given name_suffix. On failure, take the specified action.
-        :param net: the net to be saved
+        Save the given model with the given name_suffix. On failure, take the specified action.
+        :param model: the model to be saved
         :param name_suffix: name to be used for saving
         :param on_failure: action to be taken on failure; one of SaverHook.SAVE_FAILURE_ACTIONS
 
@@ -62,7 +62,7 @@ class SaverHook(AbstractHook):
         """
         try:
             logging.debug('Saving the model')
-            save_path = net.save(name_suffix)
+            save_path = model.save(name_suffix)
             logging.info('Model saved to: %s', save_path)
         except Exception as ex:  # pylint: disable=broad-except
             if on_failure == 'error':
@@ -94,11 +94,11 @@ class BestSaverHook(AbstractHook):
     CONDITIONS = {'min', 'max'}
 
     def __init__(self,  # pylint: disable=too-many-arguments
-                 net: AbstractNet, variable: str='loss', condition: str='min', stream: str='valid',
+                 model: AbstractModel, variable: str='loss', condition: str='min', stream: str='valid',
                  aggregation: str='mean', output_name: str='best', on_save_failure: str='error', **kwargs):
         """
         Example: metric=loss, condition=min -> saved the model when the loss is best so far (on `stream`).
-        :param net: trained network
+        :param model: trained model
         :param variable: variable to be monitored
         :param condition: {min, max}
         :param stream: stream to be monitored
@@ -111,7 +111,7 @@ class BestSaverHook(AbstractHook):
         assert condition in BestSaverHook.CONDITIONS
 
         super().__init__(**kwargs)
-        self._net = net
+        self._model = model
         self._variable = variable
         self._condition = condition
         self._stream_name = stream
@@ -169,4 +169,4 @@ class BestSaverHook(AbstractHook):
 
         if self._is_value_better(new_value):
             self._best_value = new_value
-            SaverHook.save_model(net=self._net, name_suffix='best', on_failure=self._on_save_failure)
+            SaverHook.save_model(model=self._model, name_suffix='best', on_failure=self._on_save_failure)

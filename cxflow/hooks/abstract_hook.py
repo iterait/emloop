@@ -12,7 +12,7 @@ from ..utils.profile import Timer
 
 
 # Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.
-CXF_HOOK_INIT_ARGS = {'net', 'dataset', 'output_dir'}
+CXF_HOOK_INIT_ARGS = {'model', 'dataset', 'output_dir'}
 
 
 class TrainingTerminated(Exception):
@@ -63,7 +63,7 @@ class AbstractHook:
         Batch results are available in results argument.
 
         :param stream_name: type of the stream (usually train/valid/test or any other)
-        :param batch_data: batch inputs and net outputs
+        :param batch_data: batch inputs and model outputs
         """
         pass
 

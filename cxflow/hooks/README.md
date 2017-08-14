@@ -13,7 +13,7 @@ Before we dig into details, we peek on how to use some of the standard hooks ava
 In your configuration, hooks are listed under `hooks` entry, for example:
 
 ```yaml
-# net & dataset configurations
+# model & dataset configurations
 
 hooks:
   - class: StatsHook
@@ -45,10 +45,10 @@ hook = MyHookClass(arg1=10, arg2=['a', 'b'])
 # use hook in the cxflow main_loop
 ```
 
-In addition to the specified args, cxflow supplies the `__init__` method with the previously created net, dataset and output directory.
+In addition to the specified args, cxflow supplies the `__init__` method with the previously created model, dataset and output directory.
 Hence, the hook creation looks more like this:
 ```python
-hook = MyHookClass(net=net, dataset=dataset, output_dir=output_dir, arg1=10, arg2=['a', 'b'])
+hook = MyHookClass(model=model, dataset=dataset, output_dir=output_dir, arg1=10, arg2=['a', 'b'])
 ```
 
 Every hook may override any of the event handling method specified above. Some hooks may be quite simple.
@@ -75,9 +75,9 @@ Now, lets take a closer look on the after_batch and after_epoch events where the
 This event is invoked after every batch regardless of what stream is being processed.
 In fact, the stream name will be available in the `stream_name` argument.
 
-The second and last argument named `batch_data` is a dict of stream sources and net outputs.
+The second and last argument named `batch_data` is a dict of stream sources and model outputs.
 
-Imagine a dataset that provides streams with `images` and `classes` sources and a net which takes the `images` and outputs its own `preditions`.
+Imagine a dataset that provides streams with `images` and `classes` sources and a model which takes the `images` and outputs its own `preditions`.
 In this case, the `batch_data` would contain the following dict
 ```python
 {'images': ['1st image', '2nd image'...],

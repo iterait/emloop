@@ -8,7 +8,7 @@ from typing import Optional, Iterable
 
 from .util import fallback
 from ..datasets import AbstractDataset
-from ..nets import AbstractNet
+from ..models import AbstractModel
 from ..hooks import AbstractHook, CXF_HOOK_INIT_ARGS
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
 from ..utils.reflection import create_object_from_config, get_class_module
@@ -16,30 +16,30 @@ from ..utils.config import config_to_str, config_to_file
 from ..main_loop import MainLoop
 
 
-def create_output_dir(config: dict, output_root: str, default_net_name: str='NonameNet') -> str:
+def create_output_dir(config: dict, output_root: str, default_model_name: str='NonameModel') -> str:
     """
     Create output_dir under the given output_root and
         - dump the given config to yaml file under this dir
         - register a file logger logging to a file under this dir
     :param config: config to be dumped
     :param output_root: dir wherein output_dir shall be created
-    :param default_net_name: name to be used when `net.name` is not found in the config
+    :param default_model_name: name to be used when `model.name` is not found in the config
     :return: path to the created output_dir
     """
     logging.info('Creating output dir')
 
     # create output dir
-    net_name = default_net_name
-    if 'name' not in config['net']:
-        logging.warning('\tnet.name not found in config, defaulting to: %s', net_name)
+    model_name = default_model_name
+    if 'name' not in config['model']:
+        logging.warning('\tmodel.name not found in config, defaulting to: %s', model_name)
     else:
-        net_name = config['net']['name']
+        model_name = config['model']['name']
 
     if not os.path.exists(output_root):
         logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
         os.makedirs(output_root)
 
-    output_dir = tempfile.mkdtemp(prefix='{}_{}_'.format(net_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S')),
+    output_dir = tempfile.mkdtemp(prefix='{}_{}_'.format(model_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S')),
                                   dir=output_root)
     logging.info('\tOutput dir: %s', output_dir)
 
@@ -70,66 +70,70 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     return dataset
 
 
-def create_net(config: dict, output_dir: str, dataset: AbstractDataset,
-               restore_from: Optional[str]=None) -> AbstractNet:
+def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
+                 restore_from: Optional[str]=None) -> AbstractModel:
     """
-    Create a net object either from scratch of from the checkpoint in `resume_dir`.
+    Create a model object either from scratch of from the checkpoint in `resume_dir`.
 
     -------------------------------------------------------
     cxflow allows the following scenarios
     -------------------------------------------------------
-    1. Create net: leave `restore_from` to `None` and specify `module` and `class`;
-    2. Restore net: specify `resume_dir` a backend-specific path to (a directory with) the saved model.
+    1. Create model: leave `restore_from` to `None` and specify `module` and `class`;
+    2. Restore model: specify `resume_dir` a backend-specific path to (a directory with) the saved model.
     -------------------------------------------------------
 
-    :param config: config dict with net config
+    :param config: config dict with model config
     :param output_dir: path to the training output dir
     :param dataset: AbstractDataset object
     :param restore_from: from whence the model should be restored (backend-specific information)
-    :return: net object
+    :return: model object
     """
 
-    logging.info('Creating a net')
+    logging.info('Creating a model')
 
-    net_config = config['net']
-    assert 'module' in net_config, '`net.module` not present in the config'
-    assert 'class' in net_config, '`net.module` not present in the config'
+    model_config = config['model']
+    assert 'module' in model_config, '`model.module` not present in the config'
+    assert 'class' in model_config, '`model.module` not present in the config'
 
-    # create net kwargs (without `module` and `class`)
-    net_kwargs = {'dataset': dataset, 'log_dir': output_dir, 'restore_from': restore_from, **net_config}
-    del net_kwargs['module']
-    del net_kwargs['class']
+    # create model kwargs (without `module` and `class`)
+    model_kwargs = {'dataset': dataset, 'log_dir': output_dir, 'restore_from': restore_from, **model_config}
+    del model_kwargs['module']
+    del model_kwargs['class']
 
     try:
-        net = create_object_from_config(net_config, kwargs=net_kwargs, key_prefix='')
+        model = create_object_from_config(model_config, kwargs=model_kwargs, key_prefix='')
     except (ImportError, AttributeError) as ex:
         if restore_from is None:  # training case
-            raise ImportError('Cannot create net from the specified net module `{}` and class `{}`.'.format(
-                net_config['module'], net_config['class'])) from ex
+            raise ImportError('Cannot create model from the specified model module `{}` and class `{}`.'.format(
+                model_config['module'], model_config['class'])) from ex
 
         else:  # restore cases (resume, predict)
-            logging.warning('Cannot create net from the specified net module `%s` and class `%s`.',
-                            net_config['module'], net_config['class'])
-            assert 'restore_fallback_module' in net_config, '`net.restore_fallback_module` not present in the config'
-            assert 'restore_fallback_class' in net_config, '`net.restore_fallback_class` not present in the config'
+            logging.warning('Cannot create model from the specified model module `%s` and class `%s`.',
+                            model_config['module'], model_config['class'])
+            assert 'restore_fallback_module' in model_config, ('`model.restore_fallback_module` '
+                                                               'not present in the config')
+            assert 'restore_fallback_class' in model_config, '`model.restore_fallback_class` not present in the config'
             logging.info('Trying to restore with fallback module `{}` and class `{}` instead.'.format(
-                net_config['restore_fallback_module'], net_config['restore_fallback_class']))
+                model_config['restore_fallback_module'], model_config['restore_fallback_class']))
 
             try:  # try fallback class
-                net = create_object_from_config(net_config, kwargs=net_kwargs, key_prefix='restore_fallback_')
+                model = create_object_from_config(model_config, kwargs=model_kwargs, key_prefix='restore_fallback_')
             except (ImportError, AttributeError) as ex:  # if fallback module/class specified but it fails
-                raise ImportError('Cannot create net from the specified restore_module `{}` and net_class `{}`.'.format(
-                    net_config['restore_fallback_module'], net_config['restore_fallback_class'])) from ex
+                raise ImportError('Cannot create model from the specified '
+                                  'restore_module `{}` and model_class `{}`.'.format(
+                                      model_config['restore_fallback_module'],
+                                      model_config['restore_fallback_class'])) from ex
 
-    logging.info('\t%s created', type(net).__name__)
-    return net
+    logging.info('\t%s created', type(model).__name__)
+    return model
 
 
-def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset, output_dir: str) -> Iterable[AbstractHook]:
+def create_hooks(config: dict, model: AbstractModel,
+                 dataset: AbstractDataset, output_dir: str) -> Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
     :param config: config dict
-    :param net: net object to be passed to the hooks
+    :param model: model object to be passed to the hooks
     :param dataset: AbstractDataset object
     :param output_dir: training output dir available to the hooks
     :return: list of hook objects
@@ -157,7 +161,7 @@ def create_hooks(config: dict, net: AbstractNet, dataset: AbstractDataset, outpu
             hook_config_to_pass = hook_config.copy()
             hook_config_to_pass.pop('module')
             hook_config_to_pass.pop('class')
-            hook_kwargs = {'dataset': dataset, 'net': net, 'output_dir': output_dir, **hook_config_to_pass}
+            hook_kwargs = {'dataset': dataset, 'model': model, 'output_dir': output_dir, **hook_config_to_pass}
             for key in CXF_HOOK_INIT_ARGS:
                 assert key in hook_kwargs
 
@@ -177,7 +181,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     Run cxflow training configured by the passed `config`.
 
     Unique `output_dir` for this training is created under the given `output_root` dir
-    wherein all the training outputs are saved. The output dir name will be roughly `[net.name]_[time]`.
+    wherein all the training outputs are saved. The output dir name will be roughly `[model.name]_[time]`.
 
     -------------------------------------------------------
     The training procedure consists of the following steps:
@@ -190,9 +194,9 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
         - Create dataset
             - YAML string with `dataset` and `log_dir` configs are passed to the dataset constructor
     Step 3:
-        - Create network
-            - Dataset, `log_dir` and net config is passed to the constructor
-            - In case the network is about to resume the training, it does so.
+        - Create model
+            - Dataset, `log_dir` and model config is passed to the constructor
+            - In case the model is about to resume the training, it does so.
     Step 4:
         - Create all the training hooks
     Step 5:
@@ -219,7 +223,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     :param restore_from: from whence the model should be restored (backend-specific information)
     """
 
-    output_dir = dataset = net = hooks = main_loop = None
+    output_dir = dataset = model = hooks = main_loop = None
 
     try:
         output_dir = create_output_dir(config=config, output_root=output_root)
@@ -232,27 +236,27 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
         fallback('Creating dataset failed', ex)
 
     try:
-        net = create_net(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
+        model = create_model(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
     except Exception as ex:  # pylint: disable=broad-except
-        fallback('Creating network failed', ex)
+        fallback('Creating model failed', ex)
 
     try:  # save the config to file
         # modify the config so that it contains fallback information
-        config['net']['restore_fallback_module'] = net.restore_fallback_module
-        config['net']['restore_fallback_class'] = net.restore_fallback_class
+        config['model']['restore_fallback_module'] = model.restore_fallback_module
+        config['model']['restore_fallback_class'] = model.restore_fallback_class
         config_to_file(config=config, output_dir=output_dir, name=CXF_CONFIG_FILE)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Saving config failed', ex)
 
     try:
-        hooks = create_hooks(config=config, net=net, dataset=dataset, output_dir=output_dir)
+        hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating hooks failed', ex)
 
     try:
         logging.info('Creating main loop')
         kwargs = config['main_loop'] if 'main_loop' in config else {}
-        main_loop = MainLoop(net=net, dataset=dataset, hooks=hooks, **kwargs)
+        main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **kwargs)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating main loop failed', ex)
 

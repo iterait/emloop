@@ -17,7 +17,7 @@ class StatsHook(AccumulatingHook):
     -------------------------------------------------------
     Example usage in config
     -------------------------------------------------------
-    # accumulate the accuracy variable (either net output or stream source); compute and store its mean value
+    # accumulate the accuracy variable (either model output or stream source); compute and store its mean value
     hooks:
       - class: StatsHook
         variables:

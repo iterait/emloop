@@ -8,7 +8,7 @@ This document provides the description of **cxflow** usage.
 It consists of four fundamental components:
 
 - Dataset
-- Net
+- Model
 - Configuration
 - Hook
 
@@ -33,7 +33,7 @@ TutorialExample/
     config/
     datasets/
     hooks/
-    nets/
+    models/
 ```
 
 ## Dataset
@@ -88,25 +88,25 @@ Working example of such dataset could look like this:
 TODO: code
 
 
-## Net
+## Model
 After the data are loaded, processed and ready to be used, the model itself must be defined.
-The net is expected to extend `cxflow.AbstractNet` which means to define what input it takes (e.g. `image` and `label`),
+The model is expected to extend `cxflow.AbstractModel` which means to define what input it takes (e.g. `image` and `label`),
 what outputs it provides (`predicted_label` and `accuracy`).
 Next, method for saving the data must be defined.
 Finally, `run` method must be implemented which handles the processing of a single batch.
 
-While `AbstractNet` is very general, from now on we will focus on TensorFlow nets only.
+While `AbstractModel` is very general, from now on we will focus on TensorFlow models only.
 For that purpose, [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) must be installed, which 
-provides `cxflow_tf.BaseTFNet`.
+provides `cxflow_tf.BaseTFModel`.
 In this tutorial, we will extend this one.
 
-When using `cxflow_tf.BaseTFNet`, everythings happen silently in the background and the only remaining part is to  specify the itself.
-This is done in `_create_net` method which must be implemented.
-Note that `_create_net` accepts arbitrary arguments - in our case used optimizer and number of hidden units.
+When using `cxflow_tf.BaseTFModel`, everythings happen silently in the background and the only remaining part is to  specify the itself.
+This is done in `_create_model` method which must be implemented.
+Note that `_create_model` accepts arbitrary arguments - in our case used optimizer and number of hidden units.
 We ignore the origin of these parameters for a while and address it in the Configuration section.
 For now, let's simply assume we have them already set.
 
-First, let's define the standard TensorFlow placeholders, i.e. the inputs of the network.
+First, let's define the standard TensorFlow placeholders, i.e. the inputs of the model.
 ```python
 x = tf.placeholder(dtype=tf.float32, shape=[None, 11], name='x')
 y = tf.placeholder(dtype=tf.float32, shape=[None], name='y')
@@ -124,11 +124,11 @@ sq_err = tf.pow(y - y_hat, 2, name='sq_err')
 loss = tf.reduce_mean(sq_err)
 ```
 
-Create optimizer via cxflow API and name it `train_op`. This ensures that the network updates its parameters in a way we want.
+Create optimizer via cxflow API and name it `train_op`. This ensures that the model updates its parameters in a way we want.
 ```python
 create_optimizer(optimizer).minimize(loss, name='train_op')
 ```
-Finally, create variables for network predictions and accuracy:
+Finally, create variables for model predictions and accuracy:
 ```python
 predictions = tf.greater_equal(y_hat, 0.5, name='predictions')
 tf.reduce_mean(tf.cast(tf.equal(predictions, tf.cast(y, tf.bool)), tf.float32, name='accuracy'))
@@ -142,14 +142,14 @@ self._session.run(tf.local_variables_initializer())
 Note that naming the variables correctly and consistently is mandatory - we will se the example usage of the names in the next section.
 
 ##Configuration
-Now we have our own dataset and a network.
+Now we have our own dataset and a model.
 How to put it together?
 This is managed by a config. file, e.g. `configs/simple.yaml`.
 
 Each config file consists of four fundamental sections
 
 - dataset
-- net
+- model
 - main_loop
 - hooks
 
@@ -162,14 +162,14 @@ dataset:
   dataset_class: MajorityDataset
 ```
 
-Simiarly, the network can be easily configured by 
+Simiarly, the model can be easily configured by 
 ```yaml
-  net_module: nets.majority_net
-  net_class: MajorityNet
+  model_module: models.majority_model
+  model_class: MajorityModel
 ```
 
-The remaining question is solve the problem of passing the parameters to the network `_create_net` method.
-This is done by passing all remaining values from `net` config section to `_create_net`.
+The remaining question is solve the problem of passing the parameters to the model `_create_model` method.
+This is done by passing all remaining values from `model` config section to `_create_model`.
 Similarly, the whole configuration section of the dataset is passed as a string to the dataset constructor.
 This means that the dataset can be implemented in any programming language that can be called from python.
 
@@ -189,7 +189,7 @@ Similarly, to configure the optimizer:
 
 end-of-example
 
-Finally, we have to specify inputs and outputs of the network.
+Finally, we have to specify inputs and outputs of the model.
 This is done by `io` section:
 ```yaml
   io:
@@ -201,7 +201,7 @@ This is done by `io` section:
       - sq_err
       - accuracy
 ```
-In this setting, we instruct the network to expect inputs `x` and `y`.
+In this setting, we instruct the model to expect inputs `x` and `y`.
 **cxflow** will make sure the proper dataset provides these sources and links them to the proper TensorFlow placeholders.
 Similarly, the output variables are the ones that will be evaluated by the computational graph.
 This is the part where the correct naming plays important role - `io` in the config is precisely mapped to the
@@ -248,7 +248,7 @@ Finally, let's add a hook that terminates the training after 10 epochs.
 See te separate tutorial
 
 ## Training Itself
-Finally, we have dataset, net and configuration implemented.
+Finally, we have dataset, model and configuration implemented.
 Now we can finally run it.
 ```bash
 $ cxflow train -v configs/simple.yaml
@@ -257,12 +257,12 @@ $ cxflow train -v configs/simple.yaml
 If some of the parameters in the configuration need to be overwritten from to command-line, it can be easily done:
 
 ```bash
-$ cxflow train -v configs/simple.yaml net.optimizer.learning_rate:float=0.1
+$ cxflow train -v configs/simple.yaml model.optimizer.learning_rate:float=0.1
 ```
 ## cxflow Advantages
-Components such as hooks, datasets and nets might be easily reused in other applications.
-As an example, let's assume our dataset is fine and we want to experiment with different networks.
-Simply create new networks with unique name and run it.
+Components such as hooks, datasets and models might be easily reused in other applications.
+As an example, let's assume our dataset is fine and we want to experiment with different models.
+Simply create new models with unique name and run it.
 
 The configuration files are plain text filex which might be easily versioned via e.g. git.
 In addition, everything is really flexible.

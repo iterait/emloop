@@ -5,7 +5,7 @@ The entry point shall be accessed from command line via `cxflow` command.
 
 At the moment cxflow allows to
 - split data to x-validation sets with `cxflow split ...`
-- train a network with `cxflow train ...`
+- train a model with `cxflow train ...`
 - resume training with `cxflow resume ...`
 - generate model predictions with `cxflow predict ...`
 
