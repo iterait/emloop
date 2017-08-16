@@ -1,5 +1,5 @@
 Introduction
-============
+############
 
 Let us describe some fundamental ideas of cxflow.
 Cxflow does not implement any building blocks for you (contrary to, e.g.,
@@ -14,7 +14,7 @@ the model, and the configuration are separated and reusable. In the following se
 we will describe how should those reusable modules look like on a simple example.
 
 Task
-====
+****
 
 The tutorial will be demonstrated on a simple task called *majority*.
 Given a vector of N bits, which bit is in majority?
@@ -29,7 +29,7 @@ Example:
    11100 -> 1
 
 Dataset
-=======
+*******
 
 The very first step in any machine learning task is to load and process the data.
 Every `cxflow` dataset is expected to extend the `cxflow.datasets.AbstractDataset` 
@@ -135,7 +135,7 @@ use the training stream for training and the testing stream for the independent 
 of the model performance.
 
 Model
-=====
+*****
 
 After the data are loaded, processed and ready to be used, we have to define the model
 to be trained.
@@ -216,7 +216,7 @@ optimization algorithm to be used and the number of hidden units.
 We will describe the origin of these parameters in the next section.
 
 Configuration
-=============
+*************
 
 Configuration of the training is a key and final part of our tutorial.
 The configuration (aka *config*) defines which dataset will be used as the data source
@@ -235,7 +235,7 @@ The YAML document consists of four fundamental sections.
 Let's dig in to them one by one.
 
 Dataset
--------
+=======
 
 In our case, we only need to tell cxflow which dataset to use.
 This is done by specifying `module` and `class` of the dataset.
@@ -259,7 +259,7 @@ In the case of using `cxflow.BaseDataset`, the YAML is automatically decoded and
 variables are passed to `_init_with_kwargs` method.
 
 Model
------
+=====
 
 Similarly, the model is defined in the `net` section.
 In our case, we want to specify `module` and `class` of the model together with `optimizer` and
@@ -290,7 +290,7 @@ in the network.
       outputs: [accuracy, predictions, loss]
 
 Main Loop
----------
+=========
 
 As the model training is executed in epochs, it is naturally implemented as a loop.
 This loop (`cxflow.MainLoop`) can be configured, e.g. in addition to the `train` stream,
@@ -307,7 +307,8 @@ follows from the example.
       extra_streams: [test]
 
 Hooks
------
+=====
+
 Hooks are actions which happen on some events, e.g. after each batch or epoch.
 Hooks represent an advanced topic which is covered in the following parts of the cxflow
 tutorial.
