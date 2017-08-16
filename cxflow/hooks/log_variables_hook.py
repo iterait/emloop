@@ -10,7 +10,7 @@ import numpy as np
 from .abstract_hook import AbstractHook
 
 
-class LoggingHook(AbstractHook):
+class LogVariables(AbstractHook):
     """
     Log the training results to stderr via standard logging module.
 
@@ -19,17 +19,17 @@ class LoggingHook(AbstractHook):
     -------------------------------------------------------
     # log all the variables
     hooks:
-      - class: LoggingHook
+      - LogVariables
     -------------------------------------------------------
     # log only certain variables
     hooks:
-      - class: LoggingHook
-        variables: [loss]
+      - LogVariables:
+          variables: [loss]
     -------------------------------------------------------
     # warn about unsupported variables
     hooks:
-      - class: LoggingHook
-        on_unknown_type: warn
+      - LogVariables:
+          on_unknown_type: warn
     -------------------------------------------------------
     """
 
@@ -40,7 +40,7 @@ class LoggingHook(AbstractHook):
         :param variables: a sequence of variable names to be logged. If not specified log all the available variables.
         :param on_unknown_type: an action to be taken if the variable value type is not supported (e.g. a list)
         """
-        assert on_unknown_type in LoggingHook.UNKNOWN_TYPE_ACTIONS
+        assert on_unknown_type in LogVariables.UNKNOWN_TYPE_ACTIONS
 
         self._variables = variables
         self._on_unknown_type = on_unknown_type

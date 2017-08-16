@@ -9,7 +9,7 @@ from .abstract_hook import AbstractHook
 from ..utils.profile import Timer
 
 
-class ProfileHook(AbstractHook):
+class LogProfile(AbstractHook):
     """
     Summarize and log epoch profile.
 
@@ -18,7 +18,7 @@ class ProfileHook(AbstractHook):
     -------------------------------------------------------
     # log all the variables
     hooks:
-      - class: ProfileHook
+      - LogProfile
     -------------------------------------------------------
     """
 

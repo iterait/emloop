@@ -11,7 +11,7 @@ import yaml
 from cxflow import AbstractModel
 from cxflow.cli.common import create_output_dir, create_dataset, create_hooks, create_model
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.profile_hook import ProfileHook
+from cxflow.hooks.log_profile_hook import LogProfile
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
@@ -162,9 +162,7 @@ class CLICommonTest(CXTestCaseWithDir):
         """Test hooks creation in train_create_hooks."""
 
         # test correct kwargs passing
-        config = {'hooks': [{'module': 'cxflow.tests.cli.common_test',
-                             'class': 'DummyHook',
-                             'additional_arg': 10}]}
+        config = {'hooks': [{'cxflow.tests.cli.common_test.DummyHook': {'additional_arg': 10}}]}
         dataset = 'dataset_placeholder'
         model = 'model_placeholder'
         expected_kwargs = {'dataset': dataset, 'model': model, 'output_dir': self.tmpdir, 'additional_arg': 10}
@@ -178,27 +176,24 @@ class CLICommonTest(CXTestCaseWithDir):
             self.assertIn(key, kwargs)
             self.assertEqual(expected_kwargs[key], kwargs[key])
 
-        # test correct hook order
-        two_hooks_config = {'hooks': [{'module': 'cxflow.tests.cli.common_test',
-                                       'class': 'DummyHook',
-                                       'additional_arg': 10},
-                                      {'module': 'cxflow.tests.cli.common_test',
-                                       'class': 'SecondDummyHook'}]}
+        # test correct hook order and hook config with no additional args
+        two_hooks_config = {'hooks': [{'cxflow.tests.cli.common_test.DummyHook': {'additional_arg': 10}},
+                                      'cxflow.tests.cli.common_test.SecondDummyHook']}
         hooks2 = create_hooks(config=two_hooks_config, dataset=dataset, model=model, output_dir=self.tmpdir)
 
         self.assertEqual(len(hooks2), 2)
         self.assertTrue(isinstance(hooks2[0], DummyHook))
         self.assertTrue(isinstance(hooks2[1], SecondDummyHook))
 
-        # test auto module
-        auto_module_hooks_config = {'hooks': [{'class': 'ProfileHook'}]}
+        # test module inference
+        auto_module_hooks_config = {'hooks': ['LogProfile']}
         hooks3 = create_hooks(config=auto_module_hooks_config, dataset=dataset, model=model, output_dir=self.tmpdir)
 
         self.assertEqual(len(hooks3), 1)
-        self.assertTrue(isinstance(hooks3[0], ProfileHook))
+        self.assertTrue(isinstance(hooks3[0], LogProfile))
 
-        # test bad auto module
-        bad_hooks_config = {'hooks': [{'class': 'IDoNotExist'}]}
+        # test non existent class
+        bad_hooks_config = {'hooks': ['IDoNotExist']}
         self.assertRaises(ValueError, create_hooks,
                           config=bad_hooks_config, dataset=dataset, model=model, output_dir=self.tmpdir)
 

@@ -9,7 +9,7 @@ from .abstract_hook import AbstractHook
 from ..models.abstract_model import AbstractModel
 
 
-class SaverHook(AbstractHook):
+class SaveEvery(AbstractHook):
     """
     Save the model every `n` epochs.
 
@@ -18,36 +18,36 @@ class SaverHook(AbstractHook):
     -------------------------------------------------------
     # save every 10th epoch
     hooks:
-      - class: LoggingHook
-        save_every_n_epochs: 10
+      - SaveEvery:
+          n_epochs: 10
     -------------------------------------------------------
     # save every epoch and only warn on failure
     hooks:
-      - class: LoggingHook
-        on_save_failure: warn
+      - SaveEvery:
+          on_failure: warn
     -------------------------------------------------------
     """
 
     SAVE_FAILURE_ACTIONS = {'error', 'warn', 'ignore'}
 
-    def __init__(self, model: AbstractModel, save_every_n_epochs: int=1, on_save_failure: str='error', **kwargs):
+    def __init__(self, model: AbstractModel, n_epochs: int=1, on_failure: str='error', **kwargs):
         """
         :param model: trained model
-        :param save_every_n_epochs: how often is the model saved
-        :param on_save_failure: action to be taken when model fails to save itself;
+        :param n_epochs: how often is the model saved
+        :param on_failure: action to be taken when model fails to save itself;
                one of SaverHook.SAVE_FAILURE_ACTIONS
         """
-        assert on_save_failure in SaverHook.SAVE_FAILURE_ACTIONS
+        assert on_failure in SaveEvery.SAVE_FAILURE_ACTIONS
 
         super().__init__(model=model, **kwargs)
         self._model = model
-        self._save_every_n_epochs = save_every_n_epochs
-        self._on_save_failure = on_save_failure
+        self._n_epochs = n_epochs
+        self._on_save_failure = on_failure
 
     def after_epoch(self, epoch_id: int, **_) -> None:
         """Save the model if epoch_id is divisible by self._save_every_n_epochs."""
-        if epoch_id % self._save_every_n_epochs == 0:
-            SaverHook.save_model(model=self._model, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
+        if epoch_id % self._n_epochs == 0:
+            SaveEvery.save_model(model=self._model, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
 
     @staticmethod
     def save_model(model: AbstractModel, name_suffix: str, on_failure: str) -> None:
@@ -71,7 +71,7 @@ class SaverHook(AbstractHook):
                 logging.warning('Failed to save the model.')
 
 
-class BestSaverHook(AbstractHook):
+class SaveBest(AbstractHook):
     """
     Save the model when it outperforms itself.
 
@@ -84,7 +84,7 @@ class BestSaverHook(AbstractHook):
     -------------------------------------------------------
     # save model with maximal train accuracy
     hooks:
-      - class: BestSaverHook
+      - class: SaveBest
         variable: accuracy
         condition: max
         stream: train
@@ -107,8 +107,8 @@ class BestSaverHook(AbstractHook):
         :param on_save_failure: action to be taken when model fails to save itself, one of {'error', 'warn', 'ignore'}
         """
 
-        assert on_save_failure in SaverHook.SAVE_FAILURE_ACTIONS
-        assert condition in BestSaverHook.CONDITIONS
+        assert on_save_failure in SaveEvery.SAVE_FAILURE_ACTIONS
+        assert condition in SaveBest.CONDITIONS
 
         super().__init__(**kwargs)
         self._model = model
@@ -169,4 +169,4 @@ class BestSaverHook(AbstractHook):
 
         if self._is_value_better(new_value):
             self._best_value = new_value
-            SaverHook.save_model(model=self._model, name_suffix='best', on_failure=self._on_save_failure)
+            SaveEvery.save_model(model=self._model, name_suffix='best', on_failure=self._on_save_failure)

@@ -9,7 +9,7 @@ import numpy as np
 
 from cxflow import AbstractModel, MainLoop, AbstractDataset
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.epoch_stopper_hook import EpochStopperHook
+from cxflow.hooks.stop_after_hook import StopAfter
 from cxflow.utils.profile import Timer
 
 from .test_core import CXTestCaseWithDir
@@ -236,7 +236,7 @@ class MainLoopTest(CXTestCaseWithDir):
         :param skip_zeroth_epoch: skip zeroth epoch flag passed to the main loop
         :return: a tuple of the created model, dataset and mainloop
         """
-        hooks = list(extra_hooks) + [EpochStopperHook(epoch_limit=epochs)]
+        hooks = list(extra_hooks) + [StopAfter(epochs=epochs)]
         if dataset is None:
             dataset = SimpleDataset()
         if model_class is None:

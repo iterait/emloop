@@ -7,7 +7,7 @@ import signal
 from .abstract_hook import AbstractHook, TrainingTerminated
 
 
-class SigintHook(AbstractHook):
+class CatchSigint(AbstractHook):
     """
     SIGINT catcher.
 
@@ -19,7 +19,7 @@ class SigintHook(AbstractHook):
     -------------------------------------------------------
     # log all the variables
     hooks:
-      - class: SigintHook
+      - CatchSigint
     -------------------------------------------------------
     """
 

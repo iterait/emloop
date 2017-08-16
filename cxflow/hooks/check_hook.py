@@ -6,7 +6,7 @@ import numpy as np
 from cxflow.hooks.abstract_hook import AbstractHook, TrainingTerminated
 
 
-class TrainCheckHook(AbstractHook):
+class Check(AbstractHook):
     """
     Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.
 
@@ -17,10 +17,10 @@ class TrainCheckHook(AbstractHook):
     -------------------------------------------------------
     # exceed 95% accuracy on valid (default) stream within at most 10 epochs
     hooks:
-      - class: TrainCheckHook
-        variable: accuracy
-        required_min_value: 0.93
-        max_epoch: 10
+      - Check:
+          variable: accuracy
+          required_min_value: 0.93
+          max_epoch: 10
     -------------------------------------------------------
     """
 

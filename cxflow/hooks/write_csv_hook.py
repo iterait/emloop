@@ -11,7 +11,7 @@ import numpy as np
 from .abstract_hook import AbstractHook
 
 
-class CSVHook(AbstractHook):
+class WriteCSV(AbstractHook):
     """
     Log the training results to CSV file.
 
@@ -20,18 +20,18 @@ class CSVHook(AbstractHook):
     -------------------------------------------------------
     # log all the variables
     hooks:
-      - class: CSVHook
+      - WriteCSV
     -------------------------------------------------------
     # log only certain variables
     hooks:
-      - class: CSVHook
-        variables: [loss, fscore]
+      - WriteCSV:
+          variables: [loss, fscore]
     -------------------------------------------------------
     # warn about unsupported variables
     hooks:
-      - class: CSVHook
-        variables: [loss, fscore, xxx]
-        on_unknown_type: warn
+      - WriteCSV:
+          variables: [loss, fscore, xxx]
+          on_unknown_type: warn
     -------------------------------------------------------
     """
 
@@ -54,8 +54,8 @@ class CSVHook(AbstractHook):
 
         super().__init__(**kwargs)
 
-        assert on_unknown_type in CSVHook.UNKNOWN_TYPE_ACTIONS
-        assert on_missing_variable in CSVHook.MISSING_VARIABLE_ACTIONS
+        assert on_unknown_type in WriteCSV.UNKNOWN_TYPE_ACTIONS
+        assert on_missing_variable in WriteCSV.MISSING_VARIABLE_ACTIONS
 
         self._variables = variables
         self._streams = None

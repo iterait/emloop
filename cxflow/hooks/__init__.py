@@ -1,11 +1,11 @@
 """cxflow hooks"""
-from .abstract_hook import AbstractHook, TrainingTerminated, CXF_HOOK_INIT_ARGS
-from .accumulating_hook import AccumulatingHook
-from .csv_hook import CSVHook
-from .epoch_stopper_hook import EpochStopperHook
-from .logging_hook import LoggingHook
-from .profile_hook import ProfileHook
-from .saver_hook import SaverHook, BestSaverHook
-from .sigint_hook import SigintHook
-from .stats_hook import StatsHook
-from .train_check_hook import TrainCheckHook
+from .abstract_hook import AbstractHook, TrainingTerminated
+from .accumulate_variables_hook import AccumulateVariables
+from .write_csv_hook import WriteCSV
+from .stop_after_hook import StopAfter
+from .log_variables_hook import LogVariables
+from .log_profile_hook import LogProfile
+from .save_hook import SaveEvery, SaveBest
+from .catch_sigint_hook import CatchSigint
+from .compute_stats_hook import ComputeStats
+from .check_hook import Check

@@ -9,9 +9,9 @@ from typing import Optional, Iterable
 from .util import fallback
 from ..datasets import AbstractDataset
 from ..models import AbstractModel
-from ..hooks import AbstractHook, CXF_HOOK_INIT_ARGS
+from ..hooks import AbstractHook
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
-from ..utils.reflection import create_object_from_config, get_class_module
+from ..utils.reflection import create_object_from_config, get_class_module, parse_fully_qualified_name, create_object
 from ..utils.config import config_to_str, config_to_file
 from ..main_loop import MainLoop
 
@@ -132,6 +132,17 @@ def create_hooks(config: dict, model: AbstractModel,
                  dataset: AbstractDataset, output_dir: str) -> Iterable[AbstractHook]:
     """
     Create hooks specified in config['hooks'] list.
+
+    Hook config entries may be one of the following types:
+
+    1] a hook with default args specified only by its name as a string; e.g.:
+        - LogVariables
+        - cxflow_tensorflow.WriteTensorBoard
+
+    2] a hook with custom args as a dict name -> args; e.g.:
+        - StopAfter:
+            n_epochs: 10
+
     :param config: config dict
     :param model: model object to be passed to the hooks
     :param dataset: AbstractDataset object
@@ -142,37 +153,31 @@ def create_hooks(config: dict, model: AbstractModel,
     hooks = []
     if 'hooks' in config:
         for hook_config in config['hooks']:
-            assert 'class' in hook_config
-            for key in CXF_HOOK_INIT_ARGS:
-                if key in hook_config:
-                    raise KeyError('Name `{}` is reserved in the hook config. Use a different name.'.format(key))
+            if isinstance(hook_config, str):
+                hook_config = {hook_config: {}}
+            assert len(hook_config) == 1, 'Hook configuration must have exactly one key (fully qualified name).'
+            hook_path = next(iter(hook_config.keys()))
+            hook_module, hook_class = parse_fully_qualified_name(hook_path)
 
             # find the hook module if not specified
-            if 'module' not in hook_config:
-                hook_module = get_class_module(CXF_HOOKS_MODULE, hook_config['class'])
-                if hook_module is not None:
-                    logging.debug('\tFound hook module `%s` for class `%s`', hook_module, hook_config['class'])
-                    hook_config['module'] = hook_module
-                else:
+            if hook_module is None:
+                hook_module = get_class_module(CXF_HOOKS_MODULE, hook_class)
+                logging.debug('\tFound hook module `%s` for class `%s`', hook_module, hook_class)
+                if hook_module is None:
                     raise ValueError('Can`t find hook module for hook class `{}`. '
                                      'Make sure it is defined under `{}` sub-modules.'
-                                     .format(hook_config['class'], CXF_HOOKS_MODULE))
+                                     .format(hook_class, CXF_HOOKS_MODULE))
             # create hook kwargs
-            hook_config_to_pass = hook_config.copy()
-            hook_config_to_pass.pop('module')
-            hook_config_to_pass.pop('class')
-            hook_kwargs = {'dataset': dataset, 'model': model, 'output_dir': output_dir, **hook_config_to_pass}
-            for key in CXF_HOOK_INIT_ARGS:
-                assert key in hook_kwargs
+            hook_kwargs = {'dataset': dataset, 'model': model, 'output_dir': output_dir, **hook_config[hook_path]}
 
             # create new hook
             try:
-                hook = create_object_from_config(hook_config, kwargs=hook_kwargs, key_prefix='')
+                hook = create_object(hook_module, hook_class, kwargs=hook_kwargs)
+                hooks.append(hook)
+                logging.info('\t%s created', type(hooks[-1]).__name__)
             except (ValueError, KeyError, TypeError, NameError, AttributeError, AssertionError, ImportError) as ex:
                 logging.error('\tFailed to create a hook from config `%s`', hook_config)
                 raise ex
-            hooks.append(hook)
-            logging.info('\t%s created', type(hooks[-1]).__name__)
     return hooks
 
 
