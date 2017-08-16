@@ -1,22 +1,19 @@
 cxflow
 ======
 
+.. toctree::
+   :hidden:
+
+   getting_started
+   tutorial
+   advanced
+   api/modules
+
 Cxflow is a smart manager for deep learning models.
 With cxflow you can easily define reusable components which enhance your future development.
 
 Check out our `10 minutes <tutorial.html>`_ example tutorial.
 Then, definitely see the `advanced section <advanced.html>`_.
-
-
-Table of Contents
------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   getting_started
-   tutorial
-   advanced
 
 Contribute
 ----------
