@@ -25,7 +25,7 @@ Alternatively, cxflow might be installed directly from the sources.
 
 .. code-block:: bash
 
-    pip install git+git@github.com:Cognexa/cxflow.git
+    pip install git+https://github.com/Cognexa/cxflow.git
 
 Developer Installation
 **********************
