@@ -3,11 +3,11 @@ cxflow
 
 .. toctree::
    :hidden:
-   :maxdepth: 1
+   :maxdepth: 2
 
    getting_started
    tutorial
-   advanced
+   advanced/index
    api/index
 
 Cxflow is a smart manager for deep learning models.

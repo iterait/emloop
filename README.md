@@ -37,7 +37,7 @@ The documentation and tutorials are yet to be done.
 
 So far, the following documents are available:
 - [introduction](tutorial)
-- [cxflow hooks](cxflow/hooks/README.md)
+- [cxflow hooks](docs/advanced/hook.rst)
 
 In order to generate API documentation, run
 ```bash
