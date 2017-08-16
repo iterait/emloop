@@ -1,10 +1,10 @@
 Getting Started
-===============
+###############
 
 Before we dive in, cxflow must be properly installed.
 
 Installation
-------------
+************
 
 The most simple installation of cxflow is via pip.
 This is the recommended option for majority of users.
@@ -28,7 +28,7 @@ Alternatively, cxflow might be installed directly from the sources.
     pip install git+git@github.com:Cognexa/cxflow.git
 
 Developer Installation
-----------------------
+**********************
 
 Finally, cxflow might be installed directly for developer purposes.
 

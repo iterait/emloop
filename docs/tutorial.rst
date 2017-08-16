@@ -1,5 +1,10 @@
+Tutorial
+########
+
+This is a simple example introducing cxflow fundamentals.
+
 Introduction
-############
+************
 
 Let us describe some fundamental ideas of cxflow.
 Cxflow does not implement any building blocks for you (contrary to, e.g.,
