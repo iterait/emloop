@@ -8,8 +8,6 @@ cxflow
    getting_started
    tutorial
    advanced/index
-   advanced/main_loop
-   advanced/dataset
    api/index
 
 Cxflow is a smart manager for deep learning models.
