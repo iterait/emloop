@@ -1,5 +1,5 @@
 """
-Test module for csv hook (cxflow.hooks.csv_hook).
+Test module for csv hook (cxflow.hooks.write_csv_hook).
 """
 
 import numpy as np
@@ -8,7 +8,7 @@ import os
 import tempfile
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.csv_hook import CSVHook
+from cxflow.hooks.write_csv_hook import WriteCSV
 
 
 _EXAMPLES = 5
@@ -37,34 +37,34 @@ def _get_epoch_data():
 
 
 class CSVHookTest(CXTestCase):
-    """Test case for CSVHook."""
+    """Test case for WriteCSV hook."""
 
     def test_init_hook(self):
         """Test correct hook initialization."""
 
         output_file = tempfile.NamedTemporaryFile().name
 
-        hook = CSVHook(output_dir="", output_file=output_file,
-                       variables=_VARIABLES)
+        hook = WriteCSV(output_dir="", output_file=output_file,
+                        variables=_VARIABLES)
 
         self.assertEqual(hook._variables, _VARIABLES)
         self.assertTrue(os.path.isfile(output_file))
 
         with self.assertRaises(AssertionError):
-            CSVHook(output_dir="", output_file=output_file,
-                    on_unknown_type='raise')
+            WriteCSV(output_dir="", output_file=output_file,
+                     on_unknown_type='raise')
 
         with self.assertRaises(AssertionError):
-            CSVHook(output_dir="", output_file=output_file,
-                    on_missing_variable='raise')
+            WriteCSV(output_dir="", output_file=output_file,
+                     on_missing_variable='raise')
 
     def test_write_header(self):
         """Test writing a correct header to csv file."""
 
         output_file = tempfile.NamedTemporaryFile().name
         delimiter = ";"
-        hook = CSVHook(output_dir="", output_file=output_file,
-                       variables=_VARIABLES, delimiter=delimiter)
+        hook = WriteCSV(output_dir="", output_file=output_file,
+                        variables=_VARIABLES, delimiter=delimiter)
         epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
 
@@ -97,9 +97,9 @@ class CSVHookTest(CXTestCase):
         output_file = tempfile.NamedTemporaryFile().name
         delimiter = ";"
         default_value = '?'
-        hook = CSVHook(output_dir="", output_file=output_file,
-                       variables=_VARIABLES, delimiter=delimiter,
-                       default_value=default_value)
+        hook = WriteCSV(output_dir="", output_file=output_file,
+                        variables=_VARIABLES, delimiter=delimiter,
+                        default_value=default_value)
         epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
 
@@ -125,8 +125,8 @@ class CSVHookTest(CXTestCase):
 
         variables = _VARIABLES + ['missing']
         output_file = tempfile.NamedTemporaryFile().name
-        hook = CSVHook(output_dir="", output_file=output_file,
-                       variables=variables, on_missing_variable='error')
+        hook = WriteCSV(output_dir="", output_file=output_file,
+                        variables=variables, on_missing_variable='error')
         epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
         epoch_id = 6
@@ -140,8 +140,8 @@ class CSVHookTest(CXTestCase):
         """
 
         output_file = tempfile.NamedTemporaryFile().name
-        hook = CSVHook(output_dir="", output_file=output_file,
-                       on_unknown_type='error')
+        hook = WriteCSV(output_dir="", output_file=output_file,
+                        on_unknown_type='error')
         epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
         epoch_id = 6
@@ -156,8 +156,8 @@ class CSVHookTest(CXTestCase):
 
         output_file = tempfile.NamedTemporaryFile().name
         delimiter = "|"
-        hook = CSVHook(output_dir="", output_file=output_file,
-                       delimiter=delimiter, variables=_VARIABLES)
+        hook = WriteCSV(output_dir="", output_file=output_file,
+                        delimiter=delimiter, variables=_VARIABLES)
         epoch_data = _get_epoch_data()
 
         hook.after_epoch(6, epoch_data)

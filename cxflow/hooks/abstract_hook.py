@@ -11,10 +11,6 @@ from ..datasets import AbstractDataset
 from ..utils.profile import Timer
 
 
-# Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.
-CXF_HOOK_INIT_ARGS = {'net', 'dataset', 'output_dir'}
-
-
 class TrainingTerminated(Exception):
     """Exception that is raised when a hook terminates the training."""
     pass
@@ -22,16 +18,27 @@ class TrainingTerminated(Exception):
 
 class AbstractHook:
     """
-    Hook interface.
+    cxflow hooks interface
 
-    The hook lifecycle of hook is as follows:
-    1) The hook is constructed `__init__`.
-    2) `before_training` is triggered.
-    3) After each batch, regardless the stream type, `after_batch` is triggered.
-    4) After an epoch is over, the summary statistics are passed to `after_epoch` together with `epoch_id`.
-       The summary statistics (epoch_data) are mutable and each hook might add new information.
-    5) When the whole training is over, `after_training` is triggered.
+    -------------------------------------------------------
+    Hook lifecycle (event -> method invocation)
+    -------------------------------------------------------
+    1) cxflow constructs the hook -> `__init__`
+    2) cxflow enters the main loop -> `before_training`
+        a] cxflow starts an epoch
+        b] cxflow computes a batch -> `after_batch`
+        c] cxflow finishes the epoch -> `after_epoch` and `after_epoch_profile`
+    3) cxflow terminates the main loop -> `after_training`
+
+    -------------------------------------------------------
+    Naming conventions
+    -------------------------------------------------------
+    - hook names should describe hook actions with verb stems. E.g.: LogProfile or SaveBestModel
+    - hook names should not include `Hook` suffix
     """
+
+    # Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.
+    CXF_HOOK_INIT_ARGS = {'model', 'dataset', 'output_dir'}
 
     EpochData = NewType('EpochData', Mapping[str, AbstractDataset.Batch])
 
@@ -41,7 +48,7 @@ class AbstractHook:
         :param kwargs: kwargs not recognized in the child hook
         """
         for key in kwargs:
-            if key not in CXF_HOOK_INIT_ARGS:
+            if key not in AbstractHook.CXF_HOOK_INIT_ARGS:
                 logging.warning('Argument `%s` was not recognized by `%s`. Recognized arguments are `%s`.',
                                 key, type(self).__name__, list(inspect.signature(type(self)).parameters.keys()))
 
@@ -63,7 +70,7 @@ class AbstractHook:
         Batch results are available in results argument.
 
         :param stream_name: type of the stream (usually train/valid/test or any other)
-        :param batch_data: batch inputs and net outputs
+        :param batch_data: batch inputs and model outputs
         """
         pass
 

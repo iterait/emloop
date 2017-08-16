@@ -11,6 +11,21 @@ from typing import Tuple, List, Dict, Iterable, Any, Optional
 _EMPTY_DICT = MappingProxyType({})
 
 
+def parse_fully_qualified_name(fq_name: str) -> Tuple[Optional[str], str]:
+    """
+    Parse the given fully-quallified name (separated with dots) to a tuple of module and class names.
+
+    Returns None instead of module if the given name contains no separators (dots).
+    :param fq_name: fully qualified name separated with dots
+    :return: a tuple of (module, class) names
+    """
+    last_dot = fq_name.rfind('.')
+    if last_dot != -1:
+        return fq_name[:last_dot], fq_name[last_dot + 1:]
+    else:
+        return None, fq_name
+
+
 def create_object_from_config(config: Dict[str, Any], args: Iterable=(),
                               kwargs: Dict[str, Any]=_EMPTY_DICT, key_prefix: str=None):
     """

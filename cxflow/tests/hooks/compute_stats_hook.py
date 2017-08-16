@@ -1,16 +1,16 @@
 """
-Test module for stats hook (cxflow.hooks.stats_hook).
+Test module for stats hook (cxflow.hooks.compute_stats_hook).
 """
 
 import numpy as np
 import collections
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.stats_hook import StatsHook
+from cxflow.hooks.compute_stats_hook import ComputeStats
 
 
 class StatsHookTest(CXTestCase):
-    """Test case for StatsHook."""
+    """Test case for ComputeStats hook."""
 
     def get_batch(self, batch_id):
         batch = {'accuracy': batch_id * (np.ones(5) + 1),
@@ -23,7 +23,7 @@ class StatsHookTest(CXTestCase):
         variables = {'loss': ['mean', 'median', 'max'],
                      'accuracy': ['mean', 'median', 'not_supported']}
         with self.assertRaises(ValueError):
-            hook = StatsHook(variables)
+            hook = ComputeStats(variables)
 
     def test_compute_save_stats(self):
         """Tests correctness of computed aggregations and their saving."""
@@ -31,7 +31,7 @@ class StatsHookTest(CXTestCase):
         variables = {'loss': ['mean', 'std', 'min', 'max', 'median'],
                      'accuracy': ['mean', 'std', 'min', 'max', 'median']}
 
-        hook = StatsHook(variables)
+        hook = ComputeStats(variables)
 
         epoch_data = {'train': {'accuracy': None, 'loss': None},
                       'test': {'accuracy': None, 'loss': None}}

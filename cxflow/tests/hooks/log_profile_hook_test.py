@@ -1,10 +1,10 @@
 """
-Module with profile hook test case (see cxflow.hooks.profile_hook).
+Module with profile hook test case (see cxflow.hooks.log_profile_hook).
 """
 from testfixtures import LogCapture
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks import ProfileHook
+from cxflow.hooks import LogProfile
 
 _TRAIN_ONLY_PROFILE = {'read_batch_train': [1.12, 2, 3],
                        'after_batch_hooks_train': [4, 0, 0.4],
@@ -33,14 +33,14 @@ _TRAIN_TEST_AND_VALID_PROFILE = {'read_batch_train': [1.001, 2, 3],
 
 class ProfileHookTest(CXTestCase):
     """
-    Test case for ProfileHook.
+    Test case for LogProfile hook.
 
     Hereby, we test only proper handling (logging) of the profile.
     The profiling itself is tested in the main_loop test (see cxflow.tests.main_loop_test.py).
     """
 
     def setUp(self):
-        self._hook = ProfileHook()
+        self._hook = LogProfile()
 
     def test_missing_train(self):
         """Test KeyError raised on missing profile entries."""

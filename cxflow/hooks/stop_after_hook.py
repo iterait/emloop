@@ -6,7 +6,7 @@ import logging
 from .abstract_hook import AbstractHook, TrainingTerminated
 
 
-class EpochStopperHook(AbstractHook):
+class StopAfter(AbstractHook):
     """
     Stop the training after the specified number of epochs.
 
@@ -15,18 +15,18 @@ class EpochStopperHook(AbstractHook):
     -------------------------------------------------------
     # stop the training after 500 epochs
     hooks:
-      - class: EpochStopperHook
-        epochs_limit: 500
+      - StopAfter:
+          epochs: 500
     -------------------------------------------------------
     """
 
-    def __init__(self, epoch_limit: int, **kwargs):
+    def __init__(self, epochs: int, **kwargs):
         """
         Create new epoch stopper hook.
-        :param epoch_limit: maximum number of training epochs
+        :param epochs: maximum number of training epochs
         """
         super().__init__(**kwargs)
-        self._epoch_limit = epoch_limit
+        self._epoch_limit = epochs
 
     def after_epoch(self, epoch_id: int, **_) -> None:
         """Stop the training if `epoch_id > self._epoch_limit`."""

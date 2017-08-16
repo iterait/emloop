@@ -1,11 +1,11 @@
 """
-Test module for accumulating hook (cxflow.hooks.accumulating_hook).
+Test module for accumulating hook (cxflow.hooks.accumulate_variables_hook).
 """
 
 import numpy as np
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.accumulating_hook import AccumulatingHook
+from cxflow.hooks.accumulate_variables_hook import AccumulateVariables
 
 
 _ITERS = 9
@@ -14,7 +14,7 @@ _FEATURES = 6
 
 
 class AccumulatingHookTest(CXTestCase):
-    """Test case for AccumulatingHook."""
+    """Test case for AccumulateVariables hook."""
 
     def get_batch(self):
         batch = {'input': np.ones((_EXAMPLES, _FEATURES)),
@@ -29,7 +29,7 @@ class AccumulatingHookTest(CXTestCase):
 
         selected_vars = ["accuracy", "cost"]
         stream_name = "train"
-        accum_hook = AccumulatingHook(variables=selected_vars)
+        accum_hook = AccumulateVariables(variables=selected_vars)
 
         for _ in range(_ITERS):
             batch = self.get_batch()
@@ -45,7 +45,7 @@ class AccumulatingHookTest(CXTestCase):
 
         selected_vars = ["accuracy", "cost", "classes"]
         stream_name = "train"
-        accum_hook = AccumulatingHook(variables=selected_vars)
+        accum_hook = AccumulateVariables(variables=selected_vars)
 
         batch = self.get_batch()
         with self.assertRaises(KeyError):
@@ -56,7 +56,7 @@ class AccumulatingHookTest(CXTestCase):
 
         selected_vars = ["accuracy", "cost", "not_iter"]
         stream_name = "train"
-        accum_hook = AccumulatingHook(variables=selected_vars)
+        accum_hook = AccumulateVariables(variables=selected_vars)
         batch = self.get_batch()
         with self.assertRaises(TypeError):
             accum_hook.after_batch(stream_name, batch)
@@ -66,7 +66,7 @@ class AccumulatingHookTest(CXTestCase):
 
         selected_vars = ["accuracy", "cost"]
         stream_name = "train"
-        accum_hook = AccumulatingHook(variables=selected_vars)
+        accum_hook = AccumulateVariables(variables=selected_vars)
 
         for _ in range(_ITERS):
             batch = self.get_batch()

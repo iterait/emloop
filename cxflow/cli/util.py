@@ -25,12 +25,12 @@ def find_config(config_path: str) -> str:
 
 def validate_config(config: dict) -> None:
     """
-    Assert the config contains both `net` and `dataset` sections.
+    Assert the config contains both `model` and `dataset` sections.
 
     Additionally, warn if no hooks specified.
     :param config: configuration object
     """
-    assert 'net' in config, '`net` not present in the config'
+    assert 'model' in config, '`model` not present in the config'
     assert 'dataset' in config, '`dataset` not present in the config'
     if 'hooks' not in config:
         logging.warning('\tNo hooks found in config')

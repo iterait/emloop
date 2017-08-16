@@ -14,13 +14,13 @@ class CLIUtilTest(CXTestCaseWithDir):
     def test_train_load_config(self):
         """Test correct config loading."""
 
-        # test a config call with both dataset and net
-        good_config = {'dataset': None, 'net': None}
+        # test a config call with both dataset and model
+        good_config = {'dataset': None, 'model': None}
         config_path = config_to_file(good_config, self.tmpdir, 'config1.yaml')
 
         # test assertion when config is incomplete
-        missing_net_config = {'dataset': None}
-        config_path2 = config_to_file(missing_net_config, self.tmpdir, 'config2.yaml')
+        missing_model_config = {'dataset': None}
+        config_path2 = config_to_file(missing_model_config, self.tmpdir, 'config2.yaml')
         loaded_config2 = load_config(config_path2, [])
         self.assertRaises(AssertionError, validate_config, loaded_config2)
 

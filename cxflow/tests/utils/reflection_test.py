@@ -4,7 +4,8 @@ Test module for reflection utils (cxflow.utils.reflection).
 import sys
 import os
 
-from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module, get_class_module
+from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module, get_class_module, \
+    parse_fully_qualified_name
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
@@ -53,6 +54,24 @@ class ClassWithArgsAndKwargsOnly:  # pylint: disable=missing-docstring
 
 class ReflectionTest(CXTestCaseWithDir):
     """Test case for the reflection util functions."""
+
+    def test_parse_fully_qualified_name(self):
+        """Test correct parsing of fully qualified names."""
+
+        # test simple name
+        module1, class1 = parse_fully_qualified_name('MyClass')
+        self.assertIsNone(module1)
+        self.assertEqual(class1, 'MyClass')
+
+        # test simple path
+        module1, class1 = parse_fully_qualified_name('MyModule.MyClass')
+        self.assertEqual(module1, 'MyModule')
+        self.assertEqual(class1, 'MyClass')
+
+        # test complex path
+        module1, class1 = parse_fully_qualified_name('MyModule.MySubmodule.MyClass')
+        self.assertEqual(module1, 'MyModule.MySubmodule')
+        self.assertEqual(class1, 'MyClass')
 
     def test_create_object(self):
         """Test base create object function."""
@@ -195,8 +214,8 @@ class ReflectionTest(CXTestCaseWithDir):
         """Test if get_class_module method wraps the `utils.reflection.find_class_module` method correctly."""
 
         # test if the module is returned directly
-        module = get_class_module('cxflow.hooks', 'ProfileHook')
-        expected_module = 'cxflow.hooks.profile_hook'
+        module = get_class_module('cxflow.hooks', 'LogProfile')
+        expected_module = 'cxflow.hooks.log_profile_hook'
         self.assertEqual(module, expected_module)
 
         # test if None is returned when the class is not found

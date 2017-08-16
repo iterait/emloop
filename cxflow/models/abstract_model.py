@@ -1,5 +1,5 @@
 """
-This module contains the definition of a net trainable in cxflow framework.
+This module contains the definition of a model trainable in cxflow framework.
 """
 from abc import abstractmethod, ABCMeta
 from typing import Iterable, Mapping, Optional
@@ -7,37 +7,38 @@ from typing import Iterable, Mapping, Optional
 from ..datasets import AbstractDataset
 
 
-class AbstractNet(metaclass=ABCMeta):
+class AbstractModel(metaclass=ABCMeta):
     """
-    Abstract neural network which exposes input and output names, run and save methods.
-    AbstractNet implementations are trainable with cxflow main_loop.
+    Abstract machine learning model which exposes input and output names, run and save methods.
+    AbstractModel implementations are trainable with cxflow main_loop.
     """
 
     @abstractmethod
     def __init__(self, dataset: Optional[AbstractDataset], log_dir: str, restore_from: Optional[str]=None, **kwargs):
         """
-        Net constructor interface.
+        Model constructor interface.
 
-        Additional parameters (currently covered by `**kwargs`) are passed according to the configuration `net` section.
+        Additional parameters (currently covered by `**kwargs`) are passed
+        according to the configuration `model` section.
 
         :param dataset: Dataset object.
         :param log_dir: Existing directory in which all output files should be stored.
-        :param restore_from: Information passed to the net constructor (backend-specific); usually a directory in which
-                             the trained model is stored.
-        :param kwargs: Configuration section `net`.
+        :param restore_from: Information passed to the model constructor (backend-specific);
+                             usually a directory in which the trained model is stored.
+        :param kwargs: Configuration section `model`.
         """
         pass
 
     @property
     @abstractmethod
     def input_names(self) -> Iterable[str]:
-        """List of net input names."""
+        """List of model input names."""
         pass
 
     @property
     @abstractmethod
     def output_names(self) -> Iterable[str]:
-        """List of net output names."""
+        """List of model output names."""
         pass
 
     @abstractmethod
@@ -53,7 +54,7 @@ class AbstractNet(metaclass=ABCMeta):
     @abstractmethod
     def save(self, name_suffix: str) -> str:
         """
-        Save the net parameters with the given name_suffix.
+        Save the model parameters with the given name_suffix.
         :return: path to the saved file/dir
         """
         pass
@@ -64,7 +65,7 @@ class AbstractNet(metaclass=ABCMeta):
         """
         Return the module name with fallback restore class.
 
-        When restoring a model, cxflow tries to use the fallback class if the specified `net.class` fails to do so.
+        When restoring a model, cxflow tries to use the fallback class if the specified `model.class` fails to do so.
         :return: fallback restore module name
         """
         pass
@@ -75,7 +76,7 @@ class AbstractNet(metaclass=ABCMeta):
         """
         Return the fallback restore class name.
 
-        When restoring a model, cxflow tries to use the fallback class if the specified `net.class` fails to do so.
+        When restoring a model, cxflow tries to use the fallback class if the specified `model.class` fails to do so.
         :return: fallback restore class name
         """
         pass

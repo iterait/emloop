@@ -7,20 +7,20 @@ from typing import Iterable, Mapping
 import numpy as np
 
 from .abstract_hook import AbstractHook
-from .accumulating_hook import AccumulatingHook
+from .accumulate_variables_hook import AccumulateVariables
 
 
-class StatsHook(AccumulatingHook):
+class ComputeStats(AccumulateVariables):
     """
     Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
 
     -------------------------------------------------------
     Example usage in config
     -------------------------------------------------------
-    # accumulate the accuracy variable (either net output or stream source); compute and store its mean value
+    # accumulate the accuracy variable (either model output or stream source); compute and store its mean value
     hooks:
-      - class: StatsHook
-        variables:
+      - ComputeStats:
+          variables:
             accuracy: [mean]
     -------------------------------------------------------
     """
@@ -36,7 +36,7 @@ class StatsHook(AccumulatingHook):
         """
         for variable, aggregations in variables.items():
             for aggregation in aggregations:
-                if aggregation not in StatsHook.AGGREGATIONS:
+                if aggregation not in ComputeStats.AGGREGATIONS:
                     raise ValueError('Aggregation `{}` for variable `{}` is not supported.'
                                      .format(aggregation, variable))
 
@@ -74,7 +74,7 @@ class StatsHook(AccumulatingHook):
             for variable_name, variable_aggrs in self._variables.items():
                 # variables are already checked in the AccumulatingHook; hence, we do not check them here
                 epoch_data[stream_name][variable_name] = OrderedDict(
-                    {aggr: StatsHook._compute_aggregation(aggr, self._accumulator[stream_name][variable_name])
+                    {aggr: ComputeStats._compute_aggregation(aggr, self._accumulator[stream_name][variable_name])
                      for aggr in variable_aggrs})
 
     def after_epoch(self, epoch_data: AbstractHook.EpochData, **kwargs) -> None:
