@@ -39,6 +39,11 @@ So far, the following documents are available:
 - [introduction](tutorial)
 - [cxflow hooks](cxflow/hooks/README.md)
 
+In order to generate API documentation, run
+```bash
+sphinx-apidoc -f -o doc/api cxflow
+```
+
 ## Extensions
 **cxflow** is meant to be extremely lightweight.
 For that reason the whole functionality is divided into various extensions with separate dependencies.
