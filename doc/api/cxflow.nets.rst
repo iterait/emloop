@@ -4,14 +4,9 @@ cxflow\.nets package
 Submodules
 ----------
 
-cxflow\.nets\.abstract\_net module
-----------------------------------
+.. toctree::
 
-.. automodule:: cxflow.nets.abstract_net
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cxflow.nets.abstract_net
 
 Module contents
 ---------------

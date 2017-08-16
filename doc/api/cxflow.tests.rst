@@ -13,22 +13,10 @@ Subpackages
 Submodules
 ----------
 
-cxflow\.tests\.main\_loop\_test module
---------------------------------------
+.. toctree::
 
-.. automodule:: cxflow.tests.main_loop_test
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cxflow\.tests\.test\_core module
---------------------------------
-
-.. automodule:: cxflow.tests.test_core
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cxflow.tests.main_loop_test
+   cxflow.tests.test_core
 
 Module contents
 ---------------

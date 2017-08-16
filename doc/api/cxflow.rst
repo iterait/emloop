@@ -16,30 +16,11 @@ Subpackages
 Submodules
 ----------
 
-cxflow\.constants module
-------------------------
+.. toctree::
 
-.. automodule:: cxflow.constants
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cxflow\.entry\_point module
----------------------------
-
-.. automodule:: cxflow.entry_point
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cxflow\.main\_loop module
--------------------------
-
-.. automodule:: cxflow.main_loop
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cxflow.constants
+   cxflow.entry_point
+   cxflow.main_loop
 
 Module contents
 ---------------
