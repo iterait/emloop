@@ -1,4 +1,6 @@
-# CXflow hooks
+Hooks
+*****
+
 In this short tutorial, we learn how to use standard cxflow hooks and even how to write new ones.
 
 CXflow hooks allow to observe, modify and act upon the training process. Hooks shall do their work in one of the following events invoked by the cxflow main loop:
