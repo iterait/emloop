@@ -27,7 +27,7 @@ def get_cxflow_arg_parser() -> ArgumentParser:
                                 help='information passed to the model constructor (backend-specific); usually a '
                                      'directory in which the trained model is stored')
 
-    # create split subparser
+    # create dataset subparser
     dataset_parser = subparsers.add_parser('dataset')
     dataset_parser.set_defaults(subcommand='dataset')
     dataset_parser.add_argument('method', help='name of the method to be invoked')

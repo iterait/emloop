@@ -4,10 +4,10 @@ This module is cxflow framework entry point.
 The entry point shall be accessed from command line via `cxflow` command.
 
 At the moment cxflow allows to
-- split data to x-validation sets with `cxflow split ...`
 - train a model with `cxflow train ...`
 - resume training with `cxflow resume ...`
 - generate model predictions with `cxflow predict ...`
+- invoke dataset method with `cxflow dataset <method> ...`
 
 Run `cxflow -h` for details.
 """
@@ -16,12 +16,12 @@ import logging
 import os
 import sys
 
-from cxflow.cli import train, resume, predict, split, grid_search, get_cxflow_arg_parser, invoke_dataset_method
+from cxflow.cli import train, resume, predict, grid_search, get_cxflow_arg_parser, invoke_dataset_method
 from .constants import CXF_LOG_FORMAT, CXF_LOG_DATE_FORMAT
 
 
 def entry_point() -> None:
-    """cxflow entry point for training and dataset splitting."""
+    """cxflow entry point."""
 
     # make sure the path contains the current working directory
     sys.path.insert(0, os.getcwd())
