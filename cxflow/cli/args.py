@@ -28,11 +28,10 @@ def get_cxflow_arg_parser() -> ArgumentParser:
                                      'directory in which the trained model is stored')
 
     # create split subparser
-    split_parser = subparsers.add_parser('split')
-    split_parser.set_defaults(subcommand='split')
-    split_parser.add_argument('config_file', help='path to the config file')
-    split_parser.add_argument('-n', '--num-splits', type=int, default=1, help='number of splits')
-    split_parser.add_argument('-r', '--ratio', type=int, nargs=3, required=True, help='train, valid and test ratios')
+    dataset_parser = subparsers.add_parser('dataset')
+    dataset_parser.set_defaults(subcommand='dataset')
+    dataset_parser.add_argument('method', help='name of the method to be invoked')
+    dataset_parser.add_argument('config_file', help='path to the config file')
 
     # create grid-search subparser
     gridsearch_parser = subparsers.add_parser('gridsearch')
@@ -44,7 +43,7 @@ def get_cxflow_arg_parser() -> ArgumentParser:
                                                                           'of executing it right away')
 
     # add common arguments
-    for parser in [main_parser, train_parser, resume_parser, predict_parser, split_parser]:
+    for parser in [main_parser, train_parser, resume_parser, predict_parser, dataset_parser]:
         parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
         parser.add_argument('-o', '--output-root', default='log', help='output directory')
 
