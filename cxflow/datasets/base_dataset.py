@@ -1,11 +1,10 @@
 """
-This module contains BaseDataset which might be used as a base class for your dataset written in python.
+This module contains `BaseDataset` which might be used as a base class for your dataset written in Python.
 """
+
 from abc import abstractmethod, ABCMeta
 
 import yaml
-
-from .abstract_dataset import AbstractDataset
 
 
 class BaseDataset(metaclass=ABCMeta):
@@ -33,21 +32,6 @@ class BaseDataset(metaclass=ABCMeta):
         Initialize the dataset with kwargs.
 
         :param output_dir: output_dir for logging and any additional outputs (None if no output dir is available)
-        :param kwargs: dataset configuration as **kwargs parsed from config['dataset']
+        :param kwargs: dataset configuration as `**kwargs` parsed from `config['dataset']`
         """
-        raise NotImplementedError('Dataset does not implement obligatory _init_with_kwargs method.')
-
-    @abstractmethod
-    def train_stream(self) -> AbstractDataset.Stream:
-        """Get the train stream iterator."""
-        raise NotImplementedError('Dataset does not implement obligatory train_stream method.')
-
-    def split(self, num_splits: int, train: float, valid: float, test: float) -> None:
-        """
-        Perform cross-validation split with the given parameters.
-        :param num_splits: the number of train-valid splits to be created (sharing the test set)
-        :param train: portion of data to be split to train
-        :param valid: portion of data to be split to valid
-        :param test: portion of data to be split to test
-        """
-        raise NotImplementedError('Dataset does not implement split method although it is now required.')
+        raise NotImplementedError('Dataset does not implement obligatory `_init_with_kwargs` method.')

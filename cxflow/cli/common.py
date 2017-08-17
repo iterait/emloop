@@ -64,8 +64,8 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     dataset_config = config['dataset']
     if 'output_dir' in dataset_config:
         raise ValueError('The `output_dir` key is reserved and can not be used in dataset configuration.')
-    dataset_config['output_dir'] = output_dir
-    dataset = create_object_from_config(config['dataset'], args=(config_to_str(dataset_config),))
+    dataset_args = {'output_dir': output_dir, **dataset_config}
+    dataset = create_object_from_config(config['dataset'], args=(config_to_str(dataset_args),))
     logging.info('\t%s created', type(dataset).__name__)
     return dataset
 

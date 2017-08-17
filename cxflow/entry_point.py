@@ -16,7 +16,7 @@ import logging
 import os
 import sys
 
-from cxflow.cli import train, resume, predict, split, grid_search, get_cxflow_arg_parser
+from cxflow.cli import train, resume, predict, split, grid_search, get_cxflow_arg_parser, invoke_dataset_method
 from .constants import CXF_LOG_FORMAT, CXF_LOG_DATE_FORMAT
 
 
@@ -57,9 +57,9 @@ def entry_point() -> None:
         predict(config_path=known_args.config_path, restore_from=known_args.restore_from, cl_arguments=unknown_args,
                 output_root=known_args.output_root)
 
-    elif known_args.subcommand == 'split':
-        split(config_file=known_args.config_file, num_splits=known_args.num_splits, train_ratio=known_args.ratio[0],
-              valid_ratio=known_args.ratio[1], test_ratio=known_args.ratio[2])
+    elif known_args.subcommand == 'dataset':
+        invoke_dataset_method(config_path=known_args.config_file, method_name=known_args.method,
+                              cl_arguments=unknown_args, output_root=known_args.output_root)
 
     elif known_args.subcommand == 'gridsearch':
         grid_search(script=known_args.script, params=known_args.params, dry_run=known_args.dry_run)
