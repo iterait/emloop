@@ -140,6 +140,8 @@ Note that in this design, the training and testing streams do not overlap, hence
 use the training stream for training and the testing stream for the unbiased estimation
 of the model performance.
 
+Detailed description of cxflow datasets might be found in the `advanced section <advanced/dataset.html>`_.
+
 Model
 *****
 
@@ -221,6 +223,8 @@ The `_create_model` method can accept arbitrary arguments - in our case, we acce
 optimization algorithm to be used and the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.
 
+Detailed description of cxflow models might be found in the `advanced section <advanced/model.html>`_.
+
 Configuration
 *************
 
@@ -232,6 +236,8 @@ The configuration file is in the form of a YAML document.
 Feel free to use JSON instead, but YAML makes a lot of thing easier.
 
 The YAML document consists of four fundamental sections.
+Detailed description of cxflow configuration might be found in the `advanced section <advanced/config.html>`_.
+
 
 #. dataset
 #. model
