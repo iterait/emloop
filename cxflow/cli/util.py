@@ -1,7 +1,6 @@
 import sys
 import logging
 import os.path as path
-import traceback
 
 from ..constants import CXF_CONFIG_FILE
 
@@ -43,5 +42,6 @@ def fallback(message: str, ex: Exception) -> None:
     :param message: message to be logged
     :param ex: Exception which caused the failure
     """
-    logging.error('%s: %s\n%s', message, ex, traceback.format_exc())
+    logging.error('%s', message)
+    logging.exception('%s', ex)
     sys.exit(1)
