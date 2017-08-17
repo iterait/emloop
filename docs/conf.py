@@ -35,10 +35,10 @@ extensions = [
     'sphinx.ext.autodoc',
     # 'sphinx.ext.doctest',
     'sphinx.ext.napoleon',
-    # 'sphinx.ext.todo',
+    'sphinx.ext.todo',
     # 'sphinx.ext.mathjax',
     # 'sphinx.ext.graphviz',
-    # 'sphinx.ext.intersphinx',
+    'sphinx.ext.intersphinx',
     # 'matplotlib.sphinxext.plot_directive',
     # 'sphinx.ext.linkcode'
 ]
