@@ -43,6 +43,13 @@ extensions = [
     # 'sphinx.ext.linkcode'
 ]
 
+autoapi_modules = {
+    'cxflow': {
+        # 'override': True,
+        # 'output': 'auto',
+        'prune': True
+    }
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
