@@ -37,25 +37,27 @@ Dataset
 *******
 
 The very first step in any machine learning task is to load and process the data.
-Every `cxflow` dataset is expected to extend the `cxflow.datasets.BaseDataset` 
-and to have the following properties:
+Every `cxflow` dataset is expected to implement the interface defined by `cxflow.AbstractDataset`,
+which is at the moment, only accepting string-encoded YAML.
+For regular projects, we recommend extending `cxflow.BaseDataset` which is a smart wrapper around configuration
+(see below).
 
-#. **Training stream** must be implemented. Training stream is an iterable which provides
-   batches of the training data.
+The dataset is supposed to wrap all data-related operations.
+It is responsible for correct data loading, verification and other useful operations.
+The main purpose of the dataset is providing various data streams that will be consequently used for training,
+validation and prediction in the production environment.
+
+Our dataset will implement the following:
+
+#. **Training stream:** an iterable which provides batches of the training data.
    The implementation of the training stream is provided in `train_stream` method.
-#. Analogously, the dataset might contain **additional streams** such as validation or test
-   streams.
-   These are implemented in `<name>_stream` methods (e.g.,
-   `test_stream`). While additional streams are not mandatory, implementing at
-   least the test stream is strongly suggested.
-#. **The constructor** accepts a YAML configuration in the form of a string
-   (more on this later).
-   The purpose of the constructor is to parse the configuration string and
-   prepare that cxflow will soon call one of the stream functions.
-#. Finally, the dataset might contain other methods, e.g., `fetch`, `split`, or
-   anything else you may need.
-   Cxflow is able to call arbitrary function on your dataset using `cxflow dataset <name>`
-   command.
+#. **Test stream:** an iterable providing testing data which will not be used during the training.
+   Arbitrary additional streams might be defined with method naming convention `<name>_stream`.
+   Therefore, out *test* stream will be implemented in `test_stream` method.
+#. **The constructor:** accepts a YAML configuration in the form of a string
+   (more on this later). We avoid the implementation of the constructor by extending `cxflow.BaseDataset`.
+#. **Additional method:** such as `fetch`, `split`, or anything else you may need.
+   Cxflow is able to call arbitrary dataset methods by invoking `cxflow dataset <method-name>` command.
 
 For our purposes, let us create a class called `MajorityDataset`:
 
