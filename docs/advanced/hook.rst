@@ -103,9 +103,9 @@ In this case, the `batch_data` would contain the following dict
 .. code-block:: python
 
     {
-        'images': ['1st image', '2nd image'...],
-        'labels': [5, 2,...],
-        'prediction': [5, 1,...]
+      'images': ['1st image', '2nd image'...],
+      'labels': [5, 2,...],
+      'prediction': [5, 1,...]
     }
 
 Now, the hook decides how to process this data. Usually, it is useful to accumulate the data over
@@ -127,9 +127,9 @@ E.g., with train, valid and test streams it initially looks as following:
 .. code-block:: python
 
     {
-        'train': {},
-        'valid': {},
-        'test': {}
+      'train': {},
+      'valid': {},
+      'test': {}
     }
 
 Now, for instance, our `ComputeStats` from the first example computes the mean over the
@@ -139,9 +139,9 @@ the `ComputeStats` hook has been called, the `epoch_data` will look as follows:
 .. code-block:: python
 
     {
-        'train': {'loss': {'mean': 0.2}},
-        'valid': {'loss': {'mean': 0.32}},
-        'test': {'loss': {'mean': 0.35}
+      'train': {'loss': {'mean': 0.2}},
+      'valid': {'loss': {'mean': 0.32}},
+      'test': {'loss': {'mean': 0.35}
     }
 
 The `LogVariables` already expects this structure and logs everything it gets.
