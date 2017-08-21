@@ -51,11 +51,7 @@ class EmptyModel(AbstractModel):
         pass
 
     @property
-    def restore_fallback_module(self) -> str:
-        return ''
-
-    @property
-    def restore_fallback_class(self) -> str:
+    def restore_fallback(self) -> str:
         return ''
 
 

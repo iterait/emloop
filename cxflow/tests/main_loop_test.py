@@ -188,11 +188,7 @@ class TrainableModel(AbstractModel):
         return self._output_names
 
     @property
-    def restore_fallback_module(self) -> str:
-        return ''
-
-    @property
-    def restore_fallback_class(self) -> str:
+    def restore_fallback(self) -> str:
         return ''
 
 

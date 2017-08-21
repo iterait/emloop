@@ -61,22 +61,12 @@ class AbstractModel(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def restore_fallback_module(self) -> str:
+    def restore_fallback(self) -> str:
         """
-        Return the module name with fallback restore class.
+        Return the fully-qualified name of the fallback restore class (e.g. `module.submodule.BaseClass`).
 
-        When restoring a model, cxflow tries to use the fallback class if the specified `model.class` fails to do so.
-        :return: fallback restore module name
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def restore_fallback_class(self) -> str:
-        """
-        Return the fallback restore class name.
-
-        When restoring a model, cxflow tries to use the fallback class if the specified `model.class` fails to do so.
-        :return: fallback restore class name
+        When restoring a model, cxflow tries to use the fallback class if the construction of the model object specified
+        in `model` configuration section fails.
+        :return: fully-qualified name of the fallback restore class
         """
         pass

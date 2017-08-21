@@ -110,19 +110,15 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
         else:  # restore cases (resume, predict)
             logging.warning('Cannot create model from the specified model module `%s` and class `%s`.',
                             model_config['module'], model_config['class'])
-            assert 'restore_fallback_module' in model_config, ('`model.restore_fallback_module` '
-                                                               'not present in the config')
-            assert 'restore_fallback_class' in model_config, '`model.restore_fallback_class` not present in the config'
-            logging.info('Trying to restore with fallback module `{}` and class `{}` instead.'.format(
-                model_config['restore_fallback_module'], model_config['restore_fallback_class']))
+            assert 'restore_fallback' in model_config, '`model.restore_fallback` not present in the config'
+            logging.info('Trying to restore with fallback `{}` instead.'.format(model_config['restore_fallback']))
 
             try:  # try fallback class
-                model = create_object_from_config(model_config, kwargs=model_kwargs, key_prefix='restore_fallback_')
+                fallback_module, fallback_class = parse_fully_qualified_name(model_config['restore_fallback'])
+                model = create_object(fallback_module, fallback_class, kwargs=model_kwargs)
             except (ImportError, AttributeError) as ex:  # if fallback module/class specified but it fails
-                raise ImportError('Cannot create model from the specified '
-                                  'restore_module `{}` and model_class `{}`.'.format(
-                                      model_config['restore_fallback_module'],
-                                      model_config['restore_fallback_class'])) from ex
+                raise ImportError('Cannot create model from the specified restore_fallback `{}`.'.format(
+                    model_config['restore_fallback'],)) from ex
 
     logging.info('\t%s created', type(model).__name__)
     return model
@@ -247,8 +243,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
 
     try:  # save the config to file
         # modify the config so that it contains fallback information
-        config['model']['restore_fallback_module'] = model.restore_fallback_module
-        config['model']['restore_fallback_class'] = model.restore_fallback_class
+        config['model']['restore_fallback'] = model.restore_fallback
         config_to_file(config=config, output_dir=output_dir, name=CXF_CONFIG_FILE)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Saving config failed', ex)

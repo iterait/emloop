@@ -56,11 +56,7 @@ class DummyModel(AbstractModel):
         return self._output_names
 
     @property
-    def restore_fallback_module(self) -> str:
-        return ''
-
-    @property
-    def restore_fallback_class(self) -> str:
+    def restore_fallback(self) -> str:
         return ''
 
 
@@ -225,8 +221,7 @@ class CLICommonTest(CXTestCaseWithDir):
         # test restoring when the model class is not found
         new_config = deepcopy(config)
         new_config['model']['class'] = 'IDontExist'
-        new_config['model']['restore_fallback_module'] = 'cxflow.tests.cli.common_test'
-        new_config['model']['restore_fallback_class'] = 'DummyModelWithKwargs2'
+        new_config['model']['restore_fallback'] = 'cxflow.tests.cli.common_test.DummyModelWithKwargs2'
         restored_model = create_model(config=new_config, output_dir=self.tmpdir + '_restored', dataset=dataset,
                                       restore_from=self.tmpdir)
         self.assertTrue(isinstance(restored_model, DummyModelWithKwargs2))
