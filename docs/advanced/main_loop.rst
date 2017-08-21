@@ -32,12 +32,13 @@ The lifecycle of the training is very simple. The following are the steps perfor
 
 #. Build the dataset and pass the section `dataset` from the `config <config.html>`_ to its constructor.
 #. Build the model an pass the section `model` from the `config <config.html>`_ to its constructor.
-#. Evaluate the extra streams, usually valid and test streams depending on your `main_loop.extra_streams`
-   `config <config.html>`_.
-   At this point, the model is not updated and therefore, it is perfectly fine to use validation and testing data.
+#. Evaluate the extra streams. Those are usually valid and test streams, depending on 
+   your `main_loop.extra_streams` `config <config.html>`_.
+   During this phase, the model is not updated and therefore, it is perfectly fine
+   to use validation and testing data.
 #. Start the training loop.
-   In the training loop, the two following steps alternate: update the model based on the training data and evaluate
-   the extra streams.
+   In the training loop, the two following steps alternate: update the model based on the training data
+   and evaluate the extra streams.
 
 The whole process might be described by the following pseudocode.
 
