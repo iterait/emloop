@@ -215,7 +215,7 @@ class ReflectionTest(CXTestCaseWithDir):
 
         # test if the module is returned directly
         module = get_class_module('cxflow.hooks', 'LogProfile')
-        expected_module = 'cxflow.hooks.log_profile_hook'
+        expected_module = 'cxflow.hooks.log_profile'
         self.assertEqual(module, expected_module)
 
         # test if None is returned when the class is not found

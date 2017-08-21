@@ -5,7 +5,7 @@ import os
 import signal
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.catch_sigint_hook import CatchSigint
+from cxflow.hooks.catch_sigint import CatchSigint
 from cxflow.hooks.abstract_hook import TrainingTerminated
 
 

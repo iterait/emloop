@@ -9,7 +9,7 @@ import numpy as np
 
 from cxflow import AbstractModel, MainLoop, AbstractDataset
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.stop_after_hook import StopAfter
+from cxflow.hooks.stop_after import StopAfter
 from cxflow.utils.profile import Timer
 
 from .test_core import CXTestCaseWithDir

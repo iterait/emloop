@@ -6,7 +6,7 @@ from typing import Mapping, List
 import collections
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.save_hook import SaveEvery, SaveBest, AbstractHook
+from cxflow.hooks.save import SaveEvery, SaveBest, AbstractHook
 from cxflow.models.abstract_model import AbstractModel
 
 

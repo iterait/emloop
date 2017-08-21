@@ -6,7 +6,7 @@ import numpy as np
 import collections
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.check_hook import Check
+from cxflow.hooks.check import Check
 from cxflow.hooks.abstract_hook import TrainingTerminated
 
 

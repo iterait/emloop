@@ -11,7 +11,7 @@ import yaml
 from cxflow import AbstractModel
 from cxflow.cli.common import create_output_dir, create_dataset, create_hooks, create_model
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.log_profile_hook import LogProfile
+from cxflow.hooks.log_profile import LogProfile
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
