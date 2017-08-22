@@ -15,9 +15,8 @@ class AbstractDataset:
     in order to make `stream_name` stream available in the cxflow `MainLoop`.
     """
 
-
-    Batch = NewType('Batch', Mapping[str, Iterable[Any]])
-    Stream = NewType('Stream', Iterable[Batch])
+    Batch = Mapping[str, Iterable[Any]]
+    Stream = Iterable[Batch]
 
     def __init__(self, config_str: str):
         """

@@ -8,7 +8,7 @@ cxflow
    getting_started
    tutorial
    advanced/index
-   api/index
+   cxflow/index
 
 Cxflow is a smart manager for deep learning models.
 With cxflow, you can easily define reusable components which speed up your future development.
