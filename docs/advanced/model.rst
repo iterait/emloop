@@ -3,7 +3,7 @@ Model
 
 Model is the second component of the cxflow environment.
 It defines the machine learning part of the whole workflow.
-The model object is defined by `cxflow.AbstractModel` API.
+The model object is defined by `cxflow.AbstractModel` interface.
 
 Firstly, the model constructor accepts a dataset instance, path to the logging directory and the information of
 if (and from where) the model should be restored.
