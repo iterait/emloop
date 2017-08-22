@@ -3,6 +3,16 @@ Getting Started
 
 Before we dive in, cxflow must be properly installed.
 
+Requirements
+************
+In order to run and install cxflow, the following utilities must be installed:
+
+- Python 3.5+.
+- `pip` 9.0+
+
+Cxflow depends on additional dependencies which are listed in the ``requirements.txt`` file.
+Nevertheless, these dependencies are automatically installed by ``pip`` (see below).
+
 Installation
 ************
 
@@ -20,11 +30,11 @@ TensorFlow backend for cxflow might be installed by:
 
     pip install cxflow-tensorflow
 
-Alternatively, cxflow might be installed directly from the sources.
+In order to use cxflow nightly builds, install directly from the source code repository (``dev`` branch).
 
 .. code-block:: bash
 
-    pip install git+https://github.com/Cognexa/cxflow.git
+    pip install -U git+https://github.com/Cognexa/cxflow.git@dev
 
 Developer Installation
 **********************
