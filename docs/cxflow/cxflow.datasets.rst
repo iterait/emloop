@@ -1,0 +1,45 @@
+===================
+``cxflow.datasets``
+===================
+
+.. automodule:: cxflow.datasets
+
+
+.. currentmodule:: cxflow.datasets
+
+
+Classes
+=======
+
+- :py:class:`AbstractDataset`:
+  This concept prescribes the API that is required from every cxflow dataset.
+
+- :py:class:`BaseDataset`:
+  Base class for datasets written in python.
+
+
+
+.. autoclass:: AbstractDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+
+   .. inheritance-diagram:: AbstractDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: BaseDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+
+   .. inheritance-diagram:: BaseDataset
+      :parts: 1
+
+   |
+

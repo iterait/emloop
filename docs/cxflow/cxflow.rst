@@ -1,0 +1,104 @@
+==========
+``cxflow``
+==========
+
+.. automodule:: cxflow
+
+
+
+Submodules
+==========
+
+.. toctree::
+   :titlesonly:
+
+   cxflow.cli
+   cxflow.constants
+   cxflow.datasets
+   cxflow.hooks
+   cxflow.models
+   cxflow.utils
+
+.. currentmodule:: cxflow
+
+
+Classes
+=======
+
+- :py:class:`AbstractDataset`:
+  This concept prescribes the API that is required from every cxflow dataset.
+
+- :py:class:`BaseDataset`:
+  Base class for datasets written in python.
+
+- :py:class:`MainLoop`:
+  Train the model, manage hooks etc.
+
+- :py:class:`AbstractModel`:
+  Abstract machine learning model which exposes input and output names, run and save methods.
+
+
+
+.. autoclass:: AbstractDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+
+   .. inheritance-diagram:: AbstractDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: BaseDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+
+   .. inheritance-diagram:: BaseDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: MainLoop
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+
+   .. inheritance-diagram:: MainLoop
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: AbstractModel
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+
+   .. inheritance-diagram:: AbstractModel
+      :parts: 1
+
+   |
+
+
+
+Variables
+=========
+
+- :py:data:`constants`
+
+.. autodata:: constants
+   :annotation:
+
+   .. code-block:: guess
+
+      <module 'cxflow.constants' from '/home/petrbel/Cognexa/cxflow/cxflow/constants.py'>
