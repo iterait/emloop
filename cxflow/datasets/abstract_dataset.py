@@ -11,8 +11,8 @@ class AbstractDataset:
     """
     This concept prescribes the API that is required from every cxflow dataset.
     Every cxflow dataset has to have a constructor which takes YAML string config.
-    Additionally, one may implement any `<stream_name>_stream` method
-    in order to make `stream_name` stream available in the cxflow `MainLoop`.
+    Additionally, one may implement any ``<stream_name>_stream`` method
+    in order to make ``stream_name`` stream available in the cxflow ``MainLoop``.
     """
 
     Batch = Mapping[str, Iterable[Any]]
@@ -20,8 +20,8 @@ class AbstractDataset:
 
     def __init__(self, config_str: str):
         """
-        Create new dataset configured with the given yaml string (obligatory).
-        The configuration must contain 'dataset' entry and may contain 'output_dir' entry.
+        Create new dataset configured with the given YAML string (obligatory).
+        The configuration must contain `dataset` entry and may contain `output_dir' entry.
         :param config_str: YAML string config
         """
         pass

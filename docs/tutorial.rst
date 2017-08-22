@@ -403,4 +403,4 @@ producion environment.
 
     cxflow predict log/MajorityExample_<some-suffix>
 
-We cover the predicion in the production evironment in the advanced tutorials.
+We cover the prediction in the production evironment in the advanced tutorials.
