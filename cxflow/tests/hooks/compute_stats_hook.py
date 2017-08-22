@@ -6,7 +6,7 @@ import numpy as np
 import collections
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.compute_stats_hook import ComputeStats
+from cxflow.hooks.compute_stats import ComputeStats
 
 
 class StatsHookTest(CXTestCase):

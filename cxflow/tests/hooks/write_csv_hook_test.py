@@ -8,7 +8,7 @@ import os
 import tempfile
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.write_csv_hook import WriteCSV
+from cxflow.hooks.write_csv import WriteCSV
 
 
 _EXAMPLES = 5

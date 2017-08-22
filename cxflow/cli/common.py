@@ -11,7 +11,7 @@ from ..datasets import AbstractDataset
 from ..models import AbstractModel
 from ..hooks import AbstractHook
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
-from ..utils.reflection import create_object_from_config, get_class_module, parse_fully_qualified_name, create_object
+from ..utils.reflection import get_class_module, parse_fully_qualified_name, create_object
 from ..utils.config import config_to_str, config_to_file
 from ..main_loop import MainLoop
 
@@ -61,11 +61,18 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     :return: dataset object
     """
     logging.info('Creating dataset')
+
     dataset_config = config['dataset']
+    assert 'class' in dataset_config, '`dataset.class` not present in the config'
+    dataset_module, dataset_class = parse_fully_qualified_name(dataset_config['class'])
+
     if 'output_dir' in dataset_config:
         raise ValueError('The `output_dir` key is reserved and can not be used in dataset configuration.')
-    dataset_args = {'output_dir': output_dir, **dataset_config}
-    dataset = create_object_from_config(config['dataset'], args=(config_to_str(dataset_args),))
+
+    dataset_config = {'output_dir': output_dir, **config['dataset']}
+    del dataset_config['class']
+
+    dataset = create_object(dataset_module, dataset_class, args=(config_to_str(dataset_config),))
     logging.info('\t%s created', type(dataset).__name__)
     return dataset
 
@@ -92,37 +99,31 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
     logging.info('Creating a model')
 
     model_config = config['model']
-    assert 'module' in model_config, '`model.module` not present in the config'
-    assert 'class' in model_config, '`model.module` not present in the config'
+    assert 'class' in model_config, '`model.class` not present in the config'
+    model_module, model_class = parse_fully_qualified_name(model_config['class'])
 
-    # create model kwargs (without `module` and `class`)
+    # create model kwargs (without `class`)
     model_kwargs = {'dataset': dataset, 'log_dir': output_dir, 'restore_from': restore_from, **model_config}
-    del model_kwargs['module']
     del model_kwargs['class']
 
     try:
-        model = create_object_from_config(model_config, kwargs=model_kwargs, key_prefix='')
+        model = create_object(model_module, model_class, kwargs=model_kwargs)
     except (ImportError, AttributeError) as ex:
         if restore_from is None:  # training case
             raise ImportError('Cannot create model from the specified model module `{}` and class `{}`.'.format(
                 model_config['module'], model_config['class'])) from ex
 
         else:  # restore cases (resume, predict)
-            logging.warning('Cannot create model from the specified model module `%s` and class `%s`.',
-                            model_config['module'], model_config['class'])
-            assert 'restore_fallback_module' in model_config, ('`model.restore_fallback_module` '
-                                                               'not present in the config')
-            assert 'restore_fallback_class' in model_config, '`model.restore_fallback_class` not present in the config'
-            logging.info('Trying to restore with fallback module `{}` and class `{}` instead.'.format(
-                model_config['restore_fallback_module'], model_config['restore_fallback_class']))
+            logging.warning('Cannot create model from the specified model class `%s`.', model_config['class'])
+            assert 'restore_fallback' in model_config, '`model.restore_fallback` not present in the config'
+            logging.info('Trying to restore with fallback `{}` instead.'.format(model_config['restore_fallback']))
 
             try:  # try fallback class
-                model = create_object_from_config(model_config, kwargs=model_kwargs, key_prefix='restore_fallback_')
+                fallback_module, fallback_class = parse_fully_qualified_name(model_config['restore_fallback'])
+                model = create_object(fallback_module, fallback_class, kwargs=model_kwargs)
             except (ImportError, AttributeError) as ex:  # if fallback module/class specified but it fails
-                raise ImportError('Cannot create model from the specified '
-                                  'restore_module `{}` and model_class `{}`.'.format(
-                                      model_config['restore_fallback_module'],
-                                      model_config['restore_fallback_class'])) from ex
+                raise ImportError('Cannot create model from the specified restore_fallback `{}`.'.format(
+                    model_config['restore_fallback'],)) from ex
 
     logging.info('\t%s created', type(model).__name__)
     return model
@@ -247,8 +248,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
 
     try:  # save the config to file
         # modify the config so that it contains fallback information
-        config['model']['restore_fallback_module'] = model.restore_fallback_module
-        config['model']['restore_fallback_class'] = model.restore_fallback_class
+        config['model']['restore_fallback'] = model.restore_fallback
         config_to_file(config=config, output_dir=output_dir, name=CXF_CONFIG_FILE)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Saving config failed', ex)

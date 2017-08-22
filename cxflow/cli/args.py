@@ -1,9 +1,12 @@
 from argparse import ArgumentParser
+import pkg_resources
 
 
 def get_cxflow_arg_parser() -> ArgumentParser:
     # create parser
     main_parser = ArgumentParser('cxflow')
+    main_parser.add_argument('--version', action='version', help='print cxflow version and quit',
+                             version='cxflow {}'.format(pkg_resources.get_distribution('cxflow').version))
     subparsers = main_parser.add_subparsers(help='cxflow modes')
 
     # create train subparser

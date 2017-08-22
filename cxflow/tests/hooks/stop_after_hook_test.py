@@ -2,7 +2,7 @@
 Test module for epoch stopper hook (cxflow.hooks.stop_after_hook).
 """
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.stop_after_hook import StopAfter
+from cxflow.hooks.stop_after import StopAfter
 from cxflow.hooks.abstract_hook import TrainingTerminated
 
 

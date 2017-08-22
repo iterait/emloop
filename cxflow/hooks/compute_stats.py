@@ -7,7 +7,7 @@ from typing import Iterable, Mapping
 import numpy as np
 
 from .abstract_hook import AbstractHook
-from .accumulate_variables_hook import AccumulateVariables
+from .accumulate_variables import AccumulateVariables
 
 
 class ComputeStats(AccumulateVariables):

@@ -5,7 +5,7 @@ Test module for accumulating hook (cxflow.hooks.accumulate_variables_hook).
 import numpy as np
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.accumulate_variables_hook import AccumulateVariables
+from cxflow.hooks.accumulate_variables import AccumulateVariables
 
 
 _ITERS = 9

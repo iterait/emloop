@@ -11,7 +11,7 @@ import yaml
 from cxflow import AbstractModel
 from cxflow.cli.common import create_output_dir, create_dataset, create_hooks, create_model
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.log_profile_hook import LogProfile
+from cxflow.hooks.log_profile import LogProfile
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
@@ -56,11 +56,7 @@ class DummyModel(AbstractModel):
         return self._output_names
 
     @property
-    def restore_fallback_module(self) -> str:
-        return ''
-
-    @property
-    def restore_fallback_class(self) -> str:
+    def restore_fallback(self) -> str:
         return ''
 
 
@@ -146,11 +142,10 @@ class CLICommonTest(CXTestCaseWithDir):
 
     def test_create_dataset(self):
         """Test correct config re-wrapping."""
-        config = {'dataset': {'module': 'cxflow.tests.cli.common_test', 'class': 'DummyDataset', 'batch_size': 10},
+        config = {'dataset': {'class': 'cxflow.tests.cli.common_test.DummyDataset', 'batch_size': 10},
                   'stream': {'train': {'rotate': 20}}, 'hooks': [{'hook_name': 'should_not_be_included'}]}
 
-        expected_config = {'module': 'cxflow.tests.cli.common_test',
-                           'class': 'DummyDataset', 'batch_size': 10, 'output_dir': 'dummy_dir'}
+        expected_config = {'batch_size': 10, 'output_dir': 'dummy_dir'}
 
         dataset = create_dataset(config=config, output_dir='dummy_dir')
 
@@ -201,8 +196,7 @@ class CLICommonTest(CXTestCaseWithDir):
         """Test if model is created correctly."""
 
         # test correct kwargs passing
-        config = {'model': {'module': 'cxflow.tests.cli.common_test',
-                            'class': 'DummyModelWithKwargs',
+        config = {'model': {'class': 'cxflow.tests.cli.common_test.DummyModelWithKwargs',
                             'io': {'in': [], 'out': ['dummy']}}}
         dataset = 'dataset_placeholder'
         expected_kwargs = {'dataset': dataset, 'log_dir': self.tmpdir, **config['model']}
@@ -210,7 +204,6 @@ class CLICommonTest(CXTestCaseWithDir):
         model.save('dummy')
 
         kwargs = model.kwargs  # pylint: disable=no-member
-        del expected_kwargs['module']
         del expected_kwargs['class']
 
         for key in expected_kwargs.keys():
@@ -224,9 +217,8 @@ class CLICommonTest(CXTestCaseWithDir):
 
         # test restoring when the model class is not found
         new_config = deepcopy(config)
-        new_config['model']['class'] = 'IDontExist'
-        new_config['model']['restore_fallback_module'] = 'cxflow.tests.cli.common_test'
-        new_config['model']['restore_fallback_class'] = 'DummyModelWithKwargs2'
+        new_config['model']['class'] = 'nonexistingmodule.IDontExist'
+        new_config['model']['restore_fallback'] = 'cxflow.tests.cli.common_test.DummyModelWithKwargs2'
         restored_model = create_model(config=new_config, output_dir=self.tmpdir + '_restored', dataset=dataset,
                                       restore_from=self.tmpdir)
         self.assertTrue(isinstance(restored_model, DummyModelWithKwargs2))
