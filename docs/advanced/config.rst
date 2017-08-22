@@ -14,7 +14,7 @@ Each configuration file is structured in the following sections.
 - `model`
 - `hooks`
 - `main_loop`
-- `predict`
+- `infer`
 
 While `dataset` and `model` sections are mandatory, the remaining ones are not.
 Nevertheless, `hooks` are strongly recommended to be specified.
@@ -179,14 +179,14 @@ Note that we've already defined anchors `&dataset` and `&model` in the snippets 
 
 Now, we can import them and rewrite only the arguments which differ.
 In the following example, we reuse the whole dataset as is.
-The model is almost the same but we need to specify different `inputs` and `outputs` since the prediction stream will
+The model is almost the same but we need to specify different `inputs` and `outputs` since the inference stream will
 no longer provide the target class (`animal`).
 The model itself is supposed to infer the `animal` instead.
 Finally, we define a completely different set of hooks.
 
 .. code-block:: yaml
 
-    predict:
+    infer:
       dataset:
         <<: *dataset
 
@@ -196,7 +196,7 @@ Finally, we define a completely different set of hooks.
         outputs: [predictions]
 
       hooks:
-        - hooks.prediction_logging_hook.PredictionLoggingHook:
+        - hooks.inference_logging_hook.InferenceLoggingHook:
             variables: [ids, predictions]
 
 Conclusion
