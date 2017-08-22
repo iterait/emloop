@@ -13,12 +13,11 @@ This is the recommended option for majority of users.
 
     pip install cxflow
 
-Optionally, install additional plugins by running:
+Optionally, install additional plugins by installing `cxflow-<plugin-name>`.
+TensorFlow backend for cxflow might be installed by:
 
 .. code-block:: bash
 
-    # pip install cxflow-[plugin-name]
-    # e.g.
     pip install cxflow-tensorflow
 
 Alternatively, cxflow might be installed directly from the sources.
@@ -37,7 +36,6 @@ Finally, cxflow might be installed directly for developer purposes.
     git clone git@github.com:Cognexa/cxflow.git
     cd cxflow
     pip install -e .
-    python setup.py test
 
 When inside the clonned directory, cxflow might be tested
 
