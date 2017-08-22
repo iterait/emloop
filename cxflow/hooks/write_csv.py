@@ -15,28 +15,34 @@ class WriteCSV(AbstractHook):
     """
     Log the training results to CSV file.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - WriteCSV
-    -------------------------------------------------------
-    # log only certain variables
-    hooks:
-      - WriteCSV:
-          variables: [loss, fscore]
-    -------------------------------------------------------
-    # warn about unsupported variables
-    hooks:
-      - WriteCSV:
-          variables: [loss, fscore, xxx]
-          on_unknown_type: warn
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: Log all the variables
+
+        hooks:
+          - WriteCSV
+
+    .. code-block:: yaml
+        :caption: Log only certain variables
+
+        hooks:
+          - WriteCSV:
+              variables: [loss, fscore]
+
+    .. code-block:: yaml
+        :caption: Warn about unsupported variables
+
+        hooks:
+          - WriteCSV:
+              variables: [loss, fscore, xxx]
+              on_unknown_type: warn
+
     """
 
     UNKNOWN_TYPE_ACTIONS = {'error', 'warn', 'default'}
+    """Action executed on unknown type detection."""
+
     MISSING_VARIABLE_ACTIONS = {'error', 'warn', 'default'}
+    """Action executed on missing variable."""
 
     def __init__(self,  # pylint: disable=too-many-arguments
                  output_dir: str, output_file: str="training.csv", delimiter: str=',',

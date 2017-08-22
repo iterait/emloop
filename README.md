@@ -41,8 +41,11 @@ So far, the following documents are available:
 
 In order to generate API documentation, run
 ```bash
-sphinx-apidoc -f -o doc/api cxflow
+sphinx-apidoc -f -o docs/api cxflow
+cd docs
+sphinx-autobuild . build
 ```
+
 
 ## Extensions
 **cxflow** is meant to be extremely lightweight.
