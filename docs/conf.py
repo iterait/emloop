@@ -32,7 +32,8 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 import sphinx_bootstrap_theme
-
+import autoapi.sphinx
+autoapi.sphinx.__version__ = '0.1'
 extensions = \
     ['sphinx.ext.autodoc',
     'autoapi.sphinx',
