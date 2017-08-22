@@ -10,7 +10,7 @@ class Check(AbstractHook):
     """
     Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.
 
-    Raise `ValueError` on error or when the threshold was not exceeded in given number of epochs
+    Raise ``ValueError`` on error or when the threshold was not exceeded in given number of epochs
 
     .. code-block:: yaml
         :caption: exceed 95% accuracy on valid (default) stream within at most 10 epochs

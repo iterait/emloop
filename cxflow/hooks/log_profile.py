@@ -26,8 +26,9 @@ class LogProfile(AbstractHook):
         Summarize and log the given epoch profile.
 
         The profile is expected to contain at least:
-            - `read_data_train`, `eval_batch_train` and `after_batch_hooks_train` entries produced by the train stream
-            - `after_epoch_hooks` entry
+            - ``read_data_train``, ``eval_batch_train`` and ``after_batch_hooks_train`` entries produced by the train
+              stream
+            - ``after_epoch_hooks`` entry
 
         :param profile: epoch timings profile
         :param extra_streams: enumeration of additiona stream names

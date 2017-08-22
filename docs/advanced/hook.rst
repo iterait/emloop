@@ -6,15 +6,15 @@ In this short tutorial, we learn how to use standard cxflow hooks and even how t
 Cxflow hooks allow to observe, modify and act upon the training process.
 Hooks shall do their work in one of the following events invoked by the cxflow `main loop <main_loop.html>`_:
 
-- **before_training** invoked once before entering the training loop, `no args`
-- **after_batch** invoked after each batch regardless of the stream, `(stream_name, batch_data)`
-- **after_epoch** invoked after each epoch, `(epoch_id, epoch_data)`
-- **after_epoch_profile** special event with training profiling data, invoked after each epoch, `(epoch_id, epoch_profile)`
-- **after_training** invoked once after the trainig finishes, `no args`
+- **before_training** invoked once before entering the training loop, ``no args``
+- **after_batch** invoked after each batch regardless of the stream, ``(stream_name, batch_data)``
+- **after_epoch** invoked after each epoch, ``(epoch_id, epoch_data)``
+- **after_epoch_profile** special event with training profiling data, invoked after each epoch, ``(epoch_id, epoch_profile)``
+- **after_training** invoked once after the trainig finishes, ``no args``
 
 Before we dig into details, we peek on how to use some of the standard hooks available in cxflow framework.
 
-In your `configuration <config.html>`_, hooks are listed under `hooks` entry, for example:
+In your `configuration <config.html>`_, hooks are listed under ``hooks`` entry, for example:
 
 .. code-block:: yaml
 
@@ -26,15 +26,15 @@ In your `configuration <config.html>`_, hooks are listed under `hooks` entry, fo
       - LogVariables
 
 would instruct cxflow to create two hooks which will keep track of the mean loss during the training.
-In fact, the `ComputeStats` stores the loss from every batch and means the accumulated values after
+In fact, the ``ComputeStats`` stores the loss from every batch and means the accumulated values after
 each epoch.
-Subsequently, the `LogVariables` logs all the variables available in the `epoch_data`, which
-in the example above is only the mean loss computed by `ComputeStats` hook.
+Subsequently, the ``LogVariables`` logs all the variables available in the ``epoch_data``, which
+in the example above is only the mean loss computed by ``ComputeStats`` hook.
 
 The names of the hooks are nothing more than the names of their respective classes.
 For hooks that are built-in inside cxflow, only the class name needs to be specified,
 however, for hooks outside of cxflow, you also have to specify their module. For instance,
-for a class called `MyHook` inside a module `my_project.hooks`, you would write:
+for a class called ``MyHook`` inside a module ``my_project.hooks``, you would write:
 
 .. code-block:: yaml
 
@@ -85,20 +85,20 @@ For example, a hook that would stop the training after the specified number of e
                 logging.info('EpochStopperHook triggered')
                 raise TrainingTerminated('Training terminated after epoch {}'.format(epoch_id))
 
-Now, lets take a closer look on the `after_batch` and `after_epoch` events where the majority
+Now, lets take a closer look on the ``after_batch`` and ``after_epoch`` events where the majority
 of hooks will operate.
 
-`after_batch` event
-===================
+``after_batch`` event
+=====================
 
 This event is invoked after every batch regardless of what stream is being processed.
-In fact, the stream name will be available in the `stream_name` argument.
+In fact, the stream name will be available in the ``stream_name`` argument.
 
-The second and last argument named `batch_data` is a dict of stream sources and model outputs.
+The second and last argument named ``batch_data`` is a dict of stream sources and model outputs.
 
-Imagine a dataset that provides streams with two sources, `images` and `labels` and a model which
-takes the `images` and outputs its own `preditions`.
-In this case, the `batch_data` would contain the following dict
+Imagine a dataset that provides streams with two sources, ``images`` and ``labels`` and a model which
+takes the ``images`` and outputs its own ``preditions``.
+In this case, the ``batch_data`` would contain the following dict
 
 .. code-block:: python
 
@@ -109,19 +109,19 @@ In this case, the `batch_data` would contain the following dict
     }
 
 Now, the hook decides how to process this data. Usually, it is useful to accumulate the data over
-the whole epoch and process them in the `after_epoch` event all at once.
+the whole epoch and process them in the ``after_epoch`` event all at once.
 Luckily, you do not have to implement this behavior on your own, it is already
-available in our :py:class:`cxflow.hooks.AccumulateVariables` hook from which
+available in our :py:class:``cxflow.hooks.AccumulateVariables`` hook from which
 you may derive your own hook.
 
-`after_epoch` event
-===================
+``after_epoch`` event
+=====================
 
-The `after_epoch` event is even more simple.
-The event accepts two arguments, `epoch_id`, representing the epoch number, and
-`epoch_data`, which is an object shared between the hooks.
+The ``after_epoch`` event is even more simple.
+The event accepts two arguments, ``epoch_id``, representing the epoch number, and
+``epoch_data``, which is an object shared between the hooks.
 
-Initially, the `epoch_data` object is an empty dict with stream name entries.
+Initially, the ``epoch_data`` object is an empty dict with stream name entries.
 E.g., with train, valid and test streams it initially looks as following:
 
 .. code-block:: python
@@ -132,9 +132,9 @@ E.g., with train, valid and test streams it initially looks as following:
       'test': {}
     }
 
-Now, for instance, our `ComputeStats` from the first example computes the mean over the
-accumulated loss data and stores the result to the given `epoch_data`. So after
-the `ComputeStats` hook has been called, the `epoch_data` will look as follows:
+Now, for instance, our ``ComputeStats`` from the first example computes the mean over the
+accumulated loss data and stores the result to the given ``epoch_data``. So after
+the ``ComputeStats`` hook has been called, the ``epoch_data`` will look as follows:
 
 .. code-block:: python
 
@@ -144,10 +144,10 @@ the `ComputeStats` hook has been called, the `epoch_data` will look as follows:
       'test': {'loss': {'mean': 0.35}
     }
 
-The `LogVariables` already expects this structure and logs everything it gets.
+The ``LogVariables`` already expects this structure and logs everything it gets.
 
-**Note that the hooks order matters! We would see nothing with the `LogVariables` placed
-before the `ComputeStats`.**
+**Note that the hooks order matters! We would see nothing with the ``LogVariables`` placed
+before the ``ComputeStats``.**
 
 Regular hook configuration
 ==========================

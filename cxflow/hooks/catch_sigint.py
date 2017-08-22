@@ -11,7 +11,7 @@ class CatchSigint(AbstractHook):
     """
     SIGINT catcher.
 
-    On first sigint finish the current batch and terminate training politely, i.e. trigger all `after_training` hooks.
+    On first sigint finish the current batch and terminate training politely, i.e. trigger all ``after_training`` hooks.
     On second sigint quit immediately with exit code 1
 
 

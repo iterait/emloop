@@ -8,8 +8,8 @@ Dataset/Model Integration
 =========================
 
 The first thing cxflow does no matter what command has been executed, is to build the dataset
-and pass the section `dataset` from the `config <config.html>`_ to its constructor.
-Afterwards, cxflow builds the model and passes the `model` section from the
+and pass the section ``dataset`` from the `config <config.html>`_ to its constructor.
+Afterwards, cxflow builds the model and passes the ``model`` section from the
 `config <config.html>`_ to its constructor.
 One of the model's arguments is also the dataset itself, so the net can query
 it for some information, such as the number of outputs, data size, etc.
@@ -17,23 +17,23 @@ it for some information, such as the number of outputs, data size, etc.
 After the dataset and the model are created, cxflow calls one of the dataset stream functions
 based on whether it is training, testing or predicting (more on this is described in the following
 sections).
-The selected stream method (e.g., `train_stream`) returns an iterable where each
+The selected stream method (e.g., ``train_stream``) returns an iterable where each
 item corresponds to a single batch of data.
 
-Finally, the stream is iterated through and each batch is fed to the model's `run` method along
+Finally, the stream is iterated through and each batch is fed to the model's ``run`` method along
 with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.
-The implementation of `run` method is backend specific.
+The implementation of ``run`` method is backend specific.
 
 Training Lifecycle
 ==================
 
 The lifecycle of the training is very simple. The following are the steps performed by cxflow.
 
-#. Build the dataset and pass the section `dataset` from the `config <config.html>`_ to its constructor.
-#. Build the model an pass the section `model` from the `config <config.html>`_ to its constructor.
+#. Build the dataset and pass the section ``dataset`` from the `config <config.html>`_ to its constructor.
+#. Build the model an pass the section ``model`` from the `config <config.html>`_ to its constructor.
 #. Evaluate the extra streams. Those are usually valid and test streams, depending on 
-   your `main_loop.extra_streams` `config <config.html>`_.
+   your ``main_loop.extra_streams`` `config <config.html>`_.
    During this phase, the model is not updated and therefore, it is perfectly fine
    to use validation and testing data.
 #. Start the training loop.

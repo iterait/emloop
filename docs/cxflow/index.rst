@@ -1,10 +1,8 @@
 API Reference
 =============
 
-.. warning::
-
-   This API reference is currently nothing but a dump of docstrings, ordered
-   alphabetically.
+Cxflow provides the following API.
+It is broken down into several packages as follows.
 
 .. toctree::
     :glob:

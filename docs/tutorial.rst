@@ -37,9 +37,9 @@ Dataset
 *******
 
 The very first step in any machine learning task is to load and process the data.
-Every `cxflow` dataset is expected to implement the interface defined by `cxflow.AbstractDataset`,
+Every ``cxflow`` dataset is expected to implement the interface defined by ``cxflow.AbstractDataset``,
 which is at the moment, only accepting string-encoded YAML.
-For regular projects, we recommend extending `cxflow.BaseDataset` which is a smart wrapper around configuration
+For regular projects, we recommend extending ``cxflow.BaseDataset`` which is a smart wrapper around configuration
 (see below).
 
 The dataset is supposed to wrap all data-related operations.
@@ -50,16 +50,16 @@ validation and prediction in the production environment.
 Our dataset will implement the following:
 
 #. **Training stream:** an iterable which provides batches of the training data.
-   The implementation of the training stream is provided in `train_stream` method.
+   The implementation of the training stream is provided in ``train_stream`` method.
 #. **Test stream:** an iterable providing testing data which will not be used during the training.
-   Arbitrary additional streams might be defined with method naming convention `<name>_stream`.
-   Therefore, out *test* stream will be implemented in `test_stream` method.
+   Arbitrary additional streams might be defined with method naming convention ``<name>_stream``.
+   Therefore, out *test* stream will be implemented in ``test_stream`` method.
 #. **The constructor:** accepts a YAML configuration in the form of a string
-   (more on this later). We avoid the implementation of the constructor by extending `cxflow.BaseDataset`.
-#. **Additional method:** such as `fetch`, `split`, or anything else you may need.
-   Cxflow is able to call arbitrary dataset methods by invoking `cxflow dataset <method-name>` command.
+   (more on this later). We avoid the implementation of the constructor by extending ``cxflow.BaseDataset``.
+#. **Additional method:** such as ``fetch``, ``split``, or anything else you may need.
+   Cxflow is able to call arbitrary dataset methods by invoking ``cxflow dataset <method-name>`` command.
 
-For our purposes, let us create a class called `MajorityDataset`:
+For our purposes, let us create a class called ``MajorityDataset``:
 
 .. code-block:: python
 
@@ -87,32 +87,32 @@ For our purposes, let us create a class called `MajorityDataset`:
                 yield {'x': self.test_x[i: i+self.batch_size],
                        'y': self.test_y[i: i+self.batch_size]}
 
-Let us describe the functionality of our `MajorityDataset` step by step.
-Let's begin with `_init_with_kwargs` method.
+Let us describe the functionality of our ``MajorityDataset`` step by step.
+Let's begin with ``_init_with_kwargs`` method.
 The method is called from the dataset constructor automatically and it is passed the
 parameters from the configuration file (configuration will be explained later).
-In our case, we need `N` (the number of examples in total), `dim` (the dimension of the
-generated data) and `batch_size` (how big our batches will be).
+In our case, we need ``N`` (the number of examples in total), ``dim`` (the dimension of the
+generated data) and ``batch_size`` (how big our batches will be).
 
-The method randomly generates a dataset of `N` vectors of ones and zeros (variable `x`).
-For each of those vectors, it calculates the correct answer (variable `y`).
+The method randomly generates a dataset of ``N`` vectors of ones and zeros (variable ``x``).
+For each of those vectors, it calculates the correct answer (variable ``y``).
 Finaly, it splits the dataset to training and testing data in the ratio of 8:2
-(this would be better done in an extra `split` function, but we have omitted this for
+(this would be better done in an extra ``split`` function, but we have omitted this for
 the sake of simplicity).
 
-To sum up, when the dataset is constructed, it features four attributes (`train_x`,
-`train_y`, `test_x` and `test_y`) that represent the loaded data.
+To sum up, when the dataset is constructed, it features four attributes (``train_x``,
+``train_y``, ``test_x`` and ``test_y``) that represent the loaded data.
 Note that it is completely valid option to rename them as desired.
 In real-world cases, we usually don't want to generate our data randomly.
-Instead, we can simply load them from file (e.g. `.csv`) or database.
+Instead, we can simply load them from file (e.g. ``.csv``) or database.
 
-To iterate over the training data, there is a `train_stream` function.
+To iterate over the training data, there is a ``train_stream`` function.
 This function returns an iterator over batches.
-Each *batch* is a dictionary with keys `x` and `y`, where the value of `x` is a list of
-training vectors and the value of `y` is the list of the correct answers.
-The lists have the length of `batch_size`.
+Each *batch* is a dictionary with keys ``x`` and ``y``, where the value of ``x`` is a list of
+training vectors and the value of ``y`` is the list of the correct answers.
+The lists have the length of ``batch_size``.
 
-A batch (with `batch_size=4`) representing the example above looks like this:
+A batch (with ``batch_size=4``) representing the example above looks like this:
 
 .. code-block:: python
 
@@ -131,7 +131,7 @@ A batch (with `batch_size=4`) representing the example above looks like this:
         ]
     }
 
-Similarly, there is a `test_stream` function that iterates over the testing data.
+Similarly, there is a ``test_stream`` function that iterates over the testing data.
 
 Iteration over the whole dataset is called an *epoch*.
 We train our machine learning models by iterating through the training stream for a single
@@ -155,10 +155,10 @@ To make this process simpler, we will use the official
 a basic TensorFlow integration to cxflow. Please install this package before you proceed
 with this tutorial.
 
-In `cxflow-tensorflow`, every model is a python class expected to
-extend the `cxflow_tensorflow.BaseModel`.
+In ``cxflow-tensorflow``, every model is a python class expected to
+extend the ``cxflow_tensorflow.BaseModel``.
 
-Let us define a class called `MajorityNet`.
+Let us define a class called ``MajorityNet``.
 
 .. code-block:: python
 
@@ -201,27 +201,27 @@ Let us define a class called `MajorityNet`.
             self._session.run(tf.local_variables_initializer())
 
 
-When implementing a custom model, make sure to extend the `cxflow.BaseModel` class.
+When implementing a custom model, make sure to extend the ``cxflow.BaseModel`` class.
 As described above, this tutorial focuses only on TensorFlow model, hence extending
-`cxflow_tensorflow.BaseModel` is a good idea.
+``cxflow_tensorflow.BaseModel`` is a good idea.
 
-The only method that is really necessary to implement is `_create_model`.
-In our case, `_create_model` method creates a simple MLP.
+The only method that is really necessary to implement is ``_create_model``.
+In our case, ``_create_model`` method creates a simple MLP.
 If you know TensorFlow a little bit, it should be easy to understand what is going on.
 
 To be precise, the model registred the following computational graph nodes:
 
 #. Placeholders *x* and *y* corresponding to a single *x* and *y* batch from the stream.
-#. Variable `train_op` denoting the operation performing the training. This operation
-   is called by `cxflow` during training.
-#. Variable `loss` denoting the mean square error of the model.
-#. Variable `predictions` denoting the output of the network, i.e., the supposed bit in majority.
-#. Variable `accuracy` denoting the fraction of correct predictions in the current batch.
+#. Variable ``train_op`` denoting the operation performing the training. This operation
+   is called by ``cxflow`` during training.
+#. Variable ``loss`` denoting the mean square error of the model.
+#. Variable ``predictions`` denoting the output of the network, i.e., the supposed bit in majority.
+#. Variable ``accuracy`` denoting the fraction of correct predictions in the current batch.
 
 Note that the registration of the nodes is done by the node naming.
 The variables that are not named explicitely will not be accessible in the future.
 
-The `_create_model` method can accept arbitrary arguments - in our case, we accept the
+The ``_create_model`` method can accept arbitrary arguments - in our case, we accept the
 optimization algorithm to be used and the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.
 
@@ -252,9 +252,9 @@ Dataset
 =======
 
 In our case, we only need to tell cxflow which dataset to use.
-This is done by specifying `module` and `class` of the dataset.
+This is done by specifying ``module`` and ``class`` of the dataset.
 In addition, we will specify the parameters of the dataset (those
-ones passed to dataset's `_init_with_kwargs` method).
+ones passed to dataset's ``_init_with_kwargs`` method).
 
 .. code-block:: yaml
 
@@ -265,26 +265,26 @@ ones passed to dataset's `_init_with_kwargs` method).
       dim: 11
       batch_size: 4
 
-We can pass arbitrary other constants to the dataset as they will be hidden in the `**kwargs`
-of the dataset's `_init_with_kwargs` method.
+We can pass arbitrary other constants to the dataset as they will be hidden in the ``**kwargs``
+of the dataset's ``_init_with_kwargs`` method.
 
-**Note:** The whole `dataset` section will be passed as a string-encoded YAML
+**Note:** The whole ``dataset`` section will be passed as a string-encoded YAML
 to the dataset constructor.
-In the case of using `cxflow.BaseDataset`, the YAML is automatically decoded and the individual
-variables are passed to `_init_with_kwargs` method.
+In the case of using ``cxflow.BaseDataset``, the YAML is automatically decoded and the individual
+variables are passed to ``_init_with_kwargs`` method.
 
 Model
 =====
 
-Similarly to the dataset, the model is defined in the `net` section.
-In our case, we want to specify `module` and `class` of the model together with `optimizer` and
-`hidden` as required from the model's `_create_net` method.
-In addition, we will specify the network `name` which will be used for naming the
+Similarly to the dataset, the model is defined in the ``net`` section.
+In our case, we want to specify ``module`` and ``class`` of the model together with ``optimizer`` and
+``hidden`` as required from the model's ``_create_net`` method.
+In addition, we will specify the network ``name`` which will be used for naming the
 logging directory.
 
 In addition, we have to specify which TensorFlow variable names are the network inputs
 and which variable names are on the output.
-This is done by `inputs` and `outputs` config items.
+This is done by ``inputs`` and ``outputs`` config items.
 
 .. code-block:: yaml
 
@@ -307,12 +307,12 @@ Main Loop
 =========
 
 As the model training is executed in epochs, it is naturally implemented as a loop.
-This loop (`cxflow.MainLoop`) can be configured, e.g., additional streams to the `train`
+This loop (``cxflow.MainLoop``) can be configured, e.g., additional streams to the ``train``
 stream might be specified.
-In our case, we also want to evaluate the `test` stream, so we will add it to the
-`main_loop.extra_streams` section of the config.  The streams are named by the dataset
-methods they are created in. That is, the `test` stream corresponds to the
-`test_stream` method of the dataset.
+In our case, we also want to evaluate the ``test`` stream, so we will add it to the
+``main_loop.extra_streams`` section of the config.  The streams are named by the dataset
+methods they are created in. That is, the ``test`` stream corresponds to the
+``test_stream`` method of the dataset.
 
 .. code-block:: yaml
 
@@ -343,9 +343,9 @@ For now, we will simply use the following config snippet in order to register a 
         epoch_limit: 10
 
 As it might be observed, we have registered four hooks.
-The first one computes various statistics, e.g. `loss` will be provided with its mean and
+The first one computes various statistics, e.g. ``loss`` will be provided with its mean and
 standard deviation.
-`accuracy` will be provided with mean only.
+``accuracy`` will be provided with mean only.
 
 The second hook is the logging hook which simply logs everything it gets to a log file
 and to the standard output.
@@ -371,7 +371,7 @@ The second part presents the output of the hooks.
 Finally, our logging hook is the one which produces the information after each epoch.
 Now we can easily watch the progress of the training.
 
-After the training is finished, note that there is a new directory `log/MajorityExample_*`.
+After the training is finished, note that there is a new directory ``log/MajorityExample_*``.
 This is the logging directory where everything cxflow produced is stored, including
 saved models, the configuration file and various other artifacts.
 
@@ -394,9 +394,9 @@ Simple as that.
 
 In case the model is good enough to be used in the production, it is extremely
 easy to use cxflow for this purpose.
-**Note:** the dataset must implement `predict_stream` method.
+**Note:** the dataset must implement ``predict_stream`` method.
 In addition, the net inputs and outputs should be modified in the configuration file
-not to include `loss`, `accuracy` and `y`, since we don't know those in the
+not to include ``loss``, ``accuracy`` and ``y``, since we don't know those in the
 producion environment.
 
 .. code-block:: bash

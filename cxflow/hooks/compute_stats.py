@@ -15,7 +15,8 @@ class ComputeStats(AccumulateVariables):
     Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
 
     .. code-block:: yaml
-        :caption: accumulate the accuracy variable (either model output or stream source); compute and store its mean value
+        :caption: accumulate the accuracy variable (either model output or stream source); compute and store its mean \
+        value
 
         hooks:
           - ComputeStats:

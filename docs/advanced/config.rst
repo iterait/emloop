@@ -10,20 +10,20 @@ or simple comments.
 
 Each configuration file is structured in the following sections.
 
-- `dataset`
-- `model`
-- `hooks`
-- `main_loop`
-- `infer`
+- ``dataset``
+- ``model``
+- ``hooks``
+- ``main_loop``
+- ``infer``
 
-While `dataset` and `model` sections are mandatory, the remaining ones are not.
-Nevertheless, `hooks` are strongly recommended to be specified.
+While ``dataset`` and ``model`` sections are mandatory, the remaining ones are not.
+Nevertheless, ``hooks`` are strongly recommended to be specified.
 
 Dataset
 =======
 
 Dataset section specifies the configuration of the dataset.
-It contains a `class` entry which points to the module and the class name of the dataset, separated
+It contains a ``class`` entry which points to the module and the class name of the dataset, separated
 by a dot.
 The remaining parameters are passed to the dataset constructor in the form of a string-encoded YAML.
 
@@ -49,9 +49,9 @@ Model
 =====
 
 Model section specifies the configuration of the model to be trained or inferred.
-Again, it contains a `class` entry which is employed by cxflow in order to construct the model object.
+Again, it contains a ``class`` entry which is employed by cxflow in order to construct the model object.
 
-In addition, `inputs` and `outputs` entries are required as well.
+In addition, ``inputs`` and ``outputs`` entries are required as well.
 These arguments define what sources will be obtained from the dataset stream and which will
 be provided by the model.
 The remaining parameters are directly passed to the model constructor from whence they might
@@ -93,8 +93,8 @@ The section contains a list of hooks to be registered in the main loop (see
 The list contains two types of entries.
 The first type specifies only the hook class name and optionally its module.
 In the case there is only the class name, the hook will be automatically
-loaded from the `cxflow.hooks` module.
-In case the hook class is fully specified including the module, e.g. `my_module.my_hook`,
+loaded from the ``cxflow.hooks`` module.
+In case the hook class is fully specified including the module, e.g. ``my_module.my_hook``,
 this hook will be loaded as expected.
 
 Example:
@@ -106,10 +106,10 @@ Example:
       - cxflow_tensorflow.TensorBoardHook
       - my_hooks.my_hook.MyHook
 
-Second possible type of hook entries is a dict in the form of `Hook -> {config}`.
-Again, the `Hook` can be either standard hook name or a fully qualified name in the
-form of `module.class`.
-The nested is passed to directly to the hook's constructor in the form of `**kwargs`.
+Second possible type of hook entries is a dict in the form of ``Hook -> {config}``.
+Again, the ``Hook`` can be either standard hook name or a fully qualified name in the
+form of ``module.class``.
+The nested is passed to directly to the hook's constructor in the form of ``**kwargs``.
 
 Example:
 
@@ -135,16 +135,16 @@ Main Loop
 Main loop section specifies various settings of the main loop.
 Currently, the following parameters are supported.
 
-- `extra_streams`: A list of additional streams that will be evalueted during training or inferred
-                   during `cxflow infer`.
-- `on_unused_sources`: Behavior of the main loop when the dataset provides batches with sources not
-                       registered in model's `inputs`. By default (`warn`), main loop warns the developer.
-                       Remaining options are `ignore` which suppresses the warning and `error` which
+- ``extra_streams``: A list of additional streams that will be evalueted during training or inferred
+                   during ``cxflow infer``.
+- ``on_unused_sources``: Behavior of the main loop when the dataset provides batches with sources not
+                       registered in model's ``inputs``. By default (``warn``), main loop warns the developer.
+                       Remaining options are ``ignore`` which suppresses the warning and ``error`` which
                        terminates the process immediately.
-- `fixed_batch_size`: If this option is specified, the main loop will enforce the batches fed to the model will
+- ``fixed_batch_size``: If this option is specified, the main loop will enforce the batches fed to the model will
                       contain exactly the specified number of examples. Incorrectly sized batches will be skipped
                       with a warning.
-- `skip_zeroth_epoch`: If set to `True`, the evaluation of `extra_streams` before the first training epoch will
+- ``skip_zeroth_epoch``: If set to ``True``, the evaluation of ``extra_streams`` before the first training epoch will
                        be skipped.
 
 Example:
@@ -163,25 +163,25 @@ In this phase, we don't know the ground truth, hence the dataset sources are dif
 In such a situation, some of the metrics are impossible to measure, e.g., accuracy which requires the
 ground truth.
 
-For this reason, a special section `infer` is introduced.
-It matches the overall configuration structure, i.e. it must contain the `model` and the `dataset` sections.
-Analogously, the `hooks` section is optional as well as `main_loop`.
+For this reason, a special section ``infer`` is introduced.
+It matches the overall configuration structure, i.e. it must contain the ``model`` and the ``dataset`` sections.
+Analogously, the ``hooks`` section is optional as well as ``main_loop``.
 
-If `cxflow infer` is invoked, the rest of the configuration is ignored and only the `infer` section is used.
-In other cases, the `infer` section is ignored.
-The main advantage of this approach is that the user doesn't have to define `infer` when they experiment with the
+If ``cxflow infer`` is invoked, the rest of the configuration is ignored and only the ``infer`` section is used.
+In other cases, the ``infer`` section is ignored.
+The main advantage of this approach is that the user doesn't have to define ``infer`` when they experiment with the
 models.
 This can be done after the model is developed, fine-tuned and ready for production.
 
-As it might be observed, the inference sections such as `model` and `dataset` are almost identical to the top level ones.
+As it might be observed, the inference sections such as ``model`` and ``dataset`` are almost identical to the top level ones.
 YAML can reduce configuration duplicity by using `anchors <https://learnxinyminutes.com/docs/yaml/>`_.
-Note that we've already defined anchors `&dataset` and `&model` in the snippets above.
+Note that we've already defined anchors ``&dataset`` and ``&model`` in the snippets above.
 
 Now, we can import them and rewrite only the arguments which differ.
 In the following example, we reuse the whole dataset as is.
-The model is almost the same but we need to specify different `inputs` and `outputs` since the inference stream will
-no longer provide the target class (`animal`).
-The model itself is supposed to infer the `animal` instead.
+The model is almost the same but we need to specify different ``inputs`` and ``outputs`` since the inference stream will
+no longer provide the target class (``animal``).
+The model itself is supposed to infer the ``animal`` instead.
 Finally, we define a completely different set of hooks.
 
 .. code-block:: yaml

@@ -11,7 +11,7 @@ from ..models.abstract_model import AbstractModel
 
 class SaveEvery(AbstractHook):
     """
-    Save the model every `n` epochs.
+    Save the model every ``n`` epochs.
 
     .. code-block:: yaml
         :caption: save every 10th epoch

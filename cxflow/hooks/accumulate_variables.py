@@ -13,7 +13,7 @@ class AccumulateVariables(AbstractHook):
     This hook accumulates the specified variables allowing their aggregation after each epoch.
 
     The hook itself does not utilize the accumulated variables. It is meant to be inherited from. The child hook
-    will have the accumulated variables available in `self._accumulator` after each epoch.
+    will have the accumulated variables available in ``self._accumulator`` after each epoch.
 
     The data are accumulated in a form of nested mapping 'stream_name' -> 'variable_name' -> [iterable values].
 
@@ -37,7 +37,7 @@ class AccumulateVariables(AbstractHook):
         """
         Extend the accumulated variables with the given batch data.
 
-        :param stream_name: stream name; e.g. `train` or any other...
+        :param stream_name: stream name; e.g. ``train`` or any other...
         :param batch_data: batch data = stream sources + model outputs
 
         Raise:

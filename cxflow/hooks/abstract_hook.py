@@ -22,17 +22,17 @@ class AbstractHook:
 
     Hook lifecycle (event -> method invocation):
 
-    1. cxflow constructs the hooks -> `__init__`
-    2. cxflow enters the main loop -> `before_training`
+    1. cxflow constructs the hooks -> ``__init__``
+    2. cxflow enters the main loop -> ``before_training``
         a. cxflow starts an epoch
-        b. cxflow computes a batch -> `after_batch`
-        c. cxflow finishes the epoch -> `after_epoch` and `after_epoch_profile`
-    3. cxflow terminates the main loop -> `after_training`
+        b. cxflow computes a batch -> ``after_batch``
+        c. cxflow finishes the epoch -> ``after_epoch`` and ``after_epoch_profile``
+    3. cxflow terminates the main loop -> ``after_training``
 
     Naming conventions:
 
-    - hook names should describe hook actions with verb stems. E.g.: `LogProfile` or `SaveBestModel`
-    - hook names should not include `Hook` suffix
+    - hook names should describe hook actions with verb stems. E.g.: ``LogProfile`` or ``SaveBestModel``
+    - hook names should not include ``Hook`` suffix
     """
 
     CXF_HOOK_INIT_ARGS = {'model', 'dataset', 'output_dir'}
