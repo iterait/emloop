@@ -13,22 +13,24 @@ class SaveEvery(AbstractHook):
     """
     Save the model every `n` epochs.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # save every 10th epoch
-    hooks:
-      - SaveEvery:
-          n_epochs: 10
-    -------------------------------------------------------
-    # save every epoch and only warn on failure
-    hooks:
-      - SaveEvery:
-          on_failure: warn
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: save every 10th epoch
+
+        hooks:
+          - SaveEvery:
+              n_epochs: 10
+
+    .. code-block:: yaml
+        :caption: save every epoch and only warn on failure
+
+        hooks:
+          - SaveEvery:
+              on_failure: warn
+
     """
 
     SAVE_FAILURE_ACTIONS = {'error', 'warn', 'ignore'}
+    """Action to be executed when model save fails."""
 
     def __init__(self, model: AbstractModel, n_epochs: int=1, on_failure: str='error', **kwargs):
         """
@@ -45,7 +47,11 @@ class SaveEvery(AbstractHook):
         self._on_save_failure = on_failure
 
     def after_epoch(self, epoch_id: int, **_) -> None:
-        """Save the model if epoch_id is divisible by self._save_every_n_epochs."""
+        """
+        Save the model if epoch_id is divisible by self._save_every_n_epochs.
+
+        :param epoch_id: number of the processed epoch
+        """
         if epoch_id % self._n_epochs == 0:
             SaveEvery.save_model(model=self._model, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
 
@@ -53,6 +59,7 @@ class SaveEvery(AbstractHook):
     def save_model(model: AbstractModel, name_suffix: str, on_failure: str) -> None:
         """
         Save the given model with the given name_suffix. On failure, take the specified action.
+
         :param model: the model to be saved
         :param name_suffix: name to be used for saving
         :param on_failure: action to be taken on failure; one of SaverHook.SAVE_FAILURE_ACTIONS
@@ -75,23 +82,24 @@ class SaveBest(AbstractHook):
     """
     Save the model when it outperforms itself.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # save model with minimal valid loss
-    hooks:
-      - class: BestSaverHook
-    -------------------------------------------------------
-    # save model with maximal train accuracy
-    hooks:
-      - class: SaveBest
-        variable: accuracy
-        condition: max
-        stream: train
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: save model with minimal valid loss
+
+        hooks:
+          - BestSaverHook
+
+    .. code-block:: yaml
+        :caption: save model with minimal valid loss
+
+        hooks:
+          - SaveBest:
+              variable: accuracy
+              condition: max
+
     """
 
     CONDITIONS = {'min', 'max'}
+    """Monitored variable objective goal."""
 
     def __init__(self,  # pylint: disable=too-many-arguments
                  model: AbstractModel, variable: str='loss', condition: str='min', stream: str='valid',
@@ -125,6 +133,8 @@ class SaveBest(AbstractHook):
         """
         Retrieve the value of the monitored variable from the given epoch data.
 
+        :param epoch_data: epoch data which determine whether the model will be saved or not
+
         Raises:
             KeyError: if any of the specified stream, variable or aggregation is not present in the epoch data.
             TypeError: if the variable value is not a dict when aggregation is specified
@@ -155,7 +165,11 @@ class SaveBest(AbstractHook):
         return value
 
     def _is_value_better(self, new_value: float) -> bool:
-        """Test if the new value is better than the best so far."""
+        """
+        Test if the new value is better than the best so far.
+
+        :param new_value: current value of the objective function
+        """
         if self._best_value is None:
             return True
         if self._condition == 'min':
@@ -164,7 +178,11 @@ class SaveBest(AbstractHook):
             return new_value > self._best_value
 
     def after_epoch(self, epoch_data: AbstractHook.EpochData, **_) -> None:
-        """Save the model if the new value of the monitored variable is better than the best value so far."""
+        """
+        Save the model if the new value of the monitored variable is better than the best value so far.
+
+        :param epoch_data: epoch data to be processed
+        """
         new_value = self._get_value(epoch_data)
 
         if self._is_value_better(new_value):

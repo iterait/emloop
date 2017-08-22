@@ -14,23 +14,27 @@ class LogVariables(AbstractHook):
     """
     Log the training results to stderr via standard logging module.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - LogVariables
-    -------------------------------------------------------
-    # log only certain variables
-    hooks:
-      - LogVariables:
-          variables: [loss]
-    -------------------------------------------------------
-    # warn about unsupported variables
-    hooks:
-      - LogVariables:
-          on_unknown_type: warn
-    -------------------------------------------------------
+
+    .. code-block:: yaml
+        :caption: log all the variables
+
+        hooks:
+          - LogVariables
+
+    .. code-block:: yaml
+        :caption: log only certain variables
+
+        hooks:
+          - LogVariables:
+              variables: [loss]
+
+    .. code-block:: yaml
+        :caption: warn about unsupported variables
+
+        hooks:
+          - LogVariables:
+              on_unknown_type: warn
+
     """
 
     UNKNOWN_TYPE_ACTIONS = {'error', 'warn', 'str', 'ignore'}
@@ -89,6 +93,12 @@ class LogVariables(AbstractHook):
                         logging.info('\t%s %s: %s', stream_name, variable, value)
 
     def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+        """
+        Log the epoch data via `logging` API. Additionally, a blank line is printed directly to stderr.
+
+        :param epoch_id: number of processed epoch
+        :param epoch_data: epoch datat to be logged
+        """
         print('\n\n', file=sys.stderr)
         logging.info('After epoch %s', epoch_id)
         self._log_variables(epoch_data)

@@ -14,18 +14,18 @@ class ComputeStats(AccumulateVariables):
     """
     Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # accumulate the accuracy variable (either model output or stream source); compute and store its mean value
-    hooks:
-      - ComputeStats:
-          variables:
-            accuracy: [mean]
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: accumulate the accuracy variable (either model output or stream source); compute and store its mean value
+
+        hooks:
+          - ComputeStats:
+              variables:
+                accuracy: [mean]
+
     """
 
     AGGREGATIONS = {'mean', 'std', 'min', 'max', 'median'}
+    """Supported numpy-like aggregation methods."""
 
     def __init__(self, variables: Mapping[str, Iterable[str]], **kwargs):
         """
@@ -68,7 +68,11 @@ class ComputeStats(AccumulateVariables):
         raise ValueError('Aggregation `{}` is not supported.'.format(aggregation))
 
     def _save_stats(self, epoch_data: AbstractHook.EpochData) -> None:
-        """Extend `epoch_data` by stream:variable:aggreagation data."""
+        """
+        Extend `epoch_data` by stream:variable:aggreagation data.
+
+        :param epoch_data: data source from which the statistics are computed
+        """
 
         for stream_name in epoch_data.keys():
             for variable_name, variable_aggrs in self._variables.items():
@@ -78,6 +82,10 @@ class ComputeStats(AccumulateVariables):
                      for aggr in variable_aggrs})
 
     def after_epoch(self, epoch_data: AbstractHook.EpochData, **kwargs) -> None:
-        """Compute the specified aggregations and save them to the given epoch data."""
+        """
+        Compute the specified aggregations and save them to the given epoch data.
+
+        :param epoch_data: epoch data to be processed
+        """
         self._save_stats(epoch_data)
         super().after_epoch(epoch_data=epoch_data, **kwargs)

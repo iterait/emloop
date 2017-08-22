@@ -17,12 +17,13 @@ class AccumulateVariables(AbstractHook):
 
     The data are accumulated in a form of nested mapping 'stream_name' -> 'variable_name' -> [iterable values].
 
-    -------------------------------------------------------
     This hook should not be used directly as it does nothing on its own.
-    -------------------------------------------------------
     """
 
     def __init__(self, variables: typing.Iterable['str'], **kwargs):
+        """
+        :param variables: collection of variable names to be logged
+        """
         super().__init__(**kwargs)
         self._variables = variables
         self._accumulator = None
@@ -36,7 +37,7 @@ class AccumulateVariables(AbstractHook):
         """
         Extend the accumulated variables with the given batch data.
 
-        :param stream_name: stream name; `train` or any other...
+        :param stream_name: stream name; e.g. `train` or any other...
         :param batch_data: batch data = stream sources + model outputs
 
         Raise:

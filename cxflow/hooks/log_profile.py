@@ -13,13 +13,12 @@ class LogProfile(AbstractHook):
     """
     Summarize and log epoch profile.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - LogProfile
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: log all variables
+
+        hooks:
+          - LogVariables
+
     """
 
     def after_epoch_profile(self, epoch_id, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:

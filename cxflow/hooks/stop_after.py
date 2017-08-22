@@ -10,19 +10,18 @@ class StopAfter(AbstractHook):
     """
     Stop the training after the specified number of epochs.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # stop the training after 500 epochs
-    hooks:
-      - StopAfter:
-          epochs: 500
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: stop the training after 500 epochs
+
+        hooks:
+          - StopAfter:
+              epochs: 500
     """
 
     def __init__(self, epochs: int, **kwargs):
         """
         Create new epoch stopper hook.
+
         :param epochs: maximum number of training epochs
         """
         super().__init__(**kwargs)

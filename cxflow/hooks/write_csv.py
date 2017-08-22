@@ -82,6 +82,8 @@ class WriteCSV(AbstractHook):
 
         Column names are inferred from the epoch data and self.variables (if specified).
         Variables and streams expected later on are stored in self._variables and self._streams respectively.
+
+        :param epoch_data: epoch data to be logged
         """
         self._variables = self._variables or list(epoch_data['train'].keys())
         self._streams = epoch_data.keys()
@@ -136,6 +138,14 @@ class WriteCSV(AbstractHook):
             file.write(row + '\n')
 
     def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+        """
+        Log epoch.
+
+        Write a row containing the epoch data. In the case of first invocation, create the CSV header.
+
+        :param epoch_id: number of the epoch
+        :param epoch_data: epoch data to be logged
+        """
         logging.debug('Saving epoch %d data to "%s"', epoch_id, self._file_path)
         if not self._header_written:
             self._write_header(epoch_data=epoch_data)

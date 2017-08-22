@@ -12,16 +12,15 @@ class Check(AbstractHook):
 
     Raise `ValueError` on error or when the threshold was not exceeded in given number of epochs
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # exceed 95% accuracy on valid (default) stream within at most 10 epochs
-    hooks:
-      - Check:
-          variable: accuracy
-          required_min_value: 0.93
-          max_epoch: 10
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: exceed 95% accuracy on valid (default) stream within at most 10 epochs
+
+        hooks:
+          - Check:
+              variable: accuracy
+              required_min_value: 0.93
+              max_epoch: 10
+
     """
 
     def __init__(self, variable: str, required_min_value: float, max_epoch: int, stream: str='valid', **kwargs):
@@ -39,6 +38,13 @@ class Check(AbstractHook):
         self._max_epoch = max_epoch
 
     def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData):
+        """
+        Check termination conditions.
+
+        :param epoch_id: number of the processed epoch
+        :param epoch_data: epoch data to be checked
+        """
+
         if self._stream not in epoch_data:
             raise KeyError('The hook could not determine whether the threshold was exceeded as the stream `{}`'
                            'was not found in the epoch data'.format(self._stream))

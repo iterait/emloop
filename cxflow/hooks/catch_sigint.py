@@ -14,13 +14,13 @@ class CatchSigint(AbstractHook):
     On first sigint finish the current batch and terminate training politely, i.e. trigger all `after_training` hooks.
     On second sigint quit immediately with exit code 1
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - CatchSigint
-    -------------------------------------------------------
+
+    .. code-block:: yaml
+        :caption: register SIGINT catching
+
+        hooks:
+          - CatchSigint
+
     """
 
     def __init__(self, **kwargs):
@@ -32,6 +32,7 @@ class CatchSigint(AbstractHook):
         """
         On the first signal, increase the self_num_sigints counter.
         Quit on any subsequent signal.
+
         :param signum: SIGINT signal number
         """
         if self._num_sigints > 0:  # not the first sigint
@@ -59,4 +60,5 @@ class CatchSigint(AbstractHook):
             raise TrainingTerminated('SIGINT caught')
 
     def after_training(self) -> None:
+        """Switch to the original signal handler."""
         signal.signal(signal.SIGINT, self._original_handler)
