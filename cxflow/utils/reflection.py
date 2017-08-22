@@ -15,9 +15,8 @@ def parse_fully_qualified_name(fq_name: str) -> Tuple[Optional[str], str]:
     """
     Parse the given fully-quallified name (separated with dots) to a tuple of module and class names.
 
-    Returns None instead of module if the given name contains no separators (dots).
     :param fq_name: fully qualified name separated with dots
-    :return: a tuple of (module, class) names
+    :return: ``None`` instead of module if the given name contains no separators (dots).
     """
     last_dot = fq_name.rfind('.')
     if last_dot != -1:
@@ -31,12 +30,12 @@ def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: 
     Create an object instance of the given class from the given module.
     Args and kwargs are passed to the constructor.
 
-    -----------------------------------------------------
     This mimics the following code:
-    -----------------------------------------------------
-    from module import class
-    return class(*args, **kwargs)
-    -----------------------------------------------------
+
+    .. code-block:: python
+
+        from module import class
+        return class(*args, **kwargs)
 
     :param module_name: module name
     :param class_name: class name
@@ -53,7 +52,11 @@ def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: 
 
 
 def list_submodules(module_name: str) -> List[str]:   # pylint: disable=invalid-sequence-index
-    """List full names of all the submodules in the given module."""
+    """
+    List full names of all the submodules in the given module.
+
+    :param module_name: name of the module of which the submodules will be listed
+    """
     _module = importlib.import_module(module_name)
     return [module_name+'.'+submodule_name for _, submodule_name, _ in pkgutil.iter_modules(_module.__path__)]
 
@@ -91,7 +94,8 @@ def get_class_module(module_name: str, class_name: str) -> Optional[str]:
     - return None when no sub-module is found
     - warn about non-searchable sub-modules
 
-    NOTE: This function logs!
+    .. note::
+        This function logs!
 
     :param module_name: module to be searched
     :param class_name: searched class name

@@ -9,16 +9,17 @@ import logging
 
 class DisabledPrint:
     """
-    Disable printing to stdout by redirecting it to /dev/null in between __enter__ and __exit__.
+    Disable printing to stdout by redirecting it to ``/dev/null`` in between ``__enter__`` and ``__exit__``.
 
-    -------------------------------------------------------
-    Usage
-    -------------------------------------------------------
-    with DisabledPrint():
-        # any print commands here will be redirected to /dev/null
-        pass
-    -------------------------------------------------------
+    .. code-block:: python
+        :caption: Usage
+
+        with DisabledPrint():
+            # any print commands here will be redirected to /dev/null
+            pass
+
     """
+
     def __init__(self):
         self._orig = None
         self._devnull = None
@@ -37,16 +38,17 @@ class DisabledPrint:
 
 class DisabledLogger:
     """
-    Entirely disable the specified logger in between __enter__ and __exit__.
+    Entirely disable the specified logger in between ``__enter__`` and ``__exit__``.
 
-    -------------------------------------------------------
-    Usage
-    -------------------------------------------------------
-    with DisabledLogger('my_logger_name'):
-        # any logging actions with the my_logger_name will be ignored
-        pass
-    -------------------------------------------------------
+    .. code-block:: python
+        :caption: Usage
+
+        with DisabledLogger('my_logger_name'):
+            # any logging actions with the my_logger_name will be ignored
+            pass
+
     """
+
     def __init__(self, name=None):
         self._name = name
         self._orig = None

@@ -3,6 +3,11 @@ import pkg_resources
 
 
 def get_cxflow_arg_parser() -> ArgumentParser:
+    """
+    Create the cxflow argument parser.
+
+    :return: an instance of the parser
+    """
     # create parser
     main_parser = ArgumentParser('cxflow')
     main_parser.add_argument('--version', action='version', help='print cxflow version and quit',

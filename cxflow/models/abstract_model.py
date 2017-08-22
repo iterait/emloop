@@ -10,7 +10,7 @@ from ..datasets import AbstractDataset
 class AbstractModel(metaclass=ABCMeta):
     """
     Abstract machine learning model which exposes input and output names, run and save methods.
-    AbstractModel implementations are trainable with cxflow main_loop.
+    `AbstractModel` implementations are trainable with ``cxflow.MainLoop``.
     """
 
     @abstractmethod
@@ -18,14 +18,14 @@ class AbstractModel(metaclass=ABCMeta):
         """
         Model constructor interface.
 
-        Additional parameters (currently covered by `**kwargs`) are passed
-        according to the configuration `model` section.
+        Additional parameters (currently covered by ``**kwargs``) are passed
+        according to the configuration ``model`` section.
 
         :param dataset: Dataset object.
         :param log_dir: Existing directory in which all output files should be stored.
         :param restore_from: Information passed to the model constructor (backend-specific);
                              usually a directory in which the trained model is stored.
-        :param kwargs: Configuration section `model`.
+        :param kwargs: Configuration section ``model``.
         """
         pass
 
@@ -47,6 +47,8 @@ class AbstractModel(metaclass=ABCMeta):
         Run feed-forward pass with the given batch and return the results as dict.
 
         When train=True, also update parameters.
+        :param batch: batch to be processed.
+        :param train: ``True`` if this batch should be used for model update, ``False`` otherwise.
         :return: results dict
         """
         pass
@@ -54,7 +56,9 @@ class AbstractModel(metaclass=ABCMeta):
     @abstractmethod
     def save(self, name_suffix: str) -> str:
         """
-        Save the model parameters with the given name_suffix.
+        Save the model parameters with the given ``name_suffix``.
+
+        :param name_suffix: name suffix to be appended to the saved model.
         :return: path to the saved file/dir
         """
         pass
@@ -67,6 +71,7 @@ class AbstractModel(metaclass=ABCMeta):
 
         When restoring a model, cxflow tries to use the fallback class if the construction of the model object specified
         in `model` configuration section fails.
+
         :return: fully-qualified name of the fallback restore class
         """
         pass
