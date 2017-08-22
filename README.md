@@ -41,7 +41,6 @@ So far, the following documents are available:
 
 In order to generate API documentation, run
 ```bash
-sphinx-apidoc -f -o docs/api cxflow
 cd docs
 sphinx-autobuild . build
 ```
