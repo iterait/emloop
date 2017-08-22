@@ -4,8 +4,7 @@ Test module for reflection utils (cxflow.utils.reflection).
 import sys
 import os
 
-from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module, get_class_module, \
-    parse_fully_qualified_name
+from cxflow.utils.reflection import create_object, find_class_module, get_class_module, parse_fully_qualified_name
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
@@ -125,42 +124,6 @@ class ReflectionTest(CXTestCaseWithDir):
         # test wrong module/class names
         self.assertRaises(ImportError, create_object, module_name=module_name+'xxx', class_name='SimpleClass')
         self.assertRaises(AttributeError, create_object, module_name=module_name, class_name='WrongName')
-
-    def test_create_object_from_config(self):
-        """Test create_object_from_config function."""
-        module_name = 'cxflow.tests.utils.reflection_test'
-
-        # test type, config read and prefix
-        simple_config = {'my_module': module_name, 'my_class': 'SimpleClass'}
-        obj = create_object_from_config(simple_config, key_prefix='my_')
-        self.assertEqual(type(obj), SimpleClass)
-
-        obsfucated_config = {'my_module': module_name, 'my_class': 'SimpleClass', '2nd_class': 'ClassWithArg'}
-        obj2 = create_object_from_config(obsfucated_config, key_prefix='my_')
-        self.assertEqual(type(obj2), SimpleClass)
-
-        # test args and kwargs forwarding
-        args_and_kwargs_config = {'my_module': module_name, 'my_class': 'ClassWithArgsAndKwargs'}
-        obj3 = create_object_from_config(args_and_kwargs_config, key_prefix='my_',
-                                         args=(12, 1, 2, 3), kwargs={'y': 1, 'z': 2})
-        self.assertEqual(type(obj3), ClassWithArgsAndKwargs)
-        self.assertEqual(obj3.ex, 12)
-        self.assertTupleEqual(obj3.args, (1, 2, 3))
-        self.assertDictEqual(obj3.kwargs, {'y': 1, 'z': 2})
-
-        # test auto config keys
-        obj4 = create_object_from_config(simple_config)
-        self.assertEqual(type(obj4), SimpleClass)
-
-        multiple_module_config = {'my_module': module_name, 'another_module': module_name, 'my_class': 'SimpleClass'}
-        self.assertRaises(ValueError, create_object_from_config, multiple_module_config)
-        multiple_class_config = {'my_module': module_name, 'my_class': 'SimpleClass', 'second_class': 'MyClass'}
-        self.assertRaises(ValueError, create_object_from_config, multiple_class_config)
-
-        missing_module_config = {'my_class': 'SimpleClass'}
-        self.assertRaises(ValueError, create_object_from_config, missing_module_config)
-        missing_class_config = {'my_module': module_name}
-        self.assertRaises(ValueError, create_object_from_config, missing_class_config)
 
     def test_find_class_module(self):
         """Test finding class module."""

@@ -26,42 +26,6 @@ def parse_fully_qualified_name(fq_name: str) -> Tuple[Optional[str], str]:
         return None, fq_name
 
 
-def create_object_from_config(config: Dict[str, Any], args: Iterable=(),
-                              kwargs: Dict[str, Any]=_EMPTY_DICT, key_prefix: str=None):
-    """
-    Create an object instance according to the given config.
-
-    Config dict has to contain module and class names under [key_prefix]module and [key_prefix]class keys.
-
-    If no key_prefix is provided,
-    the method attempts to deduce key names so that they contain 'module' and 'class' respectively.
-
-    :param config: config dict
-    :param args: args to be passed to the object constructor
-    :param kwargs: kwargs to be passed to the object constructor
-    :param key_prefix: module and class names key prefix
-    :return: created object instance
-    """
-    if key_prefix is None:
-        module_matches = [key for key in config.keys() if 'module' in key]
-        class_matches = [key for key in config.keys() if 'class' in key]
-
-        if not (len(module_matches) == 1 and len(class_matches) == 1):
-            raise ValueError('Failed to deduce module and class names keys from config `{}`. Please provide key_prefix'
-                             .format(config))
-
-        module_key = module_matches[0]
-        class_key = class_matches[0]
-    else:
-        module_key = key_prefix + 'module'
-        class_key = key_prefix + 'class'
-
-    assert module_key in config
-    assert class_key in config
-
-    return create_object(module_name=config[module_key], class_name=config[class_key], args=args, kwargs=kwargs)
-
-
 def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: Dict[str, Any]=_EMPTY_DICT):
     """
     Create an object instance of the given class from the given module.
