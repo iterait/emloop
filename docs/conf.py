@@ -122,7 +122,7 @@ html_theme_options = {
         ("Getting Started", "getting_started"),
         ("Tutorial", "tutorial"),
         ("Advanced", "advanced/index"),
-        ("API Reference", "cxflow_tensorflow/index"),
+        ("API Reference", "api/index"),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
