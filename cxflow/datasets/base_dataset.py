@@ -14,7 +14,8 @@ class BaseDataset(metaclass=ABCMeta):
     In the inherited class, one should:
         - override the ``_init_with_kwargs`` method instead of ``__init__``
         - override the ``train_stream`` method
-        - add any additional ``<stream_name>_stream` method in order to make `<stream_name>` stream available
+        - add any additional ``<stream_name>_stream`` method in order to make ``<stream_name>`` stream available
+
     """
 
     def __init__(self, config_str: str):
