@@ -8,7 +8,7 @@ Requirements
 In order to run and install cxflow, the following utilities must be installed:
 
 - Python 3.5+.
-- `pip` 9.0+
+- ``pip`` 9.0+
 
 Cxflow depends on additional dependencies which are listed in the ``requirements.txt`` file.
 Nevertheless, these dependencies are automatically installed by ``pip`` (see below).
