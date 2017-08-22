@@ -5,33 +5,37 @@ Model is the second component of the cxflow environment.
 It defines the machine learning part of the whole workflow.
 The model object is defined by `cxflow.AbstractModel` interface.
 
-Firstly, the model constructor accepts a dataset instance, path to the logging directory and the information of
-if (and from where) the model should be restored.
+The model constructor accepts a dataset instance, path to the logging directory and the information whether
+(and from where) the model should be restored or whether a new one should be created.
 
-Secondly, `input_names` and `output_names` properties must be defined.
-These properties return the corresponding lists of input and output variable names.
-The input names are expected by the model, i.e. must be keys of the given batches.
-The output names are the variables which the model computes and outputs.
-In the case of our animal recognition example, the input names would contain `image` and `animal` while the output
+Additionally, every model has to define two properties, `input_names` and `output_names`.
+These properties should return the corresponding lists of input and output variable names.
+The input names are expected to exist in every batch as the keys to the batch dictionary.
+The output names are the variables which the model computes and outputs and may be used
+by statistical hooks and similar.
+In the case of our animal recognition example from the `dataset <dataset.html>`_ tutorial,
+the input names would contain `image` and `animal` while the output
 names would contain `predicted_animal` and `loss`.
 
 Running the Model
 -----------------
 
 The most important method of the model is `run`.
-This method simulated an execution of the model on a single batch which is the first parameter.
-The second parameter is a boolean variable determining whether the model will update (train) on this batch or not.
+This method evaluates the model on a single batch given as the first parameter.
+The second parameter is a boolean variable determining whether the model should update (train) on this batch or not.
 
-Note that the model is not persistent.
-The persistence of the model might be ensured by invoking the `save` method which dumps the model (usually) to the
-filesystem.
-The method requires a suffix of the dumped file.
+Note that the trained model is not persistent as it is only stored in operating memory.
+The persistence of the model is provided by `save` method which dumps the model to the
+filesystem (although this behavior is model-specific and you may implement it as you wish in you own models).
+The `save` method shall accept only a single parameter and that is the name for the dumped file(s).
 
-The pseudocode of the model training, evaluation and saving follows.
+The pseudocode of model training, evaluation and saving may look as follows.
 Note that this loop is automatically managed by `cxflow.MainLoop` and we publish this snippet just in order to
 demonstrate the process.
 
 .. code-block:: python
+
+    # TODO model construction should be here
 
     for epoch_id in range(10):
         for train_batch in dataset.train_stream():
@@ -47,17 +51,22 @@ Restoring the Model
 -------------------
 
 Once the model is successfully saved, it might be also restored.
-This is done when the training is about to continue (`cxflow resume`) or for production environemt (`cxflow predict`).
-Both commands expect the `restore_from` positional argument which specify the backend-agnostic argument.
-This argument is passed to the model constructor (see above).
+This is done when the training is about to continue (`cxflow resume`) or in a production environemt (`cxflow predict`).
+Both commands expect a single positional argument specifying from where the model shall be loaded.
+This argument is called `restore_from` and it is passed to the model constructor (see above).
 
-If this parameter is passed, the network attempt to restore the model parameters by employing the information passed
-in `restore_from`.
-The detail behavior is backend-specific, however, in most cases it uses the backend saving API.
+If the `restore_from` argument is passed to the constructor, the model attempts to restore the model.
+Most often, it will consider the argument to be a file path and loads the file, however, the implementation
+is model-specific and may be implemented differently.
 
-In order to restore the model, cxflow needs to know what model object should be constructed first.
-This information is inferred from the dumped configuration file in the output directory.
-However, there are cases in which the model object cannot be constructed (somebody deleted source codes with the
-model object implementations etc.).
-For these cases, so called `restore_fallback` property is defined by each model.
-This is usually the backend-specific baseclass which is able to restore all its subclasses.
+In order to restore the model, cxflow needs to know what class should be instantiated to be able to call
+its constructor with the given `restore_from` argument.
+The class is inferred from the dumped configuration file in the output directory, specifically from the
+`model.class` entry.
+However, there are cases in which the original class cannot be constructed (somebody deleted source codes
+with the model object implementations etc.).
+For these cases, each model should implement a `restore_fallback` method, which usually points
+to a backend-specific baseclass which is able to restore the saved files of all its subclasses.
+For instance, in the `cxflow-tensorflow` backend, the `restore_fallback` class returns
+`cxflow_tensorflow.models.BaseModel` which it is able to load any checkpoint
+without the need for the original model source codes.
