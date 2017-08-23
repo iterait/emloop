@@ -23,7 +23,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -165,16 +165,17 @@ Terminate training if the given stream variable exceeds the threshold in at most
 <li>hook names should describe hook actions with verb stems. E.g.: <code class="docutils literal"><span class="pre">LogProfile</span></code> or <code class="docutils literal"><span class="pre">SaveBestModel</span></code></li>
 <li>hook names should not include <code class="docutils literal"><span class="pre">Hook</span></code> suffix</li>
 </ul>
-<img src="../_images/inheritance-8fc79d0550cf0db25f8cf79c4963947f7ebf0c81.png" alt="Inheritance diagram of AbstractHook" usemap="#inheritance4ee32209c7" class="inheritance"/>
-<map id="inheritance4ee32209c7" name="inheritance4ee32209c7">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-</map>
+digraph inheritance4ee32209c7 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS">
-<code class="descname">CXF_HOOK_INIT_ARGS</code><em class="property"> = {'model', 'dataset', 'output_dir'}</em><a class="headerlink" href="#cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CXF_HOOK_INIT_ARGS</code><em class="property"> = {'output_dir', 'model', 'dataset'}</em><a class="headerlink" href="#cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.</p>
 </dd></dl>
 
@@ -312,11 +313,13 @@ in aggregated (averaged) form. For any other aggregation method, one must manual
 will have the accumulated variables available in <code class="docutils literal"><span class="pre">self._accumulator</span></code> after each epoch.</p>
 <p>The data are accumulated in a form of nested mapping ‘stream_name’ -&gt; ‘variable_name’ -&gt; [iterable values].</p>
 <p>This hook should not be used directly as it does nothing on its own.</p>
-<img src="../_images/inheritance-7e231c79a21ea25e42f6e244acb03ef561fb6335.png" alt="Inheritance diagram of AccumulateVariables" usemap="#inheritancedbc454a28a" class="inheritance"/>
-<map id="inheritancedbc454a28a" name="inheritancedbc454a28a">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="This hook accumulates the specified variables allowing their aggregation after each epoch." alt="" coords="164,5,323,31"/>
-</map>
+digraph inheritancedbc454a28a {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;AccumulateVariables&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;This hook accumulates the specified variables allowing their aggregation after each epoch.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;AccumulateVariables&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -399,23 +402,25 @@ TypeError: if the variable value is not iterable (e.g. it is only a scalar)</dd>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-c2b8adf8a88418903774ea730885cebcaafc70e8.png" alt="Inheritance diagram of WriteCSV" usemap="#inheritancec30130533b" class="inheritance"/>
-<map id="inheritancec30130533b" name="inheritancec30130533b">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Log the training results to CSV file." alt="" coords="164,5,247,31"/>
-</map>
+digraph inheritancec30130533b {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;WriteCSV&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Log the training results to CSV file.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;WriteCSV&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.WriteCSV.MISSING_VARIABLE_ACTIONS">
-<code class="descname">MISSING_VARIABLE_ACTIONS</code><em class="property"> = {'warn', 'error', 'default'}</em><a class="headerlink" href="#cxflow.hooks.WriteCSV.MISSING_VARIABLE_ACTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">MISSING_VARIABLE_ACTIONS</code><em class="property"> = {'warn', 'default', 'error'}</em><a class="headerlink" href="#cxflow.hooks.WriteCSV.MISSING_VARIABLE_ACTIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Action executed on missing variable.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cxflow.hooks.WriteCSV.UNKNOWN_TYPE_ACTIONS">
-<code class="descname">UNKNOWN_TYPE_ACTIONS</code><em class="property"> = {'warn', 'error', 'default'}</em><a class="headerlink" href="#cxflow.hooks.WriteCSV.UNKNOWN_TYPE_ACTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">UNKNOWN_TYPE_ACTIONS</code><em class="property"> = {'warn', 'default', 'error'}</em><a class="headerlink" href="#cxflow.hooks.WriteCSV.UNKNOWN_TYPE_ACTIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Action executed on unknown type detection.</p>
 </dd></dl>
 
@@ -512,11 +517,13 @@ Variables and streams expected later on are stored in self._variables and self._
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-188437aece907d1035daa33972886e3a0abb4371.png" alt="Inheritance diagram of StopAfter" usemap="#inheritancee545c2060a" class="inheritance"/>
-<map id="inheritancee545c2060a" name="inheritancee545c2060a">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Stop the training after the specified number of epochs." alt="" coords="164,5,247,31"/>
-</map>
+digraph inheritancee545c2060a {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;StopAfter&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Stop the training after the specified number of epochs.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;StopAfter&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -578,11 +585,13 @@ Variables and streams expected later on are stored in self._variables and self._
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-4e5e834ecd624643c1e5b59fd7fb24e6649a6f37.png" alt="Inheritance diagram of LogVariables" usemap="#inheritance6116d9be51" class="inheritance"/>
-<map id="inheritance6116d9be51" name="inheritance6116d9be51">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Log the training results to stderr via standard logging module." alt="" coords="164,5,269,31"/>
-</map>
+digraph inheritance6116d9be51 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;LogVariables&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Log the training results to stderr via standard logging module.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;LogVariables&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -660,11 +669,13 @@ TypeError: if the variable value is of unsupported type and on_unknown_type is s
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-30e3846adcfc76ff0a88937f6b8abb94b13f0f2d.png" alt="Inheritance diagram of LogProfile" usemap="#inheritance55c160d345" class="inheritance"/>
-<map id="inheritance55c160d345" name="inheritance55c160d345">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Summarize and log epoch profile." alt="" coords="164,5,251,31"/>
-</map>
+digraph inheritance55c160d345 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;LogProfile&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Summarize and log epoch profile.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;LogProfile&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -721,17 +732,19 @@ stream</li>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-f0b048e5ee2bcb7451fb8b1d1ca5bed563550ac3.png" alt="Inheritance diagram of SaveEvery" usemap="#inheritance7abb4b3c46" class="inheritance"/>
-<map id="inheritance7abb4b3c46" name="inheritance7abb4b3c46">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Save the model every ``n`` epochs." alt="" coords="164,5,255,31"/>
-</map>
+digraph inheritance7abb4b3c46 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;SaveEvery&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Save the model every ``n`` epochs.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;SaveEvery&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveEvery.SAVE_FAILURE_ACTIONS">
-<code class="descname">SAVE_FAILURE_ACTIONS</code><em class="property"> = {'warn', 'error', 'ignore'}</em><a class="headerlink" href="#cxflow.hooks.SaveEvery.SAVE_FAILURE_ACTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">SAVE_FAILURE_ACTIONS</code><em class="property"> = {'warn', 'ignore', 'error'}</em><a class="headerlink" href="#cxflow.hooks.SaveEvery.SAVE_FAILURE_ACTIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Action to be executed when model save fails.</p>
 </dd></dl>
 
@@ -824,17 +837,19 @@ one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-f23d73ecf0d5a8ff47e52f4b223cb96113d87c99.png" alt="Inheritance diagram of SaveBest" usemap="#inheritancec153074a6b" class="inheritance"/>
-<map id="inheritancec153074a6b" name="inheritancec153074a6b">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Save the model when it outperforms itself." alt="" coords="164,5,247,31"/>
-</map>
+digraph inheritancec153074a6b {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;SaveBest&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Save the model when it outperforms itself.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;SaveBest&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveBest.CONDITIONS">
-<code class="descname">CONDITIONS</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.CONDITIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CONDITIONS</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.CONDITIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Monitored variable objective goal.</p>
 </dd></dl>
 
@@ -934,11 +949,13 @@ On second sigint quit immediately with exit code 1</p>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-b2746f625122ed8a204afeeb1dc49549c4f5e14c.png" alt="Inheritance diagram of CatchSigint" usemap="#inheritancec11864d58b" class="inheritance"/>
-<map id="inheritancec11864d58b" name="inheritancec11864d58b">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="SIGINT catcher." alt="" coords="164,5,260,31"/>
-</map>
+digraph inheritancec11864d58b {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;CatchSigint&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;SIGINT catcher.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;CatchSigint&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -1021,18 +1038,21 @@ Quit on any subsequent signal.</p>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-7871d7694df6f3fec0de38657b1af6d2b31c9a8a.png" alt="Inheritance diagram of ComputeStats" usemap="#inheritancee96d9cb954" class="inheritance"/>
-<map id="inheritancee96d9cb954" name="inheritancee96d9cb954">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="This hook accumulates the specified variables allowing their aggregation after each epoch." alt="" coords="164,5,323,31"/>
-<area shape="rect" id="node3" title="Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data." alt="" coords="371,5,485,31"/>
-</map>
+digraph inheritancee96d9cb954 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;AccumulateVariables&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;This hook accumulates the specified variables allowing their aggregation after each epoch.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;AccumulateVariables&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;ComputeStats&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.&quot;];
+  &quot;AccumulateVariables&quot; -&gt; &quot;ComputeStats&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'min', 'median', 'mean', 'max', 'std'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AGGREGATIONS</code><em class="property"> = {'min', 'mean', 'max', 'std', 'median'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported numpy-like aggregation methods.</p>
 </dd></dl>
 
@@ -1118,11 +1138,13 @@ Quit on any subsequent signal.</p>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-1563f06a9d98745a6fcf4d5cc65110e0dcb44fb0.png" alt="Inheritance diagram of Check" usemap="#inheritancea9c6fdbf70" class="inheritance"/>
-<map id="inheritancea9c6fdbf70" name="inheritancea9c6fdbf70">
-<area shape="rect" id="node1" title="Cxflow hooks interface." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="node2" title="Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs." alt="" coords="164,5,236,31"/>
-</map>
+digraph inheritancea9c6fdbf70 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;AbstractHook&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Cxflow hooks interface.&quot;];
+  &quot;Check&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.&quot;];
+  &quot;AbstractHook&quot; -&gt; &quot;Check&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -1177,10 +1199,11 @@ Exception that is raised when a hook terminates the training.</li>
 <em class="property">exception </em><code class="descclassname">cxflow.hooks.</code><code class="descname">TrainingTerminated</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/abstract_hook.html#TrainingTerminated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.TrainingTerminated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exception that is raised when a hook terminates the training.</p>
 <p class="rubric">Inheritance</p>
-<img src="../_images/inheritance-5d2a29d829a1304beee02bd9dc82c5b1db7d1229.png" alt="Inheritance diagram of TrainingTerminated" usemap="#inheritancec8adf6d556" class="inheritance"/>
-<map id="inheritancec8adf6d556" name="inheritancec8adf6d556">
-<area shape="rect" id="node1" title="Exception that is raised when a hook terminates the training." alt="" coords="5,5,152,31"/>
-</map>
+digraph inheritancec8adf6d556 {
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;TrainingTerminated&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Exception that is raised when a hook terminates the training.&quot;];
+}
 </dd></dl>
 
 </div>

@@ -101,4 +101,4 @@ Variables
 
    .. code-block:: guess
 
-      <module 'cxflow.constants' from '/home/petrbel/Cognexa/cxflow/cxflow/constants.py'>
+      <module 'cxflow.constants' from '/usr/local/lib/python3.5/dist-packages/cxflow/constants.py'>
