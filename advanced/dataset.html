@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Dataset &#8212; cxflow 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.7.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Model" href="model.html" />
+    <link rel="prev" title="Main Loop" href="main_loop.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../getting_started.html">Getting Started</a></li>
+                <li><a href="../tutorial.html">Tutorial</a></li>
+                <li><a href="index.html">Advanced</a></li>
+                <li><a href="../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<div class="side_nav">
+    <a href="main_loop.html" title="Previous Chapter: Main Loop"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Main Loop</span>
+    </a>
+    </div>
+<div class="side_nav">
+    <a href="model.html" title="Next Chapter: Model"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Model &raquo;</span>
+    </a>
+    </div><ul>
+<li><a class="reference internal" href="#">Dataset</a><ul>
+<li><a class="reference internal" href="#basedataset">BaseDataset</a></li>
+<li><a class="reference internal" href="#data-processing">Data Processing</a></li>
+<li><a class="reference internal" href="#additional-methods">Additional Methods</a></li>
+<li><a class="reference internal" href="#the-philosophy-of-laziness">The Philosophy of Laziness</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="dataset">
+<h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h1>
+<p>Dataset is an object representing the data to be fed into the model.
+In general, the dataset is an instance of arbitrary class which is able handle
+a string-encoded YAML configuration in its constructor.
+Note that this configuration is parsed from the <a class="reference external" href="config.html">config file</a> section <code class="docutils literal"><span class="pre">dataset</span></code>.</p>
+<div class="section" id="basedataset">
+<h2>BaseDataset<a class="headerlink" href="#basedataset" title="Permalink to this headline">¶</a></h2>
+<p>Inheriting from <code class="docutils literal"><span class="pre">cxflow.BaseDataset</span></code> is recommended as it parses the YAML string automatically.
+Instead of the constructor, the developer is expected to implement <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.
+This method is supposed to accept the parameters from the config file.</p>
+<p>Let us demonstrate <code class="docutils literal"><span class="pre">cxflow.BaseDataset</span></code> on an example. First, we will create a class <code class="docutils literal"><span class="pre">MyDataset</span></code> located
+in <code class="docutils literal"><span class="pre">datasets.my_dataset</span></code> module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cxflow</span> <span class="kn">import</span> <span class="n">BaseDataset</span>
+
+<span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">BaseDataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_init_with_kwargs</span><span class="p">(</span><span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">augment</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>This class is interested in two arguments, <code class="docutils literal"><span class="pre">batch_size</span></code> and <code class="docutils literal"><span class="pre">augment</span></code>. Any other argument
+it is given is ignored and hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
+<p>Second, we define the <code class="docutils literal"><span class="pre">dataset</span></code> section in the config file:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">module</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.my_dataset</span>
+  <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MyDataset</span>
+  <span class="l l-Scalar l-Scalar-Plain">batch_size</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
+  <span class="l l-Scalar l-Scalar-Plain">augment</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">rotate</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>     <span class="c1"># enable random rotations</span>
+    <span class="l l-Scalar l-Scalar-Plain">blur_prob</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>  <span class="c1"># probability of blurring</span>
+  <span class="l l-Scalar l-Scalar-Plain">width</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">800</span>
+  <span class="l l-Scalar l-Scalar-Plain">height</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">600</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="data-processing">
+<h2>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h2>
+<p>First, let us define a <strong>data source</strong>.
+We refer to the data source as to a unit (or type) of which the (training) example consists.
+Let’s take a look at an artificial image-classification task in which we are supposed to
+classify the input image into various animal classes (dog, cat, rabbit, …).
+In this setting, the sources could be e.g., <code class="docutils literal"><span class="pre">image</span></code> and <code class="docutils literal"><span class="pre">animal</span></code>.
+The former is in the form of a tensor with the shape of 800x600x3 (i.e. a regular RGB 800x600 image).
+The latter is a string describing the animal depicted in the image.</p>
+<p>Second, let us define a <strong>batch of data</strong>.
+We refer to a batch as to a collection of training examples.
+Note that the examples in the batch are represented source-wise, hence it
+is a Python <code class="docutils literal"><span class="pre">dict</span></code> mapping the source name to a collection of corresponding
+source of examples.
+The example of a single batch may look as follows (batch size is set ot four):</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">batch</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">,</span> <span class="n">img3</span><span class="p">,</span> <span class="n">img4</span><span class="p">],</span>
+  <span class="s1">&#39;animal&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;rabbit&#39;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Finally, <strong>data stream</strong> is an iterable of batches.</p>
+<p>The streams should be defined in dataset methods conveniently named <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code>.</p>
+<p>An example of a simple training stream is as follows.
+The datasets contains a <code class="docutils literal"><span class="pre">train_stream</span></code> method which loads batches via function <code class="docutils literal"><span class="pre">load_training_batch</span></code>.
+For simplicity, we assume this function is already implemented.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">load_training_batch</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The training stream is used only when training is invoked either by <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span></code> or <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">resume</span></code> commands.</p>
+<p>Analogously, additional methods such as <code class="docutils literal"><span class="pre">valid_stream</span></code> and <code class="docutils literal"><span class="pre">test_stream</span></code> can be easily implemented.
+If they are registered in the config file under <code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code>, they will be evaluated
+along with the train stream. The configuration may look as follows:</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">main_loop</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">extra_streams</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">valid</span><span class="p p-Indicator">,</span> <span class="nv">test</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>The extra streams, however, <em>are not</em> used for training, that is, the model is not updated while iterating them.</p>
+<p>During prediction (i.e., <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code> CLI command), only the <code class="docutils literal"><span class="pre">predict_stream</span></code> method is employed in order
+to provide the data to be inferred.</p>
+<p>TODO THE FOLLOWING SENTENCE MAY CHANGE.
+Extra streams might be inferred as well when registred as described above (including training stream).</p>
+</div>
+<div class="section" id="additional-methods">
+<h2>Additional Methods<a class="headerlink" href="#additional-methods" title="Permalink to this headline">¶</a></h2>
+<p>The dataset may contain various additional methods as well.
+For example, is can contain <code class="docutils literal"><span class="pre">fetch</span></code> method which checks whether the dataset has all the data it requires.
+If not, it may download them from the internet/databse/drive.</p>
+<p>Additional useful method could be <code class="docutils literal"><span class="pre">statistics</span></code> which prints various statistics of the
+provided data, plot some figures etc.
+Sometimes, we need to split the whole dataset into training, validation and testing sets.
+For this purpose, we may want to implement <code class="docutils literal"><span class="pre">split</span></code> function.</p>
+<p>The suggested methods are completely arbitrary and they may or may not be implemented.
+The key concept is to keep data-related function encapsuled together in the dataset object,
+so that one don’t need to implement several separate script for fetching/visualization/statistics etc.</p>
+<p>An elegant way of executing the dataset methods is via <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">&lt;method-name&gt;</span> <span class="pre">&lt;config-file&gt;</span></code>.
+It constructs the dataset specified in the config file and invokes the proper method.</p>
+<p>A typical pipeline contains the following commands.
+We leave them without further comments as they are self-describing.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">fetch</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">checksum</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">print_statistics</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">plot_histogram</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span> <span class="pre">config/my-data.yaml</span></code></li>
+</ul>
+</div>
+<div class="section" id="the-philosophy-of-laziness">
+<h2>The Philosophy of Laziness<a class="headerlink" href="#the-philosophy-of-laziness" title="Permalink to this headline">¶</a></h2>
+<p>In our experience, the best practice for the dataset is to implement it as lazy as possible.
+That is, constructor should not perform any time-consuming operation such as loading and decoding the data.
+Instead, the data should be loaded and encoded in the first moment they are really necessary (e.g.,
+in the <code class="docutils literal"><span class="pre">train_stream</span></code> method).</p>
+<p>The main reason for laziness is that the dataset doesn’t know for which purpose it was constructed.
+It might be queried to provide the training data or only to print some simple checksums.
+In the cases of extremely big datasets, it is useless and annoying to waste the time by loading the data
+without their actual use.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

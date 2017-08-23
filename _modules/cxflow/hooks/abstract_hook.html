@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cxflow.hooks.abstract_hook &#8212; cxflow 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.7.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for cxflow.hooks.abstract_hook</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines AbstractHook from which all the custom hooks shall be derived.</span>
+
+<span class="sd">Furthermore, TrainingTerminated exception is defined.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">NewType</span><span class="p">,</span> <span class="n">Mapping</span>
+
+<span class="kn">from</span> <span class="nn">..datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
+<span class="kn">from</span> <span class="nn">..utils.profile</span> <span class="k">import</span> <span class="n">Timer</span>
+
+
+<div class="viewcode-block" id="TrainingTerminated"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.TrainingTerminated">[docs]</a><span class="k">class</span> <span class="nc">TrainingTerminated</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception that is raised when a hook terminates the training.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="AbstractHook"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook">[docs]</a><span class="k">class</span> <span class="nc">AbstractHook</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cxflow hooks interface.</span>
+
+<span class="sd">    Hook lifecycle (event -&gt; method invocation):</span>
+
+<span class="sd">    1. cxflow constructs the hooks -&gt; ``__init__``</span>
+<span class="sd">    2. cxflow enters the main loop -&gt; ``before_training``</span>
+<span class="sd">        a. cxflow starts an epoch</span>
+<span class="sd">        b. cxflow computes a batch -&gt; ``after_batch``</span>
+<span class="sd">        c. cxflow finishes the epoch -&gt; ``after_epoch`` and ``after_epoch_profile``</span>
+<span class="sd">    3. cxflow terminates the main loop -&gt; ``after_training``</span>
+
+<span class="sd">    Naming conventions:</span>
+
+<span class="sd">    - hook names should describe hook actions with verb stems. E.g.: ``LogProfile`` or ``SaveBestModel``</span>
+<span class="sd">    - hook names should not include ``Hook`` suffix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CXF_HOOK_INIT_ARGS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;dataset&#39;</span><span class="p">,</span> <span class="s1">&#39;output_dir&#39;</span><span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.&quot;&quot;&quot;</span>
+
+    <span class="n">EpochData</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AbstractHook.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check for unrecognized arguments and warn about them.</span>
+
+<span class="sd">        :param kwargs: kwargs not recognized in the child hook</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">CXF_HOOK_INIT_ARGS</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Argument `</span><span class="si">%s</span><span class="s1">` was not recognized by `</span><span class="si">%s</span><span class="s1">`. Recognized arguments are `</span><span class="si">%s</span><span class="s1">`.&#39;</span><span class="p">,</span>
+                                <span class="n">key</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="AbstractHook.before_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Before training event.</span>
+
+<span class="sd">        No data were processed at this moment.</span>
+
+<span class="sd">        This is called exactly once during the training.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractHook.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After batch event.</span>
+
+<span class="sd">        This event is triggered after every processed batch regardless of stream type.</span>
+<span class="sd">        Batch results are available in results argument.</span>
+
+<span class="sd">        :param stream_name: type of the stream (usually train/valid/test or any other)</span>
+<span class="sd">        :param batch_data: batch inputs and model outputs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractHook.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After epoch event.</span>
+
+<span class="sd">        This event is triggered after every epoch wherein all the streams were iterated and their results are available</span>
+<span class="sd">        in aggregated (averaged) form. For any other aggregation method, one must manually handle `after_batch` events.</span>
+
+<span class="sd">        :param epoch_id: finished epoch id</span>
+<span class="sd">        :param epoch_data: epoch data flowing through all hooks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractHook.after_epoch_profile"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch_profile">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Timer</span><span class="o">.</span><span class="n">TimeProfile</span><span class="p">,</span> <span class="n">extra_streams</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After epoch profile event.</span>
+
+<span class="sd">        This event provides opportunity to process time profile of the finished epoch.</span>
+
+<span class="sd">        Note: time of processing this event is not included in the profiled</span>
+
+<span class="sd">        This is called multiple times.</span>
+
+<span class="sd">        :param epoch_id: finished epoch id</span>
+<span class="sd">        :param profile: dictionary of lists of event timings that were measured during the epoch.</span>
+<span class="sd">        :param extra_streams: enumeration of additional stream names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractHook.after_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.after_training">[docs]</a>    <span class="k">def</span> <span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        After training event.</span>
+
+<span class="sd">        This event is called after the training finished either naturally or thanks to an interrupt.</span>
+
+<span class="sd">        This is called exactly once during the training.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

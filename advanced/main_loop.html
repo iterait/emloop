@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Main Loop &#8212; cxflow 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.7.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dataset" href="dataset.html" />
+    <link rel="prev" title="Advanced" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../getting_started.html">Getting Started</a></li>
+                <li><a href="../tutorial.html">Tutorial</a></li>
+                <li><a href="index.html">Advanced</a></li>
+                <li><a href="../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<div class="side_nav">
+    <a href="index.html" title="Previous Chapter: Advanced"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Advanced</span>
+    </a>
+    </div>
+<div class="side_nav">
+    <a href="dataset.html" title="Next Chapter: Dataset"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Dataset &raquo;</span>
+    </a>
+    </div><ul>
+<li><a class="reference internal" href="#">Main Loop</a><ul>
+<li><a class="reference internal" href="#dataset-model-integration">Dataset/Model Integration</a></li>
+<li><a class="reference internal" href="#training-lifecycle">Training Lifecycle</a></li>
+<li><a class="reference internal" href="#test-lifecycle">Test Lifecycle</a></li>
+<li><a class="reference internal" href="#prediction-lifecycle">Prediction Lifecycle</a></li>
+<li><a class="reference internal" href="#hook-integration">Hook Integration</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="main-loop">
+<h1>Main Loop<a class="headerlink" href="#main-loop" title="Permalink to this headline">¶</a></h1>
+<p>Main loop is the core of the cxflow.
+As the name suggests, it is responsible for the main lifecycle of the training of the model.</p>
+<div class="section" id="dataset-model-integration">
+<h2>Dataset/Model Integration<a class="headerlink" href="#dataset-model-integration" title="Permalink to this headline">¶</a></h2>
+<p>The first thing cxflow does no matter what command has been executed, is to build the dataset
+and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
+Afterwards, cxflow builds the model and passes the <code class="docutils literal"><span class="pre">model</span></code> section from the
+<a class="reference external" href="config.html">config</a> to its constructor.
+One of the model’s arguments is also the dataset itself, so the net can query
+it for some information, such as the number of outputs, data size, etc.</p>
+<p>After the dataset and the model are created, cxflow calls one of the dataset stream functions
+based on whether it is training, testing or predicting (more on this is described in the following
+sections).
+The selected stream method (e.g., <code class="docutils literal"><span class="pre">train_stream</span></code>) returns an iterable where each
+item corresponds to a single batch of data.</p>
+<p>Finally, the stream is iterated through and each batch is fed to the model’s <code class="docutils literal"><span class="pre">run</span></code> method along
+with a boolean value indicating whether the model should update or not.
+By default, updates only happen when iterating the training stream.
+The implementation of <code class="docutils literal"><span class="pre">run</span></code> method is backend specific.</p>
+</div>
+<div class="section" id="training-lifecycle">
+<h2>Training Lifecycle<a class="headerlink" href="#training-lifecycle" title="Permalink to this headline">¶</a></h2>
+<p>The lifecycle of the training is very simple. The following are the steps performed by cxflow.</p>
+<ol class="arabic simple">
+<li>Build the dataset and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
+<li>Build the model an pass the section <code class="docutils literal"><span class="pre">model</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
+<li>Evaluate the extra streams. Those are usually valid and test streams, depending on
+your <code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> <a class="reference external" href="config.html">config</a>.
+During this phase, the model is not updated and therefore, it is perfectly fine
+to use validation and testing data.</li>
+<li>Start the training loop.
+In the training loop, the two following steps alternate: update the model based on the training data
+and evaluate the extra streams.</li>
+</ol>
+<p>The whole process might be described by the following pseudocode.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. build dataset
+<span class="m">2</span>. build model
+<span class="m">3</span>. evaluate extra streams
+<span class="m">4</span>. <span class="k">while</span> not interrupted:
+<span class="m">5</span>.     train on train stream
+<span class="m">6</span>.     evaluate extra streams
+</pre></div>
+</div>
+</div>
+<div class="section" id="test-lifecycle">
+<h2>Test Lifecycle<a class="headerlink" href="#test-lifecycle" title="Permalink to this headline">¶</a></h2>
+<p>TODO rework based on issue regarding prediction and testing.</p>
+</div>
+<div class="section" id="prediction-lifecycle">
+<h2>Prediction Lifecycle<a class="headerlink" href="#prediction-lifecycle" title="Permalink to this headline">¶</a></h2>
+<p>The lifecycle of the prediction is similar.
+The main differences are that only the prediction stream is used and the model is never updated.
+In addition, there is only a single pass through the stream and then cxflow terminates.</p>
+<p>The whole process might be described by the following pseudocode.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. build dataset
+<span class="m">2</span>. build model
+<span class="m">1</span>. evaluate prediction stream
+</pre></div>
+</div>
+</div>
+<div class="section" id="hook-integration">
+<h2>Hook Integration<a class="headerlink" href="#hook-integration" title="Permalink to this headline">¶</a></h2>
+<p>Main loop is responsible for triggering the registered hooks.
+There are multiple events for which the main loop triggers the hook.</p>
+<p>The events are as follows:</p>
+<ul class="simple">
+<li><strong>Before training</strong> is triggered before the first epoch, i.e. even before the extra streams are evaluated.</li>
+<li><strong>After batch</strong> is triggered after each processed batch.</li>
+<li><strong>After epoch</strong> is triggered at the end od each epoch.</li>
+<li><strong>After training</strong> is triggered after the final epoch, i.e. right before the training process terminates.</li>
+<li><strong>After training profile</strong> is triggered after each epoch and it is passed profiling information.</li>
+</ul>
+<p>More details might be found in the <a class="reference external" href="hook.html">hooks section</a>.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cxflow.hooks.save &#8212; cxflow 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.7.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for cxflow.hooks.save</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module with hooks saving the trained model under certain criteria.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">..models.abstract_model</span> <span class="k">import</span> <span class="n">AbstractModel</span>
+
+
+<div class="viewcode-block" id="SaveEvery"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery">[docs]</a><span class="k">class</span> <span class="nc">SaveEvery</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the model every ``n`` epochs.</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: save every 10th epoch</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - SaveEvery:</span>
+<span class="sd">              n_epochs: 10</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: save every epoch and only warn on failure</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - SaveEvery:</span>
+<span class="sd">              on_failure: warn</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SAVE_FAILURE_ACTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;Action to be executed when model save fails.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveEvery.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">on_failure</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param model: trained model</span>
+<span class="sd">        :param n_epochs: how often is the model saved</span>
+<span class="sd">        :param on_failure: action to be taken when model fails to save itself;</span>
+<span class="sd">               one of SaverHook.SAVE_FAILURE_ACTIONS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">on_failure</span> <span class="ow">in</span> <span class="n">SaveEvery</span><span class="o">.</span><span class="n">SAVE_FAILURE_ACTIONS</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">=</span> <span class="n">n_epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_save_failure</span> <span class="o">=</span> <span class="n">on_failure</span></div>
+
+<div class="viewcode-block" id="SaveEvery.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the model if epoch_id is divisible by self._save_every_n_epochs.</span>
+
+<span class="sd">        :param epoch_id: number of the processed epoch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">epoch_id</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">SaveEvery</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="n">name_suffix</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">epoch_id</span><span class="p">),</span> <span class="n">on_failure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_save_failure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SaveEvery.save_model"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery.save_model">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">,</span> <span class="n">name_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">on_failure</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the given model with the given name_suffix. On failure, take the specified action.</span>
+
+<span class="sd">        :param model: the model to be saved</span>
+<span class="sd">        :param name_suffix: name to be used for saving</span>
+<span class="sd">        :param on_failure: action to be taken on failure; one of SaverHook.SAVE_FAILURE_ACTIONS</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            IOError: on save failure and on_failure=&#39;error&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving the model&#39;</span><span class="p">)</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">name_suffix</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Model saved to: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">save_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="k">if</span> <span class="n">on_failure</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Failed to save the model.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">elif</span> <span class="n">on_failure</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Failed to save the model.&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SaveBest"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest">[docs]</a><span class="k">class</span> <span class="nc">SaveBest</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the model when it outperforms itself.</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: save model with minimal valid loss</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - BestSaverHook</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: save model with minimal valid loss</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - SaveBest:</span>
+<span class="sd">              variable: accuracy</span>
+<span class="sd">              condition: max</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONDITIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;Monitored variable objective goal.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveBest.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+                 <span class="n">model</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">,</span>
+                 <span class="n">aggregation</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">on_save_failure</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Example: metric=loss, condition=min -&gt; saved the model when the loss is best so far (on `stream`).</span>
+<span class="sd">        :param model: trained model</span>
+<span class="sd">        :param variable: variable to be monitored</span>
+<span class="sd">        :param condition: {min, max}</span>
+<span class="sd">        :param stream: stream to be monitored</span>
+<span class="sd">        :param aggregation: which aggregation to used (mean by default)</span>
+<span class="sd">        :param output_name: suffix of the saved model</span>
+<span class="sd">        :param on_save_failure: action to be taken when model fails to save itself, one of {&#39;error&#39;, &#39;warn&#39;, &#39;ignore&#39;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">on_save_failure</span> <span class="ow">in</span> <span class="n">SaveEvery</span><span class="o">.</span><span class="n">SAVE_FAILURE_ACTIONS</span>
+        <span class="k">assert</span> <span class="n">condition</span> <span class="ow">in</span> <span class="n">SaveBest</span><span class="o">.</span><span class="n">CONDITIONS</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="o">=</span> <span class="n">variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span> <span class="o">=</span> <span class="n">condition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_name</span> <span class="o">=</span> <span class="n">stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_aggregation</span> <span class="o">=</span> <span class="n">aggregation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_name</span> <span class="o">=</span> <span class="n">output_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_save_failure</span> <span class="o">=</span> <span class="n">on_save_failure</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best_value</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SaveBest._get_value"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest._get_value">[docs]</a>    <span class="k">def</span> <span class="nf">_get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the value of the monitored variable from the given epoch data.</span>
+
+<span class="sd">        :param epoch_data: epoch data which determine whether the model will be saved or not</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: if any of the specified stream, variable or aggregation is not present in the epoch data.</span>
+<span class="sd">            TypeError: if the variable value is not a dict when aggregation is specified</span>
+<span class="sd">            ValueError: if the variable value is not a scalar</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">epoch_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Stream `</span><span class="si">{}</span><span class="s1">` was not found in the epoch data.</span><span class="se">\n</span><span class="s1">Available streams are `</span><span class="si">{}</span><span class="s1">`.&#39;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream_name</span><span class="p">,</span> <span class="n">epoch_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="n">stream_data</span> <span class="o">=</span> <span class="n">epoch_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stream_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` for stream `</span><span class="si">{}</span><span class="s1">` was not found in the epoch data. &#39;</span>
+                           <span class="s1">&#39;Available variables for stream `</span><span class="si">{}</span><span class="s1">` are `</span><span class="si">{}</span><span class="s1">`.&#39;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_name</span><span class="p">,</span> <span class="n">stream_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">stream_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregation</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` is expected to be a dict when aggregation is specified. &#39;</span>
+                                <span class="s1">&#39;Got `</span><span class="si">{}</span><span class="s1">` instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aggregation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Specified aggregation `</span><span class="si">{}</span><span class="s1">` was not found in the variable `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                               <span class="s1">&#39;Available aggregations: `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_aggregation</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` value is not a scalar.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="SaveBest._is_value_better"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest._is_value_better">[docs]</a>    <span class="k">def</span> <span class="nf">_is_value_better</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test if the new value is better than the best so far.</span>
+
+<span class="sd">        :param new_value: current value of the objective function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span> <span class="o">==</span> <span class="s1">&#39;min&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_condition</span> <span class="o">==</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_value</span></div>
+
+<div class="viewcode-block" id="SaveBest.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the model if the new value of the monitored variable is better than the best value so far.</span>
+
+<span class="sd">        :param epoch_data: epoch data to be processed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">epoch_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_value_better</span><span class="p">(</span><span class="n">new_value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_best_value</span> <span class="o">=</span> <span class="n">new_value</span>
+            <span class="n">SaveEvery</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="n">name_suffix</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_save_failure</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

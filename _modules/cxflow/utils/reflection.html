@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cxflow.utils.reflection &#8212; cxflow 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.7.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for cxflow.utils.reflection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module with handy functions which are able to create objects from module and class names.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">pkgutil</span>
+
+<span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">MappingProxyType</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="n">_EMPTY_DICT</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">({})</span>
+
+
+<div class="viewcode-block" id="parse_fully_qualified_name"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.parse_fully_qualified_name">[docs]</a><span class="k">def</span> <span class="nf">parse_fully_qualified_name</span><span class="p">(</span><span class="n">fq_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the given fully-quallified name (separated with dots) to a tuple of module and class names.</span>
+
+<span class="sd">    :param fq_name: fully qualified name separated with dots</span>
+<span class="sd">    :return: ``None`` instead of module if the given name contains no separators (dots).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">last_dot</span> <span class="o">=</span> <span class="n">fq_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">last_dot</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fq_name</span><span class="p">[:</span><span class="n">last_dot</span><span class="p">],</span> <span class="n">fq_name</span><span class="p">[</span><span class="n">last_dot</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fq_name</span></div>
+
+
+<div class="viewcode-block" id="create_object"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.create_object">[docs]</a><span class="k">def</span> <span class="nf">create_object</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Iterable</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="n">_EMPTY_DICT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create an object instance of the given class from the given module.</span>
+<span class="sd">    Args and kwargs are passed to the constructor.</span>
+
+<span class="sd">    This mimics the following code:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from module import class</span>
+<span class="sd">        return class(*args, **kwargs)</span>
+
+<span class="sd">    :param module_name: module name</span>
+<span class="sd">    :param class_name: class name</span>
+<span class="sd">    :param args: args to be passed to the object constructor</span>
+<span class="sd">    :param kwargs: kwargs to be passed to the object constructor</span>
+<span class="sd">    :return: created object instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+    <span class="n">_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="n">_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="list_submodules"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.list_submodules">[docs]</a><span class="k">def</span> <span class="nf">list_submodules</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>   <span class="c1"># pylint: disable=invalid-sequence-index</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    List full names of all the submodules in the given module.</span>
+
+<span class="sd">    :param module_name: name of the module of which the submodules will be listed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">module_name</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">submodule_name</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">submodule_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">iter_modules</span><span class="p">(</span><span class="n">_module</span><span class="o">.</span><span class="n">__path__</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="find_class_module"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.find_class_module">[docs]</a><span class="k">def</span> <span class="nf">find_class_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">]]]:</span>   <span class="c1"># pylint: disable=invalid-sequence-index</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find sub-modules of the given module that contain the given class.</span>
+
+<span class="sd">    Moreover, return a list of sub-modules that could not be imported as a list of (sub-module name, Exception) tuples.</span>
+
+<span class="sd">    :param module_name: name of the module to be searched</span>
+<span class="sd">    :param class_name: searched class name</span>
+<span class="sd">    :return: a tuple of sub-modules having the searched class and sub-modules that could not be searched</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matched_submodules</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">erroneous_submodules</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">submodule_name</span> <span class="ow">in</span> <span class="n">list_submodules</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># the sub-module to be included may be erroneous and we need to continue</span>
+            <span class="n">submodule</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">submodule_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">submodule</span><span class="p">,</span> <span class="n">class_name</span><span class="p">):</span>
+                <span class="n">matched_submodules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">submodule_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+            <span class="n">erroneous_submodules</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">submodule_name</span><span class="p">,</span> <span class="n">ex</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">matched_submodules</span><span class="p">,</span> <span class="n">erroneous_submodules</span></div>
+
+
+<div class="viewcode-block" id="get_class_module"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.get_class_module">[docs]</a><span class="k">def</span> <span class="nf">get_class_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a sub-module of the given module which has the given class.</span>
+
+<span class="sd">    This method wraps `utils.reflection.find_class_module method` with the following behavior:</span>
+
+<span class="sd">    - raise error when multiple sub-modules with different classes with the same name are found</span>
+<span class="sd">    - return None when no sub-module is found</span>
+<span class="sd">    - warn about non-searchable sub-modules</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        This function logs!</span>
+
+<span class="sd">    :param module_name: module to be searched</span>
+<span class="sd">    :param class_name: searched class name</span>
+<span class="sd">    :return: sub-module with the searched class or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">matched_modules</span><span class="p">,</span> <span class="n">erroneous_modules</span> <span class="o">=</span> <span class="n">find_class_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">submodule</span><span class="p">,</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">erroneous_modules</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Could not inspect sub-module `</span><span class="si">%s</span><span class="s1">` due to `</span><span class="si">%s</span><span class="s1">` &#39;</span>
+                        <span class="s1">&#39;when searching for `</span><span class="si">%s</span><span class="s1">` in sub-modules of `</span><span class="si">%s</span><span class="s1">`.&#39;</span><span class="p">,</span>
+                        <span class="n">submodule</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">module_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matched_modules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">matched_modules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matched_modules</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># check if all the module attributes point to the same class</span>
+        <span class="n">first_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">matched_modules</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">class_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">matched_module</span> <span class="ow">in</span> <span class="n">matched_modules</span><span class="p">:</span>
+            <span class="n">another_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">matched_module</span><span class="p">),</span> <span class="n">class_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">another_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">first_class</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Found more than one sub-module when searching for `</span><span class="si">{}</span><span class="s1">` in sub-modules of `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                                 <span class="s1">&#39;Please specify the module explicitly. Found sub-modules: `</span><span class="si">{}</span><span class="s1">`&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">matched_modules</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">matched_modules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

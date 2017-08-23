@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cxflow.cli &#8212; cxflow 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.7.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="cxflow.constants" href="cxflow.constants.html" />
+    <link rel="prev" title="cxflow" href="cxflow.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../getting_started.html">Getting Started</a></li>
+                <li><a href="../tutorial.html">Tutorial</a></li>
+                <li><a href="../advanced/index.html">Advanced</a></li>
+                <li><a href="index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<div class="side_nav">
+    <a href="cxflow.html" title="Previous Chapter: cxflow"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; cxflow</span>
+    </a>
+    </div>
+<div class="side_nav">
+    <a href="cxflow.constants.html" title="Next Chapter: cxflow.constants"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">cxflow.constants &raquo;</span>
+    </a>
+    </div><ul>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">cxflow.cli</span></code></a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="module-cxflow.cli">
+<span id="cxflow-cli"></span><h1><code class="docutils literal"><span class="pre">cxflow.cli</span></code><a class="headerlink" href="#module-cxflow.cli" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="#cxflow.cli.train" title="cxflow.cli.train"><code class="xref py py-func docutils literal"><span class="pre">train()</span></code></a>:
+Load config and start the training.</li>
+<li><a class="reference internal" href="#cxflow.cli.resume" title="cxflow.cli.resume"><code class="xref py py-func docutils literal"><span class="pre">resume()</span></code></a>:
+Load config from the directory specified and start the training.</li>
+<li><a class="reference internal" href="#cxflow.cli.grid_search" title="cxflow.cli.grid_search"><code class="xref py py-func docutils literal"><span class="pre">grid_search()</span></code></a>:
+Build all grid search parameter configurations and optionally run them.</li>
+<li><a class="reference internal" href="#cxflow.cli._build_grid_search_commands" title="cxflow.cli._build_grid_search_commands"><code class="xref py py-func docutils literal"><span class="pre">_build_grid_search_commands()</span></code></a>:
+Build all grid search parameter configurations.</li>
+<li><a class="reference internal" href="#cxflow.cli.predict" title="cxflow.cli.predict"><code class="xref py py-func docutils literal"><span class="pre">predict()</span></code></a>:
+Load config from the directory specified and start the prediction.</li>
+<li><a class="reference internal" href="#cxflow.cli.invoke_dataset_method" title="cxflow.cli.invoke_dataset_method"><code class="xref py py-func docutils literal"><span class="pre">invoke_dataset_method()</span></code></a>:
+Create the specified dataset and invoke its specified method.</li>
+<li><a class="reference internal" href="#cxflow.cli.get_cxflow_arg_parser" title="cxflow.cli.get_cxflow_arg_parser"><code class="xref py py-func docutils literal"><span class="pre">get_cxflow_arg_parser()</span></code></a>:
+Create the cxflow argument parser.</li>
+<li><a class="reference internal" href="#cxflow.cli.create_output_dir" title="cxflow.cli.create_output_dir"><code class="xref py py-func docutils literal"><span class="pre">create_output_dir()</span></code></a>:
+Create output_dir under the given <code class="docutils literal"><span class="pre">output_root</span></code> and</li>
+<li><a class="reference internal" href="#cxflow.cli.create_dataset" title="cxflow.cli.create_dataset"><code class="xref py py-func docutils literal"><span class="pre">create_dataset()</span></code></a>:
+Create a dataset object according to the given config.</li>
+<li><a class="reference internal" href="#cxflow.cli.create_model" title="cxflow.cli.create_model"><code class="xref py py-func docutils literal"><span class="pre">create_model()</span></code></a>:
+Create a model object either from scratch of from the checkpoint in <cite>resume_dir</cite>.</li>
+<li><a class="reference internal" href="#cxflow.cli.create_hooks" title="cxflow.cli.create_hooks"><code class="xref py py-func docutils literal"><span class="pre">create_hooks()</span></code></a>:
+Create hooks specified in <code class="docutils literal"><span class="pre">config['hooks']</span></code> list.</li>
+<li><a class="reference internal" href="#cxflow.cli.run" title="cxflow.cli.run"><code class="xref py py-func docutils literal"><span class="pre">run()</span></code></a>:
+Run cxflow training configured by the passed <cite>config</cite>.</li>
+<li><a class="reference internal" href="#cxflow.cli.find_config" title="cxflow.cli.find_config"><code class="xref py py-func docutils literal"><span class="pre">find_config()</span></code></a>:
+Derive configuration file path from the given path and check its existence.</li>
+<li><a class="reference internal" href="#cxflow.cli.validate_config" title="cxflow.cli.validate_config"><code class="xref py py-func docutils literal"><span class="pre">validate_config()</span></code></a>:
+Assert the config contains both <cite>model</cite> and <cite>dataset</cite> sections.</li>
+<li><a class="reference internal" href="#cxflow.cli.fallback" title="cxflow.cli.fallback"><code class="xref py py-func docutils literal"><span class="pre">fallback()</span></code></a>:
+Fallback procedure when a cli command fails.</li>
+</ul>
+<dl class="function">
+<dt id="cxflow.cli.train">
+<code class="descclassname">cxflow.cli.</code><code class="descname">train</code><span class="sig-paren">(</span><em>config_file</em>, <em>cl_arguments</em>, <em>output_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/train.html#train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load config and start the training.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to configuration file</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.resume">
+<code class="descclassname">cxflow.cli.</code><code class="descname">resume</code><span class="sig-paren">(</span><em>config_path</em>, <em>restore_from</em>, <em>cl_arguments</em>, <em>output_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/resume.html#resume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.resume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load config from the directory specified and start the training.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the config file or the directory in which it is stored</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – backend-specific path to the already trained model to be restored from.
+If <code class="docutils literal"><span class="pre">None</span></code> is passed, it is inferred from the configuration file location as the directory
+it is located in.</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.grid_search">
+<code class="descclassname">cxflow.cli.</code><code class="descname">grid_search</code><span class="sig-paren">(</span><em>script</em>, <em>params</em>, <em>dry_run=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/grid_search.html#grid_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.grid_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build all grid search parameter configurations and optionally run them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – String of command prefix, e.g. <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">-v</span> <span class="pre">-o</span> <span class="pre">log</span></code>.</li>
+<li><strong>params</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – Iterable collection of strings in standard cxflow param form, e.g. <code class="docutils literal"><span class="pre">'numerical_param:int=[1,</span> <span class="pre">2]'</span></code>
+or <code class="docutils literal"><span class="pre">'text_param:str=[&quot;hello&quot;,</span> <span class="pre">&quot;cio&quot;]'</span></code>.</li>
+<li><strong>dry_run</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) – If set to <code class="docutils literal"><span class="pre">True</span></code>, the built commands will only be printed instead of executed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli._build_grid_search_commands">
+<code class="descclassname">cxflow.cli.</code><code class="descname">_build_grid_search_commands</code><span class="sig-paren">(</span><em>script</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/grid_search.html#_build_grid_search_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli._build_grid_search_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build all grid search parameter configurations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – String of command prefix, e.g. <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">-v</span> <span class="pre">-o</span> <span class="pre">log</span></code>.</li>
+<li><strong>params</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – Iterable collection of strings in standard cxflow param form, e.g. <code class="docutils literal"><span class="pre">'numerical_param:int=[1,</span> <span class="pre">2]'</span></code>
+or <code class="docutils literal"><span class="pre">'text_param:str=[&quot;hello&quot;,</span> <span class="pre">&quot;cio&quot;]'</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.predict">
+<code class="descclassname">cxflow.cli.</code><code class="descname">predict</code><span class="sig-paren">(</span><em>config_path</em>, <em>restore_from</em>, <em>cl_arguments</em>, <em>output_root</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/predict.html#predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load config from the directory specified and start the prediction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the config file or the directory in which it is stored</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – backend-specific path to the already trained model to be restored from.
+If <code class="docutils literal"><span class="pre">None</span></code> is passed, it is inferred from the configuration file location as the directory
+it is located in.</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.invoke_dataset_method">
+<code class="descclassname">cxflow.cli.</code><code class="descname">invoke_dataset_method</code><span class="sig-paren">(</span><em>config_path</em>, <em>method_name</em>, <em>output_root</em>, <em>cl_arguments</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/dataset.html#invoke_dataset_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.invoke_dataset_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the specified dataset and invoke its specified method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the config file or the directory in which it is stored</li>
+<li><strong>method_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name of the method to be invoked on the specified dataset</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.get_cxflow_arg_parser">
+<code class="descclassname">cxflow.cli.</code><code class="descname">get_cxflow_arg_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/args.html#get_cxflow_arg_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.get_cxflow_arg_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the cxflow argument parser.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/argparse.html#argparse.ArgumentParser" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">ArgumentParser</span></code></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an instance of the parser</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.create_output_dir">
+<code class="descclassname">cxflow.cli.</code><code class="descname">create_output_dir</code><span class="sig-paren">(</span><em>config</em>, <em>output_root</em>, <em>default_model_name='NonameModel'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/common.html#create_output_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.create_output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Create output_dir under the given <code class="docutils literal"><span class="pre">output_root</span></code> and</dt>
+<dd><ul class="first last simple">
+<li>dump the given config to YAML file under this dir</li>
+<li>register a file logger logging to a file under this dir</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config to be dumped</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – dir wherein output_dir shall be created</li>
+<li><strong>default_model_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name to be used when <cite>model.name</cite> is not found in the config</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">path to the created output_dir</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.create_dataset">
+<code class="descclassname">cxflow.cli.</code><code class="descname">create_dataset</code><span class="sig-paren">(</span><em>config</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/common.html#create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.create_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a dataset object according to the given config.</p>
+<p>Dataset and output_dir configs are passed to the constructor in a single YAML-encoded string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config dict with dataset config</li>
+<li><strong>output_dir</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – path to the training output dir or None</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dataset object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.create_model">
+<code class="descclassname">cxflow.cli.</code><code class="descname">create_model</code><span class="sig-paren">(</span><em>config</em>, <em>output_dir</em>, <em>dataset</em>, <em>restore_from=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/common.html#create_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.create_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a model object either from scratch of from the checkpoint in <cite>resume_dir</cite>.</p>
+<p>Cxflow allows the following scenarios</p>
+<ol class="arabic simple">
+<li>Create model: leave <code class="docutils literal"><span class="pre">restore_from=None</span></code> and specify <code class="docutils literal"><span class="pre">class</span></code>;</li>
+<li>Restore model: specify <code class="docutils literal"><span class="pre">restore_from</span></code> which is a backend-specific path to (a directory with) the saved model.</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config dict with model config</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the training output dir</li>
+<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) – AbstractDataset object</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – from whence the model should be restored (backend-specific information)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">model object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.create_hooks">
+<code class="descclassname">cxflow.cli.</code><code class="descname">create_hooks</code><span class="sig-paren">(</span><em>config</em>, <em>model</em>, <em>dataset</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/common.html#create_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.create_hooks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create hooks specified in <code class="docutils literal"><span class="pre">config['hooks']</span></code> list.</p>
+<p>Hook config entries may be one of the following types:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">A hook with default args specified only by its name as a string; e.g.</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxflow_tensorflow.WriteTensorBoard</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">A hook with custom args as a dict name -&gt; args; e.g.</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopAfter</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">n_epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config dict</li>
+<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) – model object to be passed to the hooks</li>
+<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) – AbstractDataset object</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – training output dir available to the hooks</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal"><span class="pre">AbstractHook</span></code>]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of hook objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.run">
+<code class="descclassname">cxflow.cli.</code><code class="descname">run</code><span class="sig-paren">(</span><em>config</em>, <em>output_root</em>, <em>restore_from=None</em>, <em>predict=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/common.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run cxflow training configured by the passed <cite>config</cite>.</p>
+<p>Unique <cite>output_dir</cite> for this training is created under the given <cite>output_root</cite> dir
+wherein all the training outputs are saved. The output dir name will be roughly <cite>[model.name]_[time]</cite>.</p>
+<p>The training procedure consists of the following steps:</p>
+<ol class="arabic simple">
+<li>Set up (create output dir and file logger, dump the loaded config into the output dir)</li>
+<li>Create dataset (YAML string with <code class="docutils literal"><span class="pre">dataset</span></code> and <code class="docutils literal"><span class="pre">log_dir</span></code> configs are passed to the dataset constructor)</li>
+<li>Create (or restore) model (dataset, <code class="docutils literal"><span class="pre">log_dir</span></code> and model config is passed to the constructor)</li>
+<li>Create all the training hooks</li>
+<li>Create the <code class="docutils literal"><span class="pre">MainLoop</span></code> object</li>
+<li>Run the main loop</li>
+</ol>
+<p>If any of the steps fails, the training is terminated.</p>
+<dl class="docutils">
+<dt>After the training procedure finishes, the output dir will contain the following:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">train_log.txt</span></code> with entry_point and main_loop logs (same as the stderr)</li>
+<li>dumped YAML config</li>
+</ul>
+</dd>
+<dt>Additional outputs created by hooks, dataset or tensorflow may include:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">dataset_log.txt</span></code> with info about dataset/stream creation</li>
+<li>model checkpoint(s)</li>
+<li>TensorBoard log file</li>
+<li>TensorFlow event log</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – dir under which output_dir shall be created</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – from whence the model should be restored (backend-specific information)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.find_config">
+<code class="descclassname">cxflow.cli.</code><code class="descname">find_config</code><span class="sig-paren">(</span><em>config_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/util.html#find_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.find_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derive configuration file path from the given path and check its existence.</p>
+<p>The given path is expected to be either</p>
+<ol class="arabic simple">
+<li>path to the file</li>
+<li>path to a dir, in such case the path is joined with CXF_CONFIG_FILE</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the configuration file or its parent directory</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">validated configuration file path</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.validate_config">
+<code class="descclassname">cxflow.cli.</code><code class="descname">validate_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/util.html#validate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.validate_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert the config contains both <cite>model</cite> and <cite>dataset</cite> sections.</p>
+<p>Additionally, warn if no hooks specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – configuration object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cxflow.cli.fallback">
+<code class="descclassname">cxflow.cli.</code><code class="descname">fallback</code><span class="sig-paren">(</span><em>message</em>, <em>ex</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/cli/util.html#fallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.cli.fallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fallback procedure when a cli command fails.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>message</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – message to be logged</li>
+<li><strong>ex</strong> (<code class="xref py py-class docutils literal"><span class="pre">Exception</span></code>) – Exception which caused the failure</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
