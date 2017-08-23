@@ -43,4 +43,17 @@ visibility:visible;
 }
 
 .side_nav{
-margin-bottom:8px;}
+margin-bottom:4px;
+padding:4px;
+padding-left:10px;
+}
+
+.footer{
+margin-top:30px}
+
+.searchbox{
+display:block;
+margin-top:12px;
+padding-bottom:0px;
+margin-bottom:0px;
+}
