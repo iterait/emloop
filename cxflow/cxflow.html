@@ -148,11 +148,10 @@ Abstract machine learning model which exposes input and output names, run and sa
 Every cxflow dataset has to have a constructor which takes YAML string config.
 Additionally, one may implement any <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method
 in order to make <code class="docutils literal"><span class="pre">stream_name</span></code> stream available in the cxflow <code class="docutils literal"><span class="pre">MainLoop</span></code>.</p>
-digraph inheritancea2135df863 {
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;AbstractDataset&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;This concept prescribes the API that is required from every cxflow dataset.&quot;];
-}
+<img src="../_images/inheritance-f7c060c20bf828441a24f6bf8f75736ab59a5753.png" alt="Inheritance diagram of AbstractDataset" usemap="#inheritancea2135df863" class="inheritance"/>
+<map id="inheritancea2135df863" name="inheritancea2135df863">
+<area shape="rect" id="node1" title="This concept prescribes the API that is required from every cxflow dataset." alt="" coords="5,5,132,31"/>
+</map>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -187,11 +186,10 @@ The configuration must contain <cite>dataset</cite> entry and may contain <cite>
 </ul>
 </dd>
 </dl>
-digraph inheritance7f67f7c0ff {
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;BaseDataset&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Base class for datasets written in python.&quot;];
-}
+<img src="../_images/inheritance-7f8b218164ee430de3f30c9a84b9b6e61539e6bc.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
+<map id="inheritance7f67f7c0ff" name="inheritance7f67f7c0ff">
+<area shape="rect" id="node1" title="Base class for datasets written in python." alt="" coords="5,5,111,31"/>
+</map>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -241,11 +239,10 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 <em class="property">class </em><code class="descclassname">cxflow.</code><code class="descname">MainLoop</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>hooks=()</em>, <em>extra_streams=()</em>, <em>on_unused_sources='warn'</em>, <em>fixed_batch_size=None</em>, <em>skip_zeroth_epoch=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Train the model, manage hooks etc.</p>
-digraph inheritance02e0bda668 {
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;MainLoop&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Train the model, manage hooks etc.&quot;];
-}
+<img src="../_images/inheritance-c3044cc13c746ae0d7779485d6bbc005a1de411e.png" alt="Inheritance diagram of MainLoop" usemap="#inheritance02e0bda668" class="inheritance"/>
+<map id="inheritance02e0bda668" name="inheritance02e0bda668">
+<area shape="rect" id="node1" title="Train the model, manage hooks etc." alt="" coords="5,5,88,31"/>
+</map>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -424,11 +421,10 @@ size=&quot;8.0, 12.0&quot;;
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Abstract machine learning model which exposes input and output names, run and save methods.
 <cite>AbstractModel</cite> implementations are trainable with <code class="docutils literal"><span class="pre">cxflow.MainLoop</span></code>.</p>
-digraph inheritancebbe02c0bae {
-rankdir=LR;
-size=&quot;8.0, 12.0&quot;;
-  &quot;AbstractModel&quot; [fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5)&quot;,tooltip=&quot;Abstract machine learning model which exposes input and output names, run and save methods.&quot;];
-}
+<img src="../_images/inheritance-f4ac830770dbea7306599e841daa43ca679323f9.png" alt="Inheritance diagram of AbstractModel" usemap="#inheritancebbe02c0bae" class="inheritance"/>
+<map id="inheritancebbe02c0bae" name="inheritancebbe02c0bae">
+<area shape="rect" id="node1" title="Abstract machine learning model which exposes input and output names, run and save methods." alt="" coords="5,5,120,31"/>
+</map>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
