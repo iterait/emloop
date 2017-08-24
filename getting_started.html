@@ -114,7 +114,7 @@
       
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>Before we dive in, cxflow must be properly installed.</p>
+<p>Before we dive in, cxflow has to be installed properly.</p>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>In order to run and install cxflow, the following utilities must be installed:</p>
@@ -127,30 +127,32 @@ Nevertheless, these dependencies are automatically installed by <code class="doc
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>The most simple installation of cxflow is via pip.
+<p>The simplest way of installing cxflow is using pip.
 This is the recommended option for majority of users.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install cxflow
 </pre></div>
 </div>
 <p>Optionally, install additional plugins by installing <code class="docutils literal"><span class="pre">cxflow-&lt;plugin-name&gt;</span></code>.
-TensorFlow backend for cxflow might be installed by:</p>
+TensorFlow backend for cxflow can be installed by:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install cxflow-tensorflow
 </pre></div>
 </div>
-<p>In order to use cxflow nightly builds, install directly from the source code repository (<code class="docutils literal"><span class="pre">dev</span></code> branch).</p>
+<p>In order to use cxflow nightly builds, install it directly from the source code
+repository (<code class="docutils literal"><span class="pre">dev</span></code> branch).</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>pip install -U git+https://github.com/Cognexa/cxflow.git@dev
 </pre></div>
 </div>
 </div>
 <div class="section" id="developer-installation">
 <h2>Developer Installation<a class="headerlink" href="#developer-installation" title="Permalink to this headline">¶</a></h2>
-<p>Finally, cxflow might be installed directly for developer purposes.</p>
+<p>Finally, cxflow might be installed directly for development purposes.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>git clone git@github.com:Cognexa/cxflow.git
 <span class="nb">cd</span> cxflow
 pip install -e .
 </pre></div>
 </div>
-<p>When inside the clonned directory, cxflow might be tested</p>
+<p>The cxflow test suite can be executed by running the following in the cloned
+repository:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>python setup.py <span class="nb">test</span>
 </pre></div>
 </div>

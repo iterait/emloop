@@ -1,7 +1,7 @@
 Getting Started
 ###############
 
-Before we dive in, cxflow must be properly installed.
+Before we dive in, cxflow has to be installed properly.
 
 Requirements
 ************
@@ -16,7 +16,7 @@ Nevertheless, these dependencies are automatically installed by ``pip`` (see bel
 Installation
 ************
 
-The most simple installation of cxflow is via pip.
+The simplest way of installing cxflow is using pip.
 This is the recommended option for majority of users.
 
 .. code-block:: bash
@@ -24,13 +24,14 @@ This is the recommended option for majority of users.
     pip install cxflow
 
 Optionally, install additional plugins by installing ``cxflow-<plugin-name>``.
-TensorFlow backend for cxflow might be installed by:
+TensorFlow backend for cxflow can be installed by:
 
 .. code-block:: bash
 
     pip install cxflow-tensorflow
 
-In order to use cxflow nightly builds, install directly from the source code repository (``dev`` branch).
+In order to use cxflow nightly builds, install it directly from the source code 
+repository (``dev`` branch).
 
 .. code-block:: bash
 
@@ -39,7 +40,7 @@ In order to use cxflow nightly builds, install directly from the source code rep
 Developer Installation
 **********************
 
-Finally, cxflow might be installed directly for developer purposes.
+Finally, cxflow might be installed directly for development purposes.
 
 .. code-block:: bash
 
@@ -47,7 +48,8 @@ Finally, cxflow might be installed directly for developer purposes.
     cd cxflow
     pip install -e .
 
-When inside the clonned directory, cxflow might be tested
+The cxflow test suite can be executed by running the following in the cloned 
+repository:
 
 .. code-block:: bash
 
