@@ -111,19 +111,27 @@
 
 <div class="viewcode-block" id="AbstractDataset"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset">[docs]</a><span class="k">class</span> <span class="nc">AbstractDataset</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This concept prescribes the API that is required from every cxflow dataset.</span>
+<span class="sd">    This concept prescribes the API that is required from every **cxflow** dataset.</span>
+
 <span class="sd">    Every cxflow dataset has to have a constructor which takes YAML string config.</span>
 <span class="sd">    Additionally, one may implement any ``&lt;stream_name&gt;_stream`` method</span>
-<span class="sd">    in order to make ``stream_name`` stream available in the cxflow ``MainLoop``.</span>
+<span class="sd">    in order to make ``stream_name`` stream available in the **cxflow** :py:class:`cxflow.MainLoop`.</span>
+
+<span class="sd">    All the defined stream methods should return a :py:attr:`Stream`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">Batch</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="sd">&quot;&quot;&quot;Batch type: :py:class:`typing.Mapping` of ``variable_name`` to an :py:class:`typing.Iterable` of examples.&quot;&quot;&quot;</span>
+
     <span class="n">Stream</span> <span class="o">=</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Batch</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Stream type: :py:class:`typing.Iterable` of :py:attr:`Batch` es.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractDataset.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create new dataset configured with the given YAML string (obligatory).</span>
-<span class="sd">        The configuration must contain `dataset` entry and may contain `output_dir&#39; entry.</span>
+
+<span class="sd">        The configuration must contain ``dataset`` entry and may contain ``output_dir`` entry.</span>
+
 <span class="sd">        :param config_str: YAML string config</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>

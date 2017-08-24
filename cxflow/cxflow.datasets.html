@@ -117,12 +117,12 @@
       
   <div class="section" id="module-cxflow.datasets">
 <span id="cxflow-datasets"></span><h1><code class="docutils literal"><span class="pre">cxflow.datasets</span></code><a class="headerlink" href="#module-cxflow.datasets" title="Permalink to this headline">¶</a></h1>
-<p>cxflow dataset module.</p>
+<p>Module with <strong>cxflow</strong> dataset concept (<a class="reference internal" href="#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>) and python <a class="reference internal" href="#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">BaseDataset</span></code></a>.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>:
-This concept prescribes the API that is required from every cxflow dataset.</li>
+This concept prescribes the API that is required from every <strong>cxflow</strong> dataset.</li>
 <li><a class="reference internal" href="#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">BaseDataset</span></code></a>:
 Base class for datasets written in python.</li>
 </ul>
@@ -130,24 +130,45 @@ Base class for datasets written in python.</li>
 <dt id="cxflow.datasets.AbstractDataset">
 <em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">AbstractDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/abstract_dataset.html#AbstractDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.AbstractDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>This concept prescribes the API that is required from every cxflow dataset.
-Every cxflow dataset has to have a constructor which takes YAML string config.
+<p>This concept prescribes the API that is required from every <strong>cxflow</strong> dataset.</p>
+<p>Every cxflow dataset has to have a constructor which takes YAML string config.
 Additionally, one may implement any <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method
-in order to make <code class="docutils literal"><span class="pre">stream_name</span></code> stream available in the cxflow <code class="docutils literal"><span class="pre">MainLoop</span></code>.</p>
-<img src="../_images/inheritance-f7c060c20bf828441a24f6bf8f75736ab59a5753.png" alt="Inheritance diagram of AbstractDataset" usemap="#inheritancea2135df863" class="inheritance"/>
+in order to make <code class="docutils literal"><span class="pre">stream_name</span></code> stream available in the <strong>cxflow</strong> <a class="reference internal" href="cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a>.</p>
+<p>All the defined stream methods should return a <a class="reference internal" href="#cxflow.datasets.AbstractDataset.Stream" title="cxflow.datasets.AbstractDataset.Stream"><code class="xref py py-attr docutils literal"><span class="pre">Stream</span></code></a>.</p>
+<img src="../_images/inheritance-895c3c38e7c8525225c1cb42c4c12e36a811f4d3.png" alt="Inheritance diagram of AbstractDataset" usemap="#inheritancea2135df863" class="inheritance"/>
 <map id="inheritancea2135df863" name="inheritancea2135df863">
-<area shape="rect" id="node1" title="This concept prescribes the API that is required from every cxflow dataset." alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node1" title="This concept prescribes the API that is required from every **cxflow** dataset." alt="" coords="5,5,132,31"/>
 </map>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
+<dl class="attribute">
+<dt id="cxflow.datasets.AbstractDataset.Batch">
+<code class="descname">Batch</code><a class="headerlink" href="#cxflow.datasets.AbstractDataset.Batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch type: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">typing.Mapping</span></code></a> of <code class="docutils literal"><span class="pre">variable_name</span></code> to an <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">typing.Iterable</span></code></a> of examples.</p>
+<p>alias of <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.datasets.AbstractDataset.Stream">
+<code class="descname">Stream</code><a class="headerlink" href="#cxflow.datasets.AbstractDataset.Stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream type: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">typing.Iterable</span></code></a> of <a class="reference internal" href="#cxflow.datasets.AbstractDataset.Batch" title="cxflow.datasets.AbstractDataset.Batch"><code class="xref py py-attr docutils literal"><span class="pre">Batch</span></code></a> es.</p>
+<p>alias of <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></p>
+</dd></dl>
+
 <dl class="method">
 <dt id="cxflow.datasets.AbstractDataset.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/abstract_dataset.html#AbstractDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.AbstractDataset.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new dataset configured with the given YAML string (obligatory).
-The configuration must contain <cite>dataset</cite> entry and may contain <cite>output_dir&#8217; entry.
-:type config_str: :class:`str</cite>
-:param config_str: YAML string config</p>
+<dd><p>Create new dataset configured with the given YAML string (obligatory).</p>
+<p>The configuration must contain <code class="docutils literal"><span class="pre">dataset</span></code> entry and may contain <code class="docutils literal"><span class="pre">output_dir</span></code> entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; YAML string config</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -166,9 +187,9 @@ The configuration must contain <cite>dataset</cite> entry and may contain <cite>
 </ul>
 </dd>
 </dl>
-<img src="../_images/inheritance-a78a5c9a500f22c62ff7c183a95f532ff93a6376.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
+<img src="../_images/inheritance-4808b5fa81a10a68ddbd2d52dc714298eb8c315a.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
 <map id="inheritance7f67f7c0ff" name="inheritance7f67f7c0ff">
-<area shape="rect" id="node1" title="This concept prescribes the API that is required from every cxflow dataset." alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node1" title="This concept prescribes the API that is required from every **cxflow** dataset." alt="" coords="5,5,132,31"/>
 <area shape="rect" id="node2" title="Base class for datasets written in python." alt="" coords="180,5,285,31"/>
 </map>
 <div class="line-block">
@@ -177,13 +198,13 @@ The configuration must contain <cite>dataset</cite> entry and may contain <cite>
 <dl class="method">
 <dt id="cxflow.datasets.BaseDataset.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new dataset.
-Decode the given YAML config string and pass the obtained kwargs to the <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
+<dd><p>Create new dataset.</p>
+<p>Decode the given YAML config string and pass the obtained <code class="docutils literal"><span class="pre">**kwargs</span></code> to <a class="reference internal" href="#cxflow.datasets.BaseDataset._init_with_kwargs" title="cxflow.datasets.BaseDataset._init_with_kwargs"><code class="xref py py-meth docutils literal"><span class="pre">_init_with_kwargs()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; dataset configuration as yaml string</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; dataset configuration as YAML string</td>
 </tr>
 </tbody>
 </table>
@@ -192,15 +213,18 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 <dl class="method">
 <dt id="cxflow.datasets.BaseDataset._init_with_kwargs">
 <code class="descname">_init_with_kwargs</code><span class="sig-paren">(</span><em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset._init_with_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset._init_with_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the dataset with <code class="docutils literal"><span class="pre">kwargs</span></code>.</p>
+<dd><p>Initialize the dataset with <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_dir</strong> &#8211; output directory for logging and any additional outputs (None if no output dir is available)</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; output directory for logging and any additional outputs (None if no output dir is available)</li>
 <li><strong>kwargs</strong> &#8211; dataset configuration as <code class="docutils literal"><span class="pre">**kwargs</span></code> parsed from <code class="docutils literal"><span class="pre">config['dataset']</span></code></li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#NotImplementedError" title="(in Python v3.6)"><strong>NotImplementedError</strong></a> &#8211; if not overridden</p>
 </td>
 </tr>
 </tbody>

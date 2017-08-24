@@ -12,7 +12,7 @@ Classes
 =======
 
 - :py:class:`AbstractDataset`:
-  This concept prescribes the API that is required from every cxflow dataset.
+  This concept prescribes the API that is required from every **cxflow** dataset.
 
 - :py:class:`BaseDataset`:
   Base class for datasets written in python.

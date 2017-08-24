@@ -82,10 +82,10 @@ margin-bottom:5px;}
     width:150px;
 }
 
-#cxflow-cli h3{
+#cli-reference h3{
 display:none;
 }
-#cxflow-cli td{
+#cli-reference td{
 border: none;
 }
 .nav-list li ul li ul{

@@ -190,7 +190,7 @@ Terminate training if the given stream variable exceeds the threshold in at most
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS">
-<code class="descname">CXF_HOOK_INIT_ARGS</code><em class="property"> = {'dataset', 'output_dir', 'model'}</em><a class="headerlink" href="#cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CXF_HOOK_INIT_ARGS</code><em class="property"> = {'model', 'dataset', 'output_dir'}</em><a class="headerlink" href="#cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arguments which <strong>cxflow</strong> pass, in addition to the config args, to <code class="docutils literal"><span class="pre">__init__</span></code>
 methods of every hook being created.</p>
 </dd></dl>
@@ -882,7 +882,7 @@ stream</li>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveBest.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the monitor variable.</p>
 </dd></dl>
 
@@ -1093,7 +1093,7 @@ Quit on any subsequent signal.</p>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'mean', 'std', 'min', 'max', 'median'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AGGREGATIONS</code><em class="property"> = {'mean', 'min', 'median', 'std', 'max'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported numpy-like aggregation methods.</p>
 </dd></dl>
 
