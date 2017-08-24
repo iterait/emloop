@@ -141,20 +141,38 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">MainLoop</span></code></a>:
-Train the model, manage hooks etc.</li>
+<strong>cxflow</strong> main loop for training and model inference.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.MainLoop">
 <em class="property">class </em><code class="descclassname">cxflow.</code><code class="descname">MainLoop</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>hooks=()</em>, <em>extra_streams=()</em>, <em>on_unused_sources='warn'</em>, <em>fixed_batch_size=None</em>, <em>skip_zeroth_epoch=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Train the model, manage hooks etc.</p>
-<img src="../_images/inheritance-c3044cc13c746ae0d7779485d6bbc005a1de411e.png" alt="Inheritance diagram of MainLoop" usemap="#inheritance02e0bda668" class="inheritance"/>
+<p><strong>cxflow</strong> main loop for training and model inference.</p>
+<img src="../_images/inheritance-aad60ff4963b8191d5e11e46c3b795e601120ec2.png" alt="Inheritance diagram of MainLoop" usemap="#inheritance02e0bda668" class="inheritance"/>
 <map id="inheritance02e0bda668" name="inheritance02e0bda668">
-<area shape="rect" id="node1" title="Train the model, manage hooks etc." alt="" coords="5,5,88,31"/>
+<area shape="rect" id="node1" title="**cxflow** main loop for training and model inference." alt="" coords="5,5,88,31"/>
 </map>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
+<dl class="attribute">
+<dt id="cxflow.MainLoop.PREDICT_STREAM">
+<code class="descname">PREDICT_STREAM</code><em class="property"> = 'predict'</em><a class="headerlink" href="#cxflow.MainLoop.PREDICT_STREAM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict stream name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.MainLoop.TRAIN_STREAM">
+<code class="descname">TRAIN_STREAM</code><em class="property"> = 'train'</em><a class="headerlink" href="#cxflow.MainLoop.TRAIN_STREAM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train stream name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.MainLoop.UNUSED_SOURCE_ACTIONS">
+<code class="descname">UNUSED_SOURCE_ACTIONS</code><em class="property"> = ['ignore', 'warn', 'error']</em><a class="headerlink" href="#cxflow.MainLoop.UNUSED_SOURCE_ACTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possible actions to be taken when a stream source is unused by the trained model.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="cxflow.MainLoop.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>hooks=()</em>, <em>extra_streams=()</em>, <em>on_unused_sources='warn'</em>, <em>fixed_batch_size=None</em>, <em>skip_zeroth_epoch=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop.__init__" title="Permalink to this definition">¶</a></dt>
@@ -163,12 +181,14 @@ Train the model, manage hooks etc.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) &#8211; trained model</li>
-<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) &#8211; loaded dataset</li>
-<li><strong>hooks</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<code class="xref py py-class docutils literal"><span class="pre">AbstractHook</span></code>]) &#8211; a sequence of hooks</li>
-<li><strong>extra_streams</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; a sequence of additional stream names to be evaluated</li>
-<li><strong>on_unused_sources</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to take when stream provides unused sources {&#8216;ignore&#8217;, &#8216;warn&#8217;, &#8216;error&#8217;}</li>
+<li><strong>model</strong> (<a class="reference internal" href="cxflow.models.html#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code></a>) &#8211; trained model</li>
+<li><strong>dataset</strong> (<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>) &#8211; loaded dataset</li>
+<li><strong>hooks</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">AbstractHook</span></code></a>]) &#8211; training hooks</li>
+<li><strong>extra_streams</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; additional stream names to be evaluated between epochs</li>
+<li><strong>on_unused_sources</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to take when stream provides an unused sources; one of
+<a class="reference internal" href="#cxflow.MainLoop.UNUSED_SOURCE_ACTIONS" title="cxflow.MainLoop.UNUSED_SOURCE_ACTIONS"><code class="xref py py-attr docutils literal"><span class="pre">UNUSED_SOURCE_ACTIONS</span></code></a></li>
 <li><strong>fixed_batch_size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>]) &#8211; if specified, main_loop removes all batches that do not have the specified size</li>
+<li><strong>skip_zeroth_epoch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; if specified, main loop skips the 0th epoch</li>
 </ul>
 </td>
 </tr>
@@ -179,13 +199,15 @@ Train the model, manage hooks etc.</li>
 <dl class="method">
 <dt id="cxflow.MainLoop._check_sources">
 <code class="descname">_check_sources</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._check_sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._check_sources" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check for unused and missing sources.
-:type batch: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]
-:param batch: batch to be checked</p>
+<dd><p>Check for unused and missing sources.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]) &#8211; batch to be checked</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">ValueError: is a source is missing or unused and <code class="docutils literal"><span class="pre">self._on_unused_sources</span></code> is set to <code class="docutils literal"><span class="pre">error</span></code></td>
+</tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
@@ -196,23 +218,34 @@ Train the model, manage hooks etc.</li>
 <dt id="cxflow.MainLoop._create_epoch_data">
 <code class="descname">_create_epoch_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._create_epoch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._create_epoch_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create empty epoch data double dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="cxflow.MainLoop._run_epoch">
 <code class="descname">_run_epoch</code><span class="sig-paren">(</span><em>stream</em>, <em>train</em>, <em>stream_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._run_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._run_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Iterate through the stream
-:type stream: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]
-:param stream: Iterable stream
-:type train: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>
-:param train: if set to true, the model will be trained
-:type stream_name: <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>
-:param stream_name: {train} or any specified</p>
+<dd><p>Iterate through the given stream and evaluate/train the model with the received batches.</p>
+<p>Calls <a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_batch" title="cxflow.hooks.AbstractHook.after_batch"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_batch()</span></code></a> events.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]) &#8211; stream to iterate</li>
+<li><strong>train</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; if set to <code class="docutils literal"><span class="pre">True</span></code>, the model will be trained</li>
+<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; stream name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -221,14 +254,22 @@ Train the model, manage hooks etc.</li>
 <dl class="method">
 <dt id="cxflow.MainLoop._run_zeroth_epoch">
 <code class="descname">_run_zeroth_epoch</code><span class="sig-paren">(</span><em>streams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._run_zeroth_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._run_zeroth_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run zeroth epoch on the specified streams.
-:type streams: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]
-:param streams: iterable of streams to be evaluated</p>
+<dd><p>Run zeroth epoch on the specified streams.</p>
+<dl class="docutils">
+<dt>Calls</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.before_training" title="cxflow.hooks.AbstractHook.before_training"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.before_training()</span></code></a></li>
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch" title="cxflow.hooks.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_epoch()</span></code></a></li>
+</ul>
+</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>streams</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; stream names to be evaluated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -237,12 +278,19 @@ Train the model, manage hooks etc.</li>
 <dl class="method">
 <dt id="cxflow.MainLoop.evaluate_stream">
 <code class="descname">evaluate_stream</code><span class="sig-paren">(</span><em>stream</em>, <em>stream_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop.evaluate_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop.evaluate_stream" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate the model with the given stream.</p>
+<dd><p>Evaluate the given stream.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]) &#8211; stream to be evaluated</li>
+<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; stream name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -258,16 +306,8 @@ Train the model, manage hooks etc.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the stream</td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Raises:</dt>
-<dd>AttributeError: if the dataset does not provide the function creating the stream</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AttributeError" title="(in Python v3.6)"><strong>AttributeError</strong></a> &#8211; if the dataset does not provide the function creating the stream</td>
+</tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]</td>
 </tr>
 </tbody>
@@ -292,6 +332,15 @@ Train the model, manage hooks etc.</li>
 <dt id="cxflow.MainLoop.run_training">
 <code class="descname">run_training</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop.run_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop.run_training" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the main loop in the training mode.</p>
+<dl class="docutils">
+<dt>Calls</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch" title="cxflow.hooks.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_epoch()</span></code></a></li>
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch_profile" title="cxflow.hooks.AbstractHook.after_epoch_profile"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_epoch_profile()</span></code></a></li>
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_training" title="cxflow.hooks.AbstractHook.after_training"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_training()</span></code></a></li>
+</ul>
+</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -310,7 +359,9 @@ Train the model, manage hooks etc.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]) &#8211; stream to train with</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>

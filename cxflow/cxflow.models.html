@@ -125,14 +125,11 @@ Abstract machine learning model which exposes input and output names, run and sa
 </ul>
 <dl class="class">
 <dt id="cxflow.models.AbstractModel">
-<em class="property">class </em><code class="descclassname">cxflow.models.</code><code class="descname">AbstractModel</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/abstract_model.html#AbstractModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.AbstractModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.models.</code><code class="descname">AbstractModel</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.models.AbstractModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Abstract machine learning model which exposes input and output names, run and save methods.
 <cite>AbstractModel</cite> implementations are trainable with <code class="docutils literal"><span class="pre">cxflow.MainLoop</span></code>.</p>
-<img src="../_images/inheritance-f4ac830770dbea7306599e841daa43ca679323f9.png" alt="Inheritance diagram of AbstractModel" usemap="#inheritancebbe02c0bae" class="inheritance"/>
-<map id="inheritancebbe02c0bae" name="inheritancebbe02c0bae">
-<area shape="rect" id="node1" title="Abstract machine learning model which exposes input and output names, run and save methods." alt="" coords="5,5,120,31"/>
-</map>
+<img src="../_images/inheritance-05c81c4ef143363a245b51c23e804f03e09efa9d.png" alt="Inheritance diagram of AbstractModel" class="inheritance"/>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -147,7 +144,7 @@ according to the configuration <code class="docutils literal"><span class="pre">
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>]) &#8211; Dataset object.</li>
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>]) &#8211; Dataset object.</li>
 <li><strong>log_dir</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; Existing directory in which all output files should be stored.</li>
 <li><strong>restore_from</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; Information passed to the model constructor (backend-specific);
 usually a directory in which the trained model is stored.</li>

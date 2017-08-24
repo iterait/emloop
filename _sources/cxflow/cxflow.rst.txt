@@ -25,7 +25,7 @@ Classes
 =======
 
 - :py:class:`MainLoop`:
-  Train the model, manage hooks etc.
+  **cxflow** main loop for training and model inference.
 
 
 

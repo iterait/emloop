@@ -108,7 +108,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="kn">from</span> <span class="nn">.datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
@@ -118,26 +118,33 @@
 
 
 <div class="viewcode-block" id="MainLoop"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop">[docs]</a><span class="k">class</span> <span class="nc">MainLoop</span><span class="p">:</span>   <span class="c1"># pylint: disable=too-many-instance-attributes</span>
-    <span class="sd">&quot;&quot;&quot;Train the model, manage hooks etc.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;**cxflow** main loop for training and model inference.&quot;&quot;&quot;</span>
 
-    <span class="n">UNUSED_SOURCE_ACTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">}</span>
+    <span class="n">UNUSED_SOURCE_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Possible actions to be taken when a stream source is unused by the trained model.&quot;&quot;&quot;</span>
+
     <span class="n">TRAIN_STREAM</span> <span class="o">=</span> <span class="s1">&#39;train&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Train stream name.&quot;&quot;&quot;</span>
+
     <span class="n">PREDICT_STREAM</span> <span class="o">=</span> <span class="s1">&#39;predict&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Predict stream name.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="MainLoop.__init__"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>   <span class="c1"># pylint: disable=too-many-arguments</span>
                  <span class="n">model</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="p">,</span>
-                 <span class="n">hooks</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">AbstractHook</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>
-                 <span class="n">extra_streams</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>  <span class="c1"># pylint: disable=invalid-sequence-index</span>
+                 <span class="n">hooks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AbstractHook</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>
+                 <span class="n">extra_streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>  <span class="c1"># pylint: disable=invalid-sequence-index</span>
                  <span class="n">on_unused_sources</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span>
-                 <span class="n">fixed_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">fixed_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">skip_zeroth_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param model: trained model</span>
 <span class="sd">        :param dataset: loaded dataset</span>
-<span class="sd">        :param hooks: a sequence of hooks</span>
-<span class="sd">        :param extra_streams: a sequence of additional stream names to be evaluated</span>
-<span class="sd">        :param on_unused_sources: action to take when stream provides unused sources {&#39;ignore&#39;, &#39;warn&#39;, &#39;error&#39;}</span>
+<span class="sd">        :param hooks: training hooks</span>
+<span class="sd">        :param extra_streams: additional stream names to be evaluated between epochs</span>
+<span class="sd">        :param on_unused_sources: action to take when stream provides an unused sources; one of</span>
+<span class="sd">            :py:attr:`UNUSED_SOURCE_ACTIONS`</span>
 <span class="sd">        :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size</span>
+<span class="sd">        :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">on_unused_sources</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">UNUSED_SOURCE_ACTIONS</span>
 
@@ -151,15 +158,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_streams</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_skip_zeroth_epoch</span> <span class="o">=</span> <span class="n">skip_zeroth_epoch</span></div>
 
-<div class="viewcode-block" id="MainLoop._create_epoch_data"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._create_epoch_data">[docs]</a>    <span class="k">def</span> <span class="nf">_create_epoch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MainLoop._create_epoch_data"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._create_epoch_data">[docs]</a>    <span class="k">def</span> <span class="nf">_create_epoch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create empty epoch data double dict.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">())</span>
                             <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span> <span class="o">+</span> <span class="p">[</span><span class="n">MainLoop</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">]])</span></div>
 
-<div class="viewcode-block" id="MainLoop._check_sources"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._check_sources">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MainLoop._check_sources"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._check_sources">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check for unused and missing sources.</span>
+
 <span class="sd">        :param batch: batch to be checked</span>
+<span class="sd">        :raise: ValueError: is a source is missing or unused and ``self._on_unused_sources`` is set to ``error``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unused_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">input_names</span><span class="p">]</span>
         <span class="n">missing_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">input_names</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
@@ -181,10 +190,13 @@
 
 <div class="viewcode-block" id="MainLoop._run_epoch"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._run_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">_run_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Iterate through the stream</span>
-<span class="sd">        :param stream: Iterable stream</span>
-<span class="sd">        :param train: if set to true, the model will be trained</span>
-<span class="sd">        :param stream_name: {train} or any specified</span>
+<span class="sd">        Iterate through the given stream and evaluate/train the model with the received batches.</span>
+
+<span class="sd">        Calls :py:meth:`cxflow.hooks.AbstractHook.after_batch` events.</span>
+
+<span class="sd">        :param stream: stream to iterate</span>
+<span class="sd">        :param train: if set to ``True``, the model will be trained</span>
+<span class="sd">        :param stream_name: stream name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">event_name</span> <span class="o">=</span> <span class="s1">&#39;read_batch_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
@@ -212,13 +224,21 @@
                     <span class="n">hook</span><span class="o">.</span><span class="n">after_batch</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">batch_data</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">batch_input</span><span class="p">,</span> <span class="o">**</span><span class="n">batch_output</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="MainLoop.train_by_stream"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.train_by_stream">[docs]</a>    <span class="k">def</span> <span class="nf">train_by_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Train the model with the given stream.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train the model with the given stream.</span>
+
+<span class="sd">        :param stream: stream to train with</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_epoch</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainLoop.evaluate_stream"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.evaluate_stream">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Evaluate the model with the given stream.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the given stream.</span>
 
+<span class="sd">        :param stream: stream to be evaluated</span>
+<span class="sd">        :param stream_name: stream name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_epoch</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="n">stream_name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainLoop.get_stream"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.get_stream">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
@@ -226,21 +246,24 @@
 <span class="sd">        Get a stream iterator with the given name.</span>
 
 <span class="sd">        :param stream_name: name of the stream</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            AttributeError: if the dataset does not provide the function creating the stream</span>
+<span class="sd">        :raise AttributeError: if the dataset does not provide the function creating the stream</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stream_fn_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_stream&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">stream_fn_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_stream&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">,</span> <span class="n">stream_fn_name</span><span class="p">)()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;The dataset does not have a function for creating a stream named `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
                                  <span class="s1">&#39;The function has to be named `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">stream_fn_name</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">ex</span></div>
 
-<div class="viewcode-block" id="MainLoop._run_zeroth_epoch"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._run_zeroth_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">_run_zeroth_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MainLoop._run_zeroth_epoch"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._run_zeroth_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">_run_zeroth_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run zeroth epoch on the specified streams.</span>
-<span class="sd">        :param streams: iterable of streams to be evaluated</span>
+
+<span class="sd">        Calls</span>
+<span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.before_training`</span>
+<span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`</span>
+
+<span class="sd">        :param streams: stream names to be evaluated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Initialization: before_training</span>
@@ -257,7 +280,14 @@
                 <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">epoch_data</span><span class="o">=</span><span class="n">epoch_data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainLoop.run_training"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.run_training">[docs]</a>    <span class="k">def</span> <span class="nf">run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Run the main loop in the training mode.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the main loop in the training mode.</span>
+
+<span class="sd">        Calls</span>
+<span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`</span>
+<span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`</span>
+<span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.after_training`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Training started&#39;</span><span class="p">)</span>
 
