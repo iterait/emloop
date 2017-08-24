@@ -1,0 +1,103 @@
+version: 2
+
+references:
+
+  ubuntu_deps: &ubuntu_deps
+    run:
+      name: Install dependencies on Ubuntu.
+      command: |
+        apt-get update -qy
+        apt-get install -y git python3-dev python3-pip curl
+
+  arch_deps: &arch_deps
+    run:
+      name: Install dependencies on Arch Linux.
+      command: |
+        pacman -S --noconfirm python python-pip git base-devel openssh libssh2 curl
+
+  install: &install
+    run:
+      name: Install.
+      command: |
+        source <(curl -fsSL https://raw.githubusercontent.com/Cognexa/ci-utils/master/git-utils.sh)
+        fallback_pip_install_branch https://github.com/Cognexa/cxflow.git "$CIRCLE_BRANCH"
+        pip3 install .
+
+  test: &test
+    run:
+      name: Run tests.
+      command: |
+        python3 setup.py test
+
+  deploy: &deploy
+    deploy:
+      name: PyPI deploy
+      command: |
+        pip3 install wheel setuptools --upgrade
+        .circleci/pypi_deploy.sh
+
+  doc: &doc
+    run:
+      name: Generate documentation
+      command: |
+        .circleci/doc_deploy.sh
+
+jobs:
+
+  test_ubuntu_latest:
+    docker:
+      - image: ubuntu:latest
+    working_directory: ~/cxflow-tensorflow
+    steps:
+      - *ubuntu_deps
+      - checkout
+      - *install
+      - *test
+
+  test_ubuntu_rolling:
+    docker:
+      - image: ubuntu:rolling
+    working_directory: ~/cxflow-tensorflow
+    steps:
+      - *ubuntu_deps
+      - checkout
+      - *install
+      - *test
+
+  test_archlinux:
+    docker:
+      - image: pritunl/archlinux:2017-07-08
+    working_directory: ~/cxflow-tensorflow
+    steps:
+      - *arch_deps
+      - checkout
+      - *install
+      - *test
+      - *deploy
+
+  generate_documentation:
+    docker:
+      - image: ubuntu:rolling
+    working_directory: ~/cxflow-tensorflow
+    steps:
+      - *ubuntu_deps
+      - checkout
+      - *install
+      - *doc
+
+workflows:
+
+  version: 2
+  test-doc-deploy:
+    jobs:
+      - test_ubuntu_latest
+      - test_ubuntu_rolling
+      - test_archlinux
+      - generate_documentation:
+          filters:
+            branches:
+              only: doc
+          requires:
+            - test_ubuntu_latest
+            - test_ubuntu_rolling
+            - test_archlinux
