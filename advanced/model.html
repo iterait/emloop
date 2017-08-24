@@ -135,7 +135,7 @@ names would contain <code class="docutils literal"><span class="pre">predicted_a
 <p>The most important method of the model is <code class="docutils literal"><span class="pre">run</span></code>.
 This method evaluates the model on a single batch given as the first parameter.
 The second parameter is a boolean variable determining whether the model should update (train) on this batch or not.</p>
-<p>Note that the trained model is not persistent as it is only stored in operating memory.
+<p>Note that the trained model is not persistent as it is only stored in the memory.
 The persistence of the model is provided by <code class="docutils literal"><span class="pre">save</span></code> method which dumps the model to the
 filesystem (although this behavior is model-specific and you may implement it as you wish in you own models).
 The <code class="docutils literal"><span class="pre">save</span></code> method shall accept only a single parameter and that is the name for the dumped file(s).</p>
@@ -157,7 +157,7 @@ demonstrate the process.</p>
 </div>
 <div class="section" id="restoring-the-model">
 <h2>Restoring the Model<a class="headerlink" href="#restoring-the-model" title="Permalink to this headline">¶</a></h2>
-<p>Once the model is successfully saved, it might be also restored.
+<p>Once the model is successfully saved, it can be also restored.
 This is done when the training is about to continue (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">resume</span></code>) or in a production environemt (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code>).
 Both commands expect a single positional argument specifying from where the model shall be loaded.
 This argument is called <code class="docutils literal"><span class="pre">restore_from</span></code> and it is passed to the model constructor (see above).</p>

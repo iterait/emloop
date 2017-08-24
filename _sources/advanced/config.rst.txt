@@ -1,10 +1,11 @@
 Configuration
 *************
 
-Configuration is the key part of cxflow.
-It is possible to link a dataset and appropriate model by just a few lines of a YAML document.
+Configuration is a crucial part of cxflow.
+It is possible to link a dataset and appropriate model with just a few lines of YAML.
 
-If you aren't comfortable with YAML, JSON documents are supported as well.
+If you aren't comfortable with YAML, JSON documents are supported as well (YAML 
+is actually a superset of JSON).
 However, JSON does not support advanced features such as `anchors <https://learnxinyminutes.com/docs/yaml/>`_
 or simple comments.
 
@@ -48,7 +49,7 @@ Example:
 Model
 =====
 
-Model section specifies the configuration of the model to be trained or inferred.
+The Model section specifies the configuration of the model to be trained or inferred.
 Again, it contains a ``class`` entry which is employed by cxflow in order to construct the model object.
 
 In addition, ``inputs`` and ``outputs`` entries are required as well.
@@ -211,10 +212,10 @@ Once the interface (the names and the types of the data sources) are defined, th
 of the model and the dataset might be done separately.
 In addition, the individual components are resusable for further experiments.
 
-Furhtermore, the configuration is backed up to the log directory.
+Furthermore, the configuration is backed up to the log directory.
 Therefore, it is clear what combination of model and dataset was used in the experiment,
 including all the parameters.
 
-By registering custum hooks, the training and inference process might be arbitrarily
+By registering custom hooks, the training and inference process might be arbitrarily
 changed. For instance, the results may be saved into a file/database, or they can be
 deployed and served on you webpage.

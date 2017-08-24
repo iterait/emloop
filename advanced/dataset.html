@@ -119,15 +119,15 @@
       
   <div class="section" id="dataset">
 <h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h1>
-<p>Dataset is an object representing the data to be fed into the model.
-In general, the dataset is an instance of arbitrary class which is able handle
+<p>Dataset is an object that represents the data that should be fed into the model.
+In general, the dataset is an instance of an arbitrary class which is able handle
 a string-encoded YAML configuration in its constructor.
 Note that this configuration is parsed from the <a class="reference external" href="config.html">config file</a> section <code class="docutils literal"><span class="pre">dataset</span></code>.</p>
 <div class="section" id="basedataset">
 <h2>BaseDataset<a class="headerlink" href="#basedataset" title="Permalink to this headline">¶</a></h2>
 <p>Inheriting from <code class="docutils literal"><span class="pre">cxflow.BaseDataset</span></code> is recommended as it parses the YAML string automatically.
 Instead of the constructor, the developer is expected to implement <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.
-This method is supposed to accept the parameters from the config file.</p>
+This method should accept the parameters from the config file.</p>
 <p>Let us demonstrate <code class="docutils literal"><span class="pre">cxflow.BaseDataset</span></code> on an example. First, we will create a class <code class="docutils literal"><span class="pre">MyDataset</span></code> located
 in <code class="docutils literal"><span class="pre">datasets.my_dataset</span></code> module:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cxflow</span> <span class="kn">import</span> <span class="n">BaseDataset</span>
@@ -137,7 +137,7 @@ in <code class="docutils literal"><span class="pre">datasets.my_dataset</span></
       <span class="c1"># ...</span>
 </pre></div>
 </div>
-<p>This class is interested in two arguments, <code class="docutils literal"><span class="pre">batch_size</span></code> and <code class="docutils literal"><span class="pre">augment</span></code>. Any other argument
+<p>This class requires two arguments, <code class="docutils literal"><span class="pre">batch_size</span></code> and <code class="docutils literal"><span class="pre">augment</span></code>. Any other argument
 it is given is ignored and hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
 <p>Second, we define the <code class="docutils literal"><span class="pre">dataset</span></code> section in the config file:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
@@ -174,7 +174,8 @@ The example of a single batch may look as follows (batch size is set ot four):</
 </pre></div>
 </div>
 <p>Finally, <strong>data stream</strong> is an iterable of batches.</p>
-<p>The streams should be defined in dataset methods conveniently named <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code>.</p>
+<p>The streams should be defined in dataset methods whose names follow the
+<code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> convention.</p>
 <p>An example of a simple training stream is as follows.
 The datasets contains a <code class="docutils literal"><span class="pre">train_stream</span></code> method which loads batches via function <code class="docutils literal"><span class="pre">load_training_batch</span></code>.
 For simplicity, we assume this function is already implemented.</p>
@@ -191,7 +192,8 @@ along with the train stream. The configuration may look as follows:</p>
   <span class="l l-Scalar l-Scalar-Plain">extra_streams</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">valid</span><span class="p p-Indicator">,</span> <span class="nv">test</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
-<p>The extra streams, however, <em>are not</em> used for training, that is, the model is not updated while iterating them.</p>
+<p>The extra streams, however, <em>are not</em> used for training, that is, the model is
+not updated when it iterates through them.</p>
 <p>During prediction (i.e., <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code> CLI command), only the <code class="docutils literal"><span class="pre">predict_stream</span></code> method is employed in order
 to provide the data to be inferred.</p>
 <p>TODO THE FOLLOWING SENTENCE MAY CHANGE.
@@ -200,12 +202,12 @@ Extra streams might be inferred as well when registred as described above (inclu
 <div class="section" id="additional-methods">
 <h2>Additional Methods<a class="headerlink" href="#additional-methods" title="Permalink to this headline">¶</a></h2>
 <p>The dataset may contain various additional methods as well.
-For example, is can contain <code class="docutils literal"><span class="pre">fetch</span></code> method which checks whether the dataset has all the data it requires.
-If not, it may download them from the internet/databse/drive.</p>
-<p>Additional useful method could be <code class="docutils literal"><span class="pre">statistics</span></code> which prints various statistics of the
-provided data, plot some figures etc.
+For example, is can contain a <code class="docutils literal"><span class="pre">fetch</span></code> method which checks whether the dataset has all the data it requires.
+If not, it downloads them from the internet/database/drive.</p>
+<p>Additional useful method could be <code class="docutils literal"><span class="pre">statistics</span></code>, which would print various statistics of provided data,
+plot some figures etc.
 Sometimes, we need to split the whole dataset into training, validation and testing sets.
-For this purpose, we may want to implement <code class="docutils literal"><span class="pre">split</span></code> function.</p>
+For this purpose, we would implement a <code class="docutils literal"><span class="pre">split</span></code> function.</p>
 <p>The suggested methods are completely arbitrary and they may or may not be implemented.
 The key concept is to keep data-related function encapsuled together in the dataset object,
 so that one don&#8217;t need to implement several separate script for fetching/visualization/statistics etc.</p>
@@ -224,7 +226,7 @@ We leave them without further comments as they are self-describing.</p>
 </div>
 <div class="section" id="the-philosophy-of-laziness">
 <h2>The Philosophy of Laziness<a class="headerlink" href="#the-philosophy-of-laziness" title="Permalink to this headline">¶</a></h2>
-<p>In our experience, the best practice for the dataset is to implement it as lazy as possible.
+<p>In our experience, the best practice for the dataset is to implement it as lazily as possible.
 That is, constructor should not perform any time-consuming operation such as loading and decoding the data.
 Instead, the data should be loaded and encoded in the first moment they are really necessary (e.g.,
 in the <code class="docutils literal"><span class="pre">train_stream</span></code> method).</p>

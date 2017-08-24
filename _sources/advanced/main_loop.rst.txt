@@ -7,12 +7,12 @@ As the name suggests, it is responsible for the main lifecycle of the training o
 Dataset/Model Integration
 =========================
 
-The first thing cxflow does no matter what command has been executed, is to build the dataset
-and pass the section ``dataset`` from the `config <config.html>`_ to its constructor.
+The first thing cxflow does no matter what command has been executed, is 
+building the dataset and passing the section ``dataset`` from the `config <config.html>`_ to its constructor.
 Afterwards, cxflow builds the model and passes the ``model`` section from the
 `config <config.html>`_ to its constructor.
-One of the model's arguments is also the dataset itself, so the net can query
-it for some information, such as the number of outputs, data size, etc.
+One of the arguments of the model is also the dataset itself, so the net can query
+it for information such as the number of outputs, data size, etc.
 
 After the dataset and the model are created, cxflow calls one of the dataset stream functions
 based on whether it is training, testing or predicting (more on this is described in the following
@@ -74,7 +74,7 @@ The whole process might be described by the following pseudocode.
 Hook Integration
 ================
 
-Main loop is responsible for triggering the registered hooks.
+The main loop is responsible for triggering the registered hooks.
 There are multiple events for which the main loop triggers the hook.
 
 The events are as follows:

@@ -118,7 +118,8 @@
       
   <div class="section" id="hooks">
 <h1>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h1>
-<p>In this short tutorial, we learn how to use standard cxflow hooks and even how to write new ones.</p>
+<p>In this short tutorial, we learn how to use standard cxflow hooks and also how
+to write new ones.</p>
 <p>Cxflow hooks allow to observe, modify and act upon the training process.
 Hooks shall do their work in one of the following events invoked by the cxflow <a class="reference external" href="main_loop.html">main loop</a>:</p>
 <ul class="simple">
@@ -128,8 +129,10 @@ Hooks shall do their work in one of the following events invoked by the cxflow <
 <li><strong>after_epoch_profile</strong> special event with training profiling data, invoked after each epoch, <code class="docutils literal"><span class="pre">(epoch_id,</span> <span class="pre">epoch_profile)</span></code></li>
 <li><strong>after_training</strong> invoked once after the trainig finishes, <code class="docutils literal"><span class="pre">no</span> <span class="pre">args</span></code></li>
 </ul>
-<p>Before we dig into details, we peek on how to use some of the standard hooks available in cxflow framework.</p>
-<p>In your <a class="reference external" href="config.html">configuration</a>, hooks are listed under <code class="docutils literal"><span class="pre">hooks</span></code> entry, for example:</p>
+<p>Before we dig into the details, we peek on how to use some of the standard hooks
+available in cxflow framework.</p>
+<p>In your <a class="reference external" href="config.html">configuration</a>, hooks are listed under the <code class="docutils literal"><span class="pre">hooks</span></code>
+entry, for example:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span>
@@ -138,7 +141,8 @@ Hooks shall do their work in one of the following events invoked by the cxflow <
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
 </pre></div>
 </div>
-<p>would instruct cxflow to create two hooks which will keep track of the mean loss during the training.
+<p>This example would instruct cxflow to create two hooks which will keep track of
+the mean loss during the training.
 In fact, the <code class="docutils literal"><span class="pre">ComputeStats</span></code> stores the loss from every batch and means the accumulated values after
 each epoch.
 Subsequently, the <code class="docutils literal"><span class="pre">LogVariables</span></code> logs all the variables available in the <code class="docutils literal"><span class="pre">epoch_data</span></code>, which
@@ -235,13 +239,16 @@ the <code class="docutils literal"><span class="pre">ComputeStats</span></code> 
 </pre></div>
 </div>
 <p>The <code class="docutils literal"><span class="pre">LogVariables</span></code> already expects this structure and logs everything it gets.</p>
-<p><strong>Note that the hooks order matters! We would see nothing with the ``LogVariables`` placed
-before the ``ComputeStats``.</strong></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Note that the order of hooks matters! We would see nothing with
+<code class="docutils literal"><span class="pre">LogVariables</span></code> placed before <code class="docutils literal"><span class="pre">ComputeStats</span></code>.</p>
+</div>
 </div>
 <div class="section" id="regular-hook-configuration">
 <h2>Regular hook configuration<a class="headerlink" href="#regular-hook-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Altogether, the hook system provides instruments to carefully watch and manage your training.</p>
-<p>A good starting point for your own hook configuration may be the following config:</p>
+<p>The following config is a good starting point for your own hook configuration.</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="c1"># compute classification statistics such as accuracy of f1 score</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxflow_scikit.ClassificationInfoHook</span><span class="p p-Indicator">:</span>

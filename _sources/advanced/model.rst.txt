@@ -24,7 +24,7 @@ The most important method of the model is ``run``.
 This method evaluates the model on a single batch given as the first parameter.
 The second parameter is a boolean variable determining whether the model should update (train) on this batch or not.
 
-Note that the trained model is not persistent as it is only stored in operating memory.
+Note that the trained model is not persistent as it is only stored in the memory.
 The persistence of the model is provided by ``save`` method which dumps the model to the
 filesystem (although this behavior is model-specific and you may implement it as you wish in you own models).
 The ``save`` method shall accept only a single parameter and that is the name for the dumped file(s).
@@ -50,7 +50,7 @@ demonstrate the process.
 Restoring the Model
 -------------------
 
-Once the model is successfully saved, it might be also restored.
+Once the model is successfully saved, it can be also restored.
 This is done when the training is about to continue (``cxflow resume``) or in a production environemt (``cxflow predict``).
 Both commands expect a single positional argument specifying from where the model shall be loaded.
 This argument is called ``restore_from`` and it is passed to the model constructor (see above).

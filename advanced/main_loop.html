@@ -124,12 +124,12 @@
 As the name suggests, it is responsible for the main lifecycle of the training of the model.</p>
 <div class="section" id="dataset-model-integration">
 <h2>Dataset/Model Integration<a class="headerlink" href="#dataset-model-integration" title="Permalink to this headline">¶</a></h2>
-<p>The first thing cxflow does no matter what command has been executed, is to build the dataset
-and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
+<p>The first thing cxflow does no matter what command has been executed, is
+building the dataset and passing the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
 Afterwards, cxflow builds the model and passes the <code class="docutils literal"><span class="pre">model</span></code> section from the
 <a class="reference external" href="config.html">config</a> to its constructor.
-One of the model&#8217;s arguments is also the dataset itself, so the net can query
-it for some information, such as the number of outputs, data size, etc.</p>
+One of the arguments of the model is also the dataset itself, so the net can query
+it for information such as the number of outputs, data size, etc.</p>
 <p>After the dataset and the model are created, cxflow calls one of the dataset stream functions
 based on whether it is training, testing or predicting (more on this is described in the following
 sections).
@@ -182,7 +182,7 @@ In addition, there is only a single pass through the stream and then cxflow term
 </div>
 <div class="section" id="hook-integration">
 <h2>Hook Integration<a class="headerlink" href="#hook-integration" title="Permalink to this headline">¶</a></h2>
-<p>Main loop is responsible for triggering the registered hooks.
+<p>The main loop is responsible for triggering the registered hooks.
 There are multiple events for which the main loop triggers the hook.</p>
 <p>The events are as follows:</p>
 <ul class="simple">

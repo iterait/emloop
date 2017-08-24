@@ -1,8 +1,8 @@
 Dataset
 *******
 
-Dataset is an object representing the data to be fed into the model.
-In general, the dataset is an instance of arbitrary class which is able handle
+Dataset is an object that represents the data that should be fed into the model.
+In general, the dataset is an instance of an arbitrary class which is able handle
 a string-encoded YAML configuration in its constructor.
 Note that this configuration is parsed from the `config file <config.html>`_ section ``dataset``.
 
@@ -11,7 +11,7 @@ BaseDataset
 
 Inheriting from ``cxflow.BaseDataset`` is recommended as it parses the YAML string automatically.
 Instead of the constructor, the developer is expected to implement ``_init_with_kwargs`` method.
-This method is supposed to accept the parameters from the config file.
+This method should accept the parameters from the config file.
 
 Let us demonstrate ``cxflow.BaseDataset`` on an example. First, we will create a class ``MyDataset`` located
 in ``datasets.my_dataset`` module:
@@ -24,7 +24,7 @@ in ``datasets.my_dataset`` module:
          def _init_with_kwargs(batch_size: int, augment: dict, **kwargs):
            # ...
 
-This class is interested in two arguments, ``batch_size`` and ``augment``. Any other argument
+This class requires two arguments, ``batch_size`` and ``augment``. Any other argument
 it is given is ignored and hidden in the ``**kwargs``.
 
 Second, we define the ``dataset`` section in the config file:
@@ -68,7 +68,8 @@ The example of a single batch may look as follows (batch size is set ot four):
 
 Finally, **data stream** is an iterable of batches.
 
-The streams should be defined in dataset methods conveniently named ``<name>_stream``.
+The streams should be defined in dataset methods whose names follow the 
+``<name>_stream`` convention.
 
 An example of a simple training stream is as follows.
 The datasets contains a ``train_stream`` method which loads batches via function ``load_training_batch``.
@@ -91,7 +92,8 @@ along with the train stream. The configuration may look as follows:
     main_loop:
       extra_streams: [valid, test]
 
-The extra streams, however, *are not* used for training, that is, the model is not updated while iterating them.
+The extra streams, however, *are not* used for training, that is, the model is 
+not updated when it iterates through them.
 
 During prediction (i.e., ``cxflow predict`` CLI command), only the ``predict_stream`` method is employed in order
 to provide the data to be inferred.
@@ -103,13 +105,13 @@ Additional Methods
 ------------------
 
 The dataset may contain various additional methods as well.
-For example, is can contain ``fetch`` method which checks whether the dataset has all the data it requires.
-If not, it may download them from the internet/databse/drive.
+For example, is can contain a ``fetch`` method which checks whether the dataset has all the data it requires.
+If not, it downloads them from the internet/database/drive.
 
-Additional useful method could be ``statistics`` which prints various statistics of the
-provided data, plot some figures etc.
+Additional useful method could be ``statistics``, which would print various statistics of provided data,
+plot some figures etc.
 Sometimes, we need to split the whole dataset into training, validation and testing sets.
-For this purpose, we may want to implement ``split`` function.
+For this purpose, we would implement a ``split`` function.
 
 The suggested methods are completely arbitrary and they may or may not be implemented.
 The key concept is to keep data-related function encapsuled together in the dataset object,
@@ -131,7 +133,7 @@ We leave them without further comments as they are self-describing.
 The Philosophy of Laziness
 --------------------------
 
-In our experience, the best practice for the dataset is to implement it as lazy as possible.
+In our experience, the best practice for the dataset is to implement it as lazily as possible.
 That is, constructor should not perform any time-consuming operation such as loading and decoding the data.
 Instead, the data should be loaded and encoded in the first moment they are really necessary (e.g.,
 in the ``train_stream`` method).

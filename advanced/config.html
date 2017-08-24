@@ -121,9 +121,10 @@
       
   <div class="section" id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
-<p>Configuration is the key part of cxflow.
-It is possible to link a dataset and appropriate model by just a few lines of a YAML document.</p>
-<p>If you aren&#8217;t comfortable with YAML, JSON documents are supported as well.
+<p>Configuration is a crucial part of cxflow.
+It is possible to link a dataset and appropriate model with just a few lines of YAML.</p>
+<p>If you aren&#8217;t comfortable with YAML, JSON documents are supported as well (YAML
+is actually a superset of JSON).
 However, JSON does not support advanced features such as <a class="reference external" href="https://learnxinyminutes.com/docs/yaml/">anchors</a>
 or simple comments.</p>
 <p>Each configuration file is structured in the following sections.</p>
@@ -159,7 +160,7 @@ the directory from whence the data will be loaded or a batch size.</p>
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-<p>Model section specifies the configuration of the model to be trained or inferred.
+<p>The Model section specifies the configuration of the model to be trained or inferred.
 Again, it contains a <code class="docutils literal"><span class="pre">class</span></code> entry which is employed by cxflow in order to construct the model object.</p>
 <p>In addition, <code class="docutils literal"><span class="pre">inputs</span></code> and <code class="docutils literal"><span class="pre">outputs</span></code> entries are required as well.
 These arguments define what sources will be obtained from the dataset stream and which will
@@ -310,10 +311,10 @@ on different datsets just by changing a few lines in the configuration file.</p>
 Once the interface (the names and the types of the data sources) are defined, the development
 of the model and the dataset might be done separately.
 In addition, the individual components are resusable for further experiments.</p>
-<p>Furhtermore, the configuration is backed up to the log directory.
+<p>Furthermore, the configuration is backed up to the log directory.
 Therefore, it is clear what combination of model and dataset was used in the experiment,
 including all the parameters.</p>
-<p>By registering custum hooks, the training and inference process might be arbitrarily
+<p>By registering custom hooks, the training and inference process might be arbitrarily
 changed. For instance, the results may be saved into a file/database, or they can be
 deployed and served on you webpage.</p>
 </div>
