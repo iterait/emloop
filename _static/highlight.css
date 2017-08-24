@@ -25,6 +25,9 @@ box-shadow: none;
 width:100%;
 }
 
+.admonition{
+margin-left:14px;margin-right:14px;}
+
 dl.class dd dl dd, dl.function dd dl dd {
 padding-left: 20px;
 }
@@ -56,4 +59,32 @@ display:block;
 margin-top:12px;
 padding-bottom:0px;
 margin-bottom:0px;
+}
+
+.figure{
+border: 1px solid #aaaaaa;
+  padding: 7px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.caption{
+text-align:center;
+margin-top:5px;
+margin-bottom:5px;}
+
+.option-list{
+}
+
+.option-group
+{
+    width:150px;
+}
+
+#cxflow-cli h3{
+display:none;
+}
+#cxflow-cli td{
+border: none;
 }

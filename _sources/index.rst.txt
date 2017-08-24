@@ -8,6 +8,7 @@ cxflow
    getting_started
    tutorial
    advanced/index
+   cli
    cxflow/index
 
 Cxflow is a smart manager for deep learning models.
