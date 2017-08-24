@@ -1,0 +1,47 @@
+=====================
+``cxflow.utils.misc``
+=====================
+
+.. automodule:: cxflow.utils.misc
+
+
+.. currentmodule:: cxflow.utils.misc
+
+
+Classes
+=======
+
+- :py:class:`DisabledLogger`:
+  Entirely disable the specified logger in between ``__enter__`` and ``__exit__``.
+
+- :py:class:`DisabledPrint`:
+  Disable printing to stdout by redirecting it to ``/dev/null`` in between ``__enter__`` and ``__exit__``.
+
+
+
+.. autoclass:: DisabledLogger
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: DisabledLogger
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: DisabledPrint
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: DisabledPrint
+      :parts: 1
+
+   |
+

@@ -106,12 +106,12 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">signal</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
 
 
 <div class="viewcode-block" id="CatchSigint"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.CatchSigint">[docs]</a><span class="k">class</span> <span class="nc">CatchSigint</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    SIGINT catcher.</span>
+<span class="sd">    Catch SIGINT signals allowing to stop the training with grace.</span>
 
 <span class="sd">    On first sigint finish the current batch and terminate training politely, i.e. trigger all ``after_training`` hooks.</span>
 <span class="sd">    On second sigint quit immediately with exit code 1</span>
@@ -125,14 +125,20 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_sigints</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_original_handler</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="viewcode-block" id="CatchSigint.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.CatchSigint.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create new CatchSigint hook.</span>
+
+<span class="sd">        :param kwargs: additional ``**kwargs`` are ignored</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_sigints</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_handler</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="CatchSigint._sigint_handler"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.CatchSigint._sigint_handler">[docs]</a>    <span class="k">def</span> <span class="nf">_sigint_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signum</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        On the first signal, increase the self_num_sigints counter.</span>
+<span class="sd">        On the first signal, increase the ``self_num_sigints`` counter.</span>
 <span class="sd">        Quit on any subsequent signal.</span>
 
 <span class="sd">        :param signum: SIGINT signal number</span>
@@ -154,8 +160,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stop the training if SIGINT signal was caught</span>
 
-<span class="sd">        Raises:</span>
-<span class="sd">            TrainingTerminated if an SIGINT signal was caught</span>
+<span class="sd">        :raise TrainingTerminated: if an SIGINT signal was caught</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_sigints</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Terminating because SIGINT was caught during last batch processing.&#39;</span><span class="p">)</span>

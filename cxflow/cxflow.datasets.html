@@ -150,18 +150,12 @@ The configuration must contain <cite>dataset</cite> entry and may contain <cite>
 :param config_str: YAML string config</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="cxflow.datasets.AbstractDataset.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.datasets.AbstractDataset.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="cxflow.datasets.BaseDataset">
 <em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.abstract_dataset.AbstractDataset</span></code></p>
 <p>Base class for datasets written in python.</p>
 <dl class="docutils">
 <dt>In the inherited class, one should:</dt>
@@ -172,9 +166,10 @@ The configuration must contain <cite>dataset</cite> entry and may contain <cite>
 </ul>
 </dd>
 </dl>
-<img src="../_images/inheritance-7f8b218164ee430de3f30c9a84b9b6e61539e6bc.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
+<img src="../_images/inheritance-a78a5c9a500f22c62ff7c183a95f532ff93a6376.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
 <map id="inheritance7f67f7c0ff" name="inheritance7f67f7c0ff">
-<area shape="rect" id="node1" title="Base class for datasets written in python." alt="" coords="5,5,111,31"/>
+<area shape="rect" id="node1" title="This concept prescribes the API that is required from every cxflow dataset." alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node2" title="Base class for datasets written in python." alt="" coords="180,5,285,31"/>
 </map>
 <div class="line-block">
 <div class="line"><br /></div>
@@ -192,12 +187,6 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.datasets.BaseDataset.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.datasets.BaseDataset.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">

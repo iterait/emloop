@@ -109,12 +109,12 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
 
 
 <div class="viewcode-block" id="LogVariables"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables">[docs]</a><span class="k">class</span> <span class="nc">LogVariables</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Log the training results to stderr via standard logging module.</span>
+<span class="sd">    Log the training results to stderr via standard :py:mod:`logging` module.</span>
 
 
 <span class="sd">    .. code-block:: yaml</span>
@@ -139,12 +139,15 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">UNKNOWN_TYPE_ACTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">}</span>
+    <span class="n">UNKNOWN_TYPE_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Posible actions to take on unknown variable type.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LogVariables.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_unknown_type</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param variables: a sequence of variable names to be logged. If not specified log all the available variables.</span>
-<span class="sd">        :param on_unknown_type: an action to be taken if the variable value type is not supported (e.g. a list)</span>
+<span class="sd">        Create new LogVariables hook.</span>
+
+<span class="sd">        :param variables: variable names to be logged; log all the variables by default</span>
+<span class="sd">        :param on_unknown_type: an action to be taken if the variable type is not supported (e.g. a list)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">on_unknown_type</span> <span class="ow">in</span> <span class="n">LogVariables</span><span class="o">.</span><span class="n">UNKNOWN_TYPE_ACTIONS</span>
 
@@ -154,17 +157,17 @@
 
 <div class="viewcode-block" id="LogVariables._log_variables"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables._log_variables">[docs]</a>    <span class="k">def</span> <span class="nf">_log_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Log the specified variables from the epoch data.</span>
+<span class="sd">        Log variables from the epoch data.</span>
 
-<span class="sd">        At the moment, only scalars and dicts of scalars are properly formatted and logged.</span>
-<span class="sd">        Other value types are ignored by default.</span>
-<span class="sd">        One may set on_unknown_type to `str` in order to log the variable anyways.</span>
+<span class="sd">        .. warning::</span>
+<span class="sd">            At the moment, only scalars and dicts of scalars are properly formatted and logged.</span>
+<span class="sd">            Other value types are ignored by default.</span>
+
+<span class="sd">        One may set ``on_unknown_type`` to ``str`` in order to log all the variables anyways.</span>
 
 <span class="sd">        :param epoch_data: epoch data to be logged</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            KeyError: if the specified variable is not found in the stream</span>
-<span class="sd">            TypeError: if the variable value is of unsupported type and on_unknown_type is set to `error`</span>
+<span class="sd">        :raise KeyError: if the specified variable is not found in the stream</span>
+<span class="sd">        :raise TypeError: if the variable value is of unsupported type and ``self._on_unknown_type`` is set to ``error``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">epoch_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">stream_data</span> <span class="o">=</span> <span class="n">epoch_data</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span>
@@ -196,10 +199,11 @@
 
 <div class="viewcode-block" id="LogVariables.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Log the epoch data via `logging` API. Additionally, a blank line is printed directly to stderr.</span>
+<span class="sd">        Log the epoch data via :py:mod:`logging` API.</span>
+<span class="sd">        Additionally, a blank line is printed directly to stderr to delimit the outputs from other epochs.</span>
 
 <span class="sd">        :param epoch_id: number of processed epoch</span>
-<span class="sd">        :param epoch_data: epoch datat to be logged</span>
+<span class="sd">        :param epoch_data: epoch data to be logged</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;After epoch </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>

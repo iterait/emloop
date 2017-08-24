@@ -1,0 +1,3 @@
+<map id="inheritance92c846fa63" name="inheritance92c846fa63">
+<area shape="rect" id="node1" href="#cxflow.utils.misc.DisabledPrint" target="_top" title="Disable printing to stdout by redirecting it to ``/dev/null`` in between ``__enter__`` and ``__exit__``." alt="" coords="5,5,112,31"/>
+</map>

@@ -107,19 +107,22 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
 <span class="kn">from</span> <span class="nn">..utils.profile</span> <span class="k">import</span> <span class="n">Timer</span>
 
 
 <div class="viewcode-block" id="LogProfile"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogProfile">[docs]</a><span class="k">class</span> <span class="nc">LogProfile</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Summarize and log epoch profile.</span>
+<span class="sd">    Summarize and log epoch profile via standard :py:mod:`logging`.</span>
+
+<span class="sd">    Epoch profile contains info about time spent training, reading data etc. For full reference, see</span>
+<span class="sd">    :py:class:`cxflow.MainLoop`.</span>
 
 <span class="sd">    .. code-block:: yaml</span>
-<span class="sd">        :caption: log all variables</span>
+<span class="sd">        :caption: log the time profile after each epoch</span>
 
 <span class="sd">        hooks:</span>
-<span class="sd">          - LogVariables</span>
+<span class="sd">          - LogProfile</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -133,7 +136,7 @@
 <span class="sd">            - ``after_epoch_hooks`` entry</span>
 
 <span class="sd">        :param profile: epoch timings profile</span>
-<span class="sd">        :param extra_streams: enumeration of additiona stream names</span>
+<span class="sd">        :param extra_streams: enumeration of additional stream names</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">read_data_total</span> <span class="o">=</span> <span class="mi">0</span>

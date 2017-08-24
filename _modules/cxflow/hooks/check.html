@@ -105,14 +105,14 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">cxflow.hooks.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
 
 
 <div class="viewcode-block" id="Check"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.Check">[docs]</a><span class="k">class</span> <span class="nc">Check</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.</span>
 
-<span class="sd">    Raise ``ValueError`` on error or when the threshold was not exceeded in given number of epochs</span>
+<span class="sd">    Raise :py:class:`ValueError` if the threshold was not exceeded in given number of epochs</span>
 
 <span class="sd">    .. code-block:: yaml</span>
 <span class="sd">        :caption: exceed 95% accuracy on valid (default) stream within at most 10 epochs</span>
@@ -127,13 +127,15 @@
 
 <div class="viewcode-block" id="Check.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.Check.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">required_min_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create new Check hook.</span>
+
 <span class="sd">        :param variable: variable to be checked</span>
 <span class="sd">        :param required_min_value: threshold to be exceeded</span>
 <span class="sd">        :param max_epoch: maximum epochs to be run</span>
 <span class="sd">        :param stream: stream to be checked</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="n">stream</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="o">=</span> <span class="n">variable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_required_min_value</span> <span class="o">=</span> <span class="n">required_min_value</span>
@@ -145,6 +147,10 @@
 
 <span class="sd">        :param epoch_id: number of the processed epoch</span>
 <span class="sd">        :param epoch_data: epoch data to be checked</span>
+<span class="sd">        :raise KeyError: if the stream of variable was not found in ``epoch_data``</span>
+<span class="sd">        :raise TypeError: if the monitored variable is not a scalar or scalar ``mean`` aggregation</span>
+<span class="sd">        :raise ValueError: if the specified number of epochs exceeded</span>
+<span class="sd">        :raise TrainingTerminated: if the monitor variable is above the required level</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">epoch_data</span><span class="p">:</span>
@@ -160,8 +166,8 @@
             <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The value to be checked has to be either a scalar or a dict with `mean` key. &#39;</span>
-                             <span class="s1">&#39;Got `</span><span class="si">{}</span><span class="s1">` instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The value to be checked has to be either a scalar or a dict with `mean` key. &#39;</span>
+                            <span class="s1">&#39;Got `</span><span class="si">{}</span><span class="s1">` instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required_min_value</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> level matched (current </span><span class="si">{}</span><span class="s1"> is greater than required </span><span class="si">{}</span><span class="s1">).&#39;</span>

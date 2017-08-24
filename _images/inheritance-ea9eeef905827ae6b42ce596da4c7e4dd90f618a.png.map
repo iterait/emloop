@@ -1,0 +1,5 @@
+<map id="inheritancee96d9cb954" name="inheritancee96d9cb954">
+<area shape="rect" id="node1" title="**cxflow** hook interface." alt="" coords="5,5,115,31"/>
+<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="163,5,319,31"/>
+<area shape="rect" id="node3" title="Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data." alt="" coords="367,5,481,31"/>
+</map>

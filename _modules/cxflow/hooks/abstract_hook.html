@@ -120,33 +120,38 @@
 
 <div class="viewcode-block" id="AbstractHook"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook">[docs]</a><span class="k">class</span> <span class="nc">AbstractHook</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Cxflow hooks interface.</span>
+<span class="sd">    **cxflow** hook interface.</span>
 
 <span class="sd">    Hook lifecycle (event -&gt; method invocation):</span>
 
-<span class="sd">    1. cxflow constructs the hooks -&gt; ``__init__``</span>
-<span class="sd">    2. cxflow enters the main loop -&gt; ``before_training``</span>
-<span class="sd">        a. cxflow starts an epoch</span>
-<span class="sd">        b. cxflow computes a batch -&gt; ``after_batch``</span>
-<span class="sd">        c. cxflow finishes the epoch -&gt; ``after_epoch`` and ``after_epoch_profile``</span>
-<span class="sd">    3. cxflow terminates the main loop -&gt; ``after_training``</span>
+<span class="sd">    1. **cxflow** constructs the hooks -&gt; :py:meth:`__init__`</span>
+<span class="sd">    2. **cxflow** enters the main loop -&gt; :py:meth:`before_training`</span>
+<span class="sd">        a. **cxflow** starts an epoch</span>
+<span class="sd">        b. **cxflow** computes a batch -&gt; :py:meth:`after_batch`</span>
+<span class="sd">        c. **cxflow** finishes the epoch -&gt; :py:meth:`after_epoch` and :py:meth:`after_epoch_profile`</span>
+<span class="sd">    3. **cxflow** terminates the main loop -&gt; :py:meth:`after_training`</span>
 
-<span class="sd">    Naming conventions:</span>
+<span class="sd">    .. caution::</span>
 
-<span class="sd">    - hook names should describe hook actions with verb stems. E.g.: ``LogProfile`` or ``SaveBestModel``</span>
-<span class="sd">    - hook names should not include ``Hook`` suffix</span>
+<span class="sd">        Hook naming conventions:</span>
+
+<span class="sd">        - hook names should describe hook actions with verb stems. E.g.: ``LogProfile`` or ``SaveBest``</span>
+<span class="sd">        - hook names should not include ``Hook`` suffix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">CXF_HOOK_INIT_ARGS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;dataset&#39;</span><span class="p">,</span> <span class="s1">&#39;output_dir&#39;</span><span class="p">}</span>
-    <span class="sd">&quot;&quot;&quot;Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Arguments which **cxflow** pass, in addition to the config args, to ``__init__``</span>
+<span class="sd">    methods of every hook being created.&quot;&quot;&quot;</span>
 
     <span class="n">EpochData</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Epoch data type.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractHook.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check for unrecognized arguments and warn about them.</span>
+<span class="sd">        Check and warn if there is any argument created by the user yet not recognized in the child hook ``__init__``</span>
+<span class="sd">        method.</span>
 
-<span class="sd">        :param kwargs: kwargs not recognized in the child hook</span>
+<span class="sd">        :param kwargs: ``**kwargs`` not recognized in the child hook</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">CXF_HOOK_INIT_ARGS</span><span class="p">:</span>
@@ -159,7 +164,8 @@
 
 <span class="sd">        No data were processed at this moment.</span>
 
-<span class="sd">        This is called exactly once during the training.</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This method is called exactly once during the training.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
@@ -170,7 +176,7 @@
 <span class="sd">        This event is triggered after every processed batch regardless of stream type.</span>
 <span class="sd">        Batch results are available in results argument.</span>
 
-<span class="sd">        :param stream_name: type of the stream (usually train/valid/test or any other)</span>
+<span class="sd">        :param stream_name: name of the stream (usually ``train``, ``valid`` or``test``)</span>
 <span class="sd">        :param batch_data: batch inputs and model outputs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
@@ -179,8 +185,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After epoch event.</span>
 
-<span class="sd">        This event is triggered after every epoch wherein all the streams were iterated and their results are available</span>
-<span class="sd">        in aggregated (averaged) form. For any other aggregation method, one must manually handle `after_batch` events.</span>
+<span class="sd">        This event is triggered after every epoch wherein all the streams were iterated. The ``epoch_data`` object is</span>
+<span class="sd">        initially empty and shared among all the hooks.</span>
 
 <span class="sd">        :param epoch_id: finished epoch id</span>
 <span class="sd">        :param epoch_data: epoch data flowing through all hooks</span>
@@ -193,12 +199,8 @@
 
 <span class="sd">        This event provides opportunity to process time profile of the finished epoch.</span>
 
-<span class="sd">        Note: time of processing this event is not included in the profiled</span>
-
-<span class="sd">        This is called multiple times.</span>
-
 <span class="sd">        :param epoch_id: finished epoch id</span>
-<span class="sd">        :param profile: dictionary of lists of event timings that were measured during the epoch.</span>
+<span class="sd">        :param profile: dictionary of lists of event timings that were measured during the epoch</span>
 <span class="sd">        :param extra_streams: enumeration of additional stream names</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
@@ -209,7 +211,8 @@
 
 <span class="sd">        This event is called after the training finished either naturally or thanks to an interrupt.</span>
 
-<span class="sd">        This is called exactly once during the training.</span>
+<span class="sd">        .. note::</span>
+<span class="sd">            This method is called exactly once during the training.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 </pre></div>

@@ -31,7 +31,7 @@
     <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="cxflow.cli" href="cxflow.cli.html" />
+    <link rel="next" title="cxflow.constants" href="cxflow.constants.html" />
     <link rel="prev" title="API Reference" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -95,13 +95,12 @@
     </a>
     </div>
 <div class="side_nav">
-    <a href="cxflow.cli.html" title="Next Chapter: cxflow.cli"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">cxflow.cli &raquo;</span>
+    <a href="cxflow.constants.html" title="Next Chapter: cxflow.constants"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">cxflow.constants &raquo;</span>
     </a>
     </div><ul>
 <li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">cxflow</span></code></a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#variables">Variables</a></li>
 </ul>
 </li>
 </ul>
@@ -124,121 +123,26 @@
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cxflow.cli.html"><code class="docutils literal"><span class="pre">cxflow.cli</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="cxflow.constants.html"><code class="docutils literal"><span class="pre">cxflow.constants</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="cxflow.datasets.html"><code class="docutils literal"><span class="pre">cxflow.datasets</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="cxflow.hooks.html"><code class="docutils literal"><span class="pre">cxflow.hooks</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="cxflow.models.html"><code class="docutils literal"><span class="pre">cxflow.models</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="cxflow.utils.html"><code class="docutils literal"><span class="pre">cxflow.utils</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="cxflow.utils.html"><code class="docutils literal"><span class="pre">cxflow.utils</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cxflow.utils.config.html"><code class="docutils literal"><span class="pre">cxflow.utils.config</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cxflow.utils.misc.html"><code class="docutils literal"><span class="pre">cxflow.utils.misc</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cxflow.utils.profile.html"><code class="docutils literal"><span class="pre">cxflow.utils.profile</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cxflow.utils.reflection.html"><code class="docutils literal"><span class="pre">cxflow.utils.reflection</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="#cxflow.AbstractDataset" title="cxflow.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>:
-This concept prescribes the API that is required from every cxflow dataset.</li>
-<li><a class="reference internal" href="#cxflow.BaseDataset" title="cxflow.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">BaseDataset</span></code></a>:
-Base class for datasets written in python.</li>
 <li><a class="reference internal" href="#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">MainLoop</span></code></a>:
 Train the model, manage hooks etc.</li>
-<li><a class="reference internal" href="#cxflow.AbstractModel" title="cxflow.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code></a>:
-Abstract machine learning model which exposes input and output names, run and save methods.</li>
 </ul>
-<dl class="class">
-<dt id="cxflow.AbstractDataset">
-<em class="property">class </em><code class="descclassname">cxflow.</code><code class="descname">AbstractDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/abstract_dataset.html#AbstractDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>This concept prescribes the API that is required from every cxflow dataset.
-Every cxflow dataset has to have a constructor which takes YAML string config.
-Additionally, one may implement any <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method
-in order to make <code class="docutils literal"><span class="pre">stream_name</span></code> stream available in the cxflow <code class="docutils literal"><span class="pre">MainLoop</span></code>.</p>
-<img src="../_images/inheritance-f7c060c20bf828441a24f6bf8f75736ab59a5753.png" alt="Inheritance diagram of AbstractDataset" usemap="#inheritancea2135df863" class="inheritance"/>
-<map id="inheritancea2135df863" name="inheritancea2135df863">
-<area shape="rect" id="node1" title="This concept prescribes the API that is required from every cxflow dataset." alt="" coords="5,5,132,31"/>
-</map>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<dl class="method">
-<dt id="cxflow.AbstractDataset.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/abstract_dataset.html#AbstractDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractDataset.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new dataset configured with the given YAML string (obligatory).
-The configuration must contain <cite>dataset</cite> entry and may contain <cite>output_dir&#8217; entry.
-:type config_str: :class:`str</cite>
-:param config_str: YAML string config</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.AbstractDataset.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.AbstractDataset.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cxflow.BaseDataset">
-<em class="property">class </em><code class="descclassname">cxflow.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.BaseDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Base class for datasets written in python.</p>
-<dl class="docutils">
-<dt>In the inherited class, one should:</dt>
-<dd><ul class="first last simple">
-<li>override the <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method instead of <code class="docutils literal"><span class="pre">__init__</span></code></li>
-<li>override the <code class="docutils literal"><span class="pre">train_stream</span></code> method</li>
-<li>add any additional <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method in order to make <code class="docutils literal"><span class="pre">&lt;stream_name&gt;</span></code> stream available</li>
-</ul>
-</dd>
-</dl>
-<img src="../_images/inheritance-7f8b218164ee430de3f30c9a84b9b6e61539e6bc.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
-<map id="inheritance7f67f7c0ff" name="inheritance7f67f7c0ff">
-<area shape="rect" id="node1" title="Base class for datasets written in python." alt="" coords="5,5,111,31"/>
-</map>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<dl class="method">
-<dt id="cxflow.BaseDataset.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.BaseDataset.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new dataset.
-Decode the given YAML config string and pass the obtained kwargs to the <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; dataset configuration as yaml string</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.BaseDataset.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.BaseDataset.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cxflow.BaseDataset._init_with_kwargs">
-<code class="descname">_init_with_kwargs</code><span class="sig-paren">(</span><em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset._init_with_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.BaseDataset._init_with_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the dataset with <code class="docutils literal"><span class="pre">kwargs</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_dir</strong> &#8211; output directory for logging and any additional outputs (None if no output dir is available)</li>
-<li><strong>kwargs</strong> &#8211; dataset configuration as <code class="docutils literal"><span class="pre">**kwargs</span></code> parsed from <code class="docutils literal"><span class="pre">config['dataset']</span></code></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="class">
 <dt id="cxflow.MainLoop">
 <em class="property">class </em><code class="descclassname">cxflow.</code><code class="descname">MainLoop</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>hooks=()</em>, <em>extra_streams=()</em>, <em>on_unused_sources='warn'</em>, <em>fixed_batch_size=None</em>, <em>skip_zeroth_epoch=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop" title="Permalink to this definition">¶</a></dt>
@@ -270,12 +174,6 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.MainLoop.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.MainLoop.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">
@@ -418,142 +316,6 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 </table>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="cxflow.AbstractModel">
-<em class="property">class </em><code class="descclassname">cxflow.</code><code class="descname">AbstractModel</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/abstract_model.html#AbstractModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Abstract machine learning model which exposes input and output names, run and save methods.
-<cite>AbstractModel</cite> implementations are trainable with <code class="docutils literal"><span class="pre">cxflow.MainLoop</span></code>.</p>
-<img src="../_images/inheritance-f4ac830770dbea7306599e841daa43ca679323f9.png" alt="Inheritance diagram of AbstractModel" usemap="#inheritancebbe02c0bae" class="inheritance"/>
-<map id="inheritancebbe02c0bae" name="inheritancebbe02c0bae">
-<area shape="rect" id="node1" title="Abstract machine learning model which exposes input and output names, run and save methods." alt="" coords="5,5,120,31"/>
-</map>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<dl class="method">
-<dt id="cxflow.AbstractModel.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/abstract_model.html#AbstractModel.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractModel.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Model constructor interface.</p>
-<p>Additional parameters (currently covered by <code class="docutils literal"><span class="pre">**kwargs</span></code>) are passed
-according to the configuration <code class="docutils literal"><span class="pre">model</span></code> section.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>]) &#8211; Dataset object.</li>
-<li><strong>log_dir</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; Existing directory in which all output files should be stored.</li>
-<li><strong>restore_from</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; Information passed to the model constructor (backend-specific);
-usually a directory in which the trained model is stored.</li>
-<li><strong>kwargs</strong> &#8211; Configuration section <code class="docutils literal"><span class="pre">model</span></code>.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.AbstractModel.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.AbstractModel.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.AbstractModel.input_names">
-<code class="descname">input_names</code><a class="headerlink" href="#cxflow.AbstractModel.input_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of model input names.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.AbstractModel.output_names">
-<code class="descname">output_names</code><a class="headerlink" href="#cxflow.AbstractModel.output_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of model output names.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.AbstractModel.restore_fallback">
-<code class="descname">restore_fallback</code><a class="headerlink" href="#cxflow.AbstractModel.restore_fallback" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the fully-qualified name of the fallback restore class (e.g. <cite>module.submodule.BaseClass</cite>).</p>
-<p>When restoring a model, cxflow tries to use the fallback class if the construction of the model object specified
-in <cite>model</cite> configuration section fails.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">fully-qualified name of the fallback restore class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cxflow.AbstractModel.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>batch</em>, <em>train</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/abstract_model.html#AbstractModel.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractModel.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run feed-forward pass with the given batch and return the results as dict.</p>
-<p>When train=True, also update parameters.
-:type batch: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]
-:param batch: batch to be processed.
-:type train: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>
-:param train: <code class="docutils literal"><span class="pre">True</span></code> if this batch should be used for model update, <code class="docutils literal"><span class="pre">False</span></code> otherwise.
-:rtype: <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]
-:return: results dict</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cxflow.AbstractModel.save">
-<code class="descname">save</code><span class="sig-paren">(</span><em>name_suffix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/abstract_model.html#AbstractModel.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractModel.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the model parameters with the given <code class="docutils literal"><span class="pre">name_suffix</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name_suffix</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name suffix to be appended to the saved model.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">path to the saved file/dir</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="variables">
-<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><a class="reference internal" href="cxflow.constants.html#module-cxflow.constants" title="cxflow.constants"><code class="xref py py-data docutils literal"><span class="pre">constants</span></code></a></li>
-</ul>
-<dl class="data">
-<dt id="cxflow.constants">
-<code class="descclassname">cxflow.</code><code class="descname">constants</code><a class="headerlink" href="#cxflow.constants" title="Permalink to this definition">¶</a></dt>
-<dd><p>cxflow module containing various constants.</p>
-<div class="highlight-guess"><div class="highlight"><pre><span></span>&lt;module &#39;cxflow.constants&#39; from &#39;/usr/local/lib/python3.5/dist-packages/cxflow/constants.py&#39;&gt;
-</pre></div>
-</div>
 </dd></dl>
 
 </div>

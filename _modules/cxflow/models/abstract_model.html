@@ -109,14 +109,14 @@
 <span class="kn">from</span> <span class="nn">..datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
 
 
-<div class="viewcode-block" id="AbstractModel"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.AbstractModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractModel</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractModel"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.models.AbstractModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractModel</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract machine learning model which exposes input and output names, run and save methods.</span>
 <span class="sd">    `AbstractModel` implementations are trainable with ``cxflow.MainLoop``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractModel.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.AbstractModel.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AbstractDataset</span><span class="p">],</span> <span class="n">log_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">restore_from</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractModel.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.models.AbstractModel.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AbstractDataset</span><span class="p">],</span> <span class="n">log_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">restore_from</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Model constructor interface.</span>
 
@@ -144,7 +144,7 @@
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractModel.run"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.AbstractModel.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<div class="viewcode-block" id="AbstractModel.run"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run feed-forward pass with the given batch and return the results as dict.</span>
 
@@ -156,7 +156,7 @@
         <span class="k">pass</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractModel.save"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.AbstractModel.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractModel.save"><a class="viewcode-back" href="../../../cxflow/cxflow.models.html#cxflow.models.AbstractModel.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the model parameters with the given ``name_suffix``.</span>
 

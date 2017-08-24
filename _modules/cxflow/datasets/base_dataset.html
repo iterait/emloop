@@ -108,8 +108,10 @@
 
 <span class="kn">import</span> <span class="nn">yaml</span>
 
+<span class="kn">from</span> <span class="nn">.abstract_dataset</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
 
-<div class="viewcode-block" id="BaseDataset"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.BaseDataset">[docs]</a><span class="k">class</span> <span class="nc">BaseDataset</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BaseDataset"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset">[docs]</a><span class="k">class</span> <span class="nc">BaseDataset</span><span class="p">(</span><span class="n">AbstractDataset</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for datasets written in python.</span>
 
@@ -120,18 +122,20 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BaseDataset.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.BaseDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseDataset.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create new dataset.</span>
 <span class="sd">        Decode the given YAML config string and pass the obtained kwargs to the ``_init_with_kwargs`` method.</span>
 
 <span class="sd">        :param config_str: dataset configuration as yaml string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_str</span><span class="p">)</span>
+
         <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_with_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="BaseDataset._init_with_kwargs"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.BaseDataset._init_with_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">_init_with_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseDataset._init_with_kwargs"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset._init_with_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">_init_with_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the dataset with ``kwargs``.</span>
 

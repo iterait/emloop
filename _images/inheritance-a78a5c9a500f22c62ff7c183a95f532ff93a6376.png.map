@@ -1,0 +1,4 @@
+<map id="inheritance7f67f7c0ff" name="inheritance7f67f7c0ff">
+<area shape="rect" id="node1" title="This concept prescribes the API that is required from every cxflow dataset." alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node2" title="Base class for datasets written in python." alt="" coords="180,5,285,31"/>
+</map>

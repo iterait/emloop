@@ -1,4 +1,4 @@
-dl.class, dl.function{
+dl.class, dl.function, dl.exception{
   margin-bottom: 30px;
   background-color: #ffffff;
   border: 1px solid #aaaaaa;
@@ -8,7 +8,7 @@ dl.class, dl.function{
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 
 }
-dl.class dt, dl.function dt{
+dl.class dt, dl.function dt, dl.exception dt{
   margin-bottom: 25px;
 
 }
@@ -87,4 +87,7 @@ display:none;
 }
 #cxflow-cli td{
 border: none;
+}
+.nav-list li ul li ul{
+display:none;
 }

@@ -1,0 +1,33 @@
+=======================
+``cxflow.utils.config``
+=======================
+
+.. automodule:: cxflow.utils.config
+
+
+.. currentmodule:: cxflow.utils.config
+
+
+Functions
+=========
+
+- :py:func:`parse_arg`:
+  Parse CLI argument in format ``key[:type]=value`` to ``(key, value)``
+
+- :py:func:`load_config`:
+  Load config from YAML ``config_file`` and extend/override it with the given ``additional_args``.
+
+- :py:func:`config_to_file`:
+  Save the given config to the given path in YAML.
+
+- :py:func:`config_to_str`:
+  Return the given given config as YAML str.
+
+
+.. autofunction:: parse_arg
+
+.. autofunction:: load_config
+
+.. autofunction:: config_to_file
+
+.. autofunction:: config_to_str

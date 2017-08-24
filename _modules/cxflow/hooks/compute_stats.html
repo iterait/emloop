@@ -104,12 +104,11 @@
 <span class="sd">Module with a hook capable of computing accumulated variable statistics such as mean or median.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span>
-<span class="kn">from</span> <span class="nn">.accumulate_variables</span> <span class="k">import</span> <span class="n">AccumulateVariables</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">AccumulateVariables</span>
 
 
 <div class="viewcode-block" id="ComputeStats"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats">[docs]</a><span class="k">class</span> <span class="nc">ComputeStats</span><span class="p">(</span><span class="n">AccumulateVariables</span><span class="p">):</span>
@@ -134,8 +133,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create new stats hook.</span>
 
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if the specified aggregation function is not supported</span>
+<span class="sd">        :param variables: variables mapping: ``variable_name`` -&gt; ``List`` [``aggregations``...] wherein</span>
+<span class="sd">            ``aggregations`` are one of :py:attr:`AGGREGATIONS`</span>
+<span class="sd">        :raise ValueError: if the specified aggregation function is not supported</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">aggregations</span> <span class="ow">in</span> <span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">aggregation</span> <span class="ow">in</span> <span class="n">aggregations</span><span class="p">:</span>
@@ -148,15 +148,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">=</span> <span class="n">variables</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ComputeStats._compute_aggregation"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._compute_aggregation">[docs]</a>    <span class="k">def</span> <span class="nf">_compute_aggregation</span><span class="p">(</span><span class="n">aggregation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">):</span>
+<div class="viewcode-block" id="ComputeStats._compute_aggregation"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._compute_aggregation">[docs]</a>    <span class="k">def</span> <span class="nf">_compute_aggregation</span><span class="p">(</span><span class="n">aggregation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the specified aggregation on the given data.</span>
 
 <span class="sd">        :param aggregation: on of {mean, std, min, max, median}.</span>
 <span class="sd">        :param data: data to be aggregated</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            Value Error if the specified aggregation is not supported</span>
+<span class="sd">        :raise ValueError: if the specified aggregation is not supported</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -172,7 +170,7 @@
 
 <div class="viewcode-block" id="ComputeStats._save_stats"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._save_stats">[docs]</a>    <span class="k">def</span> <span class="nf">_save_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extend `epoch_data` by stream:variable:aggreagation data.</span>
+<span class="sd">        Extend ``epoch_data`` by stream:variable:aggreagation data.</span>
 
 <span class="sd">        :param epoch_data: data source from which the statistics are computed</span>
 <span class="sd">        &quot;&quot;&quot;</span>

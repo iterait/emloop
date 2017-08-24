@@ -109,7 +109,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 
-<div class="viewcode-block" id="DisabledPrint"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.DisabledPrint">[docs]</a><span class="k">class</span> <span class="nc">DisabledPrint</span><span class="p">:</span>
+<div class="viewcode-block" id="DisabledPrint"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.misc.html#cxflow.utils.misc.DisabledPrint">[docs]</a><span class="k">class</span> <span class="nc">DisabledPrint</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Disable printing to stdout by redirecting it to ``/dev/null`` in between ``__enter__`` and ``__exit__``.</span>
 
@@ -126,19 +126,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_orig</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_devnull</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="DisabledPrint.__enter__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.DisabledPrint.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DisabledPrint.__enter__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.misc.html#cxflow.utils.misc.DisabledPrint.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Redirect stdout to /dev/null.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_orig</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_devnull</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_devnull</span></div>
 
-<div class="viewcode-block" id="DisabledPrint.__exit__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.DisabledPrint.__exit__">[docs]</a>    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="DisabledPrint.__exit__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.misc.html#cxflow.utils.misc.DisabledPrint.__exit__">[docs]</a>    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Redirect stdout back to the original stdout.&quot;&quot;&quot;</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_devnull</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="DisabledLogger"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.DisabledLogger">[docs]</a><span class="k">class</span> <span class="nc">DisabledLogger</span><span class="p">:</span>
+<div class="viewcode-block" id="DisabledLogger"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.misc.html#cxflow.utils.misc.DisabledLogger">[docs]</a><span class="k">class</span> <span class="nc">DisabledLogger</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Entirely disable the specified logger in between ``__enter__`` and ``__exit__``.</span>
 
@@ -155,15 +155,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_orig</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="DisabledLogger.__enter__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.DisabledLogger.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DisabledLogger.__enter__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.misc.html#cxflow.utils.misc.DisabledLogger.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Entirely disable logging.&quot;&quot;&quot;</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_orig</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">disabled</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="DisabledLogger.__exit__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.html#cxflow.utils.DisabledLogger.__exit__">[docs]</a>    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="DisabledLogger.__exit__"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.misc.html#cxflow.utils.misc.DisabledLogger.__exit__">[docs]</a>    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Restore logging .&quot;&quot;&quot;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig</span></div></div>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DisabledLogger&#39;</span><span class="p">,</span> <span class="s1">&#39;DisabledPrint&#39;</span><span class="p">]</span>
 </pre></div>
 
     </div>
