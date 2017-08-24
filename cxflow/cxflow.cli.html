@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>cxflow.cli &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -155,9 +159,9 @@ Fallback procedure when a cli command fails.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to configuration file</li>
-<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
-<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+<li><strong>config_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; path to configuration file</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; output root in which the training directory will be created</li>
 </ul>
 </td>
 </tr>
@@ -177,12 +181,12 @@ Fallback procedure when a cli command fails.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the config file or the directory in which it is stored</li>
-<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – backend-specific path to the already trained model to be restored from.
+<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; path to the config file or the directory in which it is stored</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; backend-specific path to the already trained model to be restored from.
 If <code class="docutils literal"><span class="pre">None</span></code> is passed, it is inferred from the configuration file location as the directory
 it is located in.</li>
-<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
-<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; output root in which the training directory will be created</li>
 </ul>
 </td>
 </tr>
@@ -202,10 +206,10 @@ it is located in.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – String of command prefix, e.g. <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">-v</span> <span class="pre">-o</span> <span class="pre">log</span></code>.</li>
-<li><strong>params</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – Iterable collection of strings in standard cxflow param form, e.g. <code class="docutils literal"><span class="pre">'numerical_param:int=[1,</span> <span class="pre">2]'</span></code>
+<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; String of command prefix, e.g. <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">-v</span> <span class="pre">-o</span> <span class="pre">log</span></code>.</li>
+<li><strong>params</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; Iterable collection of strings in standard cxflow param form, e.g. <code class="docutils literal"><span class="pre">'numerical_param:int=[1,</span> <span class="pre">2]'</span></code>
 or <code class="docutils literal"><span class="pre">'text_param:str=[&quot;hello&quot;,</span> <span class="pre">&quot;cio&quot;]'</span></code>.</li>
-<li><strong>dry_run</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) – If set to <code class="docutils literal"><span class="pre">True</span></code>, the built commands will only be printed instead of executed.</li>
+<li><strong>dry_run</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; If set to <code class="docutils literal"><span class="pre">True</span></code>, the built commands will only be printed instead of executed.</li>
 </ul>
 </td>
 </tr>
@@ -225,8 +229,8 @@ or <code class="docutils literal"><span class="pre">'text_param:str=[&quot;hello
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – String of command prefix, e.g. <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">-v</span> <span class="pre">-o</span> <span class="pre">log</span></code>.</li>
-<li><strong>params</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – Iterable collection of strings in standard cxflow param form, e.g. <code class="docutils literal"><span class="pre">'numerical_param:int=[1,</span> <span class="pre">2]'</span></code>
+<li><strong>script</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; String of command prefix, e.g. <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">-v</span> <span class="pre">-o</span> <span class="pre">log</span></code>.</li>
+<li><strong>params</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; Iterable collection of strings in standard cxflow param form, e.g. <code class="docutils literal"><span class="pre">'numerical_param:int=[1,</span> <span class="pre">2]'</span></code>
 or <code class="docutils literal"><span class="pre">'text_param:str=[&quot;hello&quot;,</span> <span class="pre">&quot;cio&quot;]'</span></code>.</li>
 </ul>
 </td>
@@ -247,12 +251,12 @@ or <code class="docutils literal"><span class="pre">'text_param:str=[&quot;hello
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the config file or the directory in which it is stored</li>
-<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – backend-specific path to the already trained model to be restored from.
+<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; path to the config file or the directory in which it is stored</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; backend-specific path to the already trained model to be restored from.
 If <code class="docutils literal"><span class="pre">None</span></code> is passed, it is inferred from the configuration file location as the directory
 it is located in.</li>
-<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
-<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; output root in which the training directory will be created</li>
 </ul>
 </td>
 </tr>
@@ -272,10 +276,10 @@ it is located in.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the config file or the directory in which it is stored</li>
-<li><strong>method_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name of the method to be invoked on the specified dataset</li>
-<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – additional command line arguments which will update the configuration</li>
-<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – output root in which the training directory will be created</li>
+<li><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; path to the config file or the directory in which it is stored</li>
+<li><strong>method_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the method to be invoked on the specified dataset</li>
+<li><strong>cl_arguments</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; additional command line arguments which will update the configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; output root in which the training directory will be created</li>
 </ul>
 </td>
 </tr>
@@ -318,9 +322,9 @@ it is located in.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config to be dumped</li>
-<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – dir wherein output_dir shall be created</li>
-<li><strong>default_model_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name to be used when <cite>model.name</cite> is not found in the config</li>
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) &#8211; config to be dumped</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; dir wherein output_dir shall be created</li>
+<li><strong>default_model_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name to be used when <cite>model.name</cite> is not found in the config</li>
 </ul>
 </td>
 </tr>
@@ -344,8 +348,8 @@ it is located in.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config dict with dataset config</li>
-<li><strong>output_dir</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – path to the training output dir or None</li>
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) &#8211; config dict with dataset config</li>
+<li><strong>output_dir</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; path to the training output dir or None</li>
 </ul>
 </td>
 </tr>
@@ -373,10 +377,10 @@ it is located in.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config dict with model config</li>
-<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the training output dir</li>
-<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) – AbstractDataset object</li>
-<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – from whence the model should be restored (backend-specific information)</li>
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) &#8211; config dict with model config</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; path to the training output dir</li>
+<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) &#8211; AbstractDataset object</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; from whence the model should be restored (backend-specific information)</li>
 </ul>
 </td>
 </tr>
@@ -416,10 +420,10 @@ it is located in.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – config dict</li>
-<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) – model object to be passed to the hooks</li>
-<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) – AbstractDataset object</li>
-<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – training output dir available to the hooks</li>
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) &#8211; config dict</li>
+<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) &#8211; model object to be passed to the hooks</li>
+<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) &#8211; AbstractDataset object</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; training output dir available to the hooks</li>
 </ul>
 </td>
 </tr>
@@ -470,9 +474,9 @@ wherein all the training outputs are saved. The output dir name will be roughly 
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – configuration</li>
-<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – dir under which output_dir shall be created</li>
-<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – from whence the model should be restored (backend-specific information)</li>
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) &#8211; configuration</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; dir under which output_dir shall be created</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; from whence the model should be restored (backend-specific information)</li>
 </ul>
 </td>
 </tr>
@@ -496,7 +500,7 @@ wherein all the training outputs are saved. The output dir name will be roughly 
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – path to the configuration file or its parent directory</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; path to the configuration file or its parent directory</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
 </tr>
@@ -515,7 +519,7 @@ wherein all the training outputs are saved. The output dir name will be roughly 
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) – configuration object</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) &#8211; configuration object</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -532,8 +536,8 @@ wherein all the training outputs are saved. The output dir name will be roughly 
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>message</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – message to be logged</li>
-<li><strong>ex</strong> (<code class="xref py py-class docutils literal"><span class="pre">Exception</span></code>) – Exception which caused the failure</li>
+<li><strong>message</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; message to be logged</li>
+<li><strong>ex</strong> (<code class="xref py py-class docutils literal"><span class="pre">Exception</span></code>) &#8211; Exception which caused the failure</li>
 </ul>
 </td>
 </tr>
@@ -560,7 +564,7 @@ wherein all the training outputs are saved. The output dir name will be roughly 
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>

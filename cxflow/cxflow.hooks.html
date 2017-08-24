@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>cxflow.hooks &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -174,7 +178,7 @@ Terminate training if the given stream variable exceeds the threshold in at most
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS">
-<code class="descname">CXF_HOOK_INIT_ARGS</code><em class="property"> = {'output_dir', 'dataset', 'model'}</em><a class="headerlink" href="#cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CXF_HOOK_INIT_ARGS</code><em class="property"> = {'model', 'output_dir', 'dataset'}</em><a class="headerlink" href="#cxflow.hooks.AbstractHook.CXF_HOOK_INIT_ARGS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Arguments which cxflow pass, in addition to the config args, to init methods of every hook being created.</p>
 </dd></dl>
 
@@ -186,7 +190,7 @@ Terminate training if the given stream variable exceeds the threshold in at most
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> – kwargs not recognized in the child hook</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; kwargs not recognized in the child hook</td>
 </tr>
 </tbody>
 </table>
@@ -209,8 +213,8 @@ Batch results are available in results argument.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – type of the stream (usually train/valid/test or any other)</li>
-<li><strong>batch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]) – batch inputs and model outputs</li>
+<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; type of the stream (usually train/valid/test or any other)</li>
+<li><strong>batch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]) &#8211; batch inputs and model outputs</li>
 </ul>
 </td>
 </tr>
@@ -232,8 +236,8 @@ in aggregated (averaged) form. For any other aggregation method, one must manual
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – finished epoch id</li>
-<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data flowing through all hooks</li>
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; finished epoch id</li>
+<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data flowing through all hooks</li>
 </ul>
 </td>
 </tr>
@@ -256,9 +260,9 @@ in aggregated (averaged) form. For any other aggregation method, one must manual
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – finished epoch id</li>
-<li><strong>profile</strong> (<code class="xref py py-class docutils literal"><span class="pre">Dict</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>]]) – dictionary of lists of event timings that were measured during the epoch.</li>
-<li><strong>extra_streams</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – enumeration of additional stream names</li>
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; finished epoch id</li>
+<li><strong>profile</strong> (<code class="xref py py-class docutils literal"><span class="pre">Dict</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>]]) &#8211; dictionary of lists of event timings that were measured during the epoch.</li>
+<li><strong>extra_streams</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; enumeration of additional stream names</li>
 </ul>
 </td>
 </tr>
@@ -310,7 +314,7 @@ in aggregated (averaged) form. For any other aggregation method, one must manual
 <p>This hook accumulates the specified variables allowing their aggregation after each epoch.</p>
 <p>The hook itself does not utilize the accumulated variables. It is meant to be inherited from. The child hook
 will have the accumulated variables available in <code class="docutils literal"><span class="pre">self._accumulator</span></code> after each epoch.</p>
-<p>The data are accumulated in a form of nested mapping ‘stream_name’ -&gt; ‘variable_name’ -&gt; [iterable values].</p>
+<p>The data are accumulated in a form of nested mapping &#8216;stream_name&#8217; -&gt; &#8216;variable_name&#8217; -&gt; [iterable values].</p>
 <p>This hook should not be used directly as it does nothing on its own.</p>
 <img src="../_images/inheritance-7e231c79a21ea25e42f6e244acb03ef561fb6335.png" alt="Inheritance diagram of AccumulateVariables" usemap="#inheritancedbc454a28a" class="inheritance"/>
 <map id="inheritancedbc454a28a" name="inheritancedbc454a28a">
@@ -327,7 +331,7 @@ will have the accumulated variables available in <code class="docutils literal">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – collection of variable names to be logged</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variables</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; collection of variable names to be logged</td>
 </tr>
 </tbody>
 </table>
@@ -348,8 +352,8 @@ will have the accumulated variables available in <code class="docutils literal">
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – stream name; e.g. <code class="docutils literal"><span class="pre">train</span></code> or any other…</li>
-<li><strong>batch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]) – batch data = stream sources + model outputs</li>
+<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; stream name; e.g. <code class="docutils literal"><span class="pre">train</span></code> or any other...</li>
+<li><strong>batch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]) &#8211; batch data = stream sources + model outputs</li>
 </ul>
 </td>
 </tr>
@@ -427,13 +431,13 @@ TypeError: if the variable value is not iterable (e.g. it is only a scalar)</dd>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – directory where the output shall be saved</li>
-<li><strong>output_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name of the output file</li>
-<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – CSV delimiter</li>
-<li><strong>default_value</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – in case the value is not contained by the epoch data, this value will be used</li>
-<li><strong>variables</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) – a sequence of variable names to be logged. If not specified log all the available variables.</li>
-<li><strong>on_unknown_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – an action to be taken if the variable value type is not supported (e.g. a list)</li>
-<li><strong>on_missing_variable</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – an action to be taken if the variable is required but not provided</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; directory where the output shall be saved</li>
+<li><strong>output_file</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the output file</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; CSV delimiter</li>
+<li><strong>default_value</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; in case the value is not contained by the epoch data, this value will be used</li>
+<li><strong>variables</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; a sequence of variable names to be logged. If not specified log all the available variables.</li>
+<li><strong>on_unknown_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; an action to be taken if the variable value type is not supported (e.g. a list)</li>
+<li><strong>on_missing_variable</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; an action to be taken if the variable is required but not provided</li>
 </ul>
 </td>
 </tr>
@@ -451,7 +455,7 @@ Variables and streams expected later on are stored in self._variables and self._
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data to be logged</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data to be logged</td>
 </tr>
 </tbody>
 </table>
@@ -466,8 +470,8 @@ Variables and streams expected later on are stored in self._variables and self._
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – epoch number (will be written at the first column)</li>
-<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data</li>
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; epoch number (will be written at the first column)</li>
+<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data</li>
 </ul>
 </td>
 </tr>
@@ -485,8 +489,8 @@ Variables and streams expected later on are stored in self._variables and self._
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – number of the epoch</li>
-<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data to be logged</li>
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; number of the epoch</li>
+<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data to be logged</li>
 </ul>
 </td>
 </tr>
@@ -528,7 +532,7 @@ Variables and streams expected later on are stored in self._variables and self._
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – maximum number of training epochs</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epochs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; maximum number of training epochs</td>
 </tr>
 </tbody>
 </table>
@@ -594,8 +598,8 @@ Variables and streams expected later on are stored in self._variables and self._
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>variables</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) – a sequence of variable names to be logged. If not specified log all the available variables.</li>
-<li><strong>on_unknown_type</strong> – an action to be taken if the variable value type is not supported (e.g. a list)</li>
+<li><strong>variables</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; a sequence of variable names to be logged. If not specified log all the available variables.</li>
+<li><strong>on_unknown_type</strong> &#8211; an action to be taken if the variable value type is not supported (e.g. a list)</li>
 </ul>
 </td>
 </tr>
@@ -614,7 +618,7 @@ One may set on_unknown_type to <cite>str</cite> in order to log the variable any
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data to be logged</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data to be logged</td>
 </tr>
 </tbody>
 </table>
@@ -634,8 +638,8 @@ TypeError: if the variable value is of unsupported type and on_unknown_type is s
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – number of processed epoch</li>
-<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch datat to be logged</li>
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; number of processed epoch</li>
+<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch datat to be logged</li>
 </ul>
 </td>
 </tr>
@@ -686,8 +690,8 @@ stream</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>profile</strong> (<code class="xref py py-class docutils literal"><span class="pre">Dict</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>]]) – epoch timings profile</li>
-<li><strong>extra_streams</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – enumeration of additiona stream names</li>
+<li><strong>profile</strong> (<code class="xref py py-class docutils literal"><span class="pre">Dict</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>]]) &#8211; epoch timings profile</li>
+<li><strong>extra_streams</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; enumeration of additiona stream names</li>
 </ul>
 </td>
 </tr>
@@ -743,9 +747,9 @@ stream</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) – trained model</li>
-<li><strong>n_epochs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – how often is the model saved</li>
-<li><strong>on_failure</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – action to be taken when model fails to save itself;
+<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) &#8211; trained model</li>
+<li><strong>n_epochs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; how often is the model saved</li>
+<li><strong>on_failure</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to be taken when model fails to save itself;
 one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 </ul>
 </td>
@@ -762,7 +766,7 @@ one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – number of the processed epoch</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; number of the processed epoch</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -779,9 +783,9 @@ one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) – the model to be saved</li>
-<li><strong>name_suffix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name to be used for saving</li>
-<li><strong>on_failure</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – action to be taken on failure; one of SaverHook.SAVE_FAILURE_ACTIONS</li>
+<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) &#8211; the model to be saved</li>
+<li><strong>name_suffix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name to be used for saving</li>
+<li><strong>on_failure</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to be taken on failure; one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 </ul>
 </td>
 </tr>
@@ -789,7 +793,7 @@ one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 </table>
 <dl class="docutils">
 <dt>Raises:</dt>
-<dd>IOError: on save failure and on_failure=’error’</dd>
+<dd>IOError: on save failure and on_failure=&#8217;error&#8217;</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -855,7 +859,7 @@ one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 :type output_name: <a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>
 :param output_name: suffix of the saved model
 :type on_save_failure: <a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>
-:param on_save_failure: action to be taken when model fails to save itself, one of {‘error’, ‘warn’, ‘ignore’}</p>
+:param on_save_failure: action to be taken when model fails to save itself, one of {&#8216;error&#8217;, &#8216;warn&#8217;, &#8216;ignore&#8217;}</p>
 </dd></dl>
 
 <dl class="method">
@@ -866,7 +870,7 @@ one of SaverHook.SAVE_FAILURE_ACTIONS</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data which determine whether the model will be saved or not</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data which determine whether the model will be saved or not</td>
 </tr>
 </tbody>
 </table>
@@ -894,7 +898,7 @@ ValueError: if the variable value is not a scalar</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_value</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>) – current value of the objective function</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_value</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>) &#8211; current value of the objective function</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></td>
 </tr>
@@ -910,7 +914,7 @@ ValueError: if the variable value is not a scalar</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data to be processed</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data to be processed</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -951,7 +955,7 @@ Quit on any subsequent signal.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>signum</strong> – SIGINT signal number</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>signum</strong> &#8211; SIGINT signal number</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -1032,7 +1036,7 @@ Quit on any subsequent signal.</p>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'max', 'std', 'median', 'mean', 'min'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AGGREGATIONS</code><em class="property"> = {'median', 'std', 'max', 'mean', 'min'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported numpy-like aggregation methods.</p>
 </dd></dl>
 
@@ -1055,8 +1059,8 @@ Quit on any subsequent signal.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>aggregation</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – on of {mean, std, min, max, median}.</li>
-<li><strong>data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[+T_co]) – data to be aggregated</li>
+<li><strong>aggregation</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; on of {mean, std, min, max, median}.</li>
+<li><strong>data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[+T_co]) &#8211; data to be aggregated</li>
 </ul>
 </td>
 </tr>
@@ -1076,7 +1080,7 @@ Quit on any subsequent signal.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – data source from which the statistics are computed</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; data source from which the statistics are computed</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -1092,7 +1096,7 @@ Quit on any subsequent signal.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data to be processed</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data to be processed</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -1134,10 +1138,10 @@ Quit on any subsequent signal.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – variable to be checked</li>
-<li><strong>required_min_value</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>) – threshold to be exceeded</li>
-<li><strong>max_epoch</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – maximum epochs to be run</li>
-<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – stream to be checked</li>
+<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; variable to be checked</li>
+<li><strong>required_min_value</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>) &#8211; threshold to be exceeded</li>
+<li><strong>max_epoch</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; maximum epochs to be run</li>
+<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; stream to be checked</li>
 </ul>
 </td>
 </tr>
@@ -1154,8 +1158,8 @@ Quit on any subsequent signal.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) – number of the processed epoch</li>
-<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) – epoch data to be checked</li>
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; number of the processed epoch</li>
+<li><strong>epoch_data</strong> (<code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-data docutils literal"><span class="pre">Any</span></code>]]]) &#8211; epoch data to be checked</li>
 </ul>
 </td>
 </tr>
@@ -1174,7 +1178,7 @@ Exception that is raised when a hook terminates the training.</li>
 </ul>
 <dl class="exception">
 <dt id="cxflow.hooks.TrainingTerminated">
-<em class="property">exception </em><code class="descclassname">cxflow.hooks.</code><code class="descname">TrainingTerminated</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/abstract_hook.html#TrainingTerminated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.TrainingTerminated" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="descclassname">cxflow.hooks.</code><code class="descname">TrainingTerminated</code><a class="reference internal" href="../_modules/cxflow/hooks/abstract_hook.html#TrainingTerminated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.TrainingTerminated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exception that is raised when a hook terminates the training.</p>
 <p class="rubric">Inheritance</p>
 <img src="../_images/inheritance-5d2a29d829a1304beee02bd9dc82c5b1db7d1229.png" alt="Inheritance diagram of TrainingTerminated" usemap="#inheritancec8adf6d556" class="inheritance"/>
@@ -1199,7 +1203,7 @@ Exception that is raised when a hook terminates the training.</li>
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>

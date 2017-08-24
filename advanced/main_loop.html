@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>Main Loop &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -124,14 +128,14 @@ As the name suggests, it is responsible for the main lifecycle of the training o
 and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
 Afterwards, cxflow builds the model and passes the <code class="docutils literal"><span class="pre">model</span></code> section from the
 <a class="reference external" href="config.html">config</a> to its constructor.
-One of the model’s arguments is also the dataset itself, so the net can query
+One of the model&#8217;s arguments is also the dataset itself, so the net can query
 it for some information, such as the number of outputs, data size, etc.</p>
 <p>After the dataset and the model are created, cxflow calls one of the dataset stream functions
 based on whether it is training, testing or predicting (more on this is described in the following
 sections).
 The selected stream method (e.g., <code class="docutils literal"><span class="pre">train_stream</span></code>) returns an iterable where each
 item corresponds to a single batch of data.</p>
-<p>Finally, the stream is iterated through and each batch is fed to the model’s <code class="docutils literal"><span class="pre">run</span></code> method along
+<p>Finally, the stream is iterated through and each batch is fed to the model&#8217;s <code class="docutils literal"><span class="pre">run</span></code> method along
 with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.
 The implementation of <code class="docutils literal"><span class="pre">run</span></code> method is backend specific.</p>
@@ -205,7 +209,7 @@ There are multiple events for which the main loop triggers the hook.</p>
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>

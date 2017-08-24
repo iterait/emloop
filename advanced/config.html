@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>Configuration &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -119,7 +123,7 @@
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
 <p>Configuration is the key part of cxflow.
 It is possible to link a dataset and appropriate model by just a few lines of a YAML document.</p>
-<p>If you aren’t comfortable with YAML, JSON documents are supported as well.
+<p>If you aren&#8217;t comfortable with YAML, JSON documents are supported as well.
 However, JSON does not support advanced features such as <a class="reference external" href="https://learnxinyminutes.com/docs/yaml/">anchors</a>
 or simple comments.</p>
 <p>Each configuration file is structured in the following sections.</p>
@@ -206,7 +210,7 @@ this hook will be loaded as expected.</p>
 <p>Second possible type of hook entries is a dict in the form of <code class="docutils literal"><span class="pre">Hook</span> <span class="pre">-&gt;</span> <span class="pre">{config}</span></code>.
 Again, the <code class="docutils literal"><span class="pre">Hook</span></code> can be either standard hook name or a fully qualified name in the
 form of <code class="docutils literal"><span class="pre">module.class</span></code>.
-The nested is passed to directly to the hook’s constructor in the form of <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
+The nested is passed to directly to the hook&#8217;s constructor in the form of <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
 <p>Example:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxflow_scikit.ClassificationInfoHook</span><span class="p p-Indicator">:</span>
@@ -235,7 +239,7 @@ Currently, the following parameters are supported.</p>
 </li>
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">on_unused_sources</span></code>: Behavior of the main loop when the dataset provides batches with sources not</dt>
-<dd>registered in model’s <code class="docutils literal"><span class="pre">inputs</span></code>. By default (<code class="docutils literal"><span class="pre">warn</span></code>), main loop warns the developer.
+<dd>registered in model&#8217;s <code class="docutils literal"><span class="pre">inputs</span></code>. By default (<code class="docutils literal"><span class="pre">warn</span></code>), main loop warns the developer.
 Remaining options are <code class="docutils literal"><span class="pre">ignore</span></code> which suppresses the warning and <code class="docutils literal"><span class="pre">error</span></code> which
 terminates the process immediately.</dd>
 </dl>
@@ -262,7 +266,7 @@ with a warning.</dd>
 <div class="section" id="inference">
 <h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
 <p>Naturally, the inference (evaluation) of the model on new unanotated data differs from its training.
-In this phase, we don’t know the ground truth, hence the dataset sources are different.
+In this phase, we don&#8217;t know the ground truth, hence the dataset sources are different.
 In such a situation, some of the metrics are impossible to measure, e.g., accuracy which requires the
 ground truth.</p>
 <p>For this reason, a special section <code class="docutils literal"><span class="pre">infer</span></code> is introduced.
@@ -270,12 +274,12 @@ It matches the overall configuration structure, i.e. it must contain the <code c
 Analogously, the <code class="docutils literal"><span class="pre">hooks</span></code> section is optional as well as <code class="docutils literal"><span class="pre">main_loop</span></code>.</p>
 <p>If <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">infer</span></code> is invoked, the rest of the configuration is ignored and only the <code class="docutils literal"><span class="pre">infer</span></code> section is used.
 In other cases, the <code class="docutils literal"><span class="pre">infer</span></code> section is ignored.
-The main advantage of this approach is that the user doesn’t have to define <code class="docutils literal"><span class="pre">infer</span></code> when they experiment with the
+The main advantage of this approach is that the user doesn&#8217;t have to define <code class="docutils literal"><span class="pre">infer</span></code> when they experiment with the
 models.
 This can be done after the model is developed, fine-tuned and ready for production.</p>
 <p>As it might be observed, the inference sections such as <code class="docutils literal"><span class="pre">model</span></code> and <code class="docutils literal"><span class="pre">dataset</span></code> are almost identical to the top level ones.
 YAML can reduce configuration duplicity by using <a class="reference external" href="https://learnxinyminutes.com/docs/yaml/">anchors</a>.
-Note that we’ve already defined anchors <code class="docutils literal"><span class="pre">&amp;dataset</span></code> and <code class="docutils literal"><span class="pre">&amp;model</span></code> in the snippets above.</p>
+Note that we&#8217;ve already defined anchors <code class="docutils literal"><span class="pre">&amp;dataset</span></code> and <code class="docutils literal"><span class="pre">&amp;model</span></code> in the snippets above.</p>
 <p>Now, we can import them and rewrite only the arguments which differ.
 In the following example, we reuse the whole dataset as is.
 The model is almost the same but we need to specify different <code class="docutils literal"><span class="pre">inputs</span></code> and <code class="docutils literal"><span class="pre">outputs</span></code> since the inference stream will
@@ -328,7 +332,7 @@ deployed and served on you webpage.</p>
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>

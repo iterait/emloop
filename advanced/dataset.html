@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>Dataset &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -152,8 +156,8 @@ it is given is ignored and hidden in the <code class="docutils literal"><span cl
 <h2>Data Processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">¶</a></h2>
 <p>First, let us define a <strong>data source</strong>.
 We refer to the data source as to a unit (or type) of which the (training) example consists.
-Let’s take a look at an artificial image-classification task in which we are supposed to
-classify the input image into various animal classes (dog, cat, rabbit, …).
+Let&#8217;s take a look at an artificial image-classification task in which we are supposed to
+classify the input image into various animal classes (dog, cat, rabbit, ...).
 In this setting, the sources could be e.g., <code class="docutils literal"><span class="pre">image</span></code> and <code class="docutils literal"><span class="pre">animal</span></code>.
 The former is in the form of a tensor with the shape of 800x600x3 (i.e. a regular RGB 800x600 image).
 The latter is a string describing the animal depicted in the image.</p>
@@ -204,7 +208,7 @@ Sometimes, we need to split the whole dataset into training, validation and test
 For this purpose, we may want to implement <code class="docutils literal"><span class="pre">split</span></code> function.</p>
 <p>The suggested methods are completely arbitrary and they may or may not be implemented.
 The key concept is to keep data-related function encapsuled together in the dataset object,
-so that one don’t need to implement several separate script for fetching/visualization/statistics etc.</p>
+so that one don&#8217;t need to implement several separate script for fetching/visualization/statistics etc.</p>
 <p>An elegant way of executing the dataset methods is via <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">&lt;method-name&gt;</span> <span class="pre">&lt;config-file&gt;</span></code>.
 It constructs the dataset specified in the config file and invokes the proper method.</p>
 <p>A typical pipeline contains the following commands.
@@ -224,7 +228,7 @@ We leave them without further comments as they are self-describing.</p>
 That is, constructor should not perform any time-consuming operation such as loading and decoding the data.
 Instead, the data should be loaded and encoded in the first moment they are really necessary (e.g.,
 in the <code class="docutils literal"><span class="pre">train_stream</span></code> method).</p>
-<p>The main reason for laziness is that the dataset doesn’t know for which purpose it was constructed.
+<p>The main reason for laziness is that the dataset doesn&#8217;t know for which purpose it was constructed.
 It might be queried to provide the training data or only to print some simple checksums.
 In the cases of extremely big datasets, it is useless and annoying to waste the time by loading the data
 without their actual use.</p>
@@ -244,7 +248,7 @@ without their actual use.</p>
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>

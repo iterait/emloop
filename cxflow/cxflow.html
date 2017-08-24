@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>cxflow &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -159,7 +163,7 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 <dt id="cxflow.AbstractDataset.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/abstract_dataset.html#AbstractDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.AbstractDataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create new dataset configured with the given YAML string (obligatory).
-The configuration must contain <cite>dataset</cite> entry and may contain <cite>output_dir’ entry.
+The configuration must contain <cite>dataset</cite> entry and may contain <cite>output_dir&#8217; entry.
 :type config_str: :class:`str</cite>
 :param config_str: YAML string config</p>
 </dd></dl>
@@ -202,7 +206,7 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – dataset configuration as yaml string</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; dataset configuration as yaml string</td>
 </tr>
 </tbody>
 </table>
@@ -223,8 +227,8 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>output_dir</strong> – output directory for logging and any additional outputs (None if no output dir is available)</li>
-<li><strong>kwargs</strong> – dataset configuration as <code class="docutils literal"><span class="pre">**kwargs</span></code> parsed from <code class="docutils literal"><span class="pre">config['dataset']</span></code></li>
+<li><strong>output_dir</strong> &#8211; output directory for logging and any additional outputs (None if no output dir is available)</li>
+<li><strong>kwargs</strong> &#8211; dataset configuration as <code class="docutils literal"><span class="pre">**kwargs</span></code> parsed from <code class="docutils literal"><span class="pre">config['dataset']</span></code></li>
 </ul>
 </td>
 </tr>
@@ -254,12 +258,12 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) – trained model</li>
-<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) – loaded dataset</li>
-<li><strong>hooks</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal"><span class="pre">AbstractHook</span></code>]) – a sequence of hooks</li>
-<li><strong>extra_streams</strong> (<code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – a sequence of additional stream names to be evaluated</li>
-<li><strong>on_unused_sources</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – action to take when stream provides unused sources {‘ignore’, ‘warn’, ‘error’}</li>
-<li><strong>fixed_batch_size</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>]) – if specified, main_loop removes all batches that do not have the specified size</li>
+<li><strong>model</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code>) &#8211; trained model</li>
+<li><strong>dataset</strong> (<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>) &#8211; loaded dataset</li>
+<li><strong>hooks</strong> (<code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal"><span class="pre">AbstractHook</span></code>]) &#8211; a sequence of hooks</li>
+<li><strong>extra_streams</strong> (<code class="xref py py-class docutils literal"><span class="pre">List</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; a sequence of additional stream names to be evaluated</li>
+<li><strong>on_unused_sources</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to take when stream provides unused sources {&#8216;ignore&#8217;, &#8216;warn&#8217;, &#8216;error&#8217;}</li>
+<li><strong>fixed_batch_size</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>]) &#8211; if specified, main_loop removes all batches that do not have the specified size</li>
 </ul>
 </td>
 </tr>
@@ -353,7 +357,7 @@ Decode the given YAML config string and pass the obtained kwargs to the <code cl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name of the stream</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the stream</td>
 </tr>
 </tbody>
 </table>
@@ -439,11 +443,11 @@ according to the configuration <code class="docutils literal"><span class="pre">
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dataset</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>]) – Dataset object.</li>
-<li><strong>log_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – Existing directory in which all output files should be stored.</li>
-<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) – Information passed to the model constructor (backend-specific);
+<li><strong>dataset</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code>]) &#8211; Dataset object.</li>
+<li><strong>log_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; Existing directory in which all output files should be stored.</li>
+<li><strong>restore_from</strong> (<code class="xref py py-data docutils literal"><span class="pre">Optional</span></code>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; Information passed to the model constructor (backend-specific);
 usually a directory in which the trained model is stored.</li>
-<li><strong>kwargs</strong> – Configuration section <code class="docutils literal"><span class="pre">model</span></code>.</li>
+<li><strong>kwargs</strong> &#8211; Configuration section <code class="docutils literal"><span class="pre">model</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -524,7 +528,7 @@ in <cite>model</cite> configuration section fails.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name_suffix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) – name suffix to be appended to the saved model.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name_suffix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name suffix to be appended to the saved model.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
 </tr>
@@ -567,7 +571,7 @@ in <cite>model</cite> configuration section fails.</p>
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>

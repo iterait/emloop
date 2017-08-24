@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>Tutorial &#8212; cxflow 0.7.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/highlight.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -20,7 +24,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -35,7 +39,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body>
+  <body role="document">
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -131,7 +135,7 @@ Cxflow does not implement any building blocks for you (contrary to, e.g.,
 <a class="reference external" href="https://github.com/fchollet/keras">Keras</a>). Instead, you can directly use
 your favourite machine learning framework, such as <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>,
 <a class="reference external" href="https://cntk.ai/">CNTK</a>, or <a class="reference external" href="https://caffe2.ai/">Caffe2</a>. Therefore,
-you don’t have to learn a new framework if you already know one.
+you don&#8217;t have to learn a new framework if you already know one.
 In addition, you can easily convert the models you already have with only minimal changes.</p>
 <p>Cxflow allows (and encourages) you to build modular projects, where the dataset,
 the model, and the configuration are separated and reusable. In the following sections,
@@ -215,7 +219,7 @@ the sake of simplicity).</p>
 <p>To sum up, when the dataset is constructed, it features four attributes (<code class="docutils literal"><span class="pre">train_x</span></code>,
 <code class="docutils literal"><span class="pre">train_y</span></code>, <code class="docutils literal"><span class="pre">test_x</span></code> and <code class="docutils literal"><span class="pre">test_y</span></code>) that represent the loaded data.
 Note that it is completely valid option to rename them as desired.
-In real-world cases, we usually don’t want to generate our data randomly.
+In real-world cases, we usually don&#8217;t want to generate our data randomly.
 Instead, we can simply load them from file (e.g. <code class="docutils literal"><span class="pre">.csv</span></code>) or database.</p>
 <p>To iterate over the training data, there is a <code class="docutils literal"><span class="pre">train_stream</span></code> function.
 This function returns an iterator over batches.
@@ -344,7 +348,7 @@ section</a>.</p>
 <p>In our case, we only need to tell cxflow which dataset to use.
 This is done by specifying <code class="docutils literal"><span class="pre">module</span></code> and <code class="docutils literal"><span class="pre">class</span></code> of the dataset.
 In addition, we will specify the parameters of the dataset (those
-ones passed to dataset’s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method).</p>
+ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method).</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">module</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.majority_dataset</span>
   <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MajorityDataset</span>
@@ -354,7 +358,7 @@ ones passed to dataset’s <code class="docutils literal"><span class="pre">_ini
 </pre></div>
 </div>
 <p>We can pass arbitrary other constants to the dataset as they will be hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>
-of the dataset’s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
+of the dataset&#8217;s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
 <p><strong>Note:</strong> The whole <code class="docutils literal"><span class="pre">dataset</span></code> section will be passed as a string-encoded YAML
 to the dataset constructor.
 In the case of using <code class="docutils literal"><span class="pre">cxflow.BaseDataset</span></code>, the YAML is automatically decoded and the individual
@@ -364,7 +368,7 @@ variables are passed to <code class="docutils literal"><span class="pre">_init_w
 <h3>Model<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>Similarly to the dataset, the model is defined in the <code class="docutils literal"><span class="pre">model</span></code> section.
 In our case, we want to specify <code class="docutils literal"><span class="pre">module</span></code> and <code class="docutils literal"><span class="pre">class</span></code> of the model together with <code class="docutils literal"><span class="pre">optimizer</span></code> and
-<code class="docutils literal"><span class="pre">hidden</span></code> as required from the model’s <code class="docutils literal"><span class="pre">_create_model</span></code> method.
+<code class="docutils literal"><span class="pre">hidden</span></code> as required from the model&#8217;s <code class="docutils literal"><span class="pre">_create_model</span></code> method.
 In addition, we will specify the network <code class="docutils literal"><span class="pre">name</span></code> which will be used for naming the
 logging directory.</p>
 <p>In addition, we have to specify which TensorFlow variable names are the network inputs
@@ -432,7 +436,7 @@ the current batch in progress.</p>
 <div class="section" id="using-cxflow">
 <h3>Using cxflow<a class="headerlink" href="#using-cxflow" title="Permalink to this headline">¶</a></h3>
 <p>Once the classes and config are implemented, the training can begin.
-Let’s try it with</p>
+Let&#8217;s try it with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow train configs/majority.yaml
 </pre></div>
 </div>
@@ -444,13 +448,13 @@ Now we can easily watch the progress of the training.</p>
 <p>After the training is finished, note that there is a new directory <code class="docutils literal"><span class="pre">log/MajorityExample_*</span></code>.
 This is the logging directory where everything cxflow produced is stored, including
 saved models, the configuration file and various other artifacts.</p>
-<p>Let’s register one more hook which saves the best model according to the test stream:</p>
+<p>Let&#8217;s register one more hook which saves the best model according to the test stream:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">BestSaverHook</span>
 </pre></div>
 </div>
 <p>When we run the training again, we see that the newly created output directory contains
 the saved model as well.</p>
-<p>Let’s resume the training from this model.</p>
+<p>Let&#8217;s resume the training from this model.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow resume log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
@@ -459,7 +463,7 @@ the saved model as well.</p>
 easy to use cxflow for this purpose.
 <strong>Note:</strong> the dataset must implement <code class="docutils literal"><span class="pre">predict_stream</span></code> method.
 In addition, the net inputs and outputs should be modified in the configuration file
-not to include <code class="docutils literal"><span class="pre">loss</span></code>, <code class="docutils literal"><span class="pre">accuracy</span></code> and <code class="docutils literal"><span class="pre">y</span></code>, since we don’t know those in the
+not to include <code class="docutils literal"><span class="pre">loss</span></code>, <code class="docutils literal"><span class="pre">accuracy</span></code> and <code class="docutils literal"><span class="pre">y</span></code>, since we don&#8217;t know those in the
 producion environment.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow predict log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
@@ -482,7 +486,7 @@ producion environment.</p>
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
     </p>
   </div>
 </footer>
