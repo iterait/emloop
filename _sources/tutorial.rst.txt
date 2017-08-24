@@ -1,7 +1,7 @@
 Tutorial
 ########
 
-This is a simple example introducing cxflow fundamentals.
+This is a simple example that will introduce the fundamentals of cxflow.
 
 Introduction
 ************
@@ -38,11 +38,11 @@ Dataset
 
 The very first step in any machine learning task is to load and process the data.
 Every ``cxflow`` dataset is expected to implement the interface defined by ``cxflow.AbstractDataset``,
-which is at the moment, only accepting string-encoded YAML.
+which, at the moment, only accepts string-encoded YAML.
 For regular projects, we recommend extending ``cxflow.BaseDataset`` which is a smart wrapper around configuration
 (see below).
 
-The dataset is supposed to wrap all data-related operations.
+The dataset is meant to wrap all data-related operations.
 It is responsible for correct data loading, verification and other useful operations.
 The main purpose of the dataset is providing various data streams that will be consequently used for training,
 validation and prediction in the production environment.
@@ -50,13 +50,16 @@ validation and prediction in the production environment.
 Our dataset will implement the following:
 
 #. **Training stream:** an iterable which provides batches of the training data.
-   The implementation of the training stream is provided in ``train_stream`` method.
+   The implementation of the training stream is provided in the ``train_stream`` 
+   method.
 #. **Test stream:** an iterable providing testing data which will not be used during the training.
-   Arbitrary additional streams might be defined with method naming convention ``<name>_stream``.
+   It is possible to define additional arbitrary stream methods that follow the 
+   ``<name>_stream`` naming convention.
    Therefore, out *test* stream will be implemented in ``test_stream`` method.
 #. **The constructor:** accepts a YAML configuration in the form of a string
-   (more on this later). We avoid the implementation of the constructor by extending ``cxflow.BaseDataset``.
-#. **Additional method:** such as ``fetch``, ``split``, or anything else you may need.
+   (more on this later). We avoid the need to implement a constructor by 
+   extending ``cxflow.BaseDataset``.
+#. **Additional methods:** such as ``fetch``, ``split``, or anything else you may need.
    Cxflow is able to call arbitrary dataset methods by invoking ``cxflow dataset <method-name>`` command.
 
 For our purposes, let us create a class called ``MajorityDataset``:
@@ -88,8 +91,8 @@ For our purposes, let us create a class called ``MajorityDataset``:
                        'y': self.test_y[i: i+self.batch_size]}
 
 Let us describe the functionality of our ``MajorityDataset`` step by step.
-Let's begin with ``_init_with_kwargs`` method.
-The method is called from the dataset constructor automatically and it is passed the
+We shall begin with the ``_init_with_kwargs`` method.
+This method is called from the dataset constructor automatically and it is passed the
 parameters from the configuration file (configuration will be explained later).
 In our case, we need ``N`` (the number of examples in total), ``dim`` (the dimension of the
 generated data) and ``batch_size`` (how big our batches will be).
@@ -133,16 +136,17 @@ A batch (with ``batch_size=4``) representing the example above looks like this:
 
 Similarly, there is a ``test_stream`` function that iterates over the testing data.
 
-Iteration over the whole dataset is called an *epoch*.
-We train our machine learning models by iterating through the training stream for a single
-or multiple epochs.
+A single iteration over the whole dataset is called an *epoch*.
+We train our machine learning models by iterating through the training stream 
+for one or more epochs.
 The test stream is used only to estimate the performance of the model.
 
 Note that in this design, the training and testing streams do not overlap, hence we might
-use the training stream for training and the testing stream for the unbiased estimation
-of the model performance.
+use the training stream for training and the testing stream for an unbiased estimation
+of the performace of the model.
 
-Detailed description of cxflow datasets might be found in the `advanced section <advanced/dataset.html>`_.
+A Detailed description of cxflow datasets might be found in the `advanced 
+section <advanced/dataset.html>`_.
 
 Model
 *****
@@ -150,9 +154,9 @@ Model
 After the data are loaded, processed and ready to be used, we have to define the model
 to be trained.
 Let us define the model using a simple `TensorFlow <https://www.tensorflow.org/>`_ graph.
-To make this process simpler, we will use the official 
-`cxflow-tensorflow <https://github.com/Cognexa/cxflow-tensorflow>`_ package, that provides
-a basic TensorFlow integration to cxflow. Please install this package before you proceed
+To make this process simpler, we will use the official `cxflow-tensorflow 
+<https://github.com/Cognexa/cxflow-tensorflow>`_ package that provides
+a basic TensorFlow integration with cxflow. Please install this package before you proceed
 with this tutorial.
 
 In ``cxflow-tensorflow``, every model is a python class expected to
@@ -170,7 +174,7 @@ Let us define a class called ``MajorityNet``.
 
     class MajorityNet(BaseModel):
 
-        def _create_net(self, optimizer, hidden, **kwargs):
+        def _create_model(self, optimizer, hidden, **kwargs):
 
             logging.debug('Constructing placeholders')
             x = tf.placeholder(dtype=tf.float32, shape=[None, 11], name='x')
@@ -202,14 +206,14 @@ Let us define a class called ``MajorityNet``.
 
 
 When implementing a custom model, make sure to extend the ``cxflow.BaseModel`` class.
-As described above, this tutorial focuses only on TensorFlow model, hence extending
+As described above, this tutorial only focuses on the TensorFlow model, hence extending
 ``cxflow_tensorflow.BaseModel`` is a good idea.
 
 The only method that is really necessary to implement is ``_create_model``.
 In our case, ``_create_model`` method creates a simple MLP.
-If you know TensorFlow a little bit, it should be easy to understand what is going on.
+If you know the fundamental basics of TensorFlow, it should be easy to understand what is going on.
 
-To be precise, the model registred the following computational graph nodes:
+To be precise, the model registered the following computational graph nodes:
 
 #. Placeholders *x* and *y* corresponding to a single *x* and *y* batch from the stream.
 #. Variable ``train_op`` denoting the operation performing the training. This operation
@@ -230,15 +234,16 @@ Detailed description of cxflow models might be found in the `advanced section <a
 Configuration
 *************
 
-Configuration of the training is a key and final part of our tutorial.
-The configuration (aka *config*) defines which dataset will be used as the data source
+Configuration of the training is the final, most important part of our tutorial.
+The configuration (a.k.a. *config*) defines which dataset will be used as the data source
 and which model will be employed for training.
 
 The configuration file is in the form of a YAML document.
-Feel free to use JSON instead, but YAML makes a lot of thing easier.
+Feel free to use JSON instead, but YAML makes a lot of things easier.
 
 The YAML document consists of four fundamental sections.
-Detailed description of cxflow configuration might be found in the `advanced section <advanced/config.html>`_.
+A detailed description of cxflow configuration can be found in the `advanced 
+section <advanced/config.html>`_.
 
 
 #. dataset
@@ -246,7 +251,7 @@ Detailed description of cxflow configuration might be found in the `advanced sec
 #. main_loop
 #. hooks
 
-Let's dig into them one by one.
+Let us describe the sections one by one.
 
 Dataset
 =======
@@ -276,15 +281,15 @@ variables are passed to ``_init_with_kwargs`` method.
 Model
 =====
 
-Similarly to the dataset, the model is defined in the ``net`` section.
+Similarly to the dataset, the model is defined in the ``model`` section.
 In our case, we want to specify ``module`` and ``class`` of the model together with ``optimizer`` and
-``hidden`` as required from the model's ``_create_net`` method.
+``hidden`` as required from the model's ``_create_model`` method.
 In addition, we will specify the network ``name`` which will be used for naming the
 logging directory.
 
 In addition, we have to specify which TensorFlow variable names are the network inputs
 and which variable names are on the output.
-This is done by ``inputs`` and ``outputs`` config items.
+This can be done by listing their names in the ``inputs`` and ``outputs`` config items.
 
 .. code-block:: yaml
 
@@ -307,10 +312,10 @@ Main Loop
 =========
 
 As the model training is executed in epochs, it is naturally implemented as a loop.
-This loop (``cxflow.MainLoop``) can be configured, e.g., additional streams to the ``train``
-stream might be specified.
+This loop (``cxflow.MainLoop``) can be extended, for example by adding more 
+streams to the ``train`` stream.
 In our case, we also want to evaluate the ``test`` stream, so we will add it to the
-``main_loop.extra_streams`` section of the config.  The streams are named by the dataset
+``main_loop.extra_streams`` section of the config. The streams are named by the dataset
 methods they are created in. That is, the ``test`` stream corresponds to the
 ``test_stream`` method of the dataset.
 
@@ -343,9 +348,8 @@ For now, we will simply use the following config snippet in order to register a 
         epoch_limit: 10
 
 As it might be observed, we have registered four hooks.
-The first one computes various statistics, e.g. ``loss`` will be provided with its mean and
-standard deviation.
-``accuracy`` will be provided with mean only.
+The first one computes various statistics: ``loss`` will be provided with its 
+mean and standard deviation, ``accuracy`` will be provided with mean only.
 
 The second hook is the logging hook which simply logs everything it gets to a log file
 and to the standard output.
@@ -358,7 +362,7 @@ The final hook stops the training after 10 epochs.
 Using cxflow
 ============
 
-Once the classes and config are implemented, the training might begin.
+Once the classes and config are implemented, the training can begin.
 Let's try it with
 
 .. code-block:: bash
@@ -375,7 +379,7 @@ After the training is finished, note that there is a new directory ``log/Majorit
 This is the logging directory where everything cxflow produced is stored, including
 saved models, the configuration file and various other artifacts.
 
-Let's register one more hook which saves the currently best model based on the test stream.
+Let's register one more hook which saves the best model according to the test stream:
 
 .. code-block:: yaml
 

@@ -48,8 +48,8 @@ Finally, cxflow might be installed directly for development purposes.
     cd cxflow
     pip install -e .
 
-The cxflow test suite can be executed by running the following in the cloned 
-repository:
+The cxflow test suite can be executed by running the following command in the 
+cloned repository:
 
 .. code-block:: bash
 
