@@ -102,16 +102,18 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
     assert 'class' in model_config, '`model.class` not present in the config'
     model_module, model_class = parse_fully_qualified_name(model_config['class'])
 
-    # create model kwargs (without `class`)
+    # create model kwargs (without `class` and `name`)
     model_kwargs = {'dataset': dataset, 'log_dir': output_dir, 'restore_from': restore_from, **model_config}
     del model_kwargs['class']
+    if 'name' in model_kwargs:
+        del model_kwargs['name']
 
     try:
         model = create_object(model_module, model_class, kwargs=model_kwargs)
     except (ImportError, AttributeError) as ex:
         if restore_from is None:  # training case
             raise ImportError('Cannot create model from the specified model module `{}` and class `{}`.'.format(
-                model_config['module'], model_config['class'])) from ex
+                model_module, model_class)) from ex
 
         else:  # restore cases (resume, predict)
             logging.warning('Cannot create model from the specified model class `%s`.', model_config['class'])
