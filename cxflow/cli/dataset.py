@@ -41,9 +41,9 @@ def invoke_dataset_method(config_path: str, method_name: str, output_root: str, 
     try:
         method = getattr(dataset, method_name)
     except AttributeError as ex:
-        fallback('Method `%s` not found in the dataset', ex)
+        fallback('Method `{}` not found in the dataset'.format(method_name), ex)
 
     try:
         method()
     except Exception as ex:  # pylint: disable=broad-except
-        fallback('Exception occurred during method `%s` invocation', ex)
+        fallback('Exception occurred during method `{}` invocation'.format(method_name), ex)
