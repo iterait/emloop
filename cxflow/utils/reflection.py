@@ -26,6 +26,21 @@ def parse_fully_qualified_name(fq_name: str) -> Tuple[Optional[str], str]:
         return None, fq_name
 
 
+def get_attribute(module_name: str, attribute_name: str):
+    """
+    Get the specified module attribute. It most cases, it will be a class or function.
+
+    :param module_name: module name
+    :param attribute_name: attribute name
+    :return: module attribute
+    """
+    assert isinstance(module_name, str)
+    assert isinstance(attribute_name, str)
+
+    _module = importlib.import_module(module_name)
+    return getattr(_module, attribute_name)
+
+
 def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: Dict[str, Any]=_EMPTY_DICT):
     """
     Create an object instance of the given class from the given module.
@@ -44,12 +59,7 @@ def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: 
     :param kwargs: kwargs to be passed to the object constructor
     :return: created object instance
     """
-    assert isinstance(module_name, str)
-    assert isinstance(class_name, str)
-
-    _module = importlib.import_module(module_name)
-    _class = getattr(_module, class_name)
-    return _class(*args, **kwargs)
+    return get_attribute(module_name, class_name)(*args, **kwargs)
 
 
 def list_submodules(module_name: str) -> List[str]:   # pylint: disable=invalid-sequence-index
