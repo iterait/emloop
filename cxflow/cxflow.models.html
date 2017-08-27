@@ -125,7 +125,7 @@ Abstract machine learning model which exposes input and output names, run and sa
 </ul>
 <dl class="class">
 <dt id="cxflow.models.AbstractModel">
-<em class="property">class </em><code class="descclassname">cxflow.models.</code><code class="descname">AbstractModel</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.models.AbstractModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.models.</code><code class="descname">AbstractModel</code><span class="sig-paren">(</span><em>dataset: typing.Union[.datasets.AbstractDataset, NoneType], log_dir: str, restore_from: typing.Union[str, NoneType] = None, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.models.AbstractModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Abstract machine learning model which exposes input and output names, run and save methods.
 <cite>AbstractModel</cite> implementations are trainable with <code class="docutils literal"><span class="pre">cxflow.MainLoop</span></code>.</p>

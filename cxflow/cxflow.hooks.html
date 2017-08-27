@@ -311,7 +311,7 @@ initially empty and shared among all the hooks.</p>
 
 <dl class="class">
 <dt id="cxflow.hooks.AccumulateVariables">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">AccumulateVariables</code><span class="sig-paren">(</span><em>variables</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/accumulate_variables.html#AccumulateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.AccumulateVariables" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">AccumulateVariables</code><span class="sig-paren">(</span><em>variables: typing.Iterable[str], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/accumulate_variables.html#AccumulateVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.AccumulateVariables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Accumulate the specified variables allowing their aggregation after each epoch.</p>
 <p>The hook itself does not utilize the accumulated variables. It is meant to be inherited from. The child hook
@@ -383,7 +383,7 @@ will have the accumulated variables available in <code class="docutils literal">
 
 <dl class="class">
 <dt id="cxflow.hooks.WriteCSV">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">WriteCSV</code><span class="sig-paren">(</span><em>output_dir</em>, <em>output_file='training.csv'</em>, <em>delimiter='</em>, <em>'</em>, <em>default_value=''</em>, <em>variables=None</em>, <em>on_unknown_type='default'</em>, <em>on_missing_variable='error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/write_csv.html#WriteCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.WriteCSV" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">WriteCSV</code><span class="sig-paren">(</span><em>output_dir: str, output_file: str = 'training.csv', delimiter: str = ',', default_value: str = '', variables: typing.Union[typing.Iterable[str], NoneType] = None, on_unknown_type: str = 'default', on_missing_variable: str = 'error', **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/write_csv.html#WriteCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.WriteCSV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Log <code class="docutils literal"><span class="pre">epoch_data</span></code> variables to a CSV file after each epoch.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
@@ -522,7 +522,7 @@ Variables and streams expected later on are stored in <code class="docutils lite
 
 <dl class="class">
 <dt id="cxflow.hooks.StopAfter">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">StopAfter</code><span class="sig-paren">(</span><em>epochs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_after.html#StopAfter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopAfter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">StopAfter</code><span class="sig-paren">(</span><em>epochs: int</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_after.html#StopAfter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopAfter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Stop the training after the specified number of epochs.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
@@ -572,7 +572,7 @@ Variables and streams expected later on are stored in <code class="docutils lite
 
 <dl class="class">
 <dt id="cxflow.hooks.LogVariables">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">LogVariables</code><span class="sig-paren">(</span><em>variables=None</em>, <em>on_unknown_type='ignore'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_variables.html#LogVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogVariables" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">LogVariables</code><span class="sig-paren">(</span><em>variables: typing.Iterable[str] = None</em>, <em>on_unknown_type='ignore'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_variables.html#LogVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogVariables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Log the training results to stderr via standard <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#module-logging" title="(in Python v3.6)"><code class="xref py py-mod docutils literal"><span class="pre">logging</span></code></a> module.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
@@ -735,7 +735,7 @@ stream</li>
 
 <dl class="class">
 <dt id="cxflow.hooks.SaveEvery">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveEvery</code><span class="sig-paren">(</span><em>model</em>, <em>n_epochs=1</em>, <em>on_failure='error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveEvery</code><span class="sig-paren">(</span><em>model: .models.AbstractModel</em>, <em>n_epochs: int = 1</em>, <em>on_failure: str = 'error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Save the model every <code class="docutils literal"><span class="pre">n_epochs</span></code> epochs.</p>
 <div class="literal-block-wrapper docutils container" id="id9">
@@ -830,7 +830,7 @@ stream</li>
 
 <dl class="class">
 <dt id="cxflow.hooks.SaveBest">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveBest</code><span class="sig-paren">(</span><em>model</em>, <em>variable='loss'</em>, <em>condition='min'</em>, <em>stream='valid'</em>, <em>aggregation='mean'</em>, <em>output_name='best'</em>, <em>on_save_failure='error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveBest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveBest" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveBest</code><span class="sig-paren">(</span><em>model: .models.AbstractModel</em>, <em>variable: str = 'loss'</em>, <em>condition: str = 'min'</em>, <em>stream: str = 'valid'</em>, <em>aggregation: str = 'mean'</em>, <em>output_name: str = 'best'</em>, <em>on_save_failure: str = 'error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveBest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveBest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Maintain the best performing model given the specified criteria.</p>
 <div class="literal-block-wrapper docutils container" id="id11">
@@ -858,7 +858,7 @@ stream</li>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveBest.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the monitor variable.</p>
 </dd></dl>
 
@@ -1045,7 +1045,7 @@ Quit on any subsequent signal.</p>
 
 <dl class="class">
 <dt id="cxflow.hooks.ComputeStats">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">ComputeStats</code><span class="sig-paren">(</span><em>variables</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/compute_stats.html#ComputeStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ComputeStats" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">ComputeStats</code><span class="sig-paren">(</span><em>variables: typing.Mapping[str, typing.Iterable[str]], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/compute_stats.html#ComputeStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ComputeStats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.accumulate_variables.AccumulateVariables</span></code></p>
 <p>Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.</p>
 <div class="literal-block-wrapper docutils container" id="id14">
@@ -1067,7 +1067,7 @@ Quit on any subsequent signal.</p>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'std', 'median', 'mean', 'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AGGREGATIONS</code><em class="property"> = {'mean', 'min', 'median', 'std', 'max'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported numpy-like aggregation methods.</p>
 </dd></dl>
 
@@ -1145,7 +1145,7 @@ Quit on any subsequent signal.</p>
 
 <dl class="class">
 <dt id="cxflow.hooks.Check">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">Check</code><span class="sig-paren">(</span><em>variable</em>, <em>required_min_value</em>, <em>max_epoch</em>, <em>stream='valid'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/check.html#Check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.Check" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">Check</code><span class="sig-paren">(</span><em>variable: str</em>, <em>required_min_value: float</em>, <em>max_epoch: int</em>, <em>stream: str = 'valid'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/check.html#Check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.Check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.</p>
 <p>Raise <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code></a> if the threshold was not exceeded in given number of epochs</p>

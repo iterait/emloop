@@ -127,6 +127,21 @@
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fq_name</span></div>
 
 
+<span class="k">def</span> <span class="nf">get_attribute</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the specified module attribute. It most cases, it will be a class or function.</span>
+
+<span class="sd">    :param module_name: module name</span>
+<span class="sd">    :param attribute_name: attribute name</span>
+<span class="sd">    :return: module attribute</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+    <span class="n">_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_module</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="create_object"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.reflection.html#cxflow.utils.reflection.create_object">[docs]</a><span class="k">def</span> <span class="nf">create_object</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Iterable</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span><span class="o">=</span><span class="n">_EMPTY_DICT</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create an object instance of the given class from the given module.</span>
@@ -145,12 +160,7 @@
 <span class="sd">    :param kwargs: kwargs to be passed to the object constructor</span>
 <span class="sd">    :return: created object instance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-
-    <span class="n">_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
-    <span class="n">_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_module</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">get_attribute</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="list_submodules"><a class="viewcode-back" href="../../../cxflow/cxflow.utils.reflection.html#cxflow.utils.reflection.list_submodules">[docs]</a><span class="k">def</span> <span class="nf">list_submodules</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>   <span class="c1"># pylint: disable=invalid-sequence-index</span>
