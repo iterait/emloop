@@ -144,10 +144,10 @@ entry, for example:</p>
 </div>
 <p>This example would instruct cxflow to create two hooks which will keep track of
 the mean loss during the training.
-In fact, the <code class="docutils literal"><span class="pre">ComputeStats</span></code> stores the loss from every batch and means the accumulated values after
+In fact, the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> stores the loss from every batch and means the accumulated values after
 each epoch.
-Subsequently, the <code class="docutils literal"><span class="pre">LogVariables</span></code> logs all the variables available in the <code class="docutils literal"><span class="pre">epoch_data</span></code>, which
-in the example above is only the mean loss computed by <code class="docutils literal"><span class="pre">ComputeStats</span></code> hook.</p>
+Subsequently, the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> logs all the variables available in the <code class="docutils literal"><span class="pre">epoch_data</span></code>, which
+in the example above is only the mean loss computed by <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> hook.</p>
 <p>The names of the hooks are nothing more than the names of their respective classes.
 For hooks that are built-in inside cxflow, only the class name needs to be specified,
 however, for hooks outside of cxflow, you also have to specify their module. For instance,
@@ -212,7 +212,7 @@ In this case, the <code class="docutils literal"><span class="pre">batch_data</s
 <p>Now, the hook decides how to process this data. Usually, it is useful to accumulate the data over
 the whole epoch and process them in the <code class="docutils literal"><span class="pre">after_epoch</span></code> event all at once.
 Luckily, you do not have to implement this behavior on your own, it is already
-available in our :py:class:<code class="docutils literal"><span class="pre">cxflow.hooks.AccumulateVariables</span></code> hook from which
+available in our <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.AccumulateVariables" title="cxflow.hooks.AccumulateVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.AccumulateVariables</span></code></a> hook from which
 you may derive your own hook.</p>
 </div>
 <div class="section" id="after-epoch-event">
@@ -229,9 +229,9 @@ E.g., with train, valid and test streams it initially looks as following:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Now, for instance, our <code class="docutils literal"><span class="pre">ComputeStats</span></code> from the first example computes the mean over the
+<p>Now, for instance, our <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> from the first example computes the mean over the
 accumulated loss data and stores the result to the given <code class="docutils literal"><span class="pre">epoch_data</span></code>. So after
-the <code class="docutils literal"><span class="pre">ComputeStats</span></code> hook has been called, the <code class="docutils literal"><span class="pre">epoch_data</span></code> will look as follows:</p>
+the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> hook has been called, the <code class="docutils literal"><span class="pre">epoch_data</span></code> will look as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">}},</span>
   <span class="s1">&#39;valid&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="mf">0.32</span><span class="p">}},</span>
@@ -239,11 +239,11 @@ the <code class="docutils literal"><span class="pre">ComputeStats</span></code> 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">LogVariables</span></code> already expects this structure and logs everything it gets.</p>
+<p>The <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> already expects this structure and logs everything it gets.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">Note that the order of hooks matters! We would see nothing with
-<code class="docutils literal"><span class="pre">LogVariables</span></code> placed before <code class="docutils literal"><span class="pre">ComputeStats</span></code>.</p>
+<a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> a placed before <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="regular-hook-configuration">

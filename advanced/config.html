@@ -134,7 +134,7 @@ or simple comments.</p>
 <li><code class="docutils literal"><span class="pre">model</span></code></li>
 <li><code class="docutils literal"><span class="pre">hooks</span></code></li>
 <li><code class="docutils literal"><span class="pre">main_loop</span></code></li>
-<li><code class="docutils literal"><span class="pre">infer</span></code></li>
+<li><code class="docutils literal"><span class="pre">predict</span></code></li>
 </ul>
 <p>While <code class="docutils literal"><span class="pre">dataset</span></code> and <code class="docutils literal"><span class="pre">model</span></code> sections are mandatory, the remaining ones are not.
 Nevertheless, <code class="docutils literal"><span class="pre">hooks</span></code> are strongly recommended to be specified.</p>
@@ -183,9 +183,9 @@ the number of hidden neurons or a learning rate.</p>
   <span class="l l-Scalar l-Scalar-Plain">n_hidden_neurons</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">512</span>
 </pre></div>
 </div>
-<p>Note that in addition to the passed variables from the configuration, the model is automatically
+<p>Note that in addition to the passed variables from the configuration, to the model is automatically
 passed the dataset object.
-Therefore, it might use dataset attributes and methods as well.
+Therefore, the model might use dataset attributes and methods as well.
 For example, dataset might compute the number of target classes and the network can build the
 classifier in a way it suits the given dataset.
 Another example from natural language processing would be a number of distinct tokens for which the network
@@ -193,13 +193,13 @@ train their embeddings.</p>
 </div>
 <div class="section" id="hooks">
 <h2>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h2>
-<p>Hooks section is an optional but a suggested section.
+<p>Hooks section is an optional but a recommended section.
 The section contains a list of hooks to be registered in the main loop (see
 <a class="reference external" href="main_loop.html">main loop</a> documentation).</p>
 <p>The list contains two types of entries.
 The first type specifies only the hook class name and optionally its module.
 In the case there is only the class name, the hook will be automatically
-loaded from the <code class="docutils literal"><span class="pre">cxflow.hooks</span></code> module.
+loaded from the <a class="reference internal" href="../cxflow/cxflow.hooks.html#module-cxflow.hooks" title="cxflow.hooks"><code class="xref py py-mod docutils literal"><span class="pre">cxflow.hooks</span></code></a> module.
 In case the hook class is fully specified including the module, e.g. <code class="docutils literal"><span class="pre">my_module.my_hook</span></code>,
 this hook will be loaded as expected.</p>
 <p>Example:</p>
@@ -209,7 +209,7 @@ this hook will be loaded as expected.</p>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">my_hooks.my_hook.MyHook</span>
 </pre></div>
 </div>
-<p>Second possible type of hook entries is a dict in the form of <code class="docutils literal"><span class="pre">Hook</span> <span class="pre">-&gt;</span> <span class="pre">{config}</span></code>.
+<p>Second possible type of hook entries is a dict in the form of <code class="docutils literal"><span class="pre">Hook</span> <span class="pre">:</span> <span class="pre">{config}</span></code>.
 Again, the <code class="docutils literal"><span class="pre">Hook</span></code> can be either standard hook name or a fully qualified name in the
 form of <code class="docutils literal"><span class="pre">module.class</span></code>.
 The nested is passed to directly to the hook&#8217;s constructor in the form of <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
@@ -236,7 +236,7 @@ Currently, the following parameters are supported.</p>
 <ul class="simple">
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">extra_streams</span></code>: A list of additional streams that will be evalueted during training or inferred</dt>
-<dd>during <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">infer</span></code>.</dd>
+<dd>during <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code>.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
@@ -271,12 +271,12 @@ with a warning.</dd>
 In this phase, we don&#8217;t know the ground truth, hence the dataset sources are different.
 In such a situation, some of the metrics are impossible to measure, e.g., accuracy which requires the
 ground truth.</p>
-<p>For this reason, a special section <code class="docutils literal"><span class="pre">infer</span></code> is introduced.
+<p>For this reason, a special section <code class="docutils literal"><span class="pre">predict</span></code> is introduced.
 It matches the overall configuration structure, i.e. it must contain the <code class="docutils literal"><span class="pre">model</span></code> and the <code class="docutils literal"><span class="pre">dataset</span></code> sections.
 Analogously, the <code class="docutils literal"><span class="pre">hooks</span></code> section is optional as well as <code class="docutils literal"><span class="pre">main_loop</span></code>.</p>
-<p>If <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">infer</span></code> is invoked, the rest of the configuration is ignored and only the <code class="docutils literal"><span class="pre">infer</span></code> section is used.
-In other cases, the <code class="docutils literal"><span class="pre">infer</span></code> section is ignored.
-The main advantage of this approach is that the user doesn&#8217;t have to define <code class="docutils literal"><span class="pre">infer</span></code> when they experiment with the
+<p>If <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code> is invoked, the rest of the configuration is ignored and only the <code class="docutils literal"><span class="pre">predict</span></code> section is used.
+In other cases, the <code class="docutils literal"><span class="pre">predict</span></code> section is ignored.
+The main advantage of this approach is that the user doesn&#8217;t have to define <code class="docutils literal"><span class="pre">predict</span></code> when they experiment with the
 models.
 This can be done after the model is developed, fine-tuned and ready for production.</p>
 <p>As it might be observed, the inference sections such as <code class="docutils literal"><span class="pre">model</span></code> and <code class="docutils literal"><span class="pre">dataset</span></code> are almost identical to the top level ones.
@@ -288,7 +288,7 @@ The model is almost the same but we need to specify different <code class="docut
 no longer provide the target class (<code class="docutils literal"><span class="pre">animal</span></code>).
 The model itself is supposed to infer the <code class="docutils literal"><span class="pre">animal</span></code> instead.
 Finally, we define a completely different set of hooks.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">infer</span><span class="p p-Indicator">:</span>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">predict</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">&lt;&lt;</span><span class="p p-Indicator">:</span> <span class="nv">*dataset</span>
 

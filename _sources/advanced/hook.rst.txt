@@ -30,10 +30,10 @@ entry, for example:
 
 This example would instruct cxflow to create two hooks which will keep track of 
 the mean loss during the training.
-In fact, the ``ComputeStats`` stores the loss from every batch and means the accumulated values after
+In fact, the :py:class:`cxflow.hooks.ComputeStats` stores the loss from every batch and means the accumulated values after
 each epoch.
-Subsequently, the ``LogVariables`` logs all the variables available in the ``epoch_data``, which
-in the example above is only the mean loss computed by ``ComputeStats`` hook.
+Subsequently, the :py:class:`cxflow.hooks.LogVariables` logs all the variables available in the ``epoch_data``, which
+in the example above is only the mean loss computed by :py:class:`cxflow.hooks.ComputeStats` hook.
 
 The names of the hooks are nothing more than the names of their respective classes.
 For hooks that are built-in inside cxflow, only the class name needs to be specified,
@@ -115,7 +115,7 @@ In this case, the ``batch_data`` would contain the following dict
 Now, the hook decides how to process this data. Usually, it is useful to accumulate the data over
 the whole epoch and process them in the ``after_epoch`` event all at once.
 Luckily, you do not have to implement this behavior on your own, it is already
-available in our :py:class:``cxflow.hooks.AccumulateVariables`` hook from which
+available in our :py:class:`cxflow.hooks.AccumulateVariables` hook from which
 you may derive your own hook.
 
 ``after_epoch`` event
@@ -136,9 +136,9 @@ E.g., with train, valid and test streams it initially looks as following:
       'test': {}
     }
 
-Now, for instance, our ``ComputeStats`` from the first example computes the mean over the
+Now, for instance, our :py:class:`cxflow.hooks.ComputeStats` from the first example computes the mean over the
 accumulated loss data and stores the result to the given ``epoch_data``. So after
-the ``ComputeStats`` hook has been called, the ``epoch_data`` will look as follows:
+the :py:class:`cxflow.hooks.ComputeStats` hook has been called, the ``epoch_data`` will look as follows:
 
 .. code-block:: python
 
@@ -148,11 +148,11 @@ the ``ComputeStats`` hook has been called, the ``epoch_data`` will look as follo
       'test': {'loss': {'mean': 0.35}
     }
 
-The ``LogVariables`` already expects this structure and logs everything it gets.
+The :py:class:`cxflow.hooks.LogVariables` already expects this structure and logs everything it gets.
 
 .. warning::
     Note that the order of hooks matters! We would see nothing with 
-    ``LogVariables`` placed before ``ComputeStats``.
+    :py:class:`cxflow.hooks.LogVariables` a placed before :py:class:`cxflow.hooks.ComputeStats`.
 
 Regular hook configuration
 ==========================
