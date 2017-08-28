@@ -16,7 +16,6 @@ Submodules
    cxflow.datasets
    cxflow.hooks
    cxflow.models
-   cxflow.utils
 
 .. currentmodule:: cxflow
 
