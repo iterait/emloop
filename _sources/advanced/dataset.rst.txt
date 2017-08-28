@@ -9,11 +9,11 @@ Note that this configuration is parsed from the `config file <config.html>`_ sec
 BaseDataset
 -----------
 
-Inheriting from ``cxflow.BaseDataset`` is recommended as it parses the YAML string automatically.
-Instead of the constructor, the developer is expected to implement ``_init_with_kwargs`` method.
+Inheriting from :py:class:`cxflow.datasets.BaseDataset` is recommended as it parses the YAML string automatically.
+Instead of the constructor, the developer is expected to implement :py:meth:`cxflow.datasets.BaseDataset._init_with_kwargs` method.
 This method should accept the parameters from the config file.
 
-Let us demonstrate ``cxflow.BaseDataset`` on an example. First, we will create a class ``MyDataset`` located
+Let us demonstrate :py:class:`cxflow.datasets.BaseDataset` on an example. First, we will create a class ``MyDataset`` located
 in ``datasets.my_dataset`` module:
 
 .. code-block:: python
@@ -32,8 +32,7 @@ Second, we define the ``dataset`` section in the config file:
 .. code-block:: yaml
 
     dataset:
-      module: datasets.my_dataset
-      class: MyDataset
+      class: datasets.MyDataset
       batch_size: 16
       augment:
         rotate: true     # enable random rotations
@@ -98,8 +97,6 @@ not updated when it iterates through them.
 During prediction (i.e., ``cxflow predict`` CLI command), only the ``predict_stream`` method is employed in order
 to provide the data to be inferred.
 
-TODO THE FOLLOWING SENTENCE MAY CHANGE.
-Extra streams might be inferred as well when registred as described above (including training stream).
 
 Additional Methods
 ------------------

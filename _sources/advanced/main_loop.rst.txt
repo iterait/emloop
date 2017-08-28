@@ -20,10 +20,10 @@ sections).
 The selected stream method (e.g., ``train_stream``) returns an iterable where each
 item corresponds to a single batch of data.
 
-Finally, the stream is iterated through and each batch is fed to the model's ``run`` method along
+Finally, the stream is iterated through and each batch is fed to the model's :py:meth:`cxflow.models.AbstractModel.run` method along
 with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.
-The implementation of ``run`` method is backend specific.
+The implementation of :py:meth:`cxflow.models.AbstractModel.run` method is backend specific.
 
 Training Lifecycle
 ==================
@@ -51,16 +51,11 @@ The whole process might be described by the following pseudocode.
     5.     train on train stream
     6.     evaluate extra streams
 
-Test Lifecycle
-====================
-
-TODO rework based on issue regarding prediction and testing.
 
 Prediction Lifecycle
 ====================
 
-The lifecycle of the prediction is similar.
-The main differences are that only the prediction stream is used and the model is never updated.
+The prediction stream is used and the model is never updated.
 In addition, there is only a single pass through the stream and then cxflow terminates.
 
 The whole process might be described by the following pseudocode.

@@ -101,7 +101,6 @@
 <li><a class="reference internal" href="#">Main Loop</a><ul>
 <li><a class="reference internal" href="#dataset-model-integration">Dataset/Model Integration</a></li>
 <li><a class="reference internal" href="#training-lifecycle">Training Lifecycle</a></li>
-<li><a class="reference internal" href="#test-lifecycle">Test Lifecycle</a></li>
 <li><a class="reference internal" href="#prediction-lifecycle">Prediction Lifecycle</a></li>
 <li><a class="reference internal" href="#hook-integration">Hook Integration</a></li>
 </ul>
@@ -136,10 +135,10 @@ based on whether it is training, testing or predicting (more on this is describe
 sections).
 The selected stream method (e.g., <code class="docutils literal"><span class="pre">train_stream</span></code>) returns an iterable where each
 item corresponds to a single batch of data.</p>
-<p>Finally, the stream is iterated through and each batch is fed to the model&#8217;s <code class="docutils literal"><span class="pre">run</span></code> method along
+<p>Finally, the stream is iterated through and each batch is fed to the model&#8217;s <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method along
 with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.
-The implementation of <code class="docutils literal"><span class="pre">run</span></code> method is backend specific.</p>
+The implementation of <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method is backend specific.</p>
 </div>
 <div class="section" id="training-lifecycle">
 <h2>Training Lifecycle<a class="headerlink" href="#training-lifecycle" title="Permalink to this headline">¶</a></h2>
@@ -165,14 +164,9 @@ and evaluate the extra streams.</li>
 </pre></div>
 </div>
 </div>
-<div class="section" id="test-lifecycle">
-<h2>Test Lifecycle<a class="headerlink" href="#test-lifecycle" title="Permalink to this headline">¶</a></h2>
-<p>TODO rework based on issue regarding prediction and testing.</p>
-</div>
 <div class="section" id="prediction-lifecycle">
 <h2>Prediction Lifecycle<a class="headerlink" href="#prediction-lifecycle" title="Permalink to this headline">¶</a></h2>
-<p>The lifecycle of the prediction is similar.
-The main differences are that only the prediction stream is used and the model is never updated.
+<p>The prediction stream is used and the model is never updated.
 In addition, there is only a single pass through the stream and then cxflow terminates.</p>
 <p>The whole process might be described by the following pseudocode.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. build dataset
