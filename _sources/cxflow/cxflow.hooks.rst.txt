@@ -21,7 +21,7 @@ Classes
   Log ``epoch_data`` variables to a CSV file after each epoch.
 
 - :py:class:`StopAfter`:
-  Stop the training after the specified number of epochs.
+  Stop the training after any of the specified conditions is met.
 
 - :py:class:`LogVariables`:
   Log the training results to stderr via standard :py:mod:`logging` module.

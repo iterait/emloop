@@ -104,34 +104,108 @@
 <span class="sd">Module with a hook which stops the training after the specified number of epochs.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
+<span class="kn">from</span> <span class="nn">..main_loop</span> <span class="k">import</span> <span class="n">MainLoop</span>
+<span class="kn">from</span> <span class="nn">..datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
 
 
 <div class="viewcode-block" id="StopAfter"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter">[docs]</a><span class="k">class</span> <span class="nc">StopAfter</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Stop the training after the specified number of epochs.</span>
+<span class="sd">    Stop the training after any of the specified conditions is met.</span>
 
 <span class="sd">    .. code-block:: yaml</span>
 <span class="sd">        :caption: stop the training after 500 epochs</span>
-
 <span class="sd">        hooks:</span>
 <span class="sd">          - StopAfter:</span>
 <span class="sd">              epochs: 500</span>
+
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: stop the training after 1000 iterations of 1 hour whichever comes first</span>
+<span class="sd">        hooks:</span>
+<span class="sd">          - StopAfter:</span>
+<span class="sd">              minutes: 60</span>
+<span class="sd">              iterations: 1000</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StopAfter.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="StopAfter.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minutes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create new StopAfter hook.</span>
 
-<span class="sd">        :param epochs: maximum number of training epochs</span>
+<span class="sd">        Possible stopping conditions are:</span>
+
+<span class="sd">            - after the specified number of epochs</span>
+<span class="sd">            - after the specified number of iterations (only train stream batches are counted as iterations)</span>
+<span class="sd">            - after the model is trained for more than the specified number of minutes (and ``after_batch``,</span>
+<span class="sd">                ``after_epoch`` event is triggered)</span>
+
+<span class="sd">        .. note:</span>
+<span class="sd">            Multiple stopping conditions may be specified, the training is stopped when any of them is met.</span>
+
+<span class="sd">        .. warning:</span>
+<span class="sd">            At least one stopping condition must be specified.</span>
+
+<span class="sd">        .. danger:</span>
+<span class="sd">            When :py:class:`TrainingTerminated` exception is raised, no additional hook events are triggered except for</span>
+<span class="sd">            :py:meth:`AbstractHook.after_training`.</span>
+
+<span class="sd">        :param epochs: stop after the specified number of epochs</span>
+<span class="sd">        :param iterations: stop after the specified number of iterations</span>
+<span class="sd">        :param minutes: stop after the specified number minutes</span>
+<span class="sd">        :raise ValueError: if no stopping condition is specified</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_limit</span> <span class="o">=</span> <span class="n">epochs</span></div>
+        <span class="k">if</span> <span class="n">epochs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">minutes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No stopping condition was specified.&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="StopAfter.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Stop the training if `epoch_id &gt; self._epoch_limit`.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">epoch_id</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_limit</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="o">=</span> <span class="n">epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iters</span> <span class="o">=</span> <span class="n">iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span> <span class="o">=</span> <span class="n">minutes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_training_start</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="StopAfter._check_train_time"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter._check_train_time">[docs]</a>    <span class="k">def</span> <span class="nf">_check_train_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the training if the training time exceeded ``self.__minutes``.</span>
+
+<span class="sd">        :raise TrainingTerminated: if the training time exceeded ``self.__minutes``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_training_start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mi">60</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Training terminated after more than </span><span class="si">{}</span><span class="s1"> minutes&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StopAfter.before_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start measuring the train time.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_training_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StopAfter.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If ``stream_name`` equals to :py:attr:`MainLoop.TRAIN_STREAM`,</span>
+<span class="sd">        increase the counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.</span>
+
+<span class="sd">        :param stream_name: stream name</span>
+<span class="sd">        :param batch_data: ignored</span>
+<span class="sd">        :raise TrainingTerminated: if the number of iterations reaches ``self._iters``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_train_time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stream_name</span> <span class="o">==</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Training terminated after iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StopAfter.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the training if the ``epoch_id`` reaches ``self._iters``; additionally, call :py:meth:`_check_train_time`.</span>
+
+<span class="sd">        :param epoch_id: epoch id</span>
+<span class="sd">        :param epoch_data: ignored</span>
+<span class="sd">        :raise TrainingTerminated: if the ``epoch_id`` reaches ``self._iters``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_train_time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">epoch_id</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;EpochStopperHook triggered&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Training terminated after epoch </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch_id</span><span class="p">))</span></div></div>
 </pre></div>
