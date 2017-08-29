@@ -6,7 +6,7 @@ Having all that, it manages iterating through streams, training and hooks execut
 """
 import sys
 import logging
-from typing import Iterable, List, Optional, Dict
+from typing import Iterable, Callable, List, Dict, Optional
 from collections import OrderedDict
 
 from .datasets import AbstractDataset
@@ -158,24 +158,42 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         Run zeroth epoch on the specified streams.
 
         Calls
-            - :py:meth:`cxflow.hooks.AbstractHook.before_training`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
 
         :param streams: stream names to be evaluated
         """
+        for stream_name in streams:
+            self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
 
+        epoch_data = self._create_epoch_data()
+        for hook in self._hooks:
+            hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
+
+    def _try_run(self, run_func: Callable[[], None]) -> None:
+        """
+        Try running the given function (training/prediction).
+
+        Calls
+            - :py:meth:`cxflow.hooks.AbstractHook.before_training`
+            - :py:meth:`cxflow.hooks.AbstractHook.after_training`
+            
+        :param run_func: function to be run
+        """
         # Initialization: before_training
         for hook in self._hooks:
             hook.before_training()
 
-        # Zeroth epoch: after_epoch
-        if not self._skip_zeroth_epoch:
-            for stream_name in streams:
-                self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
+        try:
+            run_func()
+        except TrainingTerminated as ex:
+            logging.info('Training terminated by a hook: %s', ex)
+        except KeyboardInterrupt:
+            logging.warning('Training terminated by a keyboard interrupt')
+            sys.exit(2)
 
-            epoch_data = self._create_epoch_data()
-            for hook in self._hooks:
-                hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
+        # After training: after_training
+        for hook in self._hooks:
+            hook.after_training()
 
     def run_training(self) -> None:
         """
@@ -184,14 +202,14 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         Calls
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
-            - :py:meth:`cxflow.hooks.AbstractHook.after_training`
         """
-
-        logging.debug('Training started')
-
-        try:
+        def training():
+            logging.debug('Training started')
             epoch_id = 0
-            self._run_zeroth_epoch(self._extra_streams + [MainLoop.TRAIN_STREAM])
+
+            # Zeroth epoch: after_epoch
+            if not self._skip_zeroth_epoch:
+                self._run_zeroth_epoch([MainLoop.TRAIN_STREAM] + self._extra_streams)
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
@@ -199,7 +217,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 self._epoch_profile = {}
                 epoch_data = self._create_epoch_data()
 
-                self.train_by_stream(stream=self._dataset.train_stream())
+                self.train_by_stream(stream=self.get_stream(MainLoop.TRAIN_STREAM))
                 for stream_name in self._extra_streams:
                     self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
 
@@ -212,29 +230,11 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                                              extra_streams=self._extra_streams)
                 logging.info('Epochs done: %s', epoch_id)
 
-        except TrainingTerminated as ex:
-            logging.info('Training terminated by a hook: %s', ex)
-        except KeyboardInterrupt:
-            logging.warning('Training terminated by a keyboard interrupt')
-            sys.exit(2)
-
-        # After training: after_training
-        for hook in self._hooks:
-            hook.after_training()
+        self._try_run(training)
 
     def run_prediction(self) -> None:
         """Run the main loop for in the prediction mode."""
-
-        logging.debug('Prediction started')
-
-        try:
-            self._run_zeroth_epoch(self._extra_streams + [MainLoop.PREDICT_STREAM])
-        except TrainingTerminated as ex:
-            logging.info('Training terminated by a hook: %s', ex)
-        except KeyboardInterrupt:
-            logging.warning('Training terminated by a keyboard interrupt')
-            sys.exit(2)
-
-        # After training: after_training
-        for hook in self._hooks:
-            hook.after_training()
+        def prediction():
+            logging.debug('Prediction started')
+            self._run_zeroth_epoch([MainLoop.PREDICT_STREAM])
+        self._try_run(prediction)

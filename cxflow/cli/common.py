@@ -255,6 +255,8 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     try:
         logging.info('Creating main loop')
         kwargs = config['main_loop'] if 'main_loop' in config else {}
+        if predict:
+            kwargs['extra_streams'] = []
         main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **kwargs)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating main loop failed', ex)

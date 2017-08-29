@@ -32,7 +32,7 @@ class SimpleDataset(AbstractDataset):
         super().__init__(config_str='')
         self.iters = _DATASET_ITERS
         self.shape = _DATASET_SHAPE
-        self.train_used = self.valid_used = self.test_used = False
+        self.train_used = self.valid_used = self.test_used = self.predict_used = False
         self.batches = defaultdict(lambda: [])
         self.source_names = ['input', 'target']
         self._iter = 1
@@ -58,6 +58,11 @@ class SimpleDataset(AbstractDataset):
     def test_stream(self) -> AbstractDataset.Stream:
         self.test_used = True
         for batch in self.stream('test'):
+            yield batch
+
+    def predict_stream(self) -> AbstractDataset.Stream:
+        self.predict_used = True
+        for batch in self.stream('predict'):
             yield batch
 
 
@@ -420,3 +425,11 @@ class MainLoopTest(CXTestCaseWithDir):
         # test wrong hook order
         _, _, mainloop2 = self.create_main_loop(epochs=3, extra_hooks=[EpochDataConsumer(), EpochDataProducer()])
         self.assertRaises(AssertionError, mainloop2.run_training)
+
+    def test_predict(self):
+        """Test if predict iterates only the predict stream."""
+        _, dataset, mainloop = self.create_main_loop(extra_streams=['valid'])
+        mainloop.run_prediction()
+        self.assertTrue(dataset.predict_used)
+        self.assertFalse(dataset.valid_used)
+        self.assertFalse(dataset.train_used)
