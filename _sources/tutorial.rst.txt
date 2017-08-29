@@ -24,26 +24,27 @@ Task
 The tutorial will be demonstrated on a simple task called *majority*.
 Given a vector of N bits, which bit is in majority?
 
-Example:
+Example of few 5-bit vectors:
 
-+--------------+----------------+---------------+-----------------+
-| input vector | count of zeros | count of ones | bit in majority |
-+--------------+----------------+---------------+-----------------+
-| 00101        | 3              | 2             | 0               |
-+--------------+----------------+---------------+-----------------+
-| 00000        | 5              | 0             | 0               |
-+--------------+----------------+---------------+-----------------+
-| 10101        | 2              | 3             | 1               |
-+--------------+----------------+---------------+-----------------+
-| 11100        | 2              | 3             | 1               |
-+--------------+----------------+---------------+-----------------+
++--------------+-----------------+----------------+-----------------+
+| input vector | number of zeros | number of ones | bit in majority |
++--------------+-----------------+----------------+-----------------+
+| 00101        | 3               | 2              | 0               |
++--------------+-----------------+----------------+-----------------+
+| 00000        | 5               | 0              | 0               |
++--------------+-----------------+----------------+-----------------+
+| 10101        | 2               | 3              | 1               |
++--------------+-----------------+----------------+-----------------+
+| 11100        | 2               | 3              | 1               |
++--------------+-----------------+----------------+-----------------+
 
 
 Dataset
 *******
 
 The very first step in any machine learning task is to load and process the data.
-Every :py:mod:`cxflow` dataset is expected to implement the interface defined by :py:class:`cxflow.datasets.AbstractDataset`, which, at the moment, only accepts string-encoded YAML.
+Every :py:mod:`cxflow` dataset is expected to implement the interface defined by :py:class:`cxflow.datasets.AbstractDataset`.
+At the moment, the interfaces defines only the constructor API which accepts a string-encoded YAML.
 For regular projects, we recommend extending :py:class:`cxflow.datasets.BaseDataset` which is a smart wrapper around configuration
 (see below).
 
@@ -110,8 +111,10 @@ Finally, it splits the dataset to training and testing data in the ratio of 8:2.
 To sum up, when the dataset is constructed, it features four attributes (``_train_x``,
 ``_train_y``, ``_test_x`` and ``_test_y``) that represent the loaded data.
 Note that it is completely valid option to rename them as desired.
-In real-world cases, we usually don't want to generate our data randomly.
-Instead, we can simply load them from file (e.g. ``.csv``) or database.
+
+.. note::
+    In real-world cases, we usually don't want to generate our data randomly.
+    Instead, we can simply load them from file (e.g. ``.csv``) or database.
 
 To iterate over the training data, there is a ``train_stream`` function.
 This function returns an iterator over batches.
@@ -207,7 +210,7 @@ If you know the fundamental basics of TensorFlow, it should be easy to understan
 
 To be precise, the model registered the following computational graph nodes:
 
-#. Placeholders *x* and *y* corresponding to a single *x* and *y* batch from the stream.
+#. Placeholders ``x`` and ``y`` corresponding to a single batch from the stream (only the batch sources ``x`` and ``y`` will be mapped to these placeholders).
 #. Variable ``loss`` denoting the mean square error of the model.
 #. Variable ``predictions`` denoting the output of the network, i.e., the supposed bit in majority.
 #. Variable ``accuracy`` denoting the fraction of correct predictions in the current batch.
@@ -262,10 +265,10 @@ ones passed to dataset's ``_init_with_kwargs`` method).
 We can pass arbitrary other constants to the dataset as they will be hidden in the ``**kwargs``
 of the dataset's ``_init_with_kwargs`` method.
 
-**Note:** The whole ``dataset`` section will be passed as a string-encoded YAML
-to the dataset constructor.
-In the case of using :py:class:`cxflow.datasets.BaseDataset`, the YAML is automatically decoded and the individual
-variables are passed to ``_init_with_kwargs`` method.
+.. note::
+    The whole ``dataset`` section will be passed as a string-encoded YAML to the dataset constructor.
+    In the case of using :py:class:`cxflow.datasets.BaseDataset`, the YAML is automatically decoded and the individual
+    variables are passed to ``_init_with_kwargs`` method.
 
 Model
 =====
@@ -338,7 +341,7 @@ The first one computes various statistics: ``loss`` will be provided with its
 mean and standard deviation, ``accuracy`` will be provided with mean only.
 
 The second hook is the logging hook which simply logs everything it gets to a log file
-and to the standard output.
+and to the standard error output (``/dev/stderr`` in case of unix environment).
 
 The third hook makes sure the training safely stops on sigint signal and finishes
 the current batch in progress.

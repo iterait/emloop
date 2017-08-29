@@ -146,18 +146,18 @@ we will describe how should those reusable modules look like on a simple example
 <h2>Task<a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
 <p>The tutorial will be demonstrated on a simple task called <em>majority</em>.
 Given a vector of N bits, which bit is in majority?</p>
-<p>Example:</p>
+<p>Example of few 5-bit vectors:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="23%" />
-<col width="26%" />
-<col width="24%" />
+<col width="22%" />
+<col width="27%" />
+<col width="25%" />
 <col width="27%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>input vector</td>
-<td>count of zeros</td>
-<td>count of ones</td>
+<td>number of zeros</td>
+<td>number of ones</td>
 <td>bit in majority</td>
 </tr>
 <tr class="row-even"><td>00101</td>
@@ -186,7 +186,8 @@ Given a vector of N bits, which bit is in majority?</p>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p>The very first step in any machine learning task is to load and process the data.
-Every <a class="reference internal" href="cxflow/cxflow.html#module-cxflow" title="cxflow"><code class="xref py py-mod docutils literal"><span class="pre">cxflow</span></code></a> dataset is expected to implement the interface defined by <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a>, which, at the moment, only accepts string-encoded YAML.
+Every <a class="reference internal" href="cxflow/cxflow.html#module-cxflow" title="cxflow"><code class="xref py py-mod docutils literal"><span class="pre">cxflow</span></code></a> dataset is expected to implement the interface defined by <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a>.
+At the moment, the interfaces defines only the constructor API which accepts a string-encoded YAML.
 For regular projects, we recommend extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a> which is a smart wrapper around configuration
 (see below).</p>
 <p>The dataset is meant to wrap all data-related operations.
@@ -245,9 +246,12 @@ For each of those vectors, it calculates the correct answer (variable <code clas
 Finally, it splits the dataset to training and testing data in the ratio of 8:2.</p>
 <p>To sum up, when the dataset is constructed, it features four attributes (<code class="docutils literal"><span class="pre">_train_x</span></code>,
 <code class="docutils literal"><span class="pre">_train_y</span></code>, <code class="docutils literal"><span class="pre">_test_x</span></code> and <code class="docutils literal"><span class="pre">_test_y</span></code>) that represent the loaded data.
-Note that it is completely valid option to rename them as desired.
-In real-world cases, we usually don&#8217;t want to generate our data randomly.
+Note that it is completely valid option to rename them as desired.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In real-world cases, we usually don&#8217;t want to generate our data randomly.
 Instead, we can simply load them from file (e.g. <code class="docutils literal"><span class="pre">.csv</span></code>) or database.</p>
+</div>
 <p>To iterate over the training data, there is a <code class="docutils literal"><span class="pre">train_stream</span></code> function.
 This function returns an iterator over batches.
 Each <em>batch</em> is a dictionary with keys <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code>, where the value of <code class="docutils literal"><span class="pre">x</span></code> is a list of
@@ -327,7 +331,7 @@ In our case, <code class="docutils literal"><span class="pre">_create_model</spa
 If you know the fundamental basics of TensorFlow, it should be easy to understand what is going on.</p>
 <p>To be precise, the model registered the following computational graph nodes:</p>
 <ol class="arabic simple">
-<li>Placeholders <em>x</em> and <em>y</em> corresponding to a single <em>x</em> and <em>y</em> batch from the stream.</li>
+<li>Placeholders <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> corresponding to a single batch from the stream (only the batch sources <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> will be mapped to these placeholders).</li>
 <li>Variable <code class="docutils literal"><span class="pre">loss</span></code> denoting the mean square error of the model.</li>
 <li>Variable <code class="docutils literal"><span class="pre">predictions</span></code> denoting the output of the network, i.e., the supposed bit in majority.</li>
 <li>Variable <code class="docutils literal"><span class="pre">accuracy</span></code> denoting the fraction of correct predictions in the current batch.</li>
@@ -371,10 +375,12 @@ ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">
 </div>
 <p>We can pass arbitrary other constants to the dataset as they will be hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>
 of the dataset&#8217;s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
-<p><strong>Note:</strong> The whole <code class="docutils literal"><span class="pre">dataset</span></code> section will be passed as a string-encoded YAML
-to the dataset constructor.
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The whole <code class="docutils literal"><span class="pre">dataset</span></code> section will be passed as a string-encoded YAML to the dataset constructor.
 In the case of using <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>, the YAML is automatically decoded and the individual
 variables are passed to <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
+</div>
 </div>
 <div class="section" id="id5">
 <h3>Model<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
@@ -436,7 +442,7 @@ documentation.</p>
 The first one computes various statistics: <code class="docutils literal"><span class="pre">loss</span></code> will be provided with its
 mean and standard deviation, <code class="docutils literal"><span class="pre">accuracy</span></code> will be provided with mean only.</p>
 <p>The second hook is the logging hook which simply logs everything it gets to a log file
-and to the standard output.</p>
+and to the standard error output (<code class="docutils literal"><span class="pre">/dev/stderr</span></code> in case of unix environment).</p>
 <p>The third hook makes sure the training safely stops on sigint signal and finishes
 the current batch in progress.</p>
 <p>The final hook stops the training after 10 epochs.</p>
