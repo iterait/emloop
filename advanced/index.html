@@ -98,7 +98,10 @@
     <a href="main_loop.html" title="Next Chapter: Main Loop"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Main Loop &raquo;</span>
     </a>
     </div><ul>
-<li><a class="reference internal" href="#">Advanced</a></li>
+<li><a class="reference internal" href="#">Advanced</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a></li>
+</ul>
+</li>
 </ul>
 
 <form action="../search.html" method="get" class="searchbox">
@@ -124,41 +127,28 @@
 See the following sections for more information.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="main_loop.html">Main Loop</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="main_loop.html#dataset-model-integration">Dataset/Model Integration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="main_loop.html#training-lifecycle">Training Lifecycle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="main_loop.html#prediction-lifecycle">Prediction Lifecycle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="main_loop.html#hook-integration">Hook Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_loop.html">Main Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hook.html">Hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dataset.html#basedataset">BaseDataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataset.html#data-processing">Data Processing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataset.html#additional-methods">Additional Methods</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataset.html#the-philosophy-of-laziness">The Philosophy of Laziness</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="model.html#running-the-model">Running the Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="model.html#restoring-the-model">Restoring the Model</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="hook.html">Hooks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="hook.html#after-batch-event"><code class="docutils literal"><span class="pre">after_batch</span></code> event</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hook.html#after-epoch-event"><code class="docutils literal"><span class="pre">after_epoch</span></code> event</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hook.html#regular-hook-configuration">Regular hook configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="config.html#dataset">Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html#model">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html#hooks">Hooks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html#id1">Main Loop</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html#inference">Inference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html#conclusion">Conclusion</a></li>
-</ul>
-</li>
-</ul>
+</div>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p>As already mentioned, cxflow consists of multiple mutually orthogonal components.
+The following figure demonstrate their relationships.</p>
+<p>Each solid rectangle represents a single component.
+The public methods and attributes are listed below in order to provide an insight of the component API.</p>
+<p>The solid lines represents passing one object to the constructor of another.
+For example, Dataset is passed to Hook, Model and MainLoop.
+On the contrary, Model is passed only to Hook and MainLoop.</p>
+<p>The dashed lines represent the possible method invocations among the components.
+For example, MainLoop can invoke Hook&#8217;s <code class="docutils literal"><span class="pre">after_batch</span></code> method once another batch is processed.</p>
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/cxflow-architecture.svg"><img alt="../_images/cxflow-architecture.svg" src="../_images/cxflow-architecture.svg" /></a>
+<p class="caption"><span class="caption-text">Cxflow overall architecture.</span></p>
+</div>
 </div>
 </div>
 
