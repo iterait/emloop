@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &#8212; cxflow 0.7.0 documentation</title>
+    <title>Tutorial &#8212; cxflow 0.8.0 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.8</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -134,17 +134,21 @@
       
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This is a simple example that will introduce the fundamentals of cxflow.</p>
+<p>In this tutorial, we demonstrate  <strong>cxflow</strong> basic principles via solving an example task.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Let us describe some fundamental ideas of cxflow.
-Cxflow does not implement any building blocks for you (contrary to, e.g.,
-<a class="reference external" href="https://github.com/fchollet/keras">Keras</a>). Instead, you can directly use
+<p><strong>cxflow</strong> is a lightweight framework for machine learning which focuses on:</p>
+<ul class="simple">
+<li>modularization and re-usability of ML components (datasets, models etc.)</li>
+<li>rapid experimenting with different configurations</li>
+<li>providing convenient instruments to manage and run your experiments</li>
+</ul>
+<p><strong>cxflow</strong> does not implement any building blocks, NN layers etc. Instead, you can use
 your favourite machine learning framework, such as <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>,
-<a class="reference external" href="https://cntk.ai/">CNTK</a>, or <a class="reference external" href="https://caffe2.ai/">Caffe2</a>. Therefore,
-you don&#8217;t have to learn a new framework if you already know one.
+<a class="reference external" href="https://cntk.ai/">CNTK</a>, or <a class="reference external" href="https://caffe2.ai/">Caffe2</a>; i.e., <strong>cxflow</strong> is back-end agnostic.
+Therefore, you don&#8217;t have to learn a new framework if you already know one.
 In addition, you can easily convert the models you already have with only minimal changes.</p>
-<p>Cxflow allows (and encourages) you to build modular projects, where the dataset,
+<p><strong>cxflow</strong> allows (and encourages) you to build modular projects, where the dataset,
 the model, and the configuration are separated and reusable. In the following sections,
 we will describe how should those reusable modules look like on a simple example.</p>
 </div>
@@ -155,16 +159,16 @@ Given a vector of N bits, which bit is in majority?</p>
 <p>Example of few 5-bit vectors:</p>
 <table border="1" class="docutils">
 <colgroup>
+<col width="19%" />
+<col width="23%" />
 <col width="22%" />
-<col width="27%" />
-<col width="25%" />
-<col width="27%" />
+<col width="36%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>input vector</td>
 <td>number of zeros</td>
 <td>number of ones</td>
-<td>bit in majority</td>
+<td>bit in majority (target)</td>
 </tr>
 <tr class="row-even"><td>00101</td>
 <td>3</td>
@@ -192,34 +196,34 @@ Given a vector of N bits, which bit is in majority?</p>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p>The very first step in any machine learning task is to load and process the data.
-Every <a class="reference internal" href="cxflow/cxflow.html#module-cxflow" title="cxflow"><code class="xref py py-mod docutils literal"><span class="pre">cxflow</span></code></a> dataset is expected to implement the interface defined by <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a>.
+Every <strong>cxflow</strong> dataset is expected to implement the interface defined by <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a>.
 At the moment, the interfaces defines only the constructor API which accepts a string-encoded YAML.
-For regular projects, we recommend extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a> which is a smart wrapper around configuration
-(see below).</p>
+For regular projects, we recommend extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a> which decodes the YAML
+configuration string for you.</p>
 <p>The dataset is meant to wrap all data-related operations.
 It is responsible for correct data loading, verification and other useful operations.
 The main purpose of the dataset is providing various data streams that will be consequently used for training,
 validation and prediction in the production environment.</p>
-<p>Our dataset will implement the following:</p>
+<p>Typical <strong>cxflow</strong> dataset will implement the following:</p>
 <ol class="arabic simple">
-<li><strong>Training stream:</strong> an iterable which provides batches of the training data.
-The implementation of the training stream is provided in the <code class="docutils literal"><span class="pre">train_stream</span></code>
-method.</li>
-<li><strong>Test stream:</strong> an iterable providing testing data which will not be used during the training.
-It is possible to define additional arbitrary stream methods that follow the
-<code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> naming convention.
-Therefore, our <em>test</em> stream will be implemented in <code class="docutils literal"><span class="pre">test_stream</span></code> method.</li>
+<li><strong>Training stream:</strong> an iteration of training data batches (<code class="docutils literal"><span class="pre">train_stream</span></code> method)</li>
+<li><strong>Eval streams:</strong> iterations of additional &lt;name&gt; data batches not used for training.
+It is possible to provide any &lt;name&gt; stream in the respective <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> methods.
+In our example, we will use <em>test</em> stream provided by <code class="docutils literal"><span class="pre">test_stream</span></code> method.</li>
 <li><strong>The constructor:</strong> accepts a YAML configuration in the form of a string
 (more on this later). We avoid the need to implement a constructor by
 extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>.</li>
 <li><strong>Additional methods:</strong> such as <code class="docutils literal"><span class="pre">fetch</span></code>, <code class="docutils literal"><span class="pre">split</span></code>, or anything else you may need.
-Cxflow is able to call arbitrary dataset methods by invoking <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">&lt;method-name&gt;</span></code> command.</li>
+<strong>cxflow</strong> is able to call arbitrary dataset methods by invoking <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">&lt;method-name&gt;</span></code> command.</li>
 </ol>
-<p>For our purposes, let us create a class called <code class="docutils literal"><span class="pre">MajorityDataset</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy.random</span> <span class="kn">as</span> <span class="nn">npr</span>
-<span class="kn">from</span> <span class="nn">cxflow.datasets</span> <span class="kn">import</span> <span class="n">BaseDataset</span><span class="p">,</span> <span class="n">AbstractDataset</span>
+<p>To generate the <em>majority</em> data and provide the data streams we will implement a <code class="docutils literal"><span class="pre">MajorityDataset</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">majority.py</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cxflow</span> <span class="kn">as</span> <span class="nn">cx</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="kn">as</span> <span class="nn">npr</span>
 
-<span class="k">class</span> <span class="nc">MajorityDataset</span><span class="p">(</span><span class="n">BaseDataset</span><span class="p">):</span>
+
+<span class="k">class</span> <span class="nc">MajorityDataset</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">BaseDataset</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">_init_with_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -230,16 +234,17 @@ Cxflow is able to call arbitrary dataset methods by invoking <code class="docuti
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_y</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">)],</span> <span class="n">y</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_y</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">):],</span> <span class="n">y</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">):]</span>
 
-    <span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">],</span>
                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]}</span>
 
-    <span class="k">def</span> <span class="nf">test_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">test_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">],</span>
                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]}</span>
 </pre></div>
+</div>
 </div>
 <p>Let us describe the functionality of our <code class="docutils literal"><span class="pre">MajorityDataset</span></code> step by step.
 We shall begin with the <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.
@@ -288,50 +293,47 @@ The test stream is used only to estimate the performance of the model.</p>
 <p>Note that in this design, the training and testing streams do not overlap, hence we might
 use the training stream for training and the testing stream for an unbiased estimation
 of the performace of the model.</p>
-<p>A detailed description of cxflow datasets might be found in the <span class="xref doc">advanced section</span>.</p>
+<p>A detailed description of <strong>cxflow</strong> datasets might be found in the <span class="xref doc">advanced section</span>.</p>
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-<p>After the data are loaded, processed and ready to be used, we have to define the model
-to be trained.
-Let us define the model using a simple <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a> graph.
-To make this process simpler, we will use the official <a class="reference external" href="https://github.com/Cognexa/cxflow-tensorflow">cxflow-tensorflow</a> package that provides
-a basic TensorFlow integration with cxflow. Please install this package before you proceed
+<p>Having the dataset ready, we have to define the model to be trained.
+A simple <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a> graph can solve our task.
+We will use the official <a class="reference external" href="https://github.com/Cognexa/cxflow-tensorflow">cxflow-tensorflow</a> package that provides
+convenient TensorFlow integration with <strong>cxflow</strong>. Please install this package before you proceed
 with this tutorial.</p>
-<p>In <code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code>, every model is a python class expected to
-extend the <code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code>.</p>
+<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class expected to
+extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>.</p>
 <p>Let us define a class called <code class="docutils literal"><span class="pre">MajorityNet</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">majority_net.py</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">cxflow_tensorflow</span> <span class="kn">as</span> <span class="nn">cxtf</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
 <span class="kn">import</span> <span class="nn">tensorflow.contrib.keras</span> <span class="kn">as</span> <span class="nn">K</span>
 
+
 <span class="k">class</span> <span class="nc">MajorityNet</span><span class="p">(</span><span class="n">cxtf</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simple 2-layered MLP for majority task.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_create_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing placeholders&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing placeholders matching the model.inputs&#39;</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing MLP&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s1">&#39;dense1&#39;</span><span class="p">):</span>
-            <span class="n">hidden_activations</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">hidden</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s1">&#39;dense2&#39;</span><span class="p">):</span>
-            <span class="n">y_hat</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">hidden_activations</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing MLP model&#39;</span><span class="p">)</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">hidden</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">net</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
 
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing loss and outputs matching the model.outputs&#39;</span><span class="p">)</span>
         <span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_hat</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;loss&#39;</span><span class="p">)</span>
-
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing predictions and accuracy&#39;</span><span class="p">)</span>
         <span class="n">predictions</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;predictions&#39;</span><span class="p">)</span>
-        <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">)),</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">))</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>When implementing a custom model, make sure to extend the <code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code> class.
-As described above, this tutorial only focuses on the TensorFlow model, hence extending
-<code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code> is a good idea.</p>
-<p>The only method that is really necessary to implement is <code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code>.
+</div>
+<p>The only method that is really necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
 In our case, <code class="docutils literal"><span class="pre">_create_model</span></code> method creates a simple MLP.
 If you know the fundamental basics of TensorFlow, it should be easy to understand what is going on.</p>
 <p>To be precise, the model registered the following computational graph nodes:</p>
@@ -343,15 +345,14 @@ If you know the fundamental basics of TensorFlow, it should be easy to understan
 </ol>
 <p>Note that the registration of the nodes is done by the node naming.
 The variables that are not named explicitely will not be accessible in the future.</p>
-<p>The <code class="docutils literal"><span class="pre">_create_model</span></code> method can accept arbitrary arguments - in our case, we accept the
-optimization algorithm to be used and the number of hidden units.
+<p>The <code class="docutils literal"><span class="pre">_create_model</span></code> method can accept arbitrary arguments - in our case, we allow to configure the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.</p>
-<p>Detailed description of cxflow models might be found in the <a class="reference internal" href="advanced/index.html"><span class="doc">advanced section</span></a>.</p>
+<p>Detailed description of <strong>cxflow</strong> models might be found in the <a class="reference internal" href="advanced/index.html"><span class="doc">advanced section</span></a>.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>Configuration of the training is the final, most important part of our tutorial.
-The configuration (a.k.a. <em>config</em>) defines which dataset will be used as the data source
+The configuration or <em>config</em> defines which dataset will be used as the data source
 and which model will be employed for training.</p>
 <p>The configuration file is in the form of a YAML document.
 Feel free to use JSON instead, but YAML makes a lot of things easier.</p>
@@ -455,7 +456,7 @@ the current batch in progress.</p>
 <h3>Using cxflow<a class="headerlink" href="#using-cxflow" title="Permalink to this headline">¶</a></h3>
 <p>Once the classes and config are implemented, the training can begin.
 Let&#8217;s try it with</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow train configs/majority.yaml
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow train majority/config.yaml
 </pre></div>
 </div>
 <p>The command produces a lot of output.
@@ -467,7 +468,8 @@ Now we can easily watch the progress of the training.</p>
 This is the logging directory where everything cxflow produced is stored, including
 saved models, the configuration file and various other artifacts.</p>
 <p>Let&#8217;s register one more hook which saves the best model according to the test stream:</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">BestSaverHook</span>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveBest</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">stream</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">test</span>
 </pre></div>
 </div>
 <p>When we run the training again, we see that the newly created output directory contains

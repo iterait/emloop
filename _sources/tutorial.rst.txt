@@ -1,20 +1,24 @@
 Tutorial
 ########
 
-This is a simple example that will introduce the fundamentals of cxflow.
+In this tutorial, we demonstrate  **cxflow** basic principles via solving an example task.
 
 Introduction
 ************
 
-Let us describe some fundamental ideas of cxflow.
-Cxflow does not implement any building blocks for you (contrary to, e.g.,
-`Keras <https://github.com/fchollet/keras>`_). Instead, you can directly use
+**cxflow** is a lightweight framework for machine learning which focuses on:
+
+- modularization and re-usability of ML components (datasets, models etc.)
+- rapid experimenting with different configurations
+- providing convenient instruments to manage and run your experiments
+
+**cxflow** does not implement any building blocks, NN layers etc. Instead, you can use
 your favourite machine learning framework, such as `TensorFlow <https://www.tensorflow.org/>`_,
-`CNTK <https://cntk.ai/>`_, or `Caffe2 <https://caffe2.ai/>`_. Therefore,
-you don't have to learn a new framework if you already know one.
+`CNTK <https://cntk.ai/>`_, or `Caffe2 <https://caffe2.ai/>`_; i.e., **cxflow** is back-end agnostic.
+Therefore, you don't have to learn a new framework if you already know one.
 In addition, you can easily convert the models you already have with only minimal changes.
 
-Cxflow allows (and encourages) you to build modular projects, where the dataset,
+**cxflow** allows (and encourages) you to build modular projects, where the dataset,
 the model, and the configuration are separated and reusable. In the following sections,
 we will describe how should those reusable modules look like on a simple example.
 
@@ -26,72 +30,71 @@ Given a vector of N bits, which bit is in majority?
 
 Example of few 5-bit vectors:
 
-+--------------+-----------------+----------------+-----------------+
-| input vector | number of zeros | number of ones | bit in majority |
-+--------------+-----------------+----------------+-----------------+
-| 00101        | 3               | 2              | 0               |
-+--------------+-----------------+----------------+-----------------+
-| 00000        | 5               | 0              | 0               |
-+--------------+-----------------+----------------+-----------------+
-| 10101        | 2               | 3              | 1               |
-+--------------+-----------------+----------------+-----------------+
-| 11100        | 2               | 3              | 1               |
-+--------------+-----------------+----------------+-----------------+
++--------------+-----------------+----------------+--------------------------+
+| input vector | number of zeros | number of ones | bit in majority (target) |
++--------------+-----------------+----------------+--------------------------+
+| 00101        | 3               | 2              | 0                        |
++--------------+-----------------+----------------+--------------------------+
+| 00000        | 5               | 0              | 0                        |
++--------------+-----------------+----------------+--------------------------+
+| 10101        | 2               | 3              | 1                        |
++--------------+-----------------+----------------+--------------------------+
+| 11100        | 2               | 3              | 1                        |
++--------------+-----------------+----------------+--------------------------+
 
 
 Dataset
 *******
 
 The very first step in any machine learning task is to load and process the data.
-Every :py:mod:`cxflow` dataset is expected to implement the interface defined by :py:class:`cxflow.datasets.AbstractDataset`.
+Every **cxflow** dataset is expected to implement the interface defined by :py:class:`cxflow.datasets.AbstractDataset`.
 At the moment, the interfaces defines only the constructor API which accepts a string-encoded YAML.
-For regular projects, we recommend extending :py:class:`cxflow.datasets.BaseDataset` which is a smart wrapper around configuration
-(see below).
+For regular projects, we recommend extending :py:class:`cxflow.datasets.BaseDataset` which decodes the YAML
+configuration string for you.
 
 The dataset is meant to wrap all data-related operations.
 It is responsible for correct data loading, verification and other useful operations.
 The main purpose of the dataset is providing various data streams that will be consequently used for training,
 validation and prediction in the production environment.
 
-Our dataset will implement the following:
+Typical **cxflow** dataset will implement the following:
 
-#. **Training stream:** an iterable which provides batches of the training data.
-   The implementation of the training stream is provided in the ``train_stream`` 
-   method.
-#. **Test stream:** an iterable providing testing data which will not be used during the training.
-   It is possible to define additional arbitrary stream methods that follow the 
-   ``<name>_stream`` naming convention.
-   Therefore, our *test* stream will be implemented in ``test_stream`` method.
+#. **Training stream:** an iteration of training data batches (``train_stream`` method)
+#. **Eval streams:** iterations of additional <name> data batches not used for training.
+   It is possible to provide any <name> stream in the respective ``<name>_stream`` methods.
+   In our example, we will use *test* stream provided by ``test_stream`` method.
 #. **The constructor:** accepts a YAML configuration in the form of a string
    (more on this later). We avoid the need to implement a constructor by 
    extending :py:class:`cxflow.datasets.BaseDataset`.
 #. **Additional methods:** such as ``fetch``, ``split``, or anything else you may need.
-   Cxflow is able to call arbitrary dataset methods by invoking ``cxflow dataset <method-name>`` command.
+   **cxflow** is able to call arbitrary dataset methods by invoking ``cxflow dataset <method-name>`` command.
 
-For our purposes, let us create a class called ``MajorityDataset``:
+To generate the *majority* data and provide the data streams we will implement a ``MajorityDataset``:
 
 .. code-block:: python
+    :caption: majority.py
 
+    import cxflow as cx
     import numpy.random as npr
-    from cxflow.datasets import BaseDataset, AbstractDataset
-    
-    class MajorityDataset(BaseDataset):
-    
+
+
+    class MajorityDataset(cx.BaseDataset):
+
         def _init_with_kwargs(self, n_examples: int, dim: int, batch_size: int, **kwargs) -> None:
             self.batch_size = batch_size
-    
+
             x = npr.random_integers(0, 1, n_examples * dim).reshape(n_examples, dim)
             y = x.sum(axis=1) > int(dim/2)
-    
+
             self._train_x, self._train_y = x[:int(.8 * n_examples)], y[:int(.8 * n_examples)]
             self._test_x, self._test_y = x[int(.8 * n_examples):], y[int(.8 * n_examples):]
-    
-        def train_stream(self) -> AbstractDataset.Stream:
+
+        def train_stream(self) -> cx.AbstractDataset.Stream:
             for i in range(0, len(self._train_x), self.batch_size):
                 yield {'x': self._train_x[i: i + self.batch_size],
                        'y': self._train_y[i: i + self.batch_size]}
-    
-        def test_stream(self) -> AbstractDataset.Stream:
+
+        def test_stream(self) -> cx.AbstractDataset.Stream:
             for i in range(0, len(self._test_x), self.batch_size):
                 yield {'x': self._test_x[i: i + self.batch_size],
                        'y': self._test_y[i: i + self.batch_size]}
@@ -152,17 +155,15 @@ Note that in this design, the training and testing streams do not overlap, hence
 use the training stream for training and the testing stream for an unbiased estimation
 of the performace of the model.
 
-A detailed description of cxflow datasets might be found in the :doc:`advanced section <advanced>`.
+A detailed description of **cxflow** datasets might be found in the :doc:`advanced section <advanced>`.
 
 Model
 *****
 
-After the data are loaded, processed and ready to be used, we have to define the model
-to be trained.
-Let us define the model using a simple `TensorFlow <https://www.tensorflow.org/>`_ graph.
-To make this process simpler, we will use the official `cxflow-tensorflow 
-<https://github.com/Cognexa/cxflow-tensorflow>`_ package that provides
-a basic TensorFlow integration with cxflow. Please install this package before you proceed
+Having the dataset ready, we have to define the model to be trained.
+A simple `TensorFlow <https://www.tensorflow.org/>`_ graph can solve our task.
+We will use the official `cxflow-tensorflow <https://github.com/Cognexa/cxflow-tensorflow>`_ package that provides
+convenient TensorFlow integration with **cxflow**. Please install this package before you proceed
 with this tutorial.
 
 In :py:mod:`cxflow_tensorflow`, every model is a python class expected to
@@ -171,37 +172,31 @@ extend the :py:class:`cxflow_tensorflow.BaseModel`.
 Let us define a class called ``MajorityNet``.
 
 .. code-block:: python
+    :caption: majority_net.py
 
     import logging
-    
+
     import cxflow_tensorflow as cxtf
     import tensorflow as tf
     import tensorflow.contrib.keras as K
 
+
     class MajorityNet(cxtf.BaseModel):
         """Simple 2-layered MLP for majority task."""
-    
+
         def _create_model(self, hidden):
-            logging.debug('Constructing placeholders')
+            logging.debug('Constructing placeholders matching the model.inputs')
             x = tf.placeholder(dtype=tf.float32, shape=[None, 11], name='x')
             y = tf.placeholder(dtype=tf.float32, shape=[None], name='y')
-    
-            logging.debug('Constructing MLP')
-            with tf.variable_scope('dense1'):
-                hidden_activations = K.layers.Dense(hidden)(x)
-            with tf.variable_scope('dense2'):
-                y_hat = K.layers.Dense(1)(hidden_activations)[:, 0]
-    
+
+            logging.debug('Constructing MLP model')
+            net = K.layers.Dense(hidden)(x)
+            y_hat = K.layers.Dense(1)(net)[:, 0]
+
+            logging.debug('Constructing loss and outputs matching the model.outputs')
             tf.pow(y - y_hat, 2, name='loss')
-    
-            logging.debug('Constructing predictions and accuracy')
             predictions = tf.greater_equal(y_hat, 0.5, name='predictions')
-            tf.reduce_mean(tf.cast(tf.equal(predictions, tf.cast(y, tf.bool)), tf.float32, name='accuracy'))
-
-
-When implementing a custom model, make sure to extend the :py:class:`cxflow_tensorflow.BaseModel` class.
-As described above, this tutorial only focuses on the TensorFlow model, hence extending
-:py:class:`cxflow_tensorflow.BaseModel` is a good idea.
+            tf.equal(predictions, tf.cast(y, tf.bool), name='accuracy')
 
 The only method that is really necessary to implement is :py:meth:`cxflow_tensorflow.BaseModel._create_model`.
 In our case, ``_create_model`` method creates a simple MLP.
@@ -217,17 +212,16 @@ To be precise, the model registered the following computational graph nodes:
 Note that the registration of the nodes is done by the node naming.
 The variables that are not named explicitely will not be accessible in the future.
 
-The ``_create_model`` method can accept arbitrary arguments - in our case, we accept the
-optimization algorithm to be used and the number of hidden units.
+The ``_create_model`` method can accept arbitrary arguments - in our case, we allow to configure the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.
 
-Detailed description of cxflow models might be found in the :doc:`advanced section <advanced/index>`.
+Detailed description of **cxflow** models might be found in the :doc:`advanced section <advanced/index>`.
 
 Configuration
 *************
 
 Configuration of the training is the final, most important part of our tutorial.
-The configuration (a.k.a. *config*) defines which dataset will be used as the data source
+The configuration or *config* defines which dataset will be used as the data source
 and which model will be employed for training.
 
 The configuration file is in the form of a YAML document.
@@ -286,13 +280,13 @@ This can be done by listing their names in the ``inputs`` and ``outputs`` config
     model:
       name: MajorityExample
       class: majority.MajorityNet
-    
+
       optimizer:
         class: AdamOptimizer
         learning_rate: 0.001
-    
+
       hidden: 100
-    
+
       inputs: [x, y]
       outputs: [accuracy, predictions, loss]
 
@@ -354,7 +348,7 @@ Let's try it with
 
 .. code-block:: bash
 
-    cxflow train configs/majority.yaml
+    cxflow train majority/config.yaml
 
 The command produces a lot of output.
 The first section describes the creation of the components.
@@ -370,7 +364,8 @@ Let's register one more hook which saves the best model according to the test st
 
 .. code-block:: yaml
 
-      - BestSaverHook
+    - SaveBest:
+        stream: test
 
 When we run the training again, we see that the newly created output directory contains
 the saved model as well.

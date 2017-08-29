@@ -14,21 +14,20 @@ cxflow
 Cxflow is a smart manager for deep learning models.
 With cxflow, you can easily define reusable components which speed up your future development.
 
-Check out our :doc:`10 minutes <tutorial>` example tutorial, dig into the :doc:`10 advanced section <advanced/index>` or
+Check out our :doc:`10 minutes tutorial <tutorial>`, dig into the :doc:`10 advanced section <advanced/index>` or
 see our :doc:`API reference <api/index>`.
 
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/Cognexa/cxflow/issues
-- Source Code: https://github.com/Cognexa/cxflow
+- `Issue Tracker @GitHub <https://github.com/Cognexa/cxflow/issues>`_
+- `Source Code @GitHub <https://github.com/Cognexa/cxflow>`_
 
 Support
 -------
 
 If you are having issues, please let us know either via the official
-`issue tracker <https://github.com/Cognexa/cxflow/issues>`_ or via e-mail.
-We have a mailing list located at: cxflow@cognexa.com
+`issue tracker <https://github.com/Cognexa/cxflow/issues>`_ or via e-mail cxflow (at) cognexa (dot) com.
 
 License
 -------

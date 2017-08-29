@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.stop_after &#8212; cxflow 0.7.0 documentation</title>
+    <title>cxflow.hooks.stop_after &#8212; cxflow 0.8.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.8</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -123,6 +123,7 @@
 <span class="sd">    Stop the training after any of the specified conditions is met.</span>
 
 <span class="sd">    .. code-block:: yaml</span>
+
 <span class="sd">        :caption: stop the training after 500 epochs</span>
 <span class="sd">        hooks:</span>
 <span class="sd">          - StopAfter:</span>
@@ -130,6 +131,7 @@
 
 
 <span class="sd">    .. code-block:: yaml</span>
+
 <span class="sd">        :caption: stop the training after 1000 iterations of 1 hour whichever comes first</span>
 <span class="sd">        hooks:</span>
 <span class="sd">          - StopAfter:</span>
