@@ -263,7 +263,6 @@
 <dl class="docutils">
 <dt>Calls</dt>
 <dd><ul class="first last simple">
-<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.before_training" title="cxflow.hooks.AbstractHook.before_training"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.before_training()</span></code></a></li>
 <li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch" title="cxflow.hooks.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_epoch()</span></code></a></li>
 </ul>
 </dd>
@@ -273,6 +272,30 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>streams</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; stream names to be evaluated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.MainLoop._try_run">
+<code class="descname">_try_run</code><span class="sig-paren">(</span><em>run_func</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._try_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._try_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try running the given function (training/prediction).</p>
+<dl class="docutils">
+<dt>Calls</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.before_training" title="cxflow.hooks.AbstractHook.before_training"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.before_training()</span></code></a></li>
+<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_training" title="cxflow.hooks.AbstractHook.after_training"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_training()</span></code></a></li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>run_func</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Callable</span></code></a>[[], <code class="docutils literal"><span class="pre">None</span></code>]) &#8211; function to be run</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -342,7 +365,6 @@
 <dd><ul class="first last simple">
 <li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch" title="cxflow.hooks.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_epoch()</span></code></a></li>
 <li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch_profile" title="cxflow.hooks.AbstractHook.after_epoch_profile"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_epoch_profile()</span></code></a></li>
-<li><a class="reference internal" href="cxflow.hooks.html#cxflow.hooks.AbstractHook.after_training" title="cxflow.hooks.AbstractHook.after_training"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.hooks.AbstractHook.after_training()</span></code></a></li>
 </ul>
 </dd>
 </dl>
