@@ -152,8 +152,7 @@ Note that in this design, the training and testing streams do not overlap, hence
 use the training stream for training and the testing stream for an unbiased estimation
 of the performace of the model.
 
-A detailed description of cxflow datasets might be found in the `advanced 
-section <advanced/dataset.html>`_.
+A detailed description of cxflow datasets might be found in the :doc:`advanced section <advanced>`.
 
 Model
 *****
@@ -222,7 +221,7 @@ The ``_create_model`` method can accept arbitrary arguments - in our case, we ac
 optimization algorithm to be used and the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.
 
-Detailed description of cxflow models might be found in the `advanced section <advanced/model.html>`_.
+Detailed description of cxflow models might be found in the :doc:`advanced section <advanced/index>`.
 
 Configuration
 *************
@@ -235,8 +234,7 @@ The configuration file is in the form of a YAML document.
 Feel free to use JSON instead, but YAML makes a lot of things easier.
 
 The YAML document consists of four fundamental sections.
-A detailed description of cxflow configuration can be found in the `advanced 
-section <advanced/config.html>`_.
+A detailed description of cxflow configuration can be found in the :doc:`advanced section <advanced/index>`.
 
 
 #. dataset
@@ -387,13 +385,9 @@ Simple as that.
 
 In case the model is good enough to be used in the production, it is extremely
 easy to use cxflow for this purpose.
-**Note:** the dataset must implement ``predict_stream`` method.
-In addition, the net inputs and outputs should be modified in the configuration file
-not to include ``loss``, ``accuracy`` and ``y``, since we don't know those in the
-producion environment.
+See the configuration :doc:`advanced section <advanced/config>` for more details.
+The usage is then extremely simple.
 
 .. code-block:: bash
 
     cxflow predict log/MajorityExample_<some-suffix>
-
-We cover the prediction in the production evironment in the advanced tutorials.

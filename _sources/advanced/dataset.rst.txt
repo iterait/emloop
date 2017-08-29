@@ -94,7 +94,7 @@ along with the train stream. The configuration may look as follows:
 The extra streams, however, *are not* used for training, that is, the model is 
 not updated when it iterates through them.
 
-During prediction (i.e., ``cxflow predict`` CLI command), only the ``predict_stream`` method is employed in order
+During prediction (i.e. ``cxflow predict`` CLI command), only the ``predict_stream`` method is employed in order
 to provide the data to be inferred.
 
 

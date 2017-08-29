@@ -104,8 +104,8 @@
 <li><a class="reference internal" href="#dataset">Dataset</a></li>
 <li><a class="reference internal" href="#model">Model</a></li>
 <li><a class="reference internal" href="#configuration">Configuration</a><ul>
-<li><a class="reference internal" href="#id4">Dataset</a></li>
-<li><a class="reference internal" href="#id5">Model</a></li>
+<li><a class="reference internal" href="#id2">Dataset</a></li>
+<li><a class="reference internal" href="#id3">Model</a></li>
 <li><a class="reference internal" href="#main-loop">Main Loop</a></li>
 <li><a class="reference internal" href="#hooks">Hooks</a></li>
 <li><a class="reference internal" href="#using-cxflow">Using cxflow</a></li>
@@ -282,8 +282,7 @@ The test stream is used only to estimate the performance of the model.</p>
 <p>Note that in this design, the training and testing streams do not overlap, hence we might
 use the training stream for training and the testing stream for an unbiased estimation
 of the performace of the model.</p>
-<p>A detailed description of cxflow datasets might be found in the <a class="reference external" href="advanced/dataset.html">advanced
-section</a>.</p>
+<p>A detailed description of cxflow datasets might be found in the <span class="xref doc">advanced section</span>.</p>
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
@@ -341,7 +340,7 @@ The variables that are not named explicitely will not be accessible in the futur
 <p>The <code class="docutils literal"><span class="pre">_create_model</span></code> method can accept arbitrary arguments - in our case, we accept the
 optimization algorithm to be used and the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.</p>
-<p>Detailed description of cxflow models might be found in the <a class="reference external" href="advanced/model.html">advanced section</a>.</p>
+<p>Detailed description of cxflow models might be found in the <a class="reference internal" href="advanced/index.html"><span class="doc">advanced section</span></a>.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
@@ -351,8 +350,7 @@ and which model will be employed for training.</p>
 <p>The configuration file is in the form of a YAML document.
 Feel free to use JSON instead, but YAML makes a lot of things easier.</p>
 <p>The YAML document consists of four fundamental sections.
-A detailed description of cxflow configuration can be found in the <a class="reference external" href="advanced/config.html">advanced
-section</a>.</p>
+A detailed description of cxflow configuration can be found in the <a class="reference internal" href="advanced/index.html"><span class="doc">advanced section</span></a>.</p>
 <ol class="arabic simple">
 <li>dataset</li>
 <li>model</li>
@@ -360,8 +358,8 @@ section</a>.</p>
 <li>hooks</li>
 </ol>
 <p>Let us describe the sections one by one.</p>
-<div class="section" id="id4">
-<h3>Dataset<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Dataset<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>In our case, we only need to tell cxflow which dataset to use.
 This is done by specifying a <code class="docutils literal"><span class="pre">class</span></code> of the dataset.
 In addition, we will specify the parameters of the dataset (those
@@ -382,8 +380,8 @@ In the case of using <a class="reference internal" href="cxflow/cxflow.datasets.
 variables are passed to <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
 </div>
 </div>
-<div class="section" id="id5">
-<h3>Model<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Model<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Similarly to the dataset, the model is defined in the <code class="docutils literal"><span class="pre">model</span></code> section.
 In our case, we want to specify  <code class="docutils literal"><span class="pre">class</span></code> of the model together with <code class="docutils literal"><span class="pre">optimizer</span></code> and
 <code class="docutils literal"><span class="pre">hidden</span></code> as required from the model&#8217;s <code class="docutils literal"><span class="pre">_create_model</span></code> method.
@@ -475,14 +473,11 @@ the saved model as well.</p>
 <p>Simple as that.</p>
 <p>In case the model is good enough to be used in the production, it is extremely
 easy to use cxflow for this purpose.
-<strong>Note:</strong> the dataset must implement <code class="docutils literal"><span class="pre">predict_stream</span></code> method.
-In addition, the net inputs and outputs should be modified in the configuration file
-not to include <code class="docutils literal"><span class="pre">loss</span></code>, <code class="docutils literal"><span class="pre">accuracy</span></code> and <code class="docutils literal"><span class="pre">y</span></code>, since we don&#8217;t know those in the
-producion environment.</p>
+See the configuration <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a> for more details.
+The usage is then extremely simple.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow predict log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
-<p>We cover the prediction in the production evironment in the advanced tutorials.</p>
 </div>
 </div>
 </div>

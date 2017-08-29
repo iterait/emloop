@@ -14,8 +14,8 @@ cxflow
 Cxflow is a smart manager for deep learning models.
 With cxflow, you can easily define reusable components which speed up your future development.
 
-Check out our `10 minutes <tutorial.html>`_ example tutorial, dig into the `advanced section <advanced/index.html>`_ or
-see our `API reference <api/index.html>`_.
+Check out our :doc:`10 minutes <tutorial>` example tutorial, dig into the :doc:`10 advanced section <advanced/index>` or
+see our :doc:`API reference <api/index>`.
 
 Contribute
 ----------

@@ -64,7 +64,7 @@ The whole process might be described by the following pseudocode.
 
     1. build dataset
     2. build model
-    1. evaluate prediction stream
+    3. evaluate prediction stream
 
 Hook Integration
 ================
