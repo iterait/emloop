@@ -18,9 +18,10 @@ from ..main_loop import MainLoop
 
 def create_output_dir(config: dict, output_root: str, default_model_name: str='NonameModel') -> str:
     """
-    Create output_dir under the given output_root and
-        - dump the given config to yaml file under this dir
+    Create output_dir under the given ``output_root`` and
+        - dump the given config to YAML file under this dir
         - register a file logger logging to a file under this dir
+
     :param config: config to be dumped
     :param output_root: dir wherein output_dir shall be created
     :param default_model_name: name to be used when `model.name` is not found in the config
@@ -56,6 +57,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     Create a dataset object according to the given config.
 
     Dataset and output_dir configs are passed to the constructor in a single YAML-encoded string.
+
     :param config: config dict with dataset config
     :param output_dir: path to the training output dir or None
     :return: dataset object
@@ -82,12 +84,10 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
     """
     Create a model object either from scratch of from the checkpoint in `resume_dir`.
 
-    -------------------------------------------------------
-    cxflow allows the following scenarios
-    -------------------------------------------------------
-    1. Create model: leave `restore_from` to `None` and specify `module` and `class`;
-    2. Restore model: specify `resume_dir` a backend-specific path to (a directory with) the saved model.
-    -------------------------------------------------------
+    Cxflow allows the following scenarios
+
+    1. Create model: leave ``restore_from=None`` and specify ``class``;
+    2. Restore model: specify ``restore_from`` which is a backend-specific path to (a directory with) the saved model.
 
     :param config: config dict with model config
     :param output_dir: path to the training output dir
@@ -134,17 +134,23 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
 def create_hooks(config: dict, model: AbstractModel,
                  dataset: AbstractDataset, output_dir: str) -> Iterable[AbstractHook]:
     """
-    Create hooks specified in config['hooks'] list.
+    Create hooks specified in ``config['hooks']`` list.
 
     Hook config entries may be one of the following types:
 
-    1] a hook with default args specified only by its name as a string; e.g.:
-        - LogVariables
-        - cxflow_tensorflow.WriteTensorBoard
+    .. code-block:: yaml
+        :caption: A hook with default args specified only by its name as a string; e.g.
 
-    2] a hook with custom args as a dict name -> args; e.g.:
-        - StopAfter:
-            n_epochs: 10
+        hooks:
+          - LogVariables
+          - cxflow_tensorflow.WriteTensorBoard
+
+    .. code-block:: yaml
+        :caption: A hook with custom args as a dict name -> args; e.g.
+
+        hooks:
+          - StopAfter:
+              n_epochs: 10
 
     :param config: config dict
     :param model: model object to be passed to the hooks
@@ -191,40 +197,26 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     Unique `output_dir` for this training is created under the given `output_root` dir
     wherein all the training outputs are saved. The output dir name will be roughly `[model.name]_[time]`.
 
-    -------------------------------------------------------
     The training procedure consists of the following steps:
-    -------------------------------------------------------
-    Step 1:
-        - Create output dir
-        - Create file logger under the output dir
-        - Dump loaded config to the output dir
-    Step 2:
-        - Create dataset
-            - YAML string with `dataset` and `log_dir` configs are passed to the dataset constructor
-    Step 3:
-        - Create model
-            - Dataset, `log_dir` and model config is passed to the constructor
-            - In case the model is about to resume the training, it does so.
-    Step 4:
-        - Create all the training hooks
-    Step 5:
-        - Create the MainLoop object
-    Step 6:
-        - Run the main loop
-    -------------------------------------------------------
+
+    1.  Set up (create output dir and file logger, dump the loaded config into the output dir)
+    2.  Create dataset (YAML string with ``dataset`` and ``log_dir`` configs are passed to the dataset constructor)
+    3.  Create (or restore) model (dataset, ``log_dir`` and model config is passed to the constructor)
+    4.  Create all the training hooks
+    5.  Create the ``MainLoop`` object
+    6.  Run the main loop
+
     If any of the steps fails, the training is terminated.
-    -------------------------------------------------------
 
     After the training procedure finishes, the output dir will contain the following:
-        - train_log.txt with entry_point and main_loop logs (same as the stderr)
-        - dumped yaml config
+        - ``train_log.txt`` with entry_point and main_loop logs (same as the stderr)
+        - dumped YAML config
 
     Additional outputs created by hooks, dataset or tensorflow may include:
-        - dataset_log.txt with info about dataset/stream creation
+        - ``dataset_log.txt`` with info about dataset/stream creation
         - model checkpoint(s)
-        - tensorboard log file
-        - tensorflow event log
-
+        - TensorBoard log file
+        - TensorFlow event log
 
     :param config: configuration
     :param output_root: dir under which output_dir shall be created

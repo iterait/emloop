@@ -6,7 +6,7 @@ Having all that, it manages iterating through streams, training and hooks execut
 """
 import sys
 import logging
-import typing
+from typing import Iterable, List, Optional, Dict
 from collections import OrderedDict
 
 from .datasets import AbstractDataset
@@ -16,26 +16,33 @@ from .utils.profile import Timer
 
 
 class MainLoop:   # pylint: disable=too-many-instance-attributes
-    """Train the model, manage hooks etc."""
+    """**cxflow** main loop for training and model inference."""
 
-    UNUSED_SOURCE_ACTIONS = {'ignore', 'warn', 'error'}
+    UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
+    """Possible actions to be taken when a stream source is unused by the trained model."""
+
     TRAIN_STREAM = 'train'
+    """Train stream name."""
+
     PREDICT_STREAM = 'predict'
+    """Predict stream name."""
 
     def __init__(self,   # pylint: disable=too-many-arguments
                  model: AbstractModel, dataset: AbstractDataset,
-                 hooks: typing.Iterable[AbstractHook]=(),
-                 extra_streams: typing.List[str]=(),  # pylint: disable=invalid-sequence-index
+                 hooks: Iterable[AbstractHook]=(),
+                 extra_streams: List[str]=(),  # pylint: disable=invalid-sequence-index
                  on_unused_sources: str = 'warn',
-                 fixed_batch_size: int = None,
+                 fixed_batch_size: Optional[int] = None,
                  skip_zeroth_epoch: bool = False):
         """
         :param model: trained model
         :param dataset: loaded dataset
-        :param hooks: a sequence of hooks
-        :param extra_streams: a sequence of additional stream names to be evaluated
-        :param on_unused_sources: action to take when stream provides unused sources {'ignore', 'warn', 'error'}
+        :param hooks: training hooks
+        :param extra_streams: additional stream names to be evaluated between epochs
+        :param on_unused_sources: action to take when stream provides an unused sources; one of
+            :py:attr:`UNUSED_SOURCE_ACTIONS`
         :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
+        :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch
         """
         assert on_unused_sources in MainLoop.UNUSED_SOURCE_ACTIONS
 
@@ -49,15 +56,17 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
 
-    def _create_epoch_data(self):
+    def _create_epoch_data(self) -> AbstractHook.EpochData:
         """Create empty epoch data double dict."""
         return OrderedDict([(stream_name, OrderedDict())
                             for stream_name in self._extra_streams + [MainLoop.TRAIN_STREAM]])
 
-    def _check_sources(self, batch: typing.Dict[str, object]) -> None:
+    def _check_sources(self, batch: Dict[str, object]) -> None:
         """
         Check for unused and missing sources.
+
         :param batch: batch to be checked
+        :raise: ValueError: is a source is missing or unused and ``self._on_unused_sources`` is set to ``error``
         """
         unused_sources = [source for source in batch.keys() if source not in self._model.input_names]
         missing_sources = [source for source in self._model.input_names if source not in batch.keys()]
@@ -79,10 +88,13 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
 
     def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_name: str) -> None:
         """
-        Iterate through the stream
-        :param stream: Iterable stream
-        :param train: if set to true, the model will be trained
-        :param stream_name: {train} or any specified
+        Iterate through the given stream and evaluate/train the model with the received batches.
+
+        Calls :py:meth:`cxflow.hooks.AbstractHook.after_batch` events.
+
+        :param stream: stream to iterate
+        :param train: if set to ``True``, the model will be trained
+        :param stream_name: stream name
         """
         while True:
             event_name = 'read_batch_{}'.format(stream_name)
@@ -110,13 +122,21 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                     hook.after_batch(stream_name=stream_name, batch_data={**batch_input, **batch_output})
 
     def train_by_stream(self, stream: AbstractDataset.Stream) -> None:
-        """Train the model with the given stream."""
+        """
+        Train the model with the given stream.
+
+        :param stream: stream to train with
+        """
 
         self._run_epoch(stream=stream, train=True, stream_name='train')
 
     def evaluate_stream(self, stream: AbstractDataset.Stream, stream_name: str) -> None:
-        """Evaluate the model with the given stream."""
+        """
+        Evaluate the given stream.
 
+        :param stream: stream to be evaluated
+        :param stream_name: stream name
+        """
         self._run_epoch(stream=stream, train=False, stream_name=stream_name)
 
     def get_stream(self, stream_name: str) -> AbstractDataset.Stream:
@@ -124,21 +144,24 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         Get a stream iterator with the given name.
 
         :param stream_name: name of the stream
-
-        Raises:
-            AttributeError: if the dataset does not provide the function creating the stream
+        :raise AttributeError: if the dataset does not provide the function creating the stream
         """
+        stream_fn_name = '{}_stream'.format(stream_name)
         try:
-            stream_fn_name = '{}_stream'.format(stream_name)
             return getattr(self._dataset, stream_fn_name)()
         except AttributeError as ex:
             raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
                                  'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
 
-    def _run_zeroth_epoch(self, streams: typing.Iterable[str]) -> None:
+    def _run_zeroth_epoch(self, streams: Iterable[str]) -> None:
         """
         Run zeroth epoch on the specified streams.
-        :param streams: iterable of streams to be evaluated
+
+        Calls
+            - :py:meth:`cxflow.hooks.AbstractHook.before_training`
+            - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
+
+        :param streams: stream names to be evaluated
         """
 
         # Initialization: before_training
@@ -155,7 +178,14 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
 
     def run_training(self) -> None:
-        """Run the main loop in the training mode."""
+        """
+        Run the main loop in the training mode.
+
+        Calls
+            - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
+            - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
+            - :py:meth:`cxflow.hooks.AbstractHook.after_training`
+        """
 
         logging.debug('Training started')
 

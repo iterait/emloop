@@ -4,34 +4,41 @@ Module with the SigintHook which allows to stop the training properly when a sig
 import logging
 import signal
 
-from .abstract_hook import AbstractHook, TrainingTerminated
+from . import AbstractHook, TrainingTerminated
 
 
 class CatchSigint(AbstractHook):
     """
-    SIGINT catcher.
+    Catch SIGINT signals allowing to stop the training with grace.
 
-    On first sigint finish the current batch and terminate training politely, i.e. trigger all `after_training` hooks.
+    On first sigint finish the current batch and terminate training politely, i.e. trigger all ``after_training`` hooks.
     On second sigint quit immediately with exit code 1
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - CatchSigint
-    -------------------------------------------------------
+
+    .. code-block:: yaml
+        :caption: register SIGINT catching
+
+        hooks:
+          - CatchSigint
+
     """
 
     def __init__(self, **kwargs):
+        """
+        Create new CatchSigint hook.
+
+        :param kwargs: additional ``**kwargs`` are ignored
+        """
+        super().__init__(**kwargs)
+
         self._num_sigints = 0
         self._original_handler = None
-        super().__init__(**kwargs)
 
     def _sigint_handler(self, signum, _) -> None:
         """
-        On the first signal, increase the self_num_sigints counter.
+        On the first signal, increase the ``self_num_sigints`` counter.
         Quit on any subsequent signal.
+
         :param signum: SIGINT signal number
         """
         if self._num_sigints > 0:  # not the first sigint
@@ -51,12 +58,12 @@ class CatchSigint(AbstractHook):
         """
         Stop the training if SIGINT signal was caught
 
-        Raises:
-            TrainingTerminated if an SIGINT signal was caught
+        :raise TrainingTerminated: if an SIGINT signal was caught
         """
         if self._num_sigints > 0:
             logging.warning('Terminating because SIGINT was caught during last batch processing.')
             raise TrainingTerminated('SIGINT caught')
 
     def after_training(self) -> None:
+        """Switch to the original signal handler."""
         signal.signal(signal.SIGINT, self._original_handler)

@@ -14,7 +14,7 @@ def predict(config_path: str, restore_from: Optional[str], cl_arguments: Iterabl
 
     :param config_path: path to the config file or the directory in which it is stored
     :param restore_from: backend-specific path to the already trained model to be restored from.
-                         If `None` is passed, it is inferred from the configuration file location as the directory
+                         If ``None`` is passed, it is inferred from the configuration file location as the directory
                          it is located in.
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created

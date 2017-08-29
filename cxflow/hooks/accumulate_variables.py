@@ -4,44 +4,47 @@ Module with batch data accumulating hook.
 import typing
 from collections import defaultdict
 
-from .abstract_hook import AbstractHook
+from . import AbstractHook
 from ..datasets import AbstractDataset
 
 
 class AccumulateVariables(AbstractHook):
     """
-    This hook accumulates the specified variables allowing their aggregation after each epoch.
+    Accumulate the specified variables allowing their aggregation after each epoch.
 
     The hook itself does not utilize the accumulated variables. It is meant to be inherited from. The child hook
-    will have the accumulated variables available in `self._accumulator` after each epoch.
+    will have the accumulated variables available in ``self._accumulator`` after each epoch.
 
-    The data are accumulated in a form of nested mapping 'stream_name' -> 'variable_name' -> [iterable values].
+    The data are accumulated in a form of nested mapping
+    ``stream_name`` -> ``variable_name`` -> ``Iterable``[``values``].
 
-    -------------------------------------------------------
-    This hook should not be used directly as it does nothing on its own.
-    -------------------------------------------------------
+    .. warning::
+        This hook should not be used directly as it does nothing on its own.
     """
 
-    def __init__(self, variables: typing.Iterable['str'], **kwargs):
+    def __init__(self, variables: typing.Iterable[str], **kwargs):
+        """
+        Create new AccumulateVariables hook.
+
+        :param variables: collection of variable names to be logged
+        """
         super().__init__(**kwargs)
         self._variables = variables
         self._accumulator = None
         self._reset_accumulator()
 
     def _reset_accumulator(self):
-        """Set the accumulator to an empty double-index defaultdict."""
+        """Set the accumulator to an empty double-index :py:class:`collections.defaultdict`."""
         self._accumulator = defaultdict(lambda: defaultdict(list))
 
     def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch):
         """
         Extend the accumulated variables with the given batch data.
 
-        :param stream_name: stream name; `train` or any other...
+        :param stream_name: stream name; e.g. ``train`` or any other...
         :param batch_data: batch data = stream sources + model outputs
-
-        Raise:
-            KeyError: if the variables to be aggregated are missing
-            TypeError: if the variable value is not iterable (e.g. it is only a scalar)
+        :raise KeyError: if the variables to be aggregated are missing
+        :raise TypeError: if the variable value is not iterable (e.g. it is only a scalar)
         """
         for variable in self._variables:
             if variable in batch_data:
@@ -54,5 +57,5 @@ class AccumulateVariables(AbstractHook):
                                'Available variables are `{}`.'.format(variable, batch_data.keys()))
 
     def after_epoch(self, **_):
-        """Reset the accumulator."""
+        """Reset the accumulator after each epoch."""
         self._reset_accumulator()

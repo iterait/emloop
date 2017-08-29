@@ -5,39 +5,21 @@
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
 
-This is an official repository of **cxflow** - a smart manager and personal trainer of various deep learning models.
-
-## Example
-For a quick example usage of **cxflow** please refer to a dedicated repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST).
-
-## Requirements
-Supported operating systems:
-- [Arch Linux](https://www.archlinux.org)
-- The latest [Ubuntu LTS release](http://releases.ubuntu.com)
-- [Ubuntu rolling release](http://releases.ubuntu.com).
-
-Supported Python interpreters:
-- Python 3.5+
-- Python 3.6+
-
-The list of Python package requirements is listed in `requirements.txt`.
+This is an official repository of **cxflow** - a lightweight framework for machine learning with focus on modularization, re-usability and rapid experimenting.
 
 ## Installation
-**cxflow** is available through the official PyPI repository; hence, the recommended installation is with `pip`:
 ```
 pip install cxflow
 ```
 
-## Usage
-The installation process installs `cxflow` command which might be used simply from the command line.
-Please refer to repository [Cognexa/cxMNIST](https://github.com/Cognexa/cxMNIST) for more information.
+## Quick start
 
-## Docs & Tutorials
-The documentation and tutorials are yet to be done.
+- [10 minutes tutorial](https://cxflow.org/tutorial) ([code](https://github.com/Cognexa/cxflow-examples/tree/master/majority))
+- [Documentation & API Reference](https://cxflow.org/)
+- [Additional examples](https://github.com/cognexa/cxflow-examples)
 
-So far, the following documents are available:
-- [introduction](tutorial)
-- [cxflow hooks](cxflow/hooks/README.md)
+## Requirements
+**cxflow** is supported (and tested) on [Arch Linux](https://www.archlinux.org) and [Ubuntu](http://releases.ubuntu.com) (latest LTS and rolling) with Python 3.6 and 3.5 respectively.
 
 ## Extensions
 **cxflow** is meant to be extremely lightweight.
@@ -49,5 +31,10 @@ At the moment we support the following extensions:
 - [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
 - [cxflow-rethinkdb](https://github.com/Cognexa/cxflow-rethinkdb) - RethinkDB hook for training management with NoSQL (experimental)
 
-## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
+## Contributions
+
+All contributions are welcomed. Please read our [contributor's guide](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE)

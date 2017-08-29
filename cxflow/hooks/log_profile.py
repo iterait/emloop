@@ -5,21 +5,23 @@ import logging
 from itertools import chain
 from typing import Iterable
 
-from .abstract_hook import AbstractHook
+from . import AbstractHook
 from ..utils.profile import Timer
 
 
 class LogProfile(AbstractHook):
     """
-    Summarize and log epoch profile.
+    Summarize and log epoch profile via standard :py:mod:`logging`.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - LogProfile
-    -------------------------------------------------------
+    Epoch profile contains info about time spent training, reading data etc. For full reference, see
+    :py:class:`cxflow.MainLoop`.
+
+    .. code-block:: yaml
+        :caption: log the time profile after each epoch
+
+        hooks:
+          - LogProfile
+
     """
 
     def after_epoch_profile(self, epoch_id, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
@@ -27,11 +29,12 @@ class LogProfile(AbstractHook):
         Summarize and log the given epoch profile.
 
         The profile is expected to contain at least:
-            - `read_data_train`, `eval_batch_train` and `after_batch_hooks_train` entries produced by the train stream
-            - `after_epoch_hooks` entry
+            - ``read_data_train``, ``eval_batch_train`` and ``after_batch_hooks_train`` entries produced by the train
+              stream
+            - ``after_epoch_hooks`` entry
 
         :param profile: epoch timings profile
-        :param extra_streams: enumeration of additiona stream names
+        :param extra_streams: enumeration of additional stream names
         """
 
         read_data_total = 0

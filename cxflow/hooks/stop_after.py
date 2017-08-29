@@ -15,6 +15,7 @@ class StopAfter(AbstractHook):
     Stop the training after any of the specified conditions is met.
 
     .. code-block:: yaml
+
         :caption: stop the training after 500 epochs
         hooks:
           - StopAfter:
@@ -22,6 +23,7 @@ class StopAfter(AbstractHook):
 
 
     .. code-block:: yaml
+
         :caption: stop the training after 1000 iterations of 1 hour whichever comes first
         hooks:
           - StopAfter:

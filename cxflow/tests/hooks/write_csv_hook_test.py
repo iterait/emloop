@@ -145,7 +145,7 @@ class CSVHookTest(CXTestCase):
         epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
         epoch_id = 6
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             hook._write_row(epoch_id, epoch_data)
 
     def test_after_epoch_one_header(self):

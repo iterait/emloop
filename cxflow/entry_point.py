@@ -26,7 +26,7 @@ def entry_point() -> None:
     # make sure the path contains the current working directory
     sys.path.insert(0, os.getcwd())
 
-    parser = get_cxflow_arg_parser()
+    parser = get_cxflow_arg_parser(True)
 
     # parse CLI arguments
     known_args, unknown_args = parser.parse_known_args()

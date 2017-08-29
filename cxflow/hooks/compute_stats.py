@@ -2,37 +2,38 @@
 Module with a hook capable of computing accumulated variable statistics such as mean or median.
 """
 from collections import OrderedDict
-from typing import Iterable, Mapping
+from typing import Iterable, Mapping, Any
 
 import numpy as np
 
-from .abstract_hook import AbstractHook
-from .accumulate_variables import AccumulateVariables
+from . import AbstractHook, AccumulateVariables
 
 
 class ComputeStats(AccumulateVariables):
     """
     Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # accumulate the accuracy variable (either model output or stream source); compute and store its mean value
-    hooks:
-      - ComputeStats:
-          variables:
-            accuracy: [mean]
-    -------------------------------------------------------
+    .. code-block:: yaml
+        :caption: accumulate the accuracy variable (either model output or stream source); compute and store its mean \
+        value
+
+        hooks:
+          - ComputeStats:
+              variables:
+                accuracy: [mean]
+
     """
 
     AGGREGATIONS = {'mean', 'std', 'min', 'max', 'median'}
+    """Supported numpy-like aggregation methods."""
 
     def __init__(self, variables: Mapping[str, Iterable[str]], **kwargs):
         """
         Create new stats hook.
 
-        Raises:
-            ValueError: if the specified aggregation function is not supported
+        :param variables: variables mapping: ``variable_name`` -> ``List`` [``aggregations``...] wherein
+            ``aggregations`` are one of :py:attr:`AGGREGATIONS`
+        :raise ValueError: if the specified aggregation function is not supported
         """
         for variable, aggregations in variables.items():
             for aggregation in aggregations:
@@ -45,15 +46,13 @@ class ComputeStats(AccumulateVariables):
         self._variables = variables
 
     @staticmethod
-    def _compute_aggregation(aggregation: str, data: Iterable):
+    def _compute_aggregation(aggregation: str, data: Iterable[Any]):
         """
         Compute the specified aggregation on the given data.
 
         :param aggregation: on of {mean, std, min, max, median}.
         :param data: data to be aggregated
-
-        Raises:
-            Value Error if the specified aggregation is not supported
+        :raise ValueError: if the specified aggregation is not supported
         """
         if aggregation == 'mean':
             return np.mean(data)
@@ -68,7 +67,11 @@ class ComputeStats(AccumulateVariables):
         raise ValueError('Aggregation `{}` is not supported.'.format(aggregation))
 
     def _save_stats(self, epoch_data: AbstractHook.EpochData) -> None:
-        """Extend `epoch_data` by stream:variable:aggreagation data."""
+        """
+        Extend ``epoch_data`` by stream:variable:aggreagation data.
+
+        :param epoch_data: data source from which the statistics are computed
+        """
 
         for stream_name in epoch_data.keys():
             for variable_name, variable_aggrs in self._variables.items():
@@ -78,6 +81,10 @@ class ComputeStats(AccumulateVariables):
                      for aggr in variable_aggrs})
 
     def after_epoch(self, epoch_data: AbstractHook.EpochData, **kwargs) -> None:
-        """Compute the specified aggregations and save them to the given epoch data."""
+        """
+        Compute the specified aggregations and save them to the given epoch data.
+
+        :param epoch_data: epoch data to be processed
+        """
         self._save_stats(epoch_data)
         super().after_epoch(epoch_data=epoch_data, **kwargs)

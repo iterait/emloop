@@ -2,20 +2,28 @@ from argparse import ArgumentParser
 import pkg_resources
 
 
-def get_cxflow_arg_parser() -> ArgumentParser:
+def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
+    """
+    Create the cxflow argument parser.
+
+    :return: an instance of the parser
+    """
     # create parser
-    main_parser = ArgumentParser('cxflow')
-    main_parser.add_argument('--version', action='version', help='print cxflow version and quit',
+    main_parser = ArgumentParser('cxflow',
+                                 description='cxflow: smart manager for deep learning models.',
+                                 epilog='For more info see <https://cognexa.github.io/cxflow>')
+
+    main_parser.add_argument('--version', action='version', help='Print cxflow version and quit.',
                              version='cxflow {}'.format(pkg_resources.get_distribution('cxflow').version))
-    subparsers = main_parser.add_subparsers(help='cxflow modes')
+    subparsers = main_parser.add_subparsers(help='cxflow commands')
 
     # create train subparser
-    train_parser = subparsers.add_parser('train')
+    train_parser = subparsers.add_parser('train', description='Start cxflow training from the ``config_file``.')
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
 
     # create resume subparser
-    resume_parser = subparsers.add_parser('resume')
+    resume_parser = subparsers.add_parser('resume', description='Resume cxflow training from the ``config_path``.')
     resume_parser.set_defaults(subcommand='resume')
     resume_parser.add_argument('config_path', help='path to the config file or the directory in which it is stored')
     resume_parser.add_argument('restore_from', nargs='?', default=None,
@@ -46,8 +54,9 @@ def get_cxflow_arg_parser() -> ArgumentParser:
                                                                           'of executing it right away')
 
     # add common arguments
-    for parser in [main_parser, train_parser, resume_parser, predict_parser, dataset_parser]:
-        parser.add_argument('-v', '--verbose', action='store_true', help='increase verbosity do level DEBUG')
-        parser.add_argument('-o', '--output-root', default='log', help='output directory')
+    if add_common_arguments:
+        for parser in [main_parser, train_parser, resume_parser, predict_parser, dataset_parser]:
+            parser.add_argument('--output_root', '-o', default='./log', help='output directory')
+            parser.add_argument('--verbose', '-v', action='store_true', help='increase verbosity do level DEBUG')
 
     return main_parser

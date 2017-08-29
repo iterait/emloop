@@ -54,7 +54,7 @@ class TrainCheckHookTest(CXTestCase):
     def test_not_scalar_raise(self):
         """Test raising error, when variable is not scalar."""
         hook = Check(_VAR, _MIN_ACCURACY, _MAX_EPOCH)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             hook.after_epoch(_CURRENT_EPOCH, self._epoch_data)
 
     def test_training_terminated(self):

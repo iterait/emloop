@@ -7,38 +7,45 @@ from typing import Iterable
 
 import numpy as np
 
-from .abstract_hook import AbstractHook
+from . import AbstractHook
 
 
 class LogVariables(AbstractHook):
     """
-    Log the training results to stderr via standard logging module.
+    Log the training results to stderr via standard :py:mod:`logging` module.
 
-    -------------------------------------------------------
-    Example usage in config
-    -------------------------------------------------------
-    # log all the variables
-    hooks:
-      - LogVariables
-    -------------------------------------------------------
-    # log only certain variables
-    hooks:
-      - LogVariables:
-          variables: [loss]
-    -------------------------------------------------------
-    # warn about unsupported variables
-    hooks:
-      - LogVariables:
-          on_unknown_type: warn
-    -------------------------------------------------------
+
+    .. code-block:: yaml
+        :caption: log all the variables
+
+        hooks:
+          - LogVariables
+
+    .. code-block:: yaml
+        :caption: log only certain variables
+
+        hooks:
+          - LogVariables:
+              variables: [loss]
+
+    .. code-block:: yaml
+        :caption: warn about unsupported variables
+
+        hooks:
+          - LogVariables:
+              on_unknown_type: warn
+
     """
 
-    UNKNOWN_TYPE_ACTIONS = {'error', 'warn', 'str', 'ignore'}
+    UNKNOWN_TYPE_ACTIONS = ['error', 'warn', 'str', 'ignore']
+    """Posible actions to take on unknown variable type."""
 
     def __init__(self, variables: Iterable[str]=None, on_unknown_type='ignore', **kwargs):
         """
-        :param variables: a sequence of variable names to be logged. If not specified log all the available variables.
-        :param on_unknown_type: an action to be taken if the variable value type is not supported (e.g. a list)
+        Create new LogVariables hook.
+
+        :param variables: variable names to be logged; log all the variables by default
+        :param on_unknown_type: an action to be taken if the variable type is not supported (e.g. a list)
         """
         assert on_unknown_type in LogVariables.UNKNOWN_TYPE_ACTIONS
 
@@ -48,17 +55,17 @@ class LogVariables(AbstractHook):
 
     def _log_variables(self, epoch_data: AbstractHook.EpochData):
         """
-        Log the specified variables from the epoch data.
+        Log variables from the epoch data.
 
-        At the moment, only scalars and dicts of scalars are properly formatted and logged.
-        Other value types are ignored by default.
-        One may set on_unknown_type to `str` in order to log the variable anyways.
+        .. warning::
+            At the moment, only scalars and dicts of scalars are properly formatted and logged.
+            Other value types are ignored by default.
+
+        One may set ``on_unknown_type`` to ``str`` in order to log all the variables anyways.
 
         :param epoch_data: epoch data to be logged
-
-        Raises:
-            KeyError: if the specified variable is not found in the stream
-            TypeError: if the variable value is of unsupported type and on_unknown_type is set to `error`
+        :raise KeyError: if the specified variable is not found in the stream
+        :raise TypeError: if the variable value is of unsupported type and ``self._on_unknown_type`` is set to ``error``
         """
         for stream_name in epoch_data.keys():
             stream_data = epoch_data[stream_name]
@@ -89,6 +96,13 @@ class LogVariables(AbstractHook):
                         logging.info('\t%s %s: %s', stream_name, variable, value)
 
     def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+        """
+        Log the epoch data via :py:mod:`logging` API.
+        Additionally, a blank line is printed directly to stderr to delimit the outputs from other epochs.
+
+        :param epoch_id: number of processed epoch
+        :param epoch_data: epoch data to be logged
+        """
         print('\n\n', file=sys.stderr)
         logging.info('After epoch %s', epoch_id)
         self._log_variables(epoch_data)
