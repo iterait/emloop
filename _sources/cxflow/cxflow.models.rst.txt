@@ -21,7 +21,6 @@ Classes
    :members:
    :private-members:
    :special-members:
-   :exclude-members: __weakref__
 
    .. inheritance-diagram:: AbstractModel
       :parts: 1

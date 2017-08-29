@@ -111,7 +111,13 @@
  </div>
   <input type="hidden" name="check_keywords" value="yes" />
   <input type="hidden" name="area" value="default" />
-</form>
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+</ul>
         </div>
       </div>
     <div class="col-md-9 content">
@@ -198,6 +204,12 @@ method.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.hooks.AbstractHook.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.hooks.AbstractHook.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">
@@ -927,7 +939,7 @@ stream</li>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveBest.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the monitor variable.</p>
 </dd></dl>
 
@@ -1136,7 +1148,7 @@ Quit on any subsequent signal.</p>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'min', 'std', 'mean', 'median', 'max'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AGGREGATIONS</code><em class="property"> = {'max', 'mean', 'std', 'median', 'min'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported numpy-like aggregation methods.</p>
 </dd></dl>
 

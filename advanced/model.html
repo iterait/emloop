@@ -111,7 +111,13 @@
  </div>
   <input type="hidden" name="check_keywords" value="yes" />
   <input type="hidden" name="area" value="default" />
-</form>
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+</ul>
         </div>
       </div>
     <div class="col-md-9 content">
@@ -174,7 +180,7 @@ with the model object implementations etc.).
 For these cases, each model should implement a <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.restore_fallback" title="cxflow.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.restore_fallback()</span></code></a> method, which usually points
 to a backend-specific baseclass which is able to restore the saved files of all its subclasses.
 For instance, in the <code class="docutils literal"><span class="pre">cxflow-tensorflow</span></code> backend, the <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.restore_fallback" title="cxflow.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.restore_fallback()</span></code></a> class returns
-<a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.1)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a> which it is able to load any checkpoint
+<code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code> which it is able to load any checkpoint
 without the need for the original model source codes.</p>
 </div>
 </div>

@@ -121,7 +121,13 @@
  </div>
   <input type="hidden" name="check_keywords" value="yes" />
   <input type="hidden" name="area" value="default" />
-</form>
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+</ul>
         </div>
       </div>
     <div class="col-md-9 content">
@@ -292,8 +298,8 @@ Let us define the model using a simple <a class="reference external" href="https
 To make this process simpler, we will use the official <a class="reference external" href="https://github.com/Cognexa/cxflow-tensorflow">cxflow-tensorflow</a> package that provides
 a basic TensorFlow integration with cxflow. Please install this package before you proceed
 with this tutorial.</p>
-<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.1)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class expected to
-extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.1)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>.</p>
+<p>In <code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code>, every model is a python class expected to
+extend the <code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code>.</p>
 <p>Let us define a class called <code class="docutils literal"><span class="pre">MajorityNet</span></code>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 
@@ -322,10 +328,10 @@ extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxf
         <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">)),</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>When implementing a custom model, make sure to extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.1)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a> class.
+<p>When implementing a custom model, make sure to extend the <code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code> class.
 As described above, this tutorial only focuses on the TensorFlow model, hence extending
-<a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.1)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a> is a good idea.</p>
-<p>The only method that is really necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.1)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
+<code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code> is a good idea.</p>
+<p>The only method that is really necessary to implement is <code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code>.
 In our case, <code class="docutils literal"><span class="pre">_create_model</span></code> method creates a simple MLP.
 If you know the fundamental basics of TensorFlow, it should be easy to understand what is going on.</p>
 <p>To be precise, the model registered the following computational graph nodes:</p>

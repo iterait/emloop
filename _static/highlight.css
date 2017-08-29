@@ -1,4 +1,4 @@
-dl.class, dl.function, dl.exception{
+dl.class, dl.function{
   margin-bottom: 30px;
   background-color: #ffffff;
   border: 1px solid #aaaaaa;
@@ -8,7 +8,7 @@ dl.class, dl.function, dl.exception{
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 
 }
-dl.class dt, dl.function dt, dl.exception dt{
+dl.class dt, dl.function dt{
   margin-bottom: 25px;
 
 }
@@ -73,21 +73,3 @@ border: 1px solid #aaaaaa;
 text-align:center;
 margin-top:5px;
 margin-bottom:5px;}
-
-.option-list{
-}
-
-.option-group
-{
-    width:150px;
-}
-
-#cli-reference h3{
-display:none;
-}
-#cli-reference td{
-border: none;
-}
-.nav-list li ul li ul{
-display:none;
-}

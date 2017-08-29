@@ -99,22 +99,10 @@
     </a>
     </div><ul>
 <li><a class="reference internal" href="#">CLI Reference</a><ul>
-<li><a class="reference internal" href="#cxflow-train">cxflow train</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cxflow-resume">cxflow resume</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cxflow-predict">cxflow predict</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cxflow-dataset">cxflow dataset</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#cxflow-train">cxflow train</a></li>
+<li><a class="reference internal" href="#cxflow-resume">cxflow resume</a></li>
+<li><a class="reference internal" href="#cxflow-predict">cxflow predict</a></li>
+<li><a class="reference internal" href="#cxflow-dataset">cxflow dataset</a></li>
 </ul>
 </li>
 </ul>
@@ -125,7 +113,13 @@
  </div>
   <input type="hidden" name="check_keywords" value="yes" />
   <input type="hidden" name="area" value="default" />
-</form>
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+</ul>
         </div>
       </div>
     <div class="col-md-9 content">
@@ -154,86 +148,15 @@ explained bellow.</p>
 </tbody>
 </table><div class="section" id="cxflow-train">
 <h2>cxflow train<a class="headerlink" href="#cxflow-train" title="Permalink to this headline">¶</a></h2>
-<p>Start cxflow training from the <code class="docutils literal"><span class="pre">config_file</span></code>.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cxflow</span> <span class="n">train</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_file</span>
-</pre></div>
-</div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>config_file</kbd></td>
-<td>path to the config file</td></tr>
-</tbody>
-</table>
-</div>
 </div>
 <div class="section" id="cxflow-resume">
 <h2>cxflow resume<a class="headerlink" href="#cxflow-resume" title="Permalink to this headline">¶</a></h2>
-<p>Resume cxflow training from the <code class="docutils literal"><span class="pre">config_path</span></code>.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cxflow</span> <span class="n">resume</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_path</span> <span class="p">[</span><span class="n">restore_from</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>config_path</kbd></td>
-<td>path to the config file or the directory in which it is stored</td></tr>
-<tr><td class="option-group">
-<kbd>restore_from</kbd></td>
-<td>information passed to the model constructor (backend-specific); usually a directory in which the trained model is stored</td></tr>
-</tbody>
-</table>
-</div>
 </div>
 <div class="section" id="cxflow-predict">
 <h2>cxflow predict<a class="headerlink" href="#cxflow-predict" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cxflow</span> <span class="n">predict</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_path</span> <span class="p">[</span><span class="n">restore_from</span><span class="p">]</span>
-</pre></div>
-</div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>config_path</kbd></td>
-<td>path to the config file or the directory in which it is stored</td></tr>
-<tr><td class="option-group">
-<kbd>restore_from</kbd></td>
-<td>information passed to the model constructor (backend-specific); usually a directory in which the trained model is stored</td></tr>
-</tbody>
-</table>
-</div>
 </div>
 <div class="section" id="cxflow-dataset">
 <h2>cxflow dataset<a class="headerlink" href="#cxflow-dataset" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cxflow</span> <span class="n">dataset</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">method</span> <span class="n">config_file</span>
-</pre></div>
-</div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>method</kbd></td>
-<td>name of the method to be invoked</td></tr>
-<tr><td class="option-group">
-<kbd>config_file</kbd></td>
-<td>path to the config file</td></tr>
-</tbody>
-</table>
-</div>
 </div>
 </div>
 
