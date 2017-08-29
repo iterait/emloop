@@ -18,7 +18,7 @@ your favourite machine learning framework, such as `TensorFlow <https://www.tens
 Therefore, you don't have to learn a new framework if you already know one.
 In addition, you can easily convert the models you already have with only minimal changes.
 
-**cxflow** allows (and encourages) you to build modular projects, where the dataset,
+**cxflow** allows (and encourages) you to build modular projects, wherein the dataset,
 the model, and the configuration are separated and reusable. In the following sections,
 we will describe how should those reusable modules look like on a simple example.
 
