@@ -1,5 +1,5 @@
 """
-Test module for csv hook (cxflow.hooks.write_csv_hook).
+Test module for csv hook (:py:class:`cxflow.hooks.WriteCSV).
 """
 
 import numpy as np
@@ -36,8 +36,8 @@ def _get_epoch_data():
     return epoch_data
 
 
-class CSVHookTest(CXTestCase):
-    """Test case for WriteCSV hook."""
+class WriteCSVTest(CXTestCase):
+    """Test case for :py:class:`cxflow.hooks.WriteCSV hook."""
 
     def test_init_hook(self):
         """Test correct hook initialization."""
