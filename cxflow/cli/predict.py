@@ -38,7 +38,7 @@ def predict(config_path: str, restore_from: Optional[str], cl_arguments: Iterabl
             if 'hooks' in config['predict']:
                 config['hooks'] = config['predict']['hooks']
             else:
-                logging.warning('Config lacks `hooks` section. No hook will be employed during the prediction.')
+                logging.warning('Config does not contain `predict.hooks` section. No hook will be employed during the prediction.')
                 config['hooks'] = []
 
         validate_config(config)
