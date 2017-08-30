@@ -12,9 +12,9 @@ def predict(config_path: str, restore_from: Optional[str], cl_arguments: Iterabl
     """
     Run prediction from the specified config path.
 
-    If the config contains a `predict` section:
-        - override hooks with predict.hooks if present
-        - update dataset, model and main_loop sections if the respective sections are present
+    If the config contains a ``predict`` section:
+        - override hooks with ``predict.hooks`` if present
+        - update dataset, model and main loop sections if the respective sections are present
 
     :param config_path: path to the config file or the directory in which it is stored
     :param restore_from: backend-specific path to the already trained model to be restored from.
