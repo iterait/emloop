@@ -14,36 +14,50 @@ class ComputeStats(AccumulateVariables):
     Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
 
     .. code-block:: yaml
-        :caption: accumulate the accuracy variable (either model output or stream source); compute and store its mean \
-        value
+        :caption: compute loss and accuracy means after each epoch
+
+        hooks:
+        - ComputeStats:
+            variables: [loss, accuracy]
+
+    .. code-block:: yaml
+        :caption: compute min and max loss after each epoch
 
         hooks:
           - ComputeStats:
               variables:
-                accuracy: [mean]
+              - loss : [min, max]
 
     """
 
     AGGREGATIONS = {'mean', 'std', 'min', 'max', 'median'}
     """Supported numpy-like aggregation methods."""
 
-    def __init__(self, variables: Mapping[str, Iterable[str]], **kwargs):
+    def __init__(self, variables, **kwargs):
         """
         Create new stats hook.
 
-        :param variables: variables mapping: ``variable_name`` -> ``List`` [``aggregations``...] wherein
-            ``aggregations`` are one of :py:attr:`AGGREGATIONS`
+        :param variables: list of variables mapping: ``variable_name`` -> ``List`` [``aggregations``...] wherein
+            ``aggregations`` are one of :py:attr:`AGGREGATIONS` or ``variable_name`` only to compute its mean
+        :param kwargs: Ignored
         :raise ValueError: if the specified aggregation function is not supported
         """
-        for variable, aggregations in variables.items():
+        # list of mappings variable -> [aggregations..]
+        variable_aggregations = [{variable: ['mean']} if isinstance(variable, str) else variable for variable in
+                                 variables]
+
+        # single mapping variable -> aggregations
+        self._variable_aggregations = {}
+        for variable_aggregation in variable_aggregations:
+            self._variable_aggregations.update(variable_aggregation)
+
+        for variable, aggregations in self._variable_aggregations.items():
             for aggregation in aggregations:
                 if aggregation not in ComputeStats.AGGREGATIONS:
                     raise ValueError('Aggregation `{}` for variable `{}` is not supported.'
                                      .format(aggregation, variable))
 
-        super().__init__(variables=list(variables.keys()), **kwargs)
-
-        self._variables = variables
+        super().__init__(variables=list(self._variable_aggregations.keys()), **kwargs)
 
     @staticmethod
     def _compute_aggregation(aggregation: str, data: Iterable[Any]):
@@ -74,11 +88,11 @@ class ComputeStats(AccumulateVariables):
         """
 
         for stream_name in epoch_data.keys():
-            for variable_name, variable_aggrs in self._variables.items():
+            for variable, aggregations in self._variable_aggregations.items():
                 # variables are already checked in the AccumulatingHook; hence, we do not check them here
-                epoch_data[stream_name][variable_name] = OrderedDict(
-                    {aggr: ComputeStats._compute_aggregation(aggr, self._accumulator[stream_name][variable_name])
-                     for aggr in variable_aggrs})
+                epoch_data[stream_name][variable] = OrderedDict(
+                    {aggr: ComputeStats._compute_aggregation(aggr, self._accumulator[stream_name][variable])
+                     for aggr in aggregations})
 
     def after_epoch(self, epoch_data: AbstractHook.EpochData, **kwargs) -> None:
         """
