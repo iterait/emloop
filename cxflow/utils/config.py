@@ -1,10 +1,8 @@
 """
 Config module provides util functions for loading and dumping yaml configurations.
 """
-import ast
 import typing
 from os import path
-from distutils.util import strtobool
 
 import yaml
 import ruamel.yaml  # pylint: disable=import-error
@@ -14,39 +12,16 @@ from ..constants import CXF_CONFIG_FILE
 
 def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     """
-    Parse CLI argument in format ``key[:type]=value`` to ``(key, value)``
+    Parse CLI argument in format ``key=value`` to ``(key, value)``
 
     :param arg: CLI argument string
-    :return: tuple (key, value[:type])
+    :return: tuple (key, value)
+    :raise: yaml.ParserError: on yaml parse error
     """
-    assert '=' in arg
+    assert '=' in arg, 'Unrecognized argument `{}`. [name]=[value] expected.'.format(arg)
 
-    if ':' in arg:
-        key = arg[:arg.index(':')]
-        type_ = arg[arg.index(':') + 1:arg.index('=')]
-        value = arg[arg.index('=') + 1:]
-    else:
-        key = arg[:arg.index('=')]
-        type_ = 'str'
-        value = arg[arg.index('=') + 1:]
-
-    try:
-        if type_ == 'ast':
-            value = ast.literal_eval(value)
-        elif type_ == 'int':
-            value = int(value)
-        elif type_ == 'float':
-            value = float(value)  # pylint: disable=redefined-variable-type
-        elif type_ == 'bool':
-            value = strtobool(value) == 1
-        elif type_ == 'str':
-            pass
-        else:
-            raise ValueError('Argument type `{}` is not recognized. '
-                             'Recognized types are `[ast, int, float, bool, str]`'.format(type_))
-    except (ValueError, SyntaxError) as ex:
-        raise ValueError('Could not convert argument `{}` of value `{}` to type `{}`. '
-                         'Original argument: `{}`.'.format(key, value, type_, arg)) from ex
+    key = arg[:arg.index('=')]
+    value = yaml.load(arg[arg.index('=') + 1:])
 
     return key, value
 
