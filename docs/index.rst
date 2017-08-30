@@ -1,0 +1,36 @@
+cxflow
+======
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   getting_started
+   tutorial
+   advanced/index
+   cli
+   cxflow/index
+
+**cxflow** is a lightweight framework for machine learning with focus on modularization, re-usability and rapid experimenting.
+
+Check out our :doc:`10 minutes tutorial <tutorial>`, dig into the :doc:`advanced section <advanced/index>` or
+see our :doc:`API reference <cxflow/index>`.
+
+**cxflow** provides convenient :doc:`documented <cli>` command line instruments.
+
+Contribute
+----------
+
+- `Issue Tracker @GitHub <https://github.com/Cognexa/cxflow/issues>`_
+- `Source Code @GitHub <https://github.com/Cognexa/cxflow>`_
+
+Support
+-------
+
+If you are having issues, please let us know either via the official
+`issue tracker <https://github.com/Cognexa/cxflow/issues>`_ or via e-mail cxflow (at) cognexa (dot) com.
+
+License
+-------
+
+The project is licensed under the MIT license.

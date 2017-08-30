@@ -11,40 +11,33 @@ from typing import Tuple, List, Dict, Iterable, Any, Optional
 _EMPTY_DICT = MappingProxyType({})
 
 
-def create_object_from_config(config: Dict[str, Any], args: Iterable=(),
-                              kwargs: Dict[str, Any]=_EMPTY_DICT, key_prefix: str=None):
+def parse_fully_qualified_name(fq_name: str) -> Tuple[Optional[str], str]:
     """
-    Create an object instance according to the given config.
+    Parse the given fully-quallified name (separated with dots) to a tuple of module and class names.
 
-    Config dict has to contain module and class names under [key_prefix]module and [key_prefix]class keys.
-
-    If no key_prefix is provided,
-    the method attempts to deduce key names so that they contain 'module' and 'class' respectively.
-
-    :param config: config dict
-    :param args: args to be passed to the object constructor
-    :param kwargs: kwargs to be passed to the object constructor
-    :param key_prefix: module and class names key prefix
-    :return: created object instance
+    :param fq_name: fully qualified name separated with dots
+    :return: ``None`` instead of module if the given name contains no separators (dots).
     """
-    if not key_prefix:
-        module_matches = [key for key in config.keys() if 'module' in key]
-        class_matches = [key for key in config.keys() if 'class' in key]
-
-        if not (len(module_matches) == 1 and len(class_matches) == 1):
-            raise ValueError('Failed to deduce module and class names keys from config `{}`. Please provide key_prefix'
-                             .format(config))
-
-        module_key = module_matches[0]
-        class_key = class_matches[0]
+    last_dot = fq_name.rfind('.')
+    if last_dot != -1:
+        return fq_name[:last_dot], fq_name[last_dot + 1:]
     else:
-        module_key = key_prefix + 'module'
-        class_key = key_prefix + 'class'
+        return None, fq_name
 
-    assert module_key in config
-    assert class_key in config
 
-    return create_object(module_name=config[module_key], class_name=config[class_key], args=args, kwargs=kwargs)
+def get_attribute(module_name: str, attribute_name: str):
+    """
+    Get the specified module attribute. It most cases, it will be a class or function.
+
+    :param module_name: module name
+    :param attribute_name: attribute name
+    :return: module attribute
+    """
+    assert isinstance(module_name, str)
+    assert isinstance(attribute_name, str)
+
+    _module = importlib.import_module(module_name)
+    return getattr(_module, attribute_name)
 
 
 def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: Dict[str, Any]=_EMPTY_DICT):
@@ -52,12 +45,12 @@ def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: 
     Create an object instance of the given class from the given module.
     Args and kwargs are passed to the constructor.
 
-    -----------------------------------------------------
     This mimics the following code:
-    -----------------------------------------------------
-    from module import class
-    return class(*args, **kwargs)
-    -----------------------------------------------------
+
+    .. code-block:: python
+
+        from module import class
+        return class(*args, **kwargs)
 
     :param module_name: module name
     :param class_name: class name
@@ -65,16 +58,15 @@ def create_object(module_name: str, class_name: str, args: Iterable=(), kwargs: 
     :param kwargs: kwargs to be passed to the object constructor
     :return: created object instance
     """
-    assert isinstance(module_name, str)
-    assert isinstance(class_name, str)
-
-    _module = importlib.import_module(module_name)
-    _class = getattr(_module, class_name)
-    return _class(*args, **kwargs)
+    return get_attribute(module_name, class_name)(*args, **kwargs)
 
 
 def list_submodules(module_name: str) -> List[str]:   # pylint: disable=invalid-sequence-index
-    """List full names of all the submodules in the given module."""
+    """
+    List full names of all the submodules in the given module.
+
+    :param module_name: name of the module of which the submodules will be listed
+    """
     _module = importlib.import_module(module_name)
     return [module_name+'.'+submodule_name for _, submodule_name, _ in pkgutil.iter_modules(_module.__path__)]
 
@@ -112,7 +104,8 @@ def get_class_module(module_name: str, class_name: str) -> Optional[str]:
     - return None when no sub-module is found
     - warn about non-searchable sub-modules
 
-    NOTE: This function logs!
+    .. note::
+        This function logs!
 
     :param module_name: module to be searched
     :param class_name: searched class name
@@ -138,3 +131,5 @@ def get_class_module(module_name: str, class_name: str) -> Optional[str]:
                                  .format(class_name, module_name, matched_modules))
         return matched_modules[0]
     return None
+
+__all__ = []

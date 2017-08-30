@@ -1,57 +1,36 @@
 """
 Config module provides util functions for loading and dumping yaml configurations.
 """
-import ast
 import typing
 from os import path
-from distutils.util import strtobool
 
 import yaml
 import ruamel.yaml  # pylint: disable=import-error
 
+from ..constants import CXF_CONFIG_FILE
+
 
 def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     """
-    Parse CLI argument in format key[:type]=value to (key, value)
+    Parse CLI argument in format ``key=value`` to ``(key, value)``
+
     :param arg: CLI argument string
-    :return: tuple (key, value[:type])
+    :return: tuple (key, value)
+    :raise: yaml.ParserError: on yaml parse error
     """
-    assert '=' in arg
+    assert '=' in arg, 'Unrecognized argument `{}`. [name]=[value] expected.'.format(arg)
 
-    if ':' in arg:
-        key = arg[:arg.index(':')]
-        type_ = arg[arg.index(':') + 1:arg.index('=')]
-        value = arg[arg.index('=') + 1:]
-    else:
-        key = arg[:arg.index('=')]
-        type_ = 'str'
-        value = arg[arg.index('=') + 1:]
-
-    try:
-        if type_ == 'ast':
-            value = ast.literal_eval(value)
-        elif type_ == 'int':
-            value = int(value)
-        elif type_ == 'float':
-            value = float(value)  # pylint: disable=redefined-variable-type
-        elif type_ == 'bool':
-            value = strtobool(value) == 1
-        elif type_ == 'str':
-            pass
-        else:
-            raise ValueError('Argument type `{}` is not recognized. '
-                             'Recognized types are `[ast, int, float, bool, str]`'.format(type_))
-    except (ValueError, SyntaxError) as ex:
-        raise ValueError('Could not convert argument `{}` of value `{}` to type `{}`. '
-                         'Original argument: `{}`.'.format(key, value, type_, arg)) from ex
+    key = arg[:arg.index('=')]
+    value = yaml.load(arg[arg.index('=') + 1:])
 
     return key, value
 
 
 def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict:
     """
-    Load config from yaml `config_file` and extend/override it with the given `additional_args`.
-    :param config_file: path the yaml config file to be loaded
+    Load config from YAML ``config_file`` and extend/override it with the given ``additional_args``.
+
+    :param config_file: path the YAML config file to be loaded
     :param additional_args: additional args which may extend or override the config loaded from the file.
     :return: configuration as dict
     """
@@ -73,9 +52,10 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict
     return config
 
 
-def config_to_file(config, output_dir: str, name: str='config.yaml') -> str:
+def config_to_file(config, output_dir: str, name: str=CXF_CONFIG_FILE) -> str:
     """
-    Save the given config to the given path in yaml.
+    Save the given config to the given path in YAML.
+
     :param config: configuration dict
     :param output_dir: target output directory
     :param name: target filename
@@ -89,8 +69,11 @@ def config_to_file(config, output_dir: str, name: str='config.yaml') -> str:
 
 def config_to_str(config: dict) -> str:
     """
-    Return the given given config as yaml str.
+    Return the given given config as YAML str.
+
     :param config: configuration dict
     :return: given configuration as yaml str
     """
     return yaml.dump(config)
+
+__all__ = []

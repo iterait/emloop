@@ -7,9 +7,9 @@ from typing import Mapping, List, Iterable
 
 import numpy as np
 
-from cxflow import AbstractNet, MainLoop, AbstractDataset
+from cxflow import AbstractModel, MainLoop, AbstractDataset
 from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.epoch_stopper_hook import EpochStopperHook
+from cxflow.hooks.stop_after import StopAfter
 from cxflow.utils.profile import Timer
 
 from .test_core import CXTestCaseWithDir
@@ -17,7 +17,7 @@ from .test_core import CXTestCaseWithDir
 _READ_DATA_SLEEP_S = 0.1
 _AFTER_BATCH_SLEEP_S = 0.2
 _AFTER_EPOCH_SLEEP_S = 0.3
-_NET_RUN_SLEEP_S = 0.5
+_MODEL_RUN_SLEEP_S = 0.5
 
 _DATASET_ITERS = 13
 _DATASET_SHAPE = (11, 10)
@@ -32,7 +32,7 @@ class SimpleDataset(AbstractDataset):
         super().__init__(config_str='')
         self.iters = _DATASET_ITERS
         self.shape = _DATASET_SHAPE
-        self.train_used = self.valid_used = self.test_used = False
+        self.train_used = self.valid_used = self.test_used = self.predict_used = False
         self.batches = defaultdict(lambda: [])
         self.source_names = ['input', 'target']
         self._iter = 1
@@ -45,26 +45,31 @@ class SimpleDataset(AbstractDataset):
             self._iter += 1
             yield batch
 
-    def create_train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> AbstractDataset.Stream:
         self.train_used = True
         for batch in self.stream('train'):
             yield batch
 
-    def create_valid_stream(self) -> AbstractDataset.Stream:
+    def valid_stream(self) -> AbstractDataset.Stream:
         self.valid_used = True
         for batch in self.stream('valid'):
             yield batch
 
-    def create_test_stream(self) -> AbstractDataset.Stream:
+    def test_stream(self) -> AbstractDataset.Stream:
         self.test_used = True
         for batch in self.stream('test'):
+            yield batch
+
+    def predict_stream(self) -> AbstractDataset.Stream:
+        self.predict_used = True
+        for batch in self.stream('predict'):
             yield batch
 
 
 class ExtendedDataset(SimpleDataset):
     """SimpleDataset extension with additional 'unused' source in the train stream."""
 
-    def create_train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> AbstractDataset.Stream:
         self.train_used = True
         for _ in range(self.iters):
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape), 'unused': np.zeros(self.shape)}
@@ -73,7 +78,7 @@ class ExtendedDataset(SimpleDataset):
 class DelayedDataset(SimpleDataset):
     """SimpleDataset extension which sleeps briefly before each train batch allowing to measure the data read time."""
 
-    def create_train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> AbstractDataset.Stream:
         for _ in range(self.iters):
             time.sleep(_READ_DATA_SLEEP_S)
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape)}
@@ -165,9 +170,9 @@ class EpochDataConsumer(AbstractHook):
         assert epoch_data['train']['my_variable'] == _EPOCH_DATA_VAR_VALUE
 
 
-class TrainableNet(AbstractNet):
-    """Simple trainable net"""
-    def __init__(self, io: dict, **kwargs):  #pylint: disable=unused-argument
+class TrainableModel(AbstractModel):
+    """Simple trainable model"""
+    def __init__(self, io: dict, **kwargs):  # pylint: disable=unused-argument
         self._input_names = io['in']
         self._output_names = io['out']
 
@@ -179,25 +184,29 @@ class TrainableNet(AbstractNet):
 
     @property
     def input_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
-        """List of tf tensor names listed as net inputs."""
+        """List of tf tensor names listed as model inputs."""
         return self._input_names
 
     @property
     def output_names(self) -> List[str]:   # pylint: disable=invalid-sequence-index
-        """List of tf tensor names listed as net outputs."""
+        """List of tf tensor names listed as model outputs."""
         return self._output_names
 
+    @property
+    def restore_fallback(self) -> str:
+        return ''
 
-class DelayedNet(TrainableNet):
-    """Trainable net which sleeps briefly when processing a batch allowing to measure the net eval time."""
+
+class DelayedModel(TrainableModel):
+    """Trainable model which sleeps briefly when processing a batch allowing to measure the model eval time."""
 
     def run(self, batch: Mapping[str, object], train: bool):
-        time.sleep(_NET_RUN_SLEEP_S)
+        time.sleep(_MODEL_RUN_SLEEP_S)
         return super().run(batch, train)
 
 
-class RecordingNet(TrainableNet):
-    """Net which records its outputs from all the run method calls."""
+class RecordingModel(TrainableModel):
+    """Model which records its outputs from all the run method calls."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -215,35 +224,35 @@ class MainLoopTest(CXTestCaseWithDir):
     """MainLoop test case."""
 
     def create_main_loop(self,  # pylint: disable=too-many-arguments
-                         epochs=1, extra_hooks=(), dataset=None, net_class=None, skip_zeroth_epoch=True,
+                         epochs=1, extra_hooks=(), dataset=None, model_class=None, skip_zeroth_epoch=True,
                          **main_loop_kwargs):
         """
-        Create and return a net, dataset and mainloop.
+        Create and return a model, dataset and mainloop.
 
         :param epochs: the number of epochs to be run in the main_loop
         :param extra_hooks: additional hooks to be passed to the main loop
         :param main_loop_kwargs: additional kwargs to be passed to the main loop
         :param dataset: dataset to be passed to the main loop, SimpleDataset() is created if None
-        :param net_class: net class to be created and passed to the main loop, TrainableNet if None
+        :param model_class: model class to be created and passed to the main loop, TrainableModel if None
         :param skip_zeroth_epoch: skip zeroth epoch flag passed to the main loop
-        :return: a tuple of the created net, dataset and mainloop
+        :return: a tuple of the created model, dataset and mainloop
         """
-        hooks = list(extra_hooks) + [EpochStopperHook(epoch_limit=epochs)]
+        hooks = list(extra_hooks) + [StopAfter(epochs=epochs)]
         if dataset is None:
             dataset = SimpleDataset()
-        if net_class is None:
-            net_class = TrainableNet
-        net = net_class(dataset=dataset, log_dir=self.tmpdir,  # pylint: disable=redefined-variable-type
-                        io={'in': ['input', 'target'], 'out': ['output']})
-        mainloop = MainLoop(net=net, dataset=dataset, hooks=hooks,
+        if model_class is None:
+            model_class = TrainableModel
+        model = model_class(dataset=dataset, log_dir=self.tmpdir,  # pylint: disable=redefined-variable-type
+                            io={'in': ['input', 'target'], 'out': ['output']})
+        mainloop = MainLoop(model=model, dataset=dataset, hooks=hooks,
                             skip_zeroth_epoch=skip_zeroth_epoch, **main_loop_kwargs)
-        return net, dataset, mainloop
+        return model, dataset, mainloop
 
     def test_events(self):
         """Test event counts and order."""
         recording_hook = EventRecordingHook()
         _, _, mainloop = self.create_main_loop(epochs=3, extra_hooks=[recording_hook])
-        mainloop.run()
+        mainloop.run_training()
 
         before_training = [1]
         first_epoch_batches = list(range(2, 2+_DATASET_ITERS))
@@ -270,74 +279,74 @@ class MainLoopTest(CXTestCaseWithDir):
     def test_event_data(self):
         """Test after_epoch and after_batch event args match the expectation."""
         recording_hook = DataRecordingHook()
-        net, dataset, mainloop = self.create_main_loop(epochs=3, net_class=RecordingNet,
-                                                       extra_hooks=[recording_hook], extra_streams=['valid'])
-        mainloop.run()
+        model, dataset, mainloop = self.create_main_loop(epochs=3, model_class=RecordingModel,
+                                                         extra_hooks=[recording_hook], extra_streams=['valid'])
+        mainloop.run_training()
 
         # check the epoch ids
         self.assertListEqual(recording_hook.epoch_ids, [1, 2, 3])
 
-        # now the net recorded its outputs as a list of all the batches regardless the stream and epoch, i.e.:
+        # now the model recorded its outputs as a list of all the batches regardless the stream and epoch, i.e.:
         # [train_e1_b1, train_e1_b2, ..., valid_e1_b1, ... train_e2,b1, ...]
         # while the DataRecordingHook has the following structure:
         # {'train': [train_e1_b1, train_e1,b2, ..., train_e2,b1, ...], 'valid': [...]}
-        # we will convert the 'net structure' to the 'hook structure' so that they are comparable
+        # we will convert the 'model structure' to the 'hook structure' so that they are comparable
         def chunks(list_, size):
             """Split the given list_ into chunks of size consecutive elements."""
             for i in range(0, len(list_), size):
                 yield list_[i:i + size]
 
-        output_data = net.output_data  # pylint: disable=no-member
-        input_data = net.input_data  # pylint: disable=no-member
-        net_outputs_by_stream_list = list(zip(*[(epoch[:len(epoch)//2], epoch[len(epoch)//2:])
-                                                for epoch in chunks(output_data, _DATASET_ITERS*2)]))
-        net_inputs_by_stream_list = list(zip(*[(epoch[:len(epoch)//2], epoch[len(epoch)//2:])
-                                               for epoch in chunks(input_data, _DATASET_ITERS*2)]))
+        output_data = model.output_data  # pylint: disable=no-member
+        input_data = model.input_data  # pylint: disable=no-member
+        model_outputs_by_stream_list = list(zip(*[(epoch[:len(epoch)//2], epoch[len(epoch)//2:])
+                                                  for epoch in chunks(output_data, _DATASET_ITERS*2)]))
+        model_inputs_by_stream_list = list(zip(*[(epoch[:len(epoch)//2], epoch[len(epoch)//2:])
+                                                 for epoch in chunks(input_data, _DATASET_ITERS*2)]))
 
-        net_outpus_by_stream = {'train': sum(net_outputs_by_stream_list[0], []),
-                                'valid': sum(net_outputs_by_stream_list[1], [])}
+        model_outpus_by_stream = {'train': sum(model_outputs_by_stream_list[0], []),
+                                  'valid': sum(model_outputs_by_stream_list[1], [])}
 
-        net_inputs_by_stream = {'train': sum(net_inputs_by_stream_list[0], []),
-                                'valid': sum(net_inputs_by_stream_list[1], [])}
+        model_inputs_by_stream = {'train': sum(model_inputs_by_stream_list[0], []),
+                                  'valid': sum(model_inputs_by_stream_list[1], [])}
 
         # for all the streams
         for stream_name in ['valid', 'train']:
             self.assertIn(stream_name, recording_hook.batch_data)
             io_data = zip(recording_hook.batch_data[stream_name],
-                          net_outpus_by_stream[stream_name],
-                          net_inputs_by_stream[stream_name],
+                          model_outpus_by_stream[stream_name],
+                          model_inputs_by_stream[stream_name],
                           dataset.batches[stream_name])
-            for hook_data, net_outputs, net_inputs, batches in io_data:
-                # check if the hook_data and net_inputs contain correct stream sources
+            for hook_data, model_outputs, model_inputs, batches in io_data:
+                # check if the hook_data and model_inputs contain correct stream sources
                 for source_name in dataset.source_names:
                     self.assertIn(source_name, hook_data)
-                    self.assertIn(source_name, net_inputs)
+                    self.assertIn(source_name, model_inputs)
                     self.assertTrue(np.alltrue(hook_data[source_name] == batches[source_name]))
-                    self.assertTrue(np.alltrue(net_inputs[source_name] == batches[source_name]))
-                # check if the hook_data contains correct net outputs
-                for output_name in net.output_names:
+                    self.assertTrue(np.alltrue(model_inputs[source_name] == batches[source_name]))
+                # check if the hook_data contains correct model outputs
+                for output_name in model.output_names:
                     self.assertIn(output_name, hook_data)
-                    self.assertTrue(np.alltrue(hook_data[output_name] == net_outputs[output_name]))
+                    self.assertTrue(np.alltrue(hook_data[output_name] == model_outputs[output_name]))
 
     def test_stream_usage(self):
         """Test if the streams are used only when specified."""
         # test if the train stream is used by default
         _, dataset, mainloop = self.create_main_loop()
-        mainloop.run()
+        mainloop.run_training()
         self.assertTrue(dataset.train_used)
         self.assertFalse(dataset.valid_used)
         self.assertFalse(dataset.test_used)
 
         # test if the valid stream is used when specified
         _, dataset2, mainloop2 = self.create_main_loop(extra_streams=['valid'])
-        mainloop2.run()
+        mainloop2.run_training()
         self.assertTrue(dataset2.train_used)
         self.assertTrue(dataset2.valid_used)
         self.assertFalse(dataset2.test_used)
 
         # test an exception is raised when a stream that is not available is specified
         _, _, mainloop3 = self.create_main_loop(extra_streams=['another'])
-        self.assertRaises(AttributeError, mainloop3.run)
+        self.assertRaises(AttributeError, mainloop3.run_training)
 
     def test_profiling(self):
         """Test if the mainloop is profiled correctly."""
@@ -345,7 +354,7 @@ class MainLoopTest(CXTestCaseWithDir):
         # data read profiling
         profile_hook = SaveProfileHook()
         _, _, mainloop = self.create_main_loop(epochs=2, extra_hooks=[profile_hook], dataset=DelayedDataset())
-        mainloop.run()
+        mainloop.run_training()
         profile = profile_hook.profile
 
         self.assertIn('read_batch_train', profile)
@@ -354,7 +363,7 @@ class MainLoopTest(CXTestCaseWithDir):
         # hook profiling
         profile_hook2 = SaveProfileHook()
         _, _, mainloop2 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook2, DelayedHook()])
-        mainloop2.run()
+        mainloop2.run_training()
         profile2 = profile_hook2.profile
 
         self.assertIn('after_batch_hooks_train', profile2)
@@ -364,30 +373,30 @@ class MainLoopTest(CXTestCaseWithDir):
         self.assertIn('after_epoch_hooks', profile2)
         self.assertTrue(np.allclose(profile2['after_epoch_hooks'], [_AFTER_EPOCH_SLEEP_S], atol=0.01))
 
-        # net eval profiling
+        # model eval profiling
         profile_hook3 = SaveProfileHook()
-        _, _, mainloop3 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook3], net_class=DelayedNet)
+        _, _, mainloop3 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook3], model_class=DelayedModel)
 
-        mainloop3.run()
+        mainloop3.run_training()
         profile3 = profile_hook3.profile
 
         self.assertIn('eval_batch_train', profile3)
-        self.assertTrue(np.allclose(profile3['eval_batch_train'], [_NET_RUN_SLEEP_S]*_DATASET_ITERS, atol=0.1))
+        self.assertTrue(np.allclose(profile3['eval_batch_train'], [_MODEL_RUN_SLEEP_S]*_DATASET_ITERS, atol=0.1))
 
         # multiple streams profiling
         profile_hook4 = SaveProfileHook()
         _, _, mainloop4 = self.create_main_loop(epochs=2, extra_hooks=[profile_hook4], extra_streams=['valid', 'test'])
-        mainloop4.run()
+        mainloop4.run_training()
         profile4 = profile_hook4.profile
         for prefix in ['eval_batch_', 'read_batch_', 'after_batch_hooks_']:
             for stream_name in ['train', 'valid', 'test']:
                 self.assertIn(prefix+stream_name, profile4)
 
     def test_zeroth_epoch(self):
-        """Test the net is not trained in the zeroth epoch."""
+        """Test the model is not trained in the zeroth epoch."""
         data_recording_hook = DataRecordingHook()
         _, _, mainloop = self.create_main_loop(epochs=0, extra_hooks=[data_recording_hook], skip_zeroth_epoch=False)
-        mainloop.run()
+        mainloop.run_training()
 
         # check if we actually iterated through the train stream
         self.assertListEqual(data_recording_hook.epoch_ids, [0])
@@ -398,21 +407,29 @@ class MainLoopTest(CXTestCaseWithDir):
         """Test error is raised when on_unused_inputs='error'."""
         _, _, mainloop = self.create_main_loop(epochs=3, on_unused_sources='error')
         # this should not raise an error
-        mainloop.run()
+        mainloop.run_training()
 
         _, _, mainloop2 = self.create_main_loop(epochs=3, dataset=ExtendedDataset(), on_unused_sources='error')
-        self.assertRaises(ValueError, mainloop2.run)
+        self.assertRaises(ValueError, mainloop2.run_training)
 
         _, _, mainloop3 = self.create_main_loop(epochs=3, dataset=ExtendedDataset(), on_unused_sources='ignore')
-        mainloop3.run()
+        mainloop3.run_training()
 
     def test_epoch_data(self):
         """Test correct epoch_data handling."""
 
         # test if the epoch data is passed between hooks
         _, _, mainloop = self.create_main_loop(epochs=3, extra_hooks=[EpochDataProducer(), EpochDataConsumer()])
-        mainloop.run()
+        mainloop.run_training()
 
         # test wrong hook order
         _, _, mainloop2 = self.create_main_loop(epochs=3, extra_hooks=[EpochDataConsumer(), EpochDataProducer()])
-        self.assertRaises(AssertionError, mainloop2.run)
+        self.assertRaises(AssertionError, mainloop2.run_training)
+
+    def test_predict(self):
+        """Test if predict iterates only the predict stream."""
+        _, dataset, mainloop = self.create_main_loop(extra_streams=['valid'])
+        mainloop.run_prediction()
+        self.assertTrue(dataset.predict_used)
+        self.assertFalse(dataset.valid_used)
+        self.assertFalse(dataset.train_used)

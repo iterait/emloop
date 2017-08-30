@@ -4,7 +4,7 @@ Test module for reflection utils (cxflow.utils.reflection).
 import sys
 import os
 
-from cxflow.utils.reflection import create_object, create_object_from_config, find_class_module, get_class_module
+from cxflow.utils.reflection import create_object, find_class_module, get_class_module, parse_fully_qualified_name
 from cxflow.tests.test_core import CXTestCaseWithDir
 
 
@@ -53,6 +53,24 @@ class ClassWithArgsAndKwargsOnly:  # pylint: disable=missing-docstring
 
 class ReflectionTest(CXTestCaseWithDir):
     """Test case for the reflection util functions."""
+
+    def test_parse_fully_qualified_name(self):
+        """Test correct parsing of fully qualified names."""
+
+        # test simple name
+        module1, class1 = parse_fully_qualified_name('MyClass')
+        self.assertIsNone(module1)
+        self.assertEqual(class1, 'MyClass')
+
+        # test simple path
+        module1, class1 = parse_fully_qualified_name('MyModule.MyClass')
+        self.assertEqual(module1, 'MyModule')
+        self.assertEqual(class1, 'MyClass')
+
+        # test complex path
+        module1, class1 = parse_fully_qualified_name('MyModule.MySubmodule.MyClass')
+        self.assertEqual(module1, 'MyModule.MySubmodule')
+        self.assertEqual(class1, 'MyClass')
 
     def test_create_object(self):
         """Test base create object function."""
@@ -107,42 +125,6 @@ class ReflectionTest(CXTestCaseWithDir):
         self.assertRaises(ImportError, create_object, module_name=module_name+'xxx', class_name='SimpleClass')
         self.assertRaises(AttributeError, create_object, module_name=module_name, class_name='WrongName')
 
-    def test_create_object_from_config(self):
-        """Test create_object_from_config function."""
-        module_name = 'cxflow.tests.utils.reflection_test'
-
-        # test type, config read and prefix
-        simple_config = {'my_module': module_name, 'my_class': 'SimpleClass'}
-        obj = create_object_from_config(simple_config, key_prefix='my_')
-        self.assertEqual(type(obj), SimpleClass)
-
-        obsfucated_config = {'my_module': module_name, 'my_class': 'SimpleClass', '2nd_class': 'ClassWithArg'}
-        obj2 = create_object_from_config(obsfucated_config, key_prefix='my_')
-        self.assertEqual(type(obj2), SimpleClass)
-
-        # test args and kwargs forwarding
-        args_and_kwargs_config = {'my_module': module_name, 'my_class': 'ClassWithArgsAndKwargs'}
-        obj3 = create_object_from_config(args_and_kwargs_config, key_prefix='my_',
-                                         args=(12, 1, 2, 3), kwargs={'y': 1, 'z': 2})
-        self.assertEqual(type(obj3), ClassWithArgsAndKwargs)
-        self.assertEqual(obj3.ex, 12)
-        self.assertTupleEqual(obj3.args, (1, 2, 3))
-        self.assertDictEqual(obj3.kwargs, {'y': 1, 'z': 2})
-
-        # test auto config keys
-        obj4 = create_object_from_config(simple_config)
-        self.assertEqual(type(obj4), SimpleClass)
-
-        multiple_module_config = {'my_module': module_name, 'another_module': module_name, 'my_class': 'SimpleClass'}
-        self.assertRaises(ValueError, create_object_from_config, multiple_module_config)
-        multiple_class_config = {'my_module': module_name, 'my_class': 'SimpleClass', 'second_class': 'MyClass'}
-        self.assertRaises(ValueError, create_object_from_config, multiple_class_config)
-
-        missing_module_config = {'my_class': 'SimpleClass'}
-        self.assertRaises(ValueError, create_object_from_config, missing_module_config)
-        missing_class_config = {'my_module': module_name}
-        self.assertRaises(ValueError, create_object_from_config, missing_class_config)
-
     def test_find_class_module(self):
         """Test finding class module."""
 
@@ -195,8 +177,8 @@ class ReflectionTest(CXTestCaseWithDir):
         """Test if get_class_module method wraps the `utils.reflection.find_class_module` method correctly."""
 
         # test if the module is returned directly
-        module = get_class_module('cxflow.hooks', 'ProfileHook')
-        expected_module = 'cxflow.hooks.profile_hook'
+        module = get_class_module('cxflow.hooks', 'LogProfile')
+        expected_module = 'cxflow.hooks.log_profile'
         self.assertEqual(module, expected_module)
 
         # test if None is returned when the class is not found
