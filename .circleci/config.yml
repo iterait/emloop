@@ -108,7 +108,7 @@ workflows:
       - generate_documentation:
           filters:
             branches:
-              only: dev
+              only: master
           requires:
             - test_ubuntu_latest
             - test_ubuntu_rolling
