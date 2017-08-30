@@ -1,5 +1,5 @@
 """
-Test module for cxflow cli utils (cli/util.py).
+Test module for **cxflow** cli utils (cli/util.py).
 """
 
 from cxflow.cli.util import validate_config

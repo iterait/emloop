@@ -1,4 +1,4 @@
-"""cxflow base module"""
+"""**cxflow** core module."""
 from .entry_point import train
 from .datasets import AbstractDataset, BaseDataset
 from .main_loop import MainLoop

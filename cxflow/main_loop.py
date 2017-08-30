@@ -1,5 +1,5 @@
 """
-cxflow main loop for training models.
+**cxflow** main loop for training models.
 
 The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks.
 Having all that, it manages iterating through streams, training and hooks execution.
@@ -66,7 +66,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         Check for unused and missing sources.
 
         :param batch: batch to be checked
-        :raise: ValueError: is a source is missing or unused and ``self._on_unused_sources`` is set to ``error``
+        :raise ValueError: if a source is missing or unused and ``self._on_unused_sources`` is set to ``error``
         """
         unused_sources = [source for source in batch.keys() if source not in self._model.input_names]
         missing_sources = [source for source in self._model.input_names if source not in batch.keys()]

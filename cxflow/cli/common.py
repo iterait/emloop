@@ -118,7 +118,7 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
         else:  # restore cases (resume, predict)
             logging.warning('Cannot create model from the specified model class `%s`.', model_config['class'])
             assert 'restore_fallback' in model_config, '`model.restore_fallback` not present in the config'
-            logging.info('Trying to restore with fallback `{}` instead.'.format(model_config['restore_fallback']))
+            logging.info('Trying to restore with fallback `%s` instead.', model_config['restore_fallback'])
 
             try:  # try fallback class
                 fallback_module, fallback_class = parse_fully_qualified_name(model_config['restore_fallback'])
@@ -154,7 +154,7 @@ def create_hooks(config: dict, model: AbstractModel,
 
     :param config: config dict
     :param model: model object to be passed to the hooks
-    :param dataset: AbstractDataset object
+    :param dataset: dataset object to be passed to hooks
     :param output_dir: training output dir available to the hooks
     :return: list of hook objects
     """
@@ -192,7 +192,7 @@ def create_hooks(config: dict, model: AbstractModel,
 
 def run(config: dict, output_root: str, restore_from: str=None, predict: bool=False) -> None:
     """
-    Run cxflow training configured by the passed `config`.
+    Run **cxflow** training configured by the passed `config`.
 
     Unique ``output_dir`` for this training is created under the given ``output_root`` dir
     wherein all the training outputs are saved. The output dir name will be roughly ``[model.name]_[time]``.

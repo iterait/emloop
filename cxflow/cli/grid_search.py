@@ -15,8 +15,8 @@ def _build_grid_search_commands(script: str, params: typing.Iterable[str]) -> ty
     Build all grid search parameter configurations.
 
     :param script: String of command prefix, e.g. ``cxflow train -v -o log``.
-    :param params: Iterable collection of strings in standard cxflow param form, e.g. ``'numerical_param:int=[1, 2]'``
-                   or ``'text_param:str=["hello", "cio"]'``.
+    :param params: Iterable collection of strings in standard **cxflow** param form, e.g. ``'numerical_param=[1, 2]'``
+                   or ``'text_param=["hello", "cio"]'``.
     """
 
     param_space = OrderedDict()
@@ -46,8 +46,8 @@ def grid_search(script: str, params: typing.Iterable[str], dry_run: bool=False) 
     Build all grid search parameter configurations and optionally run them.
 
     :param script: String of command prefix, e.g. ``cxflow train -v -o log``.
-    :param params: Iterable collection of strings in standard cxflow param form, e.g. ``'numerical_param:int=[1, 2]'``
-                   or ``'text_param:str=["hello", "cio"]'``.
+    :param params: Iterable collection of strings in standard **cxflow** param form, e.g. ``'numerical_param=[1, 2]'``
+                   or ``'text_param=["hello", "cio"]'``.
     :param dry_run: If set to ``True``, the built commands will only be printed instead of executed.
     """
 

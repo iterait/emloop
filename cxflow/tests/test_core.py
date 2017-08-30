@@ -1,5 +1,5 @@
 """
-Test module with base cxflow test case classes.
+Test module with base **cxflow** test case classes.
 """
 import logging
 import shutil
@@ -8,7 +8,7 @@ from unittest import TestCase
 
 
 class CXTestCase(TestCase):
-    """Base cxflow test case which disables logging."""
+    """Base **cxflow** test case which disables logging."""
 
     def __init__(self, *args, **kwargs):
         """Create a new test case and disable logging."""

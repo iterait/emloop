@@ -16,9 +16,10 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
     Base class for datasets written in python.
 
     In the inherited class, one should:
-        - override the ``_init_with_kwargs`` method instead of ``__init__``
-        - override the ``train_stream`` method
-        - add any additional ``<stream_name>_stream`` method in order to make ``<stream_name>`` stream available
+        - override the ``_configure_dataset``
+        - (optional) implement ``train_stream`` method if intended to be used with ``cxflow train ...``
+        - (optional) implement ``predict_stream`` method if intended to be used with ``cxflow predict ...``
+        - (optional) implement ``<stream_name>_stream`` method in order to make ``<stream_name>`` stream available
 
     """
 
@@ -26,22 +27,22 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
         """
         Create new dataset.
 
-        Decode the given YAML config string and pass the obtained ``**kwargs`` to :py:meth:`_init_with_kwargs`.
+        Decode the given YAML config string and pass the obtained ``**kwargs`` to :py:meth:`_configure_dataset`.
 
         :param config_str: dataset configuration as YAML string
         """
         super().__init__(config_str)
 
         config = yaml.load(config_str)
-        self._init_with_kwargs(**config)
+        self._configure_dataset(**config)
 
     @abstractmethod
-    def _init_with_kwargs(self, output_dir: Optional[str], **kwargs):
+    def _configure_dataset(self, output_dir: Optional[str], **kwargs):
         """
-        Initialize the dataset with ``**kwargs``.
+        Configure the dataset with ``**kwargs`` decoded from YAML configuration.
 
         :param output_dir: output directory for logging and any additional outputs (None if no output dir is available)
         :param kwargs: dataset configuration as ``**kwargs`` parsed from ``config['dataset']``
         :raise NotImplementedError: if not overridden
         """
-        raise NotImplementedError('Dataset does not implement obligatory `_init_with_kwargs` method.')
+        raise NotImplementedError('Dataset does not implement obligatory `_configure_dataset` method.')

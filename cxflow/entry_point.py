@@ -1,9 +1,9 @@
 """
-This module is cxflow framework entry point.
+This module is **cxflow** framework entry point.
 
 The entry point shall be accessed from command line via `cxflow` command.
 
-At the moment cxflow allows to
+At the moment **cxflow** allows to
 - train a model with ``cxflow train ...``
 - resume training with ``cxflow resume ...``
 - generate model predictions with ``cxflow predict ...``
@@ -21,7 +21,7 @@ from .constants import CXF_LOG_FORMAT, CXF_LOG_DATE_FORMAT
 
 
 def entry_point() -> None:
-    """cxflow entry point."""
+    """**cxflow** entry point."""
 
     # make sure the path contains the current working directory
     sys.path.insert(0, os.getcwd())

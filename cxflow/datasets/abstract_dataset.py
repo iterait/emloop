@@ -11,7 +11,7 @@ class AbstractDataset:
     """
     This concept prescribes the API that is required from every **cxflow** dataset.
 
-    Every cxflow dataset has to have a constructor which takes YAML string config.
+    Every **cxflow** dataset has to have a constructor which takes YAML string config.
     Additionally, one may implement any ``<stream_name>_stream`` method
     in order to make ``stream_name`` stream available in the **cxflow** :py:class:`cxflow.MainLoop`.
 

@@ -23,8 +23,7 @@ entry, for example:
 
     hooks:
       - ComputeStats:
-          variables:
-            loss: [mean]
+          variables: [loss]
 
       - LogVariables
 
@@ -61,7 +60,7 @@ will be roughly translated to
 
     from my_project.hooks import MyHook
     hook = MyHook(arg1=10, arg2=['a', 'b'])
-    # use hook in the cxflow main_loop
+    # use hook in the **cxflow** main_loop
 
 In addition to the specified arguments, cxflow supplies the constructor with the model,
 the dataset and the log output directory.
@@ -164,15 +163,9 @@ The following config is a good starting point for your own hook configuration.
 .. code-block:: yaml
   
     hooks:
-      # compute classification statistics such as accuracy of f1 score
-      - cxflow_scikit.ClassificationInfoHook:
-          predicted_variable: predictions
-          gold_variable: labels
-
-      # compute mean loss over each epoch
+      # compute mean loss after each epoch
       - ComputeStats:
-          variables:
-            loss: [mean]
+          variables: [loss]
 
       # log the results to the standard python logging, csv and tensorboard
       - LogVariables

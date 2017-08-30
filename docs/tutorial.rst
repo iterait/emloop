@@ -80,7 +80,7 @@ To generate the *majority* data and provide the data streams we will implement a
 
     class MajorityDataset(cx.BaseDataset):
 
-        def _init_with_kwargs(self, n_examples: int, dim: int, batch_size: int, **kwargs) -> None:
+        def _configure_dataset(self, n_examples: int, dim: int, batch_size: int, **kwargs) -> None:
             self.batch_size = batch_size
 
             x = npr.random_integers(0, 1, n_examples * dim).reshape(n_examples, dim)
@@ -101,7 +101,7 @@ To generate the *majority* data and provide the data streams we will implement a
 
 
 Let us describe the functionality of our ``MajorityDataset`` step by step.
-We shall begin with the ``_init_with_kwargs`` method.
+We shall begin with the ``_configure_dataset`` method.
 This method is called from the dataset constructor automatically and it is passed the
 parameters from the configuration file (configuration will be explained later).
 In our case, we need ``n_examples`` (the number of examples in total), ``dim`` (the dimension of the
@@ -244,7 +244,7 @@ Dataset
 In our case, we only need to tell cxflow which dataset to use.
 This is done by specifying a ``class`` of the dataset.
 In addition, we will specify the parameters of the dataset (those
-ones passed to dataset's ``_init_with_kwargs`` method).
+ones passed to dataset's ``_configure_dataset`` method).
 
 .. code-block:: yaml
 
@@ -255,12 +255,12 @@ ones passed to dataset's ``_init_with_kwargs`` method).
       batch_size: 4
 
 We can pass arbitrary other constants to the dataset as they will be hidden in the ``**kwargs``
-of the dataset's ``_init_with_kwargs`` method.
+of the dataset's ``_configure_dataset`` method.
 
 .. note::
     The whole ``dataset`` section will be passed as a string-encoded YAML to the dataset constructor.
     In the case of using :py:class:`cxflow.datasets.BaseDataset`, the YAML is automatically decoded and the individual
-    variables are passed to ``_init_with_kwargs`` method.
+    variables are passed to ``_configure_dataset`` method.
 
 Model
 =====

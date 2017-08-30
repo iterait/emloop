@@ -1,5 +1,5 @@
 """
-This module contains the definition of a model trainable in cxflow framework.
+This module contains the definition of a model trainable in **cxflow** framework.
 """
 from abc import abstractmethod, ABCMeta
 from typing import Iterable, Mapping, Optional
@@ -21,11 +21,11 @@ class AbstractModel(metaclass=ABCMeta):
         Additional parameters (currently covered by ``**kwargs``) are passed
         according to the configuration ``model`` section.
 
-        :param dataset: Dataset object.
-        :param log_dir: Existing directory in which all output files should be stored.
-        :param restore_from: Information passed to the model constructor (backend-specific);
-                             usually a directory in which the trained model is stored.
-        :param kwargs: Configuration section ``model``.
+        :param dataset: dataset object
+        :param log_dir: existing directory in which all output files should be stored
+        :param restore_from: information passed to the model constructor (backend-specific);
+                             usually a directory in which the trained model is stored
+        :param kwargs: configuration section ``model``
         """
         pass
 
@@ -42,13 +42,14 @@ class AbstractModel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
+    def run(self, batch: AbstractDataset.Batch, train: bool) -> AbstractDataset.Batch:
         """
         Run feed-forward pass with the given batch and return the results as dict.
 
         When ``train=True``, also update parameters.
-        :param batch: batch to be processed.
-        :param train: ``True`` if this batch should be used for model update, ``False`` otherwise.
+
+        :param batch: batch to be processed
+        :param train: ``True`` if this batch should be used for model update, ``False`` otherwise
         :return: results dict
         """
         pass
@@ -58,7 +59,7 @@ class AbstractModel(metaclass=ABCMeta):
         """
         Save the model parameters with the given ``name_suffix``.
 
-        :param name_suffix: name suffix to be appended to the saved model.
+        :param name_suffix: name suffix to be appended to the saved model
         :return: path to the saved file/dir
         """
         pass
@@ -69,7 +70,7 @@ class AbstractModel(metaclass=ABCMeta):
         """
         Return the fully-qualified name of the fallback restore class (e.g. ``module.submodule.BaseClass``).
 
-        When restoring a model, cxflow tries to use the fallback class if the construction of the model object specified
+        When restoring a model, **cxflow** tries to use the fallback class if the construction of the model object specified
         in `model` configuration section fails.
 
         :return: fully-qualified name of the fallback restore class

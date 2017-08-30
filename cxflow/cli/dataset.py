@@ -3,7 +3,7 @@ import os.path as path
 
 from typing import Iterable
 
-from .util import fallback, validate_config
+from .util import fallback, validate_config, find_config
 from .common import create_dataset, create_output_dir
 from ..utils.config import load_config
 
@@ -21,7 +21,7 @@ def invoke_dataset_method(config_path: str, method_name: str, output_root: str, 
     config = dataset = method = output_dir = None
 
     try:
-        assert path.exists(config_path), '`{}` does not exist'.format(config_path)
+        config_path = find_config(config_path)
         config = load_config(config_file=config_path, additional_args=cl_arguments)
         validate_config(config)
         logging.debug('\tLoaded config: %s', config)

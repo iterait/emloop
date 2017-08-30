@@ -26,7 +26,7 @@ class ComputeStats(AccumulateVariables):
         hooks:
           - ComputeStats:
               variables:
-              - loss : [min, max]
+                - loss : [min, max]
 
     """
 

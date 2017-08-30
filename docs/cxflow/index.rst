@@ -1,8 +1,7 @@
 API Reference
 =============
 
-Cxflow provides the following API.
-It is broken down into several packages as follows.
+**cxflow** API is divided into several packages as follows.
 
 .. toctree::
     :glob:

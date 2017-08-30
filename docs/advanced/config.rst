@@ -37,7 +37,7 @@ Example:
 
 .. code-block:: yaml
 
-    dataset:  &dataset
+    dataset:
       class: datasets.my_dataset.MyDataset
 
       data_root: /var/my_data
@@ -66,7 +66,7 @@ Example:
 
 .. code-block:: yaml
 
-    model:  &model
+    model:
       class: models.my_model.MyModel
       inputs: [image, animal]
       outputs: [prediction, loss, accuracy]
@@ -122,8 +122,7 @@ Example:
           gold_variable: labels
 
       - ComputeStats:
-          variables:
-          loss: [mean]
+          variables: [loss]
 
 Both syntaxes might be mixed up arbitrarily.
 The reason for this approch is that the parameter-less hooks or the ones with convenient
@@ -134,19 +133,12 @@ Main Loop
 =========
 
 Main loop section specifies various settings of the main loop.
-Currently, the following parameters are supported.
+Currently, the following parameters matching to the :py:class:`cxflow.MainLoop` constructor are supported:
 
-- ``extra_streams``: A list of additional streams that will be evalueted during training or inferred
-                   during ``cxflow predict``.
-- ``on_unused_sources``: Behavior of the main loop when the dataset provides batches with sources not
-                       registered in model's ``inputs``. By default (``warn``), main loop warns the developer.
-                       Remaining options are ``ignore`` which suppresses the warning and ``error`` which
-                       terminates the process immediately.
-- ``fixed_batch_size``: If this option is specified, the main loop will enforce the batches fed to the model will
-                      contain exactly the specified number of examples. Incorrectly sized batches will be skipped
-                      with a warning.
-- ``skip_zeroth_epoch``: If set to ``True``, the evaluation of ``extra_streams`` before the first training epoch will
-                       be skipped.
+- **extra_streams**: A list of additional streams that will be evalueted during training or inferred during ``cxflow predict``.
+- **on_unused_sources**: Behavior of the main loop when the dataset provides batches with sources not registered in model's ``inputs``. By default (``warn``), main loop warns the developer. Remaining options are ``ignore`` which suppresses the warning and ``error`` which terminates the process immediately.
+- **fixed_batch_size**: If this option is specified, the main loop will enforce the batches fed to the model will contain exactly the specified number of examples. Incorrectly sized batches will be skipped with a warning.
+- **skip_zeroth_epoch**: If set to ``True``, the evaluation of ``extra_streams`` before the first training epoch will be skipped.
 
 Example:
 
@@ -159,40 +151,25 @@ Example:
 Inference
 =========
 
-Naturally, the inference (evaluation) of the model on new unanotated data differs from its training.
+Naturally, the inference (evaluation or prediction) of the model on new unanotated data differs from its training.
 In this phase, we don't know the ground truth, hence the dataset sources are different.
 In such a situation, some of the metrics are impossible to measure, e.g., accuracy which requires the
-ground truth.
+ground truth. Most likely, we also need a different set of hooks to process the model outputs.
 
-For this reason, a special section ``predict`` is introduced.
-It matches the overall configuration structure, i.e. it must contain the ``model`` and the ``dataset`` sections.
-Analogously, the ``hooks`` section is optional as well as ``main_loop``.
+For this reason, one can override the configuration with special ``predict`` section.
+This section matches the overall configuration structure, i.e. it may contain the
+``model``, ``dataset``, ``hooks`` and/or  ``main_loop`` sections.
 
-If ``cxflow predict`` is invoked, the rest of the configuration is ignored and only the ``predict`` section is used.
-In other cases, the ``predict`` section is ignored.
-The main advantage of this approach is that the user doesn't have to define ``predict`` when they experiment with the
-models.
-This can be done after the model is developed, fine-tuned and ready for production.
-
-As it might be observed, the inference sections such as ``model`` and ``dataset`` are almost identical to the top level ones.
-YAML can reduce configuration duplicity by using `anchors <https://learnxinyminutes.com/docs/yaml/>`_.
-Note that we've already defined anchors ``&dataset`` and ``&model`` in the snippets above.
-
-Now, we can import them and rewrite only the arguments which differ.
-In the following example, we reuse the whole dataset as is.
-The model is almost the same but we need to specify different ``inputs`` and ``outputs`` since the inference stream will
-no longer provide the target class (``animal``).
-The model itself is supposed to infer the ``animal`` instead.
-Finally, we define a completely different set of hooks.
+In the following example, we use all the original setings but the model inputs and ouputs are overriden. Furthermore,
+a different list of hooks is specified. Yet another example is available in our
+`examples repository @GitHub <https://github.com/Cognexa/cxflow-examples/tree/master/imdb>`_.
 
 .. code-block:: yaml
 
-    predict:
-      dataset:
-        <<: *dataset
+    ...
 
+    predict:
       model:
-        <<: *model
         inputs: [images]
         outputs: [predictions]
 

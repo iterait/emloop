@@ -1,4 +1,4 @@
-"""cxflow module containing various constants."""
+"""**cxflow** module containing various constants."""
 
 CXF_LOG_FORMAT = '%(asctime)s.%(msecs)06d: %(levelname)-8s@%(module)-15s: %(message)s'
 """General logging format."""

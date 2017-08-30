@@ -24,8 +24,8 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
     try:
         config_path = find_config(config_path)
         restore_from = restore_from or path.dirname(config_path)
-
         config = load_config(config_file=config_path, additional_args=cl_arguments)
+
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)

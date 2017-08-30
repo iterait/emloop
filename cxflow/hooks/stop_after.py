@@ -38,10 +38,10 @@ class StopAfter(AbstractHook):
 
         Possible stopping conditions are:
 
-            - after the specified number of epochs
-            - after the specified number of iterations (only train stream batches are counted as iterations)
-            - after the model is trained for more than the specified number of minutes (and ``after_batch``,
-                ``after_epoch`` event is triggered)
+        - after the specified number of epochs
+        - after the specified number of iterations (only train stream batches are counted as iterations)
+        - after the model is trained for more than the specified number of minutes (and ``after_batch``, \
+        ``after_epoch`` event is triggered)
 
         .. note:
             Multiple stopping conditions may be specified, the training is stopped when any of them is met.

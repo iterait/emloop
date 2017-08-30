@@ -4,7 +4,7 @@ import pkg_resources
 
 def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     """
-    Create the cxflow argument parser.
+    Create the **cxflow** argument parser.
 
     :return: an instance of the parser
     """
@@ -32,7 +32,7 @@ def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
                                     'usually a directory in which the trained model is stored')
 
     # create predict subparser
-    predict_parser = subparsers.add_parser('predict')
+    predict_parser = subparsers.add_parser('predict', description='Run prediction with the given ``config_path``.')
     predict_parser.set_defaults(subcommand='predict')
     predict_parser.add_argument('config_path', help='path to the config file or the directory in which it is stored')
     predict_parser.add_argument('restore_from', nargs='?', default=None,
@@ -40,13 +40,13 @@ def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
                                      'directory in which the trained model is stored')
 
     # create dataset subparser
-    dataset_parser = subparsers.add_parser('dataset')
+    dataset_parser = subparsers.add_parser('dataset', description='Invoke arbitrary dataset method.')
     dataset_parser.set_defaults(subcommand='dataset')
     dataset_parser.add_argument('method', help='name of the method to be invoked')
     dataset_parser.add_argument('config_file', help='path to the config file')
 
     # create grid-search subparser
-    gridsearch_parser = subparsers.add_parser('gridsearch')
+    gridsearch_parser = subparsers.add_parser('gridsearch', description='Do parameter grid search (experimental).')
     gridsearch_parser.set_defaults(subcommand='gridsearch')
     gridsearch_parser.add_argument('script', help='Script to be grid-searched')
     gridsearch_parser.add_argument('params', nargs='*', help='Params to be tested. Format: name:type=[value1,value2]. '

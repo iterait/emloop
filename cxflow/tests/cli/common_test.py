@@ -1,5 +1,5 @@
 """
-Test module for cxflow common functions (cli/common.py).
+Test module for **cxflow** common functions (cli/common.py).
 """
 import os
 from os import path
