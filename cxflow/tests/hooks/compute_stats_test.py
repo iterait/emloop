@@ -20,18 +20,17 @@ class ComputeStatsTest(CXTestCase):
     def test_raise_on_init(self):
         """Tests raising error if specified aggregation is not supported."""
 
-        variables = {'loss': ['mean', 'median', 'max'],
-                     'accuracy': ['mean', 'median', 'not_supported']}
+        variables = [{'loss': ['mean', 'median', 'max']},
+                     {'accuracy': ['mean', 'median', 'not_supported']}]
         with self.assertRaises(ValueError):
-            hook = ComputeStats(variables)
+            hook = ComputeStats(variables=variables)
 
     def test_compute_save_stats(self):
         """Tests correctness of computed aggregations and their saving."""
 
-        variables = {'loss': ['mean', 'std', 'min', 'max', 'median'],
-                     'accuracy': ['mean', 'std', 'min', 'max', 'median']}
+        variables = ['loss', {'accuracy': ['mean', 'std', 'min', 'max', 'median']}]
 
-        hook = ComputeStats(variables)
+        hook = ComputeStats(variables=variables)
 
         epoch_data = {'train': {'accuracy': None, 'loss': None},
                       'test': {'accuracy': None, 'loss': None}}
@@ -43,10 +42,10 @@ class ComputeStatsTest(CXTestCase):
         hook.after_epoch(epoch_data)
 
         valid_aggrs = {'train':
-                       {'loss': {'mean': 4.5, 'std': 1.5, 'min': 3, 'max': 6, 'median': 4.5},
+                       {'loss': {'mean': 4.5},
                         'accuracy': {'mean': 3, 'std': 1, 'min': 2, 'max': 4, 'median': 3}},
                        'test':
-                       {'loss': {'mean': 4.5, 'std': 1.5, 'min': 3, 'max': 6, 'median': 4.5},
+                       {'loss': {'mean': 4.5},
                         'accuracy': {'mean': 3, 'std': 1, 'min': 2, 'max': 4, 'median': 3}}}
 
         self.assertEqual(epoch_data.keys(),
