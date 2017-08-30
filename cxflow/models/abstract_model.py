@@ -10,7 +10,7 @@ from ..datasets import AbstractDataset
 class AbstractModel(metaclass=ABCMeta):
     """
     Abstract machine learning model which exposes input and output names, run and save methods.
-    `AbstractModel` implementations are trainable with ``cxflow.MainLoop``.
+    `AbstractModel` implementations are trainable with :py:class:`cxflow.MainLoop`.
     """
 
     @abstractmethod
@@ -46,7 +46,7 @@ class AbstractModel(metaclass=ABCMeta):
         """
         Run feed-forward pass with the given batch and return the results as dict.
 
-        When train=True, also update parameters.
+        When ``train=True``, also update parameters.
         :param batch: batch to be processed.
         :param train: ``True`` if this batch should be used for model update, ``False`` otherwise.
         :return: results dict
@@ -67,7 +67,7 @@ class AbstractModel(metaclass=ABCMeta):
     @abstractmethod
     def restore_fallback(self) -> str:
         """
-        Return the fully-qualified name of the fallback restore class (e.g. `module.submodule.BaseClass`).
+        Return the fully-qualified name of the fallback restore class (e.g. ``module.submodule.BaseClass``).
 
         When restoring a model, cxflow tries to use the fallback class if the construction of the model object specified
         in `model` configuration section fails.

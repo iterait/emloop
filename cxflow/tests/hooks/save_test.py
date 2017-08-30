@@ -1,5 +1,5 @@
 """
-Test module for saver hook (cxflow.hooks.save_hook).
+Test module for saver hook (:py:mod:`cxflow.hooks.save_hook`).
 """
 
 from typing import Mapping, List
@@ -31,7 +31,7 @@ def _get_epoch_data(valid_loss_mean_val: float=3) -> AbstractHook.EpochData:
 
 
 class EmptyModel(AbstractModel):
-    """The model which raises `ValueError` if save method is called."""
+    """The model which raises ``ValueError`` if save method is called."""
 
     def __init__(self, **kwargs):
         pass
@@ -55,12 +55,12 @@ class EmptyModel(AbstractModel):
         return ''
 
 
-class SaverHookTest(CXTestCase):
-    """Test case for SaverHook."""
+class SaveAfterTest(CXTestCase):
+    """Test case for :py:class:`cxflow.hooks.SaverEvery`."""
 
     def test_raise_on_save_failure(self):
         """
-        Test raising an exception if `on_save_failure`
+        Test raising an exception if ``on_save_failure``
         parameter is not: error/warn/ignore.
         """
         with self.assertRaises(AssertionError):
@@ -76,7 +76,7 @@ class SaverHookTest(CXTestCase):
     def test_no_raise(self):
         """
         Test whether an exception is not raised
-        if `on_save_failure` is set to warn/ignore.
+        if ``on_save_failure`` is set to warn/ignore.
         """
         SaveEvery(model=EmptyModel(), n_epochs=3,
                   on_failure='warn').after_epoch(epoch_id=30)
@@ -84,12 +84,12 @@ class SaverHookTest(CXTestCase):
                   on_failure='ignore').after_epoch(epoch_id=30)
 
 
-class BestSaverHookTest(CXTestCase):
-    """Test case for SaveBest hook."""
+class SaveBestTest(CXTestCase):
+    """Test case for :py:class:`cxflow.hooks.SaveBest` hook."""
 
     def test_raise_invalid_on_save_failure(self):
         """
-        Test raising an exception if `on_save_failure`
+        Test raising an exception if ``on_save_failure``
         parameter is not: error/warn/ignore.
         """
         with self.assertRaises(AssertionError):

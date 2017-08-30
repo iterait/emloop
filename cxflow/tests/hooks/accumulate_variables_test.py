@@ -13,7 +13,7 @@ _EXAMPLES = 5
 _FEATURES = 6
 
 
-class AccumulatingHookTest(CXTestCase):
+class AccumulateVariablesTest(CXTestCase):
     """Test case for AccumulateVariables hook."""
 
     def get_batch(self):

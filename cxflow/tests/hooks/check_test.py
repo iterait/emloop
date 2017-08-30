@@ -1,5 +1,5 @@
 """
-Test module for train check hook (cxflow.hooks.check_hook).
+Test module for :py:class:`cxflow.hooks.Check`.
 """
 
 import numpy as np
@@ -31,13 +31,12 @@ def _get_epoch_data():
     return epoch_data
 
 
-class TrainCheckHookTest(CXTestCase):
-    """Test case for TrainCheckHook."""
+class CheckTest(CXTestCase):
+    """Test case for :py:class:`cxflow.hooks.Check`."""
 
     def setUp(self):
         """Create new epoch data for each test separately."""
         self._epoch_data = _get_epoch_data()
-
 
     def test_stream_raise(self):
         """Test raising error, when stream not in epoch_data."""

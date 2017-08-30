@@ -11,11 +11,12 @@ from cxflow.hooks.abstract_hook import TrainingTerminated
 NOTRAIN_STREAM_NAME = 'valid'
 assert MainLoop.TRAIN_STREAM is not NOTRAIN_STREAM_NAME
 
-class EpochStopperHookTest(CXTestCase):
-    """Test case for StopAfter hook."""
+
+class StopAfterTest(CXTestCase):
+    """Test case for :py:class:`cxflow.hooks.StopAfter` hook."""
 
     def test_no_conditions_raise(self):
-        """Test if ``__init__`` raises ValueError when no stopping condtion is specified."""
+        """Test if ``__init__`` raises ValueError when no stopping condition is specified."""
         self.assertRaises(ValueError, StopAfter)
 
     def test_stop_after_epochs(self):
