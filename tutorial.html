@@ -225,7 +225,7 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
 
 <span class="k">class</span> <span class="nc">MajorityDataset</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">BaseDataset</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">_init_with_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">random_integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_examples</span> <span class="o">*</span> <span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_examples</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
@@ -247,7 +247,7 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
 </div>
 </div>
 <p>Let us describe the functionality of our <code class="docutils literal"><span class="pre">MajorityDataset</span></code> step by step.
-We shall begin with the <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.
+We shall begin with the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.
 This method is called from the dataset constructor automatically and it is passed the
 parameters from the configuration file (configuration will be explained later).
 In our case, we need <code class="docutils literal"><span class="pre">n_examples</span></code> (the number of examples in total), <code class="docutils literal"><span class="pre">dim</span></code> (the dimension of the
@@ -370,7 +370,7 @@ A detailed description of cxflow configuration can be found in the <a class="ref
 <p>In our case, we only need to tell cxflow which dataset to use.
 This is done by specifying a <code class="docutils literal"><span class="pre">class</span></code> of the dataset.
 In addition, we will specify the parameters of the dataset (those
-ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method).</p>
+ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method).</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.MajorityDataset</span>
   <span class="l l-Scalar l-Scalar-Plain">n_examples</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
@@ -379,12 +379,12 @@ ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">
 </pre></div>
 </div>
 <p>We can pass arbitrary other constants to the dataset as they will be hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>
-of the dataset&#8217;s <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
+of the dataset&#8217;s <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The whole <code class="docutils literal"><span class="pre">dataset</span></code> section will be passed as a string-encoded YAML to the dataset constructor.
 In the case of using <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>, the YAML is automatically decoded and the individual
-variables are passed to <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method.</p>
+variables are passed to <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.</p>
 </div>
 </div>
 <div class="section" id="id3">

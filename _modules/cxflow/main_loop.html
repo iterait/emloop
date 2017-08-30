@@ -107,7 +107,7 @@
       
   <h1>Source code for cxflow.main_loop</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">cxflow main loop for training models.</span>
+<span class="sd">**cxflow** main loop for training models.</span>
 
 <span class="sd">The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks.</span>
 <span class="sd">Having all that, it manages iterating through streams, training and hooks execution.</span>
@@ -139,9 +139,9 @@
                  <span class="n">model</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="p">,</span>
                  <span class="n">hooks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AbstractHook</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>
                  <span class="n">extra_streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>  <span class="c1"># pylint: disable=invalid-sequence-index</span>
-                 <span class="n">on_unused_sources</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span>
-                 <span class="n">fixed_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">skip_zeroth_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+                 <span class="n">on_unused_sources</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span>
+                 <span class="n">fixed_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">skip_zeroth_epoch</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param model: trained model</span>
 <span class="sd">        :param dataset: loaded dataset</span>
@@ -167,14 +167,14 @@
 <div class="viewcode-block" id="MainLoop._create_epoch_data"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._create_epoch_data">[docs]</a>    <span class="k">def</span> <span class="nf">_create_epoch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create empty epoch data double dict.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">())</span>
-                            <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span> <span class="o">+</span> <span class="p">[</span><span class="n">MainLoop</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">]])</span></div>
+                            <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="p">[</span><span class="n">MainLoop</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="MainLoop._check_sources"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._check_sources">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check for unused and missing sources.</span>
 
 <span class="sd">        :param batch: batch to be checked</span>
-<span class="sd">        :raise: ValueError: is a source is missing or unused and ``self._on_unused_sources`` is set to ``error``</span>
+<span class="sd">        :raise ValueError: if a source is missing or unused and ``self._on_unused_sources`` is set to ``error``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">unused_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">input_names</span><span class="p">]</span>
         <span class="n">missing_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">input_names</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
@@ -296,7 +296,7 @@
         <span class="k">except</span> <span class="n">TrainingTerminated</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Training terminated by a hook: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Training terminated by a keyboard interrupt&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Main loop run terminated by a keyboard interrupt&#39;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># After training: after_training</span>

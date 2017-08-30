@@ -24,6 +24,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: AbstractDataset
       :parts: 1
@@ -37,6 +38,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: BaseDataset
       :parts: 1

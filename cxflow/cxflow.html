@@ -124,7 +124,7 @@
       
   <div class="section" id="module-cxflow">
 <span id="cxflow"></span><h1><code class="docutils literal"><span class="pre">cxflow</span></code><a class="headerlink" href="#module-cxflow" title="Permalink to this headline">¶</a></h1>
-<p>cxflow base module</p>
+<p><strong>cxflow</strong> core module.</p>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -195,12 +195,6 @@
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="cxflow.MainLoop.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.MainLoop.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="cxflow.MainLoop._check_sources">
 <code class="descname">_check_sources</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._check_sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._check_sources" title="Permalink to this definition">¶</a></dt>
@@ -211,7 +205,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]) &#8211; batch to be checked</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raise:</th><td class="field-body">ValueError: is a source is missing or unused and <code class="docutils literal"><span class="pre">self._on_unused_sources</span></code> is set to <code class="docutils literal"><span class="pre">error</span></code></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if a source is missing or unused and <code class="docutils literal"><span class="pre">self._on_unused_sources</span></code> is set to <code class="docutils literal"><span class="pre">error</span></code></td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>

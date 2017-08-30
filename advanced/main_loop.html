@@ -126,32 +126,34 @@
       
   <div class="section" id="main-loop">
 <h1>Main Loop<a class="headerlink" href="#main-loop" title="Permalink to this headline">¶</a></h1>
-<p>Main loop is the core of the cxflow.
-As the name suggests, it is responsible for the main lifecycle of the training of the model.</p>
+<p>Main loop is the core of the <strong>cxflow</strong> responsible for the main lifecycle of the training of the model.</p>
 <div class="section" id="dataset-model-integration">
 <h2>Dataset/Model Integration<a class="headerlink" href="#dataset-model-integration" title="Permalink to this headline">¶</a></h2>
-<p>The first thing cxflow does no matter what command has been executed, is
-building the dataset and passing the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
-Afterwards, cxflow builds the model and passes the <code class="docutils literal"><span class="pre">model</span></code> section from the
+<p>The first thing <strong>cxflow</strong> does no matter what command has been executed, is
+creating the dataset and passing the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
+Afterwards, cxflow creates the model and passes the <code class="docutils literal"><span class="pre">model</span></code> section from the
 <a class="reference external" href="config.html">config</a> to its constructor.
-One of the arguments of the model is also the dataset itself, so the net can query
+One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.</p>
-<p>After the dataset and the model are created, cxflow calls one of the dataset stream functions
+<p>After the dataset and the model are created, <strong>cxflow</strong> calls one of the dataset stream functions
 based on whether it is training, testing or predicting (more on this is described in the following
 sections).
 The selected stream method (e.g., <code class="docutils literal"><span class="pre">train_stream</span></code>) returns an iterable where each
 item corresponds to a single batch of data.</p>
-<p>Finally, the stream is iterated through and each batch is fed to the model&#8217;s <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method along
-with a boolean value indicating whether the model should update or not.
-By default, updates only happen when iterating the training stream.
-The implementation of <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method is backend specific.</p>
+<p>Finally, the stream is iterated through and each batch is fed to the model&#8217;s <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a>
+method along with a boolean value indicating whether the model should update or not.
+By default, updates only happen when iterating the training stream.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The implementation of <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method is backend specific.</p>
+</div>
 </div>
 <div class="section" id="training-lifecycle">
 <h2>Training Lifecycle<a class="headerlink" href="#training-lifecycle" title="Permalink to this headline">¶</a></h2>
-<p>The lifecycle of the training is very simple. The following are the steps performed by cxflow.</p>
+<p>The lifecycle of the training is very simple. The following are the steps performed by <strong>cxflow</strong>.</p>
 <ol class="arabic simple">
-<li>Build the dataset and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
-<li>Build the model an pass the section <code class="docutils literal"><span class="pre">model</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
+<li>Create the dataset and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
+<li>Create the model an pass the section <code class="docutils literal"><span class="pre">model</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
 <li>Evaluate the extra streams. Those are usually valid and test streams, depending on
 your <code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> <a class="reference external" href="config.html">config</a>.
 During this phase, the model is not updated and therefore, it is perfectly fine
@@ -161,9 +163,9 @@ In the training loop, the two following steps alternate: update the model based 
 and evaluate the extra streams.</li>
 </ol>
 <p>The whole process might be described by the following pseudocode.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. build dataset
-<span class="m">2</span>. build model
-<span class="m">3</span>. evaluate extra streams
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. create dataset
+<span class="m">2</span>. create model
+<span class="m">3</span>. evaluate all the streams
 <span class="m">4</span>. <span class="k">while</span> not interrupted:
 <span class="m">5</span>.     train on train stream
 <span class="m">6</span>.     evaluate extra streams
@@ -175,8 +177,8 @@ and evaluate the extra streams.</li>
 <p>The prediction stream is used and the model is never updated.
 In addition, there is only a single pass through the stream and then cxflow terminates.</p>
 <p>The whole process might be described by the following pseudocode.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. build dataset
-<span class="m">2</span>. build model
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. create dataset
+<span class="m">2</span>. create model
 <span class="m">3</span>. evaluate prediction stream
 </pre></div>
 </div>

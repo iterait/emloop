@@ -137,7 +137,7 @@ Base class for datasets written in python.</li>
 <em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">AbstractDataset</code><span class="sig-paren">(</span><em>config_str: str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.AbstractDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>This concept prescribes the API that is required from every <strong>cxflow</strong> dataset.</p>
-<p>Every cxflow dataset has to have a constructor which takes YAML string config.
+<p>Every <strong>cxflow</strong> dataset has to have a constructor which takes YAML string config.
 Additionally, one may implement any <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method
 in order to make <code class="docutils literal"><span class="pre">stream_name</span></code> stream available in the <strong>cxflow</strong> <a class="reference internal" href="cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a>.</p>
 <p>All the defined stream methods should return a <code class="xref py py-attr docutils literal"><span class="pre">Stream</span></code>.</p>
@@ -160,32 +160,24 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="cxflow.datasets.AbstractDataset.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#cxflow.datasets.AbstractDataset.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="cxflow.datasets.BaseDataset">
-<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str: str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.BaseDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">datasets.AbstractDataset</span></code></a></p>
 <p>Base class for datasets written in python.</p>
 <dl class="docutils">
 <dt>In the inherited class, one should:</dt>
 <dd><ul class="first last simple">
-<li>override the <code class="docutils literal"><span class="pre">_init_with_kwargs</span></code> method instead of <code class="docutils literal"><span class="pre">__init__</span></code></li>
-<li>override the <code class="docutils literal"><span class="pre">train_stream</span></code> method</li>
-<li>add any additional <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method in order to make <code class="docutils literal"><span class="pre">&lt;stream_name&gt;</span></code> stream available</li>
+<li>override the <code class="docutils literal"><span class="pre">_configure_dataset</span></code></li>
+<li>(optional) implement <code class="docutils literal"><span class="pre">train_stream</span></code> method if intended to be used with <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">...</span></code></li>
+<li>(optional) implement <code class="docutils literal"><span class="pre">predict_stream</span></code> method if intended to be used with <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span> <span class="pre">...</span></code></li>
+<li>(optional) implement <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method in order to make <code class="docutils literal"><span class="pre">&lt;stream_name&gt;</span></code> stream available</li>
 </ul>
 </dd>
 </dl>
-<img src="../_images/inheritance-8d69251d2d7f74eb8a054b19f5b78209807db911.png" alt="Inheritance diagram of BaseDataset" usemap="#inheritance7f67f7c0ff" class="inheritance"/>
-<map id="inheritance7f67f7c0ff" name="inheritance7f67f7c0ff">
-<area shape="rect" id="node2" title="Base class for datasets written in python." alt="" coords="180,5,285,31"/>
-</map>
+<img src="../_images/inheritance-546cf1f3479497ddc573004189bdf9a97826a087.png" alt="Inheritance diagram of BaseDataset" class="inheritance"/>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
@@ -193,7 +185,7 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 <dt id="cxflow.datasets.BaseDataset.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create new dataset.</p>
-<p>Decode the given YAML config string and pass the obtained <code class="docutils literal"><span class="pre">**kwargs</span></code> to <a class="reference internal" href="#cxflow.datasets.BaseDataset._init_with_kwargs" title="cxflow.datasets.BaseDataset._init_with_kwargs"><code class="xref py py-meth docutils literal"><span class="pre">_init_with_kwargs()</span></code></a>.</p>
+<p>Decode the given YAML config string and pass the obtained <code class="docutils literal"><span class="pre">**kwargs</span></code> to <a class="reference internal" href="#cxflow.datasets.BaseDataset._configure_dataset" title="cxflow.datasets.BaseDataset._configure_dataset"><code class="xref py py-meth docutils literal"><span class="pre">_configure_dataset()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -205,9 +197,9 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 </dd></dl>
 
 <dl class="method">
-<dt id="cxflow.datasets.BaseDataset._init_with_kwargs">
-<code class="descname">_init_with_kwargs</code><span class="sig-paren">(</span><em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset._init_with_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset._init_with_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the dataset with <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
+<dt id="cxflow.datasets.BaseDataset._configure_dataset">
+<code class="descname">_configure_dataset</code><span class="sig-paren">(</span><em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset._configure_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset._configure_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the dataset with <code class="docutils literal"><span class="pre">**kwargs</span></code> decoded from YAML configuration.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

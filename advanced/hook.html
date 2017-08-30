@@ -142,8 +142,7 @@ available in cxflow framework.</p>
 entry, for example:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
-      <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">loss</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">mean</span><span class="p p-Indicator">]</span>
+      <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">loss</span><span class="p p-Indicator">]</span>
 
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
 </pre></div>
@@ -173,7 +172,7 @@ For instance, the following config:</p>
 <p>will be roughly translated to</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">my_project.hooks</span> <span class="kn">import</span> <span class="n">MyHook</span>
 <span class="n">hook</span> <span class="o">=</span> <span class="n">MyHook</span><span class="p">(</span><span class="n">arg1</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
-<span class="c1"># use hook in the cxflow main_loop</span>
+<span class="c1"># use hook in the **cxflow** main_loop</span>
 </pre></div>
 </div>
 <p>In addition to the specified arguments, cxflow supplies the constructor with the model,
@@ -257,15 +256,9 @@ the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks
 <p>Altogether, the hook system provides instruments to carefully watch and manage your training.</p>
 <p>The following config is a good starting point for your own hook configuration.</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
-  <span class="c1"># compute classification statistics such as accuracy of f1 score</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxflow_scikit.ClassificationInfoHook</span><span class="p p-Indicator">:</span>
-      <span class="l l-Scalar l-Scalar-Plain">predicted_variable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">predictions</span>
-      <span class="l l-Scalar l-Scalar-Plain">gold_variable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">labels</span>
-
-  <span class="c1"># compute mean loss over each epoch</span>
+  <span class="c1"># compute mean loss after each epoch</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
-      <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">loss</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">mean</span><span class="p p-Indicator">]</span>
+      <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">loss</span><span class="p p-Indicator">]</span>
 
   <span class="c1"># log the results to the standard python logging, csv and tensorboard</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>

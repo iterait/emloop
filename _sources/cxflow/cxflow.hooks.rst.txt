@@ -51,6 +51,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: AbstractHook
       :parts: 1
@@ -64,6 +65,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: AccumulateVariables
       :parts: 1
@@ -77,6 +79,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: WriteCSV
       :parts: 1
@@ -90,6 +93,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: StopAfter
       :parts: 1
@@ -103,6 +107,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: LogVariables
       :parts: 1
@@ -116,6 +121,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: LogProfile
       :parts: 1
@@ -129,6 +135,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: SaveEvery
       :parts: 1
@@ -142,6 +149,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: SaveBest
       :parts: 1
@@ -155,6 +163,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: CatchSigint
       :parts: 1
@@ -168,6 +177,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: ComputeStats
       :parts: 1
@@ -181,6 +191,7 @@ Classes
    :members:
    :private-members:
    :special-members:
+   :exclude-members: __weakref__
 
    .. inheritance-diagram:: Check
       :parts: 1

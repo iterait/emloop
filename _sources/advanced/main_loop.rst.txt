@@ -1,38 +1,39 @@
 Main Loop
 *********
 
-Main loop is the core of the cxflow.
-As the name suggests, it is responsible for the main lifecycle of the training of the model.
+Main loop is the core of the **cxflow** responsible for the main lifecycle of the training of the model.
 
 Dataset/Model Integration
 =========================
 
-The first thing cxflow does no matter what command has been executed, is 
-building the dataset and passing the section ``dataset`` from the `config <config.html>`_ to its constructor.
-Afterwards, cxflow builds the model and passes the ``model`` section from the
+The first thing **cxflow** does no matter what command has been executed, is
+creating the dataset and passing the section ``dataset`` from the `config <config.html>`_ to its constructor.
+Afterwards, cxflow creates the model and passes the ``model`` section from the
 `config <config.html>`_ to its constructor.
-One of the arguments of the model is also the dataset itself, so the net can query
+One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.
 
-After the dataset and the model are created, cxflow calls one of the dataset stream functions
+After the dataset and the model are created, **cxflow** calls one of the dataset stream functions
 based on whether it is training, testing or predicting (more on this is described in the following
 sections).
 The selected stream method (e.g., ``train_stream``) returns an iterable where each
 item corresponds to a single batch of data.
 
-Finally, the stream is iterated through and each batch is fed to the model's :py:meth:`cxflow.models.AbstractModel.run` method along
-with a boolean value indicating whether the model should update or not.
+Finally, the stream is iterated through and each batch is fed to the model's :py:meth:`cxflow.models.AbstractModel.run`
+method along with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.
-The implementation of :py:meth:`cxflow.models.AbstractModel.run` method is backend specific.
+
+.. note::
+    The implementation of :py:meth:`cxflow.models.AbstractModel.run` method is backend specific.
 
 Training Lifecycle
 ==================
 
-The lifecycle of the training is very simple. The following are the steps performed by cxflow.
+The lifecycle of the training is very simple. The following are the steps performed by **cxflow**.
 
-#. Build the dataset and pass the section ``dataset`` from the `config <config.html>`_ to its constructor.
-#. Build the model an pass the section ``model`` from the `config <config.html>`_ to its constructor.
-#. Evaluate the extra streams. Those are usually valid and test streams, depending on 
+#. Create the dataset and pass the section ``dataset`` from the `config <config.html>`_ to its constructor.
+#. Create the model an pass the section ``model`` from the `config <config.html>`_ to its constructor.
+#. Evaluate the extra streams. Those are usually valid and test streams, depending on
    your ``main_loop.extra_streams`` `config <config.html>`_.
    During this phase, the model is not updated and therefore, it is perfectly fine
    to use validation and testing data.
@@ -44,9 +45,9 @@ The whole process might be described by the following pseudocode.
 
 .. code-block:: bash
 
-    1. build dataset
-    2. build model
-    3. evaluate extra streams
+    1. create dataset
+    2. create model
+    3. evaluate all the streams
     4. while not interrupted:
     5.     train on train stream
     6.     evaluate extra streams
@@ -62,8 +63,8 @@ The whole process might be described by the following pseudocode.
 
 .. code-block:: bash
 
-    1. build dataset
-    2. build model
+    1. create dataset
+    2. create model
     3. evaluate prediction stream
 
 Hook Integration

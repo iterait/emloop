@@ -133,14 +133,14 @@ Note that this configuration is parsed from the <a class="reference external" hr
 <div class="section" id="basedataset">
 <h2>BaseDataset<a class="headerlink" href="#basedataset" title="Permalink to this headline">¶</a></h2>
 <p>Inheriting from <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a> is recommended as it parses the YAML string automatically.
-Instead of the constructor, the developer is expected to implement <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset._init_with_kwargs" title="cxflow.datasets.BaseDataset._init_with_kwargs"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.datasets.BaseDataset._init_with_kwargs()</span></code></a> method.
+Instead of the constructor, the developer is expected to implement <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset._configure_dataset" title="cxflow.datasets.BaseDataset._configure_dataset"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.datasets.BaseDataset._configure_dataset()</span></code></a> method.
 This method should accept the parameters from the config file.</p>
 <p>Let us demonstrate <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a> on an example. First, we will create a class <code class="docutils literal"><span class="pre">MyDataset</span></code> located
 in <code class="docutils literal"><span class="pre">datasets.my_dataset</span></code> module:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cxflow</span> <span class="kn">import</span> <span class="n">BaseDataset</span>
 
 <span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">BaseDataset</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_init_with_kwargs</span><span class="p">(</span><span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">augment</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">augment</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
       <span class="c1"># ...</span>
 </pre></div>
 </div>
