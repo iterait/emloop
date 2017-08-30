@@ -47,7 +47,7 @@ def entry_point() -> None:
     logger.addHandler(stderr_handler)
 
     if known_args.subcommand == 'train':
-        train(config_file=known_args.config_file, cl_arguments=unknown_args, output_root=known_args.output_root)
+        train(config_path=known_args.config_file, cl_arguments=unknown_args, output_root=known_args.output_root)
 
     elif known_args.subcommand == 'resume':
         resume(config_path=known_args.config_path, restore_from=known_args.restore_from, cl_arguments=unknown_args,
