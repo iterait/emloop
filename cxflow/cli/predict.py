@@ -10,7 +10,11 @@ from ..utils.config import load_config
 
 def predict(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str) -> None:
     """
-    Load config from the directory specified and start the prediction.
+    Run prediction from the specified config path.
+
+    If the config contains a `predict` section:
+        - override hooks with predict.hooks if present
+        - update dataset, model and main_loop sections if the respective sections are present
 
     :param config_path: path to the config file or the directory in which it is stored
     :param restore_from: backend-specific path to the already trained model to be restored from.
@@ -26,8 +30,14 @@ def predict(config_path: str, restore_from: Optional[str], cl_arguments: Iterabl
         restore_from = restore_from or path.dirname(config_path)
         config = load_config(config_file=config_path, additional_args=cl_arguments)
 
-        assert 'predict' in config, '`predict` section is not present in config'
-        config = config['predict']
+        if 'predict' in config:
+            for section in ['dataset', 'model', 'main_loop']:
+                if section in config['predict']:
+                    for key in config['predict'][section]:
+                        config[section][key] = config['predict'][section][key]
+            if 'hooks' in config['predict']:
+                config['hooks'] = config['predict']['hooks']
+
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)
