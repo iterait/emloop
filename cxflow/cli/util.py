@@ -12,7 +12,7 @@ def find_config(config_path: str) -> str:
     The given path is expected to be either
 
     1. path to the file
-    2. path to a dir, in such case the path is joined with CXF_CONFIG_FILE
+    2. path to a dir, in such case the path is joined with ``CXF_CONFIG_FILE``
 
     :param config_path: path to the configuration file or its parent directory
     :return: validated configuration file path
@@ -25,7 +25,7 @@ def find_config(config_path: str) -> str:
 
 def validate_config(config: dict) -> None:
     """
-    Assert the config contains both `model` and `dataset` sections.
+    Assert the config contains both ``model`` and ``dataset`` sections.
 
     Additionally, warn if no hooks specified.
 

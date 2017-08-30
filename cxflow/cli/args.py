@@ -10,7 +10,8 @@ def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     """
     # create parser
     main_parser = ArgumentParser('cxflow',
-                                 description='cxflow: smart manager for deep learning models.',
+                                 description='cxflow: lightweight framework for machine learning with '
+                                             'focus on modularization, re-usability and rapid experimenting.',
                                  epilog='For more info see <https://cognexa.github.io/cxflow>')
 
     main_parser.add_argument('--version', action='version', help='Print cxflow version and quit.',

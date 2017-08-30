@@ -1,5 +1,5 @@
 """
-Module with profile hook test case (see cxflow.hooks.log_profile_hook).
+Module with profile hook test case (see :py:class:`cxflow.hooks.LogProfile`).
 """
 from testfixtures import LogCapture
 
@@ -31,9 +31,9 @@ _TRAIN_TEST_AND_VALID_PROFILE = {'read_batch_train': [1.001, 2, 3],
                                  'after_epoch_hooks': [5.3]}
 
 
-class ProfileHookTest(CXTestCase):
+class LogProfileTest(CXTestCase):
     """
-    Test case for LogProfile hook.
+    Test case for :py:class:`cxflow.hooks.LogProfile` hook.
 
     Hereby, we test only proper handling (logging) of the profile.
     The profiling itself is tested in the main_loop test (see cxflow.tests.main_loop_test.py).

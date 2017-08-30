@@ -4,10 +4,10 @@ This module is cxflow framework entry point.
 The entry point shall be accessed from command line via `cxflow` command.
 
 At the moment cxflow allows to
-- train a model with `cxflow train ...`
-- resume training with `cxflow resume ...`
-- generate model predictions with `cxflow predict ...`
-- invoke dataset method with `cxflow dataset <method> ...`
+- train a model with ``cxflow train ...``
+- resume training with ``cxflow resume ...``
+- generate model predictions with ``cxflow predict ...``
+- invoke dataset method with ``cxflow dataset <method> ...``
 
 Run `cxflow -h` for details.
 """

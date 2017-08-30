@@ -1,5 +1,6 @@
 """
-This module contains `BaseDataset` which might be used as a base class for your dataset written in Python.
+This module contains :py:class:`cxflow.datasets.BaseDataset` which might be used as a base class for your
+dataset implemented in Python.
 """
 
 from abc import abstractmethod, ABCMeta

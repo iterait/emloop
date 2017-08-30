@@ -9,7 +9,7 @@ from cxflow.tests.test_core import CXTestCase
 from cxflow.hooks.compute_stats import ComputeStats
 
 
-class StatsHookTest(CXTestCase):
+class ComputeStatsTest(CXTestCase):
     """Test case for ComputeStats hook."""
 
     def get_batch(self, batch_id):

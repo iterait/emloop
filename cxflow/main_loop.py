@@ -31,9 +31,9 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                  model: AbstractModel, dataset: AbstractDataset,
                  hooks: Iterable[AbstractHook]=(),
                  extra_streams: List[str]=(),  # pylint: disable=invalid-sequence-index
-                 on_unused_sources: str = 'warn',
-                 fixed_batch_size: Optional[int] = None,
-                 skip_zeroth_epoch: bool = False):
+                 on_unused_sources: str='warn',
+                 fixed_batch_size: Optional[int]=None,
+                 skip_zeroth_epoch: bool=False):
         """
         :param model: trained model
         :param dataset: loaded dataset
@@ -59,7 +59,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
     def _create_epoch_data(self) -> AbstractHook.EpochData:
         """Create empty epoch data double dict."""
         return OrderedDict([(stream_name, OrderedDict())
-                            for stream_name in self._extra_streams + [MainLoop.TRAIN_STREAM]])
+                            for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
         """
@@ -188,7 +188,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         except TrainingTerminated as ex:
             logging.info('Training terminated by a hook: %s', ex)
         except KeyboardInterrupt:
-            logging.warning('Training terminated by a keyboard interrupt')
+            logging.warning('Main loop run terminated by a keyboard interrupt')
             sys.exit(2)
 
         # After training: after_training

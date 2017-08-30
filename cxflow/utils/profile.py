@@ -29,7 +29,7 @@ class Timer:
         Create new Timer instance.
 
         :param name: event name under which the measured time should be saved
-        :param profile: profile = dict of lists of timings
+        :param profile: dict of lists of timings
         """
         self._name = name
         self._profile = profile

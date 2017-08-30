@@ -56,7 +56,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     """
     Create a dataset object according to the given config.
 
-    Dataset and output_dir configs are passed to the constructor in a single YAML-encoded string.
+    Dataset config section and the `output_dir` are passed to the constructor in a single YAML-encoded string.
 
     :param config: config dict with dataset config
     :param output_dir: path to the training output dir or None
@@ -82,7 +82,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
 def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
                  restore_from: Optional[str]=None) -> AbstractModel:
     """
-    Create a model object either from scratch of from the checkpoint in `resume_dir`.
+    Create a model object either from scratch of from the checkpoint in ``resume_dir``.
 
     Cxflow allows the following scenarios
 
@@ -91,7 +91,7 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
 
     :param config: config dict with model config
     :param output_dir: path to the training output dir
-    :param dataset: AbstractDataset object
+    :param dataset: dataset object implementing the :py:class:`cxflow.datasets.AbstractDataset` concept
     :param restore_from: from whence the model should be restored (backend-specific information)
     :return: model object
     """
@@ -194,8 +194,8 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     """
     Run cxflow training configured by the passed `config`.
 
-    Unique `output_dir` for this training is created under the given `output_root` dir
-    wherein all the training outputs are saved. The output dir name will be roughly `[model.name]_[time]`.
+    Unique ``output_dir`` for this training is created under the given ``output_root`` dir
+    wherein all the training outputs are saved. The output dir name will be roughly ``[model.name]_[time]``.
 
     The training procedure consists of the following steps:
 
@@ -209,7 +209,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     If any of the steps fails, the training is terminated.
 
     After the training procedure finishes, the output dir will contain the following:
-        - ``train_log.txt`` with entry_point and main_loop logs (same as the stderr)
+        - ``train_log.txt`` with entry point and main loop logs (same as the stderr)
         - dumped YAML config
 
     Additional outputs created by hooks, dataset or tensorflow may include:

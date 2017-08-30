@@ -22,7 +22,7 @@ class DummyDataset:
 
 
 class DummyHook(AbstractHook):
-    """Dummy hook which save its **kwargs to self.kwargs."""
+    """Dummy hook which save its ``**kwargs`` to ``self.kwargs``."""
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -79,7 +79,7 @@ class DummyModelWithKwargs2(DummyModelWithKwargs):
 
 
 class CLICommonTest(CXTestCaseWithDir):
-    """cli common test case."""
+    """CLI common test case."""
 
     def test_create_output_dir(self):
         """Test output dir creating and correct naming."""
@@ -154,7 +154,7 @@ class CLICommonTest(CXTestCaseWithDir):
         self.assertDictEqual(dataset.config, expected_config)
 
     def test_create_hooks(self):
-        """Test hooks creation in train_create_hooks."""
+        """Test hooks creation in :py:class:`cxflow.cli.create_hooks."""
 
         # test correct kwargs passing
         config = {'hooks': [{'cxflow.tests.cli.common_test.DummyHook': {'additional_arg': 10}}]}
