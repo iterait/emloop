@@ -7,9 +7,6 @@ import shutil
 from . import AbstractHook
 from ..datasets import AbstractDataset
 
-_ERASE_LINE = '\x1b[2K'
-"""Code for erasing a line."""
-
 
 class Progress(AbstractHook):
     """
@@ -55,7 +52,11 @@ class Progress(AbstractHook):
         filled_len = int(length * iteration // total)
         bar = fill * filled_len + '-' * (length - filled_len)
 
-        print('%s |%s| %s/%s=%s%% %s' % (prefix, bar, iteration, total, percent, suffix), end='\r')
+        print('\r%s |%s| %s/%s=%s%% %s' % (prefix, bar, iteration, total, percent, suffix), end='\r')
+
+    def _erase_line(self):
+        """Erase the current line."""
+        print('\x1b[2K', end='\r')
 
     def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch):
         """
@@ -71,7 +72,7 @@ class Progress(AbstractHook):
             self._batch_count[stream_name] += 1
 
         if not self._first_batch_in_epoch:
-            print(_ERASE_LINE, end='\r')
+            self._erase_line()
         else:
             self._first_batch_in_epoch = False
 
@@ -79,23 +80,40 @@ class Progress(AbstractHook):
         prefix = 'Progress of {} stream:'.format(stream_name)
         suffix = 'complete'
 
+        terminal_width = shutil.get_terminal_size().columns
+
+        # not first epochs
         if self._batch_count_saved:
             total_batches = self._batch_count_saved[stream_name]
             extra_chars_count = 5
-            bar_len = shutil.get_terminal_size().columns - (extra_chars_count +
-                                                            len(prefix) + len(suffix) +
-                                                            len("{0}/{0}=100.0%".format(total_batches)))
+            bar_len = terminal_width - (extra_chars_count + len(prefix) +
+                                        len(suffix) + len("{0}/{0}=100.0%".format(total_batches)))
 
-            self._print_progress_bar(current_batch, total_batches, prefix=prefix, suffix=suffix, length=bar_len)
+            if bar_len > 0:
+                self._print_progress_bar(current_batch, total_batches, prefix=prefix, suffix=suffix, length=bar_len)
+            else:
+                # print progress as short as possible
+                print("{}: {}/{}".format(stream_name, current_batch, total_batches), end='\r')
 
+            # erase progress bar after last batch
+            if total_batches == current_batch:
+                self._erase_line()
+
+        # first epoch
         else:
-            print("{}: {} {}".format(prefix, current_batch, suffix), end='\r')
+            progress_msg = "{} {} {}".format(prefix, current_batch, suffix)
+            if len(progress_msg) <= terminal_width:
+                print(progress_msg, end='\r')
+            else:
+                # print progress as short as possible
+                print("{}: {}".format(stream_name, current_batch), end='\r')
 
     def after_epoch(self, **_):
         """
         After the first epoch the count of batches is saved, because of displaying the progress bar.
         After every epoch the current batch count is reseted.
         """
+        # after first epoch
         if not self._batch_count_saved:
             self._batch_count_saved = self._batch_count.copy()
         self._reset()
