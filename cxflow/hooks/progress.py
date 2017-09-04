@@ -1,41 +1,38 @@
 """
-Module with the hook which displays progress of the current epoch.
+Module with the hook which shows progress of the current epoch.
 """
 
 import shutil
+import collections
 
 from . import AbstractHook
 from ..datasets import AbstractDataset
 
 
-class Progress(AbstractHook):
+class ShowProgress(AbstractHook):
     """
-    Display progress of a processed stream in the current epoch.
+    Show progress of a processed stream in the current epoch.
 
     .. code-block:: yaml
-        :caption: display progress of the current epoch
+        :caption: show progress of the current epoch
 
         hooks:
           - Progress
     """
 
     def __init__(self, **kwargs):
-        """
-        Create new Progress hook.
-        """
+        """Create new Progress hook."""
         super().__init__(**kwargs)
-        self._batch_count = {}
-        self._batch_count_saved = None
-        self._first_batch_in_epoch = True
+        self._batch_count_saved = {}
+        self._reset()
 
     def _reset(self) -> None:
-        """
-        Reset `_batch_count` and `_first_batch_in_epoch` to initial values.
-        """
-        self._batch_count = {}
+        """Reset `_batch_count` and `_first_batch_in_epoch` to initial values."""
+        self._batch_count = collections.defaultdict(lambda: 0)
         self._first_batch_in_epoch = True
 
-    def _print_progress_bar(self, iteration: int, total: int, prefix: str='',
+    @staticmethod
+    def _print_progress_bar(iteration: int, total: int, prefix: str='',
                             suffix: str='', length: int=50, fill: str='█') -> None:
         """
         Display current state of the progress bar.
@@ -48,13 +45,14 @@ class Progress(AbstractHook):
         param fill: char to be displayed as a step in the progress bar
         """
 
-        percent = ("{0:.1f}").format(100 * (iteration / float(total)))
+        percent = "{0:.1f}".format(100 * (iteration / float(total)))
         filled_len = int(length * iteration // total)
         bar = fill * filled_len + '-' * (length - filled_len)
 
         print('\r%s |%s| %s/%s=%s%% %s' % (prefix, bar, iteration, total, percent, suffix), end='\r')
 
-    def _erase_line(self):
+    @staticmethod
+    def _erase_line():
         """Erase the current line."""
         print('\x1b[2K', end='\r')
 
@@ -66,10 +64,7 @@ class Progress(AbstractHook):
         param stream_name: name of current stream
         """
 
-        if stream_name not in self._batch_count:
-            self._batch_count[stream_name] = 1
-        else:
-            self._batch_count[stream_name] += 1
+        self._batch_count[stream_name] += 1
 
         if not self._first_batch_in_epoch:
             self._erase_line()
