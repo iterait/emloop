@@ -17,11 +17,11 @@ class ShowProgress(AbstractHook):
         :caption: show progress of the current epoch
 
         hooks:
-          - Progress
+          - ShowProgress
     """
 
     def __init__(self, **kwargs):
-        """Create new Progress hook."""
+        """Create new ShowProgress hook."""
         super().__init__(**kwargs)
         self._batch_count_saved = {}
         self._reset()
