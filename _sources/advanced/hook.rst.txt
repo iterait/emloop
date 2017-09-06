@@ -1,11 +1,11 @@
 Hooks
 *****
 
-In this short tutorial, we learn how to use standard cxflow hooks and also how 
+In this short tutorial, we learn how to use standard **cxflow** hooks and also how 
 to write new ones.
 
-Cxflow hooks allow to observe, modify and act upon the training process.
-Hooks shall do their work in one of the following events invoked by the cxflow `main loop <main_loop.html>`_:
+**cxflow** hooks allow to observe, modify and act upon the training process.
+Hook actions are triggered by the following events invoked by the **cxflow** `main loop <main_loop.html>`_:
 
 - **before_training** invoked once before entering the training loop, ``no args``
 - **after_batch** invoked after each batch regardless of the stream, ``(stream_name, batch_data)``
@@ -14,7 +14,7 @@ Hooks shall do their work in one of the following events invoked by the cxflow `
 - **after_training** invoked once after the trainig finishes, ``no args``
 
 Before we dig into the details, we peek on how to use some of the standard hooks 
-available in cxflow framework.
+available in **cxflow** framework.
 
 In your `configuration <config.html>`_, hooks are listed under the ``hooks`` 
 entry, for example:
@@ -27,15 +27,15 @@ entry, for example:
 
       - LogVariables
 
-This example would instruct cxflow to create two hooks which will keep track of 
+This example would instruct **cxflow** to create two hooks which will keep track of 
 the mean loss during the training.
 In fact, the :py:class:`cxflow.hooks.ComputeStats` stores the loss from every batch and means the accumulated values after
 each epoch.
 Subsequently, the :py:class:`cxflow.hooks.LogVariables` logs all the variables available in the ``epoch_data``, which
-in the example above is only the mean loss computed by :py:class:`cxflow.hooks.ComputeStats` hook.
+in the example above is only the mean loss computed by the :py:class:`cxflow.hooks.ComputeStats` hook.
 
 The names of the hooks are nothing more than the names of their respective classes.
-For hooks that are built-in inside cxflow, only the class name needs to be specified,
+For hooks that are built-in inside **cxflow**, only the class name needs to be specified,
 however, for hooks outside of cxflow, you also have to specify their module. For instance,
 for a class called ``MyHook`` inside a module ``my_project.hooks``, you would write:
 
@@ -62,7 +62,7 @@ will be roughly translated to
     hook = MyHook(arg1=10, arg2=['a', 'b'])
     # use hook in the **cxflow** main_loop
 
-In addition to the specified arguments, cxflow supplies the constructor with the model,
+In addition to the specified arguments, **cxflow** supplies the constructor with the model,
 the dataset and the log output directory.
 Hence, the hook creation looks actually more like this:
 
@@ -88,7 +88,7 @@ For example, a hook that would stop the training after the specified number of e
                 logging.info('EpochStopperHook triggered')
                 raise TrainingTerminated('Training terminated after epoch {}'.format(epoch_id))
 
-Now, lets take a closer look on the ``after_batch`` and ``after_epoch`` events where the majority
+Now, lets take a closer look at the ``after_batch`` and ``after_epoch`` events where the majority
 of hooks will operate.
 
 ``after_batch`` event
@@ -101,7 +101,7 @@ The second and last argument named ``batch_data`` is a dict of stream sources an
 
 Imagine a dataset that provides streams with two sources, ``images`` and ``labels`` and a model which
 takes the ``images`` and outputs its own ``preditions``.
-In this case, the ``batch_data`` would contain the following dict
+In this case, the ``batch_data`` would contain the following dict:
 
 .. code-block:: python
 
@@ -124,8 +124,8 @@ The ``after_epoch`` event is even more simple.
 The event accepts two arguments, ``epoch_id``, representing the epoch number, and
 ``epoch_data``, which is an object shared between the hooks.
 
-Initially, the ``epoch_data`` object is an empty dict with stream name entries.
-E.g., with train, valid and test streams it initially looks as following:
+Initially, the ``epoch_data`` object is a dict with stream names as keys and empty dicts as values.
+With train, valid and test streams it initially looks as following:
 
 .. code-block:: python
 
@@ -150,8 +150,8 @@ the :py:class:`cxflow.hooks.ComputeStats` hook has been called, the ``epoch_data
 The :py:class:`cxflow.hooks.LogVariables` already expects this structure and logs everything it gets.
 
 .. warning::
-    Note that the order of hooks matters! We would see nothing with 
-    :py:class:`cxflow.hooks.LogVariables` a placed before :py:class:`cxflow.hooks.ComputeStats`.
+    Note that the order of hooks matters! We would see nothing if 
+    :py:class:`cxflow.hooks.LogVariables` is placed before :py:class:`cxflow.hooks.ComputeStats`.
 
 Regular hook configuration
 ==========================

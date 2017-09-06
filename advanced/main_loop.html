@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Loop &#8212; cxflow 0.8.1 documentation</title>
+    <title>Main Loop &#8212; cxflow 0.8.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.1',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -126,13 +126,14 @@
       
   <div class="section" id="main-loop">
 <h1>Main Loop<a class="headerlink" href="#main-loop" title="Permalink to this headline">¶</a></h1>
-<p>Main loop is the core of the <strong>cxflow</strong> responsible for the main lifecycle of the training of the model.</p>
+<p>Main loop is the core of <strong>cxflow</strong> responsible for
+the main lifecycle of model training.</p>
 <div class="section" id="dataset-model-integration">
 <h2>Dataset/Model Integration<a class="headerlink" href="#dataset-model-integration" title="Permalink to this headline">¶</a></h2>
-<p>The first thing <strong>cxflow</strong> does no matter what command has been executed, is
-creating the dataset and passing the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.
-Afterwards, cxflow creates the model and passes the <code class="docutils literal"><span class="pre">model</span></code> section from the
-<a class="reference external" href="config.html">config</a> to its constructor.
+<p>No matter what command has been executed, <strong>cxflow</strong> always starts by creating
+the dataset and passing the <code class="docutils literal"><span class="pre">dataset</span></code> section from the <a class="reference external" href="config.html">config</a>
+to its constructor. Consequently, <strong>cxflow</strong> continues with creating the model and passing the
+<code class="docutils literal"><span class="pre">model</span></code> section from the <a class="reference external" href="config.html">config</a> to its constructor.
 One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.</p>
 <p>After the dataset and the model are created, <strong>cxflow</strong> calls one of the dataset stream functions
@@ -150,10 +151,11 @@ By default, updates only happen when iterating the training stream.</p>
 </div>
 <div class="section" id="training-lifecycle">
 <h2>Training Lifecycle<a class="headerlink" href="#training-lifecycle" title="Permalink to this headline">¶</a></h2>
-<p>The lifecycle of the training is very simple. The following are the steps performed by <strong>cxflow</strong>.</p>
+<p>The lifecycle of the training is very simple. Here are the steps performed by
+<strong>cxflow</strong>.</p>
 <ol class="arabic simple">
-<li>Create the dataset and pass the section <code class="docutils literal"><span class="pre">dataset</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
-<li>Create the model an pass the section <code class="docutils literal"><span class="pre">model</span></code> from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
+<li>Create the dataset and pass the <code class="docutils literal"><span class="pre">dataset</span></code> section from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
+<li>Create the model an pass the <code class="docutils literal"><span class="pre">model</span></code> section from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
 <li>Evaluate the extra streams. Those are usually valid and test streams, depending on
 your <code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> <a class="reference external" href="config.html">config</a>.
 During this phase, the model is not updated and therefore, it is perfectly fine
@@ -162,7 +164,7 @@ to use validation and testing data.</li>
 In the training loop, the two following steps alternate: update the model based on the training data
 and evaluate the extra streams.</li>
 </ol>
-<p>The whole process might be described by the following pseudocode.</p>
+<p>The whole process can be described by the following pseudocode.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. create dataset
 <span class="m">2</span>. create model
 <span class="m">3</span>. evaluate all the streams
@@ -175,10 +177,11 @@ and evaluate the extra streams.</li>
 <div class="section" id="prediction-lifecycle">
 <h2>Prediction Lifecycle<a class="headerlink" href="#prediction-lifecycle" title="Permalink to this headline">¶</a></h2>
 <p>The prediction stream is used and the model is never updated.
-In addition, there is only a single pass through the stream and then cxflow terminates.</p>
-<p>The whole process might be described by the following pseudocode.</p>
+In addition, there is only a single pass through the stream before cxflow
+terminates.</p>
+<p>The whole process can be described by the following pseudocode.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. create dataset
-<span class="m">2</span>. create model
+<span class="m">2</span>. restore model
 <span class="m">3</span>. evaluate prediction stream
 </pre></div>
 </div>
@@ -189,11 +192,13 @@ In addition, there is only a single pass through the stream and then cxflow term
 There are multiple events for which the main loop triggers the hook.</p>
 <p>The events are as follows:</p>
 <ul class="simple">
-<li><strong>Before training</strong> is triggered before the first epoch, i.e. even before the extra streams are evaluated.</li>
+<li><strong>Before training</strong> is triggered prior to the first epoch, i.e. even before
+the extra streams are evaluated.</li>
 <li><strong>After batch</strong> is triggered after each processed batch.</li>
-<li><strong>After epoch</strong> is triggered at the end od each epoch.</li>
+<li><strong>After epoch</strong> is triggered at the end of each epoch.</li>
 <li><strong>After training</strong> is triggered after the final epoch, i.e. right before the training process terminates.</li>
-<li><strong>After training profile</strong> is triggered after each epoch and it is passed profiling information.</li>
+<li><strong>After training profile</strong> is triggered after each epoch and receives
+profiling information.</li>
 </ul>
 <p>More details might be found in the <a class="reference external" href="hook.html">hooks section</a>.</p>
 </div>

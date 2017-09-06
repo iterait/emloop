@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Hooks &#8212; cxflow 0.8.1 documentation</title>
+    <title>Hooks &#8212; cxflow 0.8.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.1',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -125,10 +125,10 @@
       
   <div class="section" id="hooks">
 <h1>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h1>
-<p>In this short tutorial, we learn how to use standard cxflow hooks and also how
+<p>In this short tutorial, we learn how to use standard <strong>cxflow</strong> hooks and also how
 to write new ones.</p>
-<p>Cxflow hooks allow to observe, modify and act upon the training process.
-Hooks shall do their work in one of the following events invoked by the cxflow <a class="reference external" href="main_loop.html">main loop</a>:</p>
+<p><strong>cxflow</strong> hooks allow to observe, modify and act upon the training process.
+Hook actions are triggered by the following events invoked by the <strong>cxflow</strong> <a class="reference external" href="main_loop.html">main loop</a>:</p>
 <ul class="simple">
 <li><strong>before_training</strong> invoked once before entering the training loop, <code class="docutils literal"><span class="pre">no</span> <span class="pre">args</span></code></li>
 <li><strong>after_batch</strong> invoked after each batch regardless of the stream, <code class="docutils literal"><span class="pre">(stream_name,</span> <span class="pre">batch_data)</span></code></li>
@@ -137,7 +137,7 @@ Hooks shall do their work in one of the following events invoked by the cxflow <
 <li><strong>after_training</strong> invoked once after the trainig finishes, <code class="docutils literal"><span class="pre">no</span> <span class="pre">args</span></code></li>
 </ul>
 <p>Before we dig into the details, we peek on how to use some of the standard hooks
-available in cxflow framework.</p>
+available in <strong>cxflow</strong> framework.</p>
 <p>In your <a class="reference external" href="config.html">configuration</a>, hooks are listed under the <code class="docutils literal"><span class="pre">hooks</span></code>
 entry, for example:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
@@ -147,14 +147,14 @@ entry, for example:</p>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
 </pre></div>
 </div>
-<p>This example would instruct cxflow to create two hooks which will keep track of
+<p>This example would instruct <strong>cxflow</strong> to create two hooks which will keep track of
 the mean loss during the training.
 In fact, the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> stores the loss from every batch and means the accumulated values after
 each epoch.
 Subsequently, the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> logs all the variables available in the <code class="docutils literal"><span class="pre">epoch_data</span></code>, which
-in the example above is only the mean loss computed by <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> hook.</p>
+in the example above is only the mean loss computed by the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a> hook.</p>
 <p>The names of the hooks are nothing more than the names of their respective classes.
-For hooks that are built-in inside cxflow, only the class name needs to be specified,
+For hooks that are built-in inside <strong>cxflow</strong>, only the class name needs to be specified,
 however, for hooks outside of cxflow, you also have to specify their module. For instance,
 for a class called <code class="docutils literal"><span class="pre">MyHook</span></code> inside a module <code class="docutils literal"><span class="pre">my_project.hooks</span></code>, you would write:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
@@ -175,7 +175,7 @@ For instance, the following config:</p>
 <span class="c1"># use hook in the **cxflow** main_loop</span>
 </pre></div>
 </div>
-<p>In addition to the specified arguments, cxflow supplies the constructor with the model,
+<p>In addition to the specified arguments, <strong>cxflow</strong> supplies the constructor with the model,
 the dataset and the log output directory.
 Hence, the hook creation looks actually more like this:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">hook</span> <span class="o">=</span> <span class="n">MyHook</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">arg1</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
@@ -197,7 +197,7 @@ For example, a hook that would stop the training after the specified number of e
             <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Training terminated after epoch {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch_id</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Now, lets take a closer look on the <code class="docutils literal"><span class="pre">after_batch</span></code> and <code class="docutils literal"><span class="pre">after_epoch</span></code> events where the majority
+<p>Now, lets take a closer look at the <code class="docutils literal"><span class="pre">after_batch</span></code> and <code class="docutils literal"><span class="pre">after_epoch</span></code> events where the majority
 of hooks will operate.</p>
 <div class="section" id="after-batch-event">
 <h2><code class="docutils literal"><span class="pre">after_batch</span></code> event<a class="headerlink" href="#after-batch-event" title="Permalink to this headline">¶</a></h2>
@@ -206,7 +206,7 @@ In fact, the stream name will be available in the <code class="docutils literal"
 <p>The second and last argument named <code class="docutils literal"><span class="pre">batch_data</span></code> is a dict of stream sources and model outputs.</p>
 <p>Imagine a dataset that provides streams with two sources, <code class="docutils literal"><span class="pre">images</span></code> and <code class="docutils literal"><span class="pre">labels</span></code> and a model which
 takes the <code class="docutils literal"><span class="pre">images</span></code> and outputs its own <code class="docutils literal"><span class="pre">preditions</span></code>.
-In this case, the <code class="docutils literal"><span class="pre">batch_data</span></code> would contain the following dict</p>
+In this case, the <code class="docutils literal"><span class="pre">batch_data</span></code> would contain the following dict:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1st image&#39;</span><span class="p">,</span> <span class="s1">&#39;2nd image&#39;</span><span class="o">...</span><span class="p">],</span>
   <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="o">...</span><span class="p">],</span>
@@ -225,8 +225,8 @@ you may derive your own hook.</p>
 <p>The <code class="docutils literal"><span class="pre">after_epoch</span></code> event is even more simple.
 The event accepts two arguments, <code class="docutils literal"><span class="pre">epoch_id</span></code>, representing the epoch number, and
 <code class="docutils literal"><span class="pre">epoch_data</span></code>, which is an object shared between the hooks.</p>
-<p>Initially, the <code class="docutils literal"><span class="pre">epoch_data</span></code> object is an empty dict with stream name entries.
-E.g., with train, valid and test streams it initially looks as following:</p>
+<p>Initially, the <code class="docutils literal"><span class="pre">epoch_data</span></code> object is a dict with stream names as keys and empty dicts as values.
+With train, valid and test streams it initially looks as following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">{},</span>
   <span class="s1">&#39;valid&#39;</span><span class="p">:</span> <span class="p">{},</span>
@@ -247,8 +247,8 @@ the <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks
 <p>The <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> already expects this structure and logs everything it gets.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">Note that the order of hooks matters! We would see nothing with
-<a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> a placed before <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a>.</p>
+<p class="last">Note that the order of hooks matters! We would see nothing if
+<a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables" title="cxflow.hooks.LogVariables"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.LogVariables</span></code></a> is placed before <a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats" title="cxflow.hooks.ComputeStats"><code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.ComputeStats</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="regular-hook-configuration">

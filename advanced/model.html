@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Model &#8212; cxflow 0.8.1 documentation</title>
+    <title>Model &#8212; cxflow 0.8.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.1',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -124,28 +124,28 @@
       
   <div class="section" id="model">
 <h1>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
-<p>Model is the second component of the cxflow environment.
+<p>The model is the second component of the <strong>cxflow</strong> environment.
 It defines the machine learning part of the whole workflow.
-The model object is defined by <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">cxflow.models.AbstractModel</span></code></a> interface.</p>
+The model object is defined by the <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">cxflow.models.AbstractModel</span></code></a> interface.</p>
 <p>The model constructor accepts a dataset instance, path to the logging directory and the information whether
 (and from where) the model should be restored or whether a new one should be created.</p>
 <p>Additionally, every model has to define two properties, <code class="docutils literal"><span class="pre">input_names</span></code> and <code class="docutils literal"><span class="pre">output_names</span></code>.
 These properties should return the corresponding lists of input and output variable names.
 The input names are expected to exist in every batch as the keys to the batch dictionary.
-The output names are the variables which the model computes and outputs and may be used
-by statistical hooks and similar.
+The output names are the variables, which the model computes and outputs, and which may be used
+by statistical hooks and alike.
 In the case of our animal recognition example from the <a class="reference external" href="dataset.html">dataset</a> tutorial,
-the input names would contain <code class="docutils literal"><span class="pre">image</span></code> and <code class="docutils literal"><span class="pre">animal</span></code> while the output
+the input names would contain <code class="docutils literal"><span class="pre">image</span></code> and <code class="docutils literal"><span class="pre">animal</span></code>, while the output
 names would contain <code class="docutils literal"><span class="pre">predicted_animal</span></code> and <code class="docutils literal"><span class="pre">loss</span></code>.</p>
 <div class="section" id="running-the-model">
 <h2>Running the Model<a class="headerlink" href="#running-the-model" title="Permalink to this headline">¶</a></h2>
-<p>The most important method of the model is <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a>.
+<p>The most important method of the model is the <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a>.
 This method evaluates the model on a single batch given as the first parameter.
 The second parameter is a boolean variable determining whether the model should update (train) on this batch or not.</p>
-<p>Note that the trained model is not persistent as it is only stored in the memory.
-The persistence of the model is provided by <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.save" title="cxflow.models.AbstractModel.save"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.save()</span></code></a> method which dumps the model to the
+<p>Note that the trained model is not persistent, as it is only stored in the memory.
+The persistence of the model is provided by the <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.save" title="cxflow.models.AbstractModel.save"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.save()</span></code></a> method, which dumps the model to the
 filesystem (although this behavior is model-specific and you may implement it as you wish in you own models).
-The <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.save" title="cxflow.models.AbstractModel.save"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.save()</span></code></a> method shall accept only a single parameter and that is the name for the dumped file(s).</p>
+The <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.save" title="cxflow.models.AbstractModel.save"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.save()</span></code></a> method shall accept only a single parameter -the name for the dumped file(s).</p>
 <p>The pseudocode of model training, evaluation and saving may look as follows.
 Note that this loop is automatically managed by <a class="reference internal" href="../cxflow/cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a> and we publish this snippet just in order to
 demonstrate the process.</p>
@@ -168,19 +168,19 @@ demonstrate the process.</p>
 This is done when the training is about to continue (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">resume</span></code>) or in a production environemt (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code>).
 Both commands expect a single positional argument specifying from where the model shall be loaded.
 This argument is called <code class="docutils literal"><span class="pre">restore_from</span></code> and it is passed to the model constructor (see below).</p>
-<p>If the <code class="docutils literal"><span class="pre">restore_from</span></code> argument is passed to the constructor, the model attempts to restore the model.
-Most often, it will consider the argument to be a file path and loads the file, however, the implementation
+<p>If the <code class="docutils literal"><span class="pre">restore_from</span></code> argument is passed to the constructor, the model attempts to restore itself.
+Most often, it will consider the argument to be a file path and loads the file, yet the implementation
 is model-specific and may be implemented differently.</p>
-<p>In order to restore the model, cxflow needs to know what class should be instantiated to be able to call
+<p>To restore the model, <strong>cxflow</strong> needs to know what class should be instantiated to be able to call
 its constructor with the given <code class="docutils literal"><span class="pre">restore_from</span></code> argument.
 The class is inferred from the dumped configuration file in the output directory, specifically from the
 <code class="docutils literal"><span class="pre">model.class</span></code> entry.
 However, there are cases in which the original class cannot be constructed (somebody deleted source codes
 with the model object implementations etc.).
 For these cases, each model should implement a <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.restore_fallback" title="cxflow.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.restore_fallback()</span></code></a> method, which usually points
-to a backend-specific baseclass which is able to restore the saved files of all its subclasses.
+to a backend-specific base class, which is able to restore the saved files of all its subclasses.
 For instance, in the <code class="docutils literal"><span class="pre">cxflow-tensorflow</span></code> backend, the <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.restore_fallback" title="cxflow.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.restore_fallback()</span></code></a> class returns
-<a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a> which it is able to load any checkpoint
+<a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>, which it is able to load any checkpoint
 without the need for the original model source codes.</p>
 </div>
 </div>

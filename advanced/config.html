@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &#8212; cxflow 0.8.1 documentation</title>
+    <title>Configuration &#8212; cxflow 0.8.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.8.1',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -128,13 +128,11 @@
       
   <div class="section" id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
-<p>Configuration is a crucial part of cxflow.
-It is possible to link a dataset and appropriate model with just a few lines of YAML.</p>
-<p>If you aren&#8217;t comfortable with YAML, JSON documents are supported as well (YAML
-is actually a superset of JSON).
+<p>Configuration is a crucial part of <strong>cxflow</strong> linking all the components together with just a few lines of YAML.</p>
+<p>If you aren&#8217;t comfortable with YAML, JSON documents are supported as well (YAML is actually a superset of JSON).
 However, JSON does not support advanced features such as <a class="reference external" href="https://learnxinyminutes.com/docs/yaml/">anchors</a>
 or simple comments.</p>
-<p>Each configuration file is structured in the following sections.</p>
+<p>Each configuration file is divided into following sections:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">dataset</span></code></li>
 <li><code class="docutils literal"><span class="pre">model</span></code></li>
@@ -142,18 +140,16 @@ or simple comments.</p>
 <li><code class="docutils literal"><span class="pre">main_loop</span></code></li>
 <li><code class="docutils literal"><span class="pre">predict</span></code></li>
 </ul>
-<p>While <code class="docutils literal"><span class="pre">dataset</span></code> and <code class="docutils literal"><span class="pre">model</span></code> sections are mandatory, the remaining ones are not.
-Nevertheless, <code class="docutils literal"><span class="pre">hooks</span></code> are strongly recommended to be specified.</p>
+<p>wherein only <code class="docutils literal"><span class="pre">dataset</span></code> and <code class="docutils literal"><span class="pre">model</span></code> sections are mandatory.</p>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
-<p>Dataset section specifies the configuration of the dataset.
-It contains a <code class="docutils literal"><span class="pre">class</span></code> entry which points to the module and the class name of the dataset, separated
-by a dot.
-The remaining parameters are passed to the dataset constructor in the form of a string-encoded YAML.</p>
-<p>See <a class="reference external" href="dataset.html">dataset documentation</a> for more information.</p>
-<p>The common dataset arguments might include e.g., augmentation setting for the training stream,
-the directory from whence the data will be loaded or a batch size.</p>
-<p>Example:</p>
+<p>The dataset section contains, unsurprisingly, the dataset configuration. First of all, one need to specify the
+fully qualified name of the dataset in the <code class="docutils literal"><span class="pre">class</span></code> entry.</p>
+<p>All the remaining parameters are passed to the dataset constructor in the form of a string-encoded YAML.</p>
+<p>The common dataset arguments can include augmentation setting for the training
+stream, the data root directory or a batch size, to name but a few.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">example dataset configuration</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.my_dataset.MyDataset</span>
 
@@ -165,19 +161,21 @@ the directory from whence the data will be loaded or a batch size.</p>
 </pre></div>
 </div>
 </div>
+<p>See <a class="reference external" href="dataset.html">dataset documentation</a> for more information.</p>
+</div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-<p>The Model section specifies the configuration of the model to be trained or inferred.
-Again, it contains a <code class="docutils literal"><span class="pre">class</span></code> entry which is employed by cxflow in order to construct the model object.</p>
+<p>The model section specifies the configuration of the model to be trained.
+Again, it contains a <code class="docutils literal"><span class="pre">class</span></code> that <strong>cxflow</strong> uses for constructing the model.</p>
 <p>In addition, <code class="docutils literal"><span class="pre">inputs</span></code> and <code class="docutils literal"><span class="pre">outputs</span></code> entries are required as well.
 These arguments define what sources will be obtained from the dataset stream and which will
 be provided by the model.
-The remaining parameters are directly passed to the model constructor from whence they might
-(or might not) be used. See <a class="reference external" href="model.html">model documentation</a> for more information.</p>
-<p>The common arguments might include model-specific parameters.
-For example, an image-processing deep neural network might require the input image resolution,
-the number of hidden neurons or a learning rate.</p>
-<p>Example:</p>
+The remaining parameters are directly passed to the model constructor from where they might
+(or might not) be used.</p>
+<p>For example, an image-processing deep neural network might require the input image resolution,
+the number of hidden neurons or a learning rate as in the following example:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">model configuration with additional parameters</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">models.my_model.MyModel</span>
   <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">image</span><span class="p p-Indicator">,</span> <span class="nv">animal</span><span class="p p-Indicator">]</span>
@@ -189,37 +187,42 @@ the number of hidden neurons or a learning rate.</p>
   <span class="l l-Scalar l-Scalar-Plain">n_hidden_neurons</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">512</span>
 </pre></div>
 </div>
-<p>Note that in addition to the passed variables from the configuration, to the model is automatically
-passed the dataset object.
-Therefore, the model might use dataset attributes and methods as well.
-For example, dataset might compute the number of target classes and the network can build the
-classifier in a way it suits the given dataset.
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that in addition to the passed variables from the configuration, the
+dataset object is automatically passed to the model.
+Therefore, the model might use attributes and methods of the dataset as well.
+For example, the dataset might compute the number of target classes and the network can build the
+classifier in a way that suits the given dataset.
 Another example from natural language processing would be a number of distinct tokens for which the network
 train their embeddings.</p>
 </div>
+<p>See <a class="reference external" href="model.html">model documentation</a> for more information.</p>
+</div>
 <div class="section" id="hooks">
 <h2>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h2>
-<p>Hooks section is an optional but a recommended section.
-The section contains a list of hooks to be registered in the main loop (see
-<a class="reference external" href="main_loop.html">main loop</a> documentation).</p>
-<p>The list contains two types of entries.
-The first type specifies only the hook class name and optionally its module.
-In the case there is only the class name, the hook will be automatically
-loaded from the <a class="reference internal" href="../cxflow/cxflow.hooks.html#module-cxflow.hooks" title="cxflow.hooks"><code class="xref py py-mod docutils literal"><span class="pre">cxflow.hooks</span></code></a> module.
-In case the hook class is fully specified including the module, e.g. <code class="docutils literal"><span class="pre">my_module.my_hook</span></code>,
-this hook will be loaded as expected.</p>
-<p>Example:</p>
+<p>The hooks section is optional yet omnipresent. It contains a list of hooks to be registered in the main loop (see
+<a class="reference external" href="main_loop.html">main loop</a> documentation) to save your model, terminate the training, visualize results etc.</p>
+<p>Hooks are specified by their fully qualified names as in the following example:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">non-parametrized hooks</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogProfile</span>  <span class="c1"># cxflow.log_profile.LogProfile</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxflow_tensorflow.TensorBoardHook</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">my_hooks.my_hook.MyHook</span>
 </pre></div>
 </div>
-<p>Second possible type of hook entries is a dict in the form of <code class="docutils literal"><span class="pre">Hook</span> <span class="pre">:</span> <span class="pre">{config}</span></code>.
-Again, the <code class="docutils literal"><span class="pre">Hook</span></code> can be either standard hook name or a fully qualified name in the
-form of <code class="docutils literal"><span class="pre">module.class</span></code>.
-The nested is passed to directly to the hook&#8217;s constructor in the form of <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
-<p>Example:</p>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Standard <strong>cxflow</strong> hooks from <code class="docutils literal"><span class="pre">cxflow.hooks</span></code> module may be referenced only by their names,
+e.g.: <code class="docutils literal"><span class="pre">LogProfile</span></code> instead of <code class="docutils literal"><span class="pre">cxflow.log_profile.LogProfile</span></code>.</p>
+</div>
+<p>In some cases, we need to configure the hooks being created with additional parameters. To do so, simply define a
+dictionary of parameters which will be passed to the hook constructor. E.g.:</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">parametrized hooks</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxflow_scikit.ClassificationInfoHook</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">predicted_variable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">predictions</span>
@@ -229,40 +232,58 @@ The nested is passed to directly to the hook&#8217;s constructor in the form of 
       <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">loss</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
-<p>Both syntaxes might be mixed up arbitrarily.
-The reason for this approch is that the parameter-less hooks or the ones with convenient
-default values can be registred very easily.
-However, if there is the need, hooks might be configured at will.</p>
+</div>
 </div>
 <div class="section" id="id1">
 <h2>Main Loop<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>Main loop section specifies various settings of the main loop.
-Currently, the following parameters matching to the <a class="reference internal" href="../cxflow/cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a> constructor are supported:</p>
-<ul class="simple">
-<li><strong>extra_streams</strong>: A list of additional streams that will be evalueted during training or inferred during <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code>.</li>
-<li><strong>on_unused_sources</strong>: Behavior of the main loop when the dataset provides batches with sources not registered in model&#8217;s <code class="docutils literal"><span class="pre">inputs</span></code>. By default (<code class="docutils literal"><span class="pre">warn</span></code>), main loop warns the developer. Remaining options are <code class="docutils literal"><span class="pre">ignore</span></code> which suppresses the warning and <code class="docutils literal"><span class="pre">error</span></code> which terminates the process immediately.</li>
-<li><strong>fixed_batch_size</strong>: If this option is specified, the main loop will enforce the batches fed to the model will contain exactly the specified number of examples. Incorrectly sized batches will be skipped with a warning.</li>
-<li><strong>skip_zeroth_epoch</strong>: If set to <code class="docutils literal"><span class="pre">True</span></code>, the evaluation of <code class="docutils literal"><span class="pre">extra_streams</span></code> before the first training epoch will be skipped.</li>
+<p>The <code class="docutils literal"><span class="pre">main_loop</span></code> section is optional. Any parameter specified there is forwarded to the
+<a class="reference internal" href="../cxflow/cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a> constructor which takes the following arguments:</p>
+<dl class="method">
+<dt id="cxflow.MainLoop.__init__">
+<code class="descclassname">MainLoop.</code><code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>hooks=()</em>, <em>extra_streams=()</em>, <em>on_unused_sources='warn'</em>, <em>fixed_batch_size=None</em>, <em>skip_zeroth_epoch=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> (<a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code></a>) &#8211; trained model</li>
+<li><strong>dataset</strong> (<a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>) &#8211; loaded dataset</li>
+<li><strong>hooks</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference internal" href="../cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">AbstractHook</span></code></a>]) &#8211; training hooks</li>
+<li><strong>extra_streams</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; additional stream names to be evaluated between epochs</li>
+<li><strong>on_unused_sources</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to take when stream provides an unused sources; one of
+<code class="xref py py-attr docutils literal"><span class="pre">UNUSED_SOURCE_ACTIONS</span></code></li>
+<li><strong>fixed_batch_size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>]) &#8211; if specified, main_loop removes all batches that do not have the specified size</li>
+<li><strong>skip_zeroth_epoch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; if specified, main loop skips the 0th epoch</li>
 </ul>
-<p>Example:</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">main loop configuration</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">main_loop</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">extra_streams</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">valid</span><span class="p p-Indicator">,</span> <span class="nv">test</span><span class="p p-Indicator">]</span>
   <span class="l l-Scalar l-Scalar-Plain">skip_zeroth_epoch</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="inference">
 <h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
-<p>Naturally, the inference (evaluation or prediction) of the model on new unanotated data differs from its training.
+<p>Naturally, the inference (sometimes refered as <em>evaluation</em> or <em>prediction</em>) of the model on new unanotated data differs from its training.
 In this phase, we don&#8217;t know the ground truth, hence the dataset sources are different.
-In such a situation, some of the metrics are impossible to measure, e.g., accuracy which requires the
+In such a situation, some of the metrics are impossible to measure, e.g. accuracy, which requires the
 ground truth. Most likely, we also need a different set of hooks to process the model outputs.</p>
-<p>For this reason, one can override the configuration with special <code class="docutils literal"><span class="pre">predict</span></code> section.
+<p>For this reason, one can override the configuration with a special <code class="docutils literal"><span class="pre">predict</span></code> section.
 This section matches the overall configuration structure, i.e. it may contain the
 <code class="docutils literal"><span class="pre">model</span></code>, <code class="docutils literal"><span class="pre">dataset</span></code>, <code class="docutils literal"><span class="pre">hooks</span></code> and/or  <code class="docutils literal"><span class="pre">main_loop</span></code> sections.</p>
 <p>In the following example, we use all the original setings but the model inputs and ouputs are overriden. Furthermore,
 a different list of hooks is specified. Yet another example is available in our
 <a class="reference external" href="https://github.com/Cognexa/cxflow-examples/tree/master/imdb">examples repository &#64;GitHub</a>.</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">predict section of <strong>cxflow</strong> configuration</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="nn">...</span>
 
 <span class="l l-Scalar l-Scalar-Plain">predict</span><span class="p p-Indicator">:</span>
@@ -276,12 +297,13 @@ a different list of hooks is specified. Yet another example is available in our
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>The main motivation for this type of configuration is its modularity.
 The developer might easily produce various general models that will be trained or evaluated
-on different datsets just by changing a few lines in the configuration file.</p>
-<p>By this approach, the whole process of developing machine learning models is modularized.
+on different datasets, just by changing a few lines in the configuration file.</p>
+<p>With this approach, the whole process of developing machine learning models is modularized.
 Once the interface (the names and the types of the data sources) are defined, the development
 of the model and the dataset might be done separately.
 In addition, the individual components are resusable for further experiments.</p>
@@ -289,8 +311,7 @@ In addition, the individual components are resusable for further experiments.</p
 Therefore, it is clear what combination of model and dataset was used in the experiment,
 including all the parameters.</p>
 <p>By registering custom hooks, the training and inference process might be arbitrarily
-changed. For instance, the results may be saved into a file/database, or they can be
-deployed and served on you webpage.</p>
+changed. For instance, the results may be saved into a file/database, or they can be streamed</p>
 </div>
 </div>
 

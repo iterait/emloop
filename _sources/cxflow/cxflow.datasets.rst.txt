@@ -17,6 +17,9 @@ Classes
 - :py:class:`BaseDataset`:
   Base class for datasets written in python.
 
+- :py:class:`DownloadableDataset`:
+  DownloadableDataset is dataset base class implementing routines for downloading and extracting data via
+
 
 
 .. autoclass:: AbstractDataset
@@ -41,6 +44,20 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: BaseDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: DownloadableDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: DownloadableDataset
       :parts: 1
 
    |

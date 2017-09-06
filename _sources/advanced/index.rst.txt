@@ -1,7 +1,7 @@
 Advanced
 ========
 
-This section dives into the implementation details of **cxflow** components.
+This section dives into the implementation details of the **cxflow** components.
 See the following sections for more information.
 
 .. toctree::

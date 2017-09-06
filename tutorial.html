@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &#8212; cxflow 0.8.1 documentation</title>
+    <title>Tutorial &#8212; cxflow 0.8.2 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.8.1',
+        VERSION:     '0.8.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -134,7 +134,8 @@
       
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we demonstrate  <strong>cxflow</strong> basic principles via solving an example task.</p>
+<p>In this tutorial, we are using an example task to demonstrate&nbsp;cxflow’s&nbsp;basic
+principles.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p><strong>cxflow</strong> is a lightweight framework for machine learning which focuses on:</p>
@@ -144,13 +145,16 @@
 <li>providing convenient instruments to manage and run your experiments</li>
 </ul>
 <p><strong>cxflow</strong> does not implement any building blocks, NN layers etc. Instead, you can use
-your favourite machine learning framework, such as <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>,
-<a class="reference external" href="https://cntk.ai/">CNTK</a>, or <a class="reference external" href="https://caffe2.ai/">Caffe2</a>; i.e., <strong>cxflow</strong> is back-end agnostic.
-Therefore, you don&#8217;t have to learn a new framework if you already know one.
-In addition, you can easily convert the models you already have with only minimal changes.</p>
-<p><strong>cxflow</strong> allows (and encourages) you to build modular projects, wherein the dataset,
-the model, and the configuration are separated and reusable. In the following sections,
-we will describe how should those reusable modules look like on a simple example.</p>
+your favorite machine learning framework, such as <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>,
+<a class="reference external" href="https://cntk.ai/">CNTK</a>, or <a class="reference external" href="https://caffe2.ai/">Caffe2</a>. In other words,
+<strong>cxflow</strong> is back-end agnostic.
+Therefore, you don&#8217;t have to learn a new framework, if you already know one.
+In addition, you can easily convert the models you already have by making only
+minimal changes.</p>
+<p><strong>cxflow</strong> allows (and encourages) you to build modular projects, where the
+dataset, the model, and the configuration are separated and reusable. In the following sections,
+we will describe how those reusable modules should look like on a simple
+example.</p>
 </div>
 <div class="section" id="task">
 <h2>Task<a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
@@ -204,11 +208,11 @@ configuration string for you.</p>
 It is responsible for correct data loading, verification and other useful operations.
 The main purpose of the dataset is providing various data streams that will be consequently used for training,
 validation and prediction in the production environment.</p>
-<p>Typical <strong>cxflow</strong> dataset will implement the following:</p>
+<p>A typical <strong>cxflow</strong> dataset will implement the following:</p>
 <ol class="arabic simple">
 <li><strong>Training stream:</strong> an iteration of training data batches (<code class="docutils literal"><span class="pre">train_stream</span></code> method)</li>
-<li><strong>Eval streams:</strong> iterations of additional &lt;name&gt; data batches not used for training.
-It is possible to provide any &lt;name&gt; stream in the respective <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> methods.
+<li><strong>Eval streams:</strong> iterations of additional streams not used for training.
+To provide a stream named &lt;name&gt;, method <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> needs to return its iterator.
 In our example, we will use <em>test</em> stream provided by <code class="docutils literal"><span class="pre">test_stream</span></code> method.</li>
 <li><strong>The constructor:</strong> accepts a YAML configuration in the form of a string
 (more on this later). We avoid the need to implement a constructor by
@@ -248,22 +252,22 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
 </div>
 <p>Let us describe the functionality of our <code class="docutils literal"><span class="pre">MajorityDataset</span></code> step by step.
 We shall begin with the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.
-This method is called from the dataset constructor automatically and it is passed the
+This method is called automatically by the dataset constructor, which provides it with the
 parameters from the configuration file (configuration will be explained later).
 In our case, we need <code class="docutils literal"><span class="pre">n_examples</span></code> (the number of examples in total), <code class="docutils literal"><span class="pre">dim</span></code> (the dimension of the
 generated data) and <code class="docutils literal"><span class="pre">batch_size</span></code> (how big our batches will be).</p>
 <p>The method randomly generates a dataset of <code class="docutils literal"><span class="pre">n_examples</span></code> vectors of ones and zeros (variable <code class="docutils literal"><span class="pre">x</span></code>).
 For each of those vectors, it calculates the correct answer (variable <code class="docutils literal"><span class="pre">y</span></code>).
-Finally, it splits the dataset to training and testing data in the ratio of 8:2.</p>
-<p>To sum up, when the dataset is constructed, it features four attributes (<code class="docutils literal"><span class="pre">_train_x</span></code>,
+Finally, it splits the dataset into training and testing data in the ratio of 8:2.</p>
+<p>To sum up, once the dataset is constructed, it features four attributes (<code class="docutils literal"><span class="pre">_train_x</span></code>,
 <code class="docutils literal"><span class="pre">_train_y</span></code>, <code class="docutils literal"><span class="pre">_test_x</span></code> and <code class="docutils literal"><span class="pre">_test_y</span></code>) that represent the loaded data.
-Note that it is completely valid option to rename them as desired.</p>
+Note that you have the option to rename them as desired.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">In real-world cases, we usually don&#8217;t want to generate our data randomly.
-Instead, we can simply load them from file (e.g. <code class="docutils literal"><span class="pre">.csv</span></code>) or database.</p>
+Instead, we can simply load them from a file (e.g. <code class="docutils literal"><span class="pre">.csv</span></code>) or from a database.</p>
 </div>
-<p>To iterate over the training data, there is a <code class="docutils literal"><span class="pre">train_stream</span></code> function.
+<p>The train_stream&nbsp;function iterates over the training data.
 This function returns an iterator over batches.
 Each <em>batch</em> is a dictionary with keys <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code>, where the value of <code class="docutils literal"><span class="pre">x</span></code> is a list of
 training vectors and the value of <code class="docutils literal"><span class="pre">y</span></code> is the list of the correct answers.
@@ -290,19 +294,22 @@ The lists have the length of <code class="docutils literal"><span class="pre">ba
 We train our machine learning models by iterating through the training stream
 for one or more epochs.
 The test stream is used only to estimate the performance of the model.</p>
-<p>Note that in this design, the training and testing streams do not overlap, hence we might
-use the training stream for training and the testing stream for an unbiased estimation
-of the performace of the model.</p>
-<p>A detailed description of <strong>cxflow</strong> datasets might be found in the <span class="xref doc">advanced section</span>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this example, the training and testing streams are generated randomly and thus,
+they may slightly overlap and bias the performace estimation.</p>
+</div>
+<p>A detailed description of <strong>cxflow</strong> datasets might be found in the
+<a class="reference internal" href="advanced/dataset.html"><span class="doc">advanced section</span></a>.</p>
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-<p>Having the dataset ready, we have to define the model to be trained.
+<p>With the dataset ready, we now must define the model that is to be trained.
 A simple <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a> graph can solve our task.
 We will use the official <a class="reference external" href="https://github.com/Cognexa/cxflow-tensorflow">cxflow-tensorflow</a> package that provides
 convenient TensorFlow integration with <strong>cxflow</strong>. Please install this package before you proceed
 with this tutorial.</p>
-<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class expected to
+<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class that is expected to
 extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>.</p>
 <p>Let us define a class called <code class="docutils literal"><span class="pre">MajorityNet</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
@@ -333,31 +340,37 @@ extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxf
 </pre></div>
 </div>
 </div>
-<p>The only method that is really necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
-In our case, <code class="docutils literal"><span class="pre">_create_model</span></code> method creates a simple MLP.
-If you know the fundamental basics of TensorFlow, it should be easy to understand what is going on.</p>
+<p>The only method that is necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.2)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
+In our case, the <code class="docutils literal"><span class="pre">_create_model</span></code> method creates a simple MLP.
+If you know the fundamentals of TensorFlow, it should be easy to understand what is going on.</p>
 <p>To be precise, the model registered the following computational graph nodes:</p>
 <ol class="arabic simple">
 <li>Placeholders <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> corresponding to a single batch from the stream (only the batch sources <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> will be mapped to these placeholders).</li>
 <li>Variable <code class="docutils literal"><span class="pre">loss</span></code> denoting the mean square error of the model.</li>
-<li>Variable <code class="docutils literal"><span class="pre">predictions</span></code> denoting the output of the network, i.e., the supposed bit in majority.</li>
+<li>Variable <code class="docutils literal"><span class="pre">predictions</span></code> denoting the output of the network, i.e., the bit
+predicted to be in majority.</li>
 <li>Variable <code class="docutils literal"><span class="pre">accuracy</span></code> denoting the fraction of correct predictions in the current batch.</li>
 </ol>
-<p>Note that the registration of the nodes is done by the node naming.
-The variables that are not named explicitely will not be accessible in the future.</p>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p class="last">For each of input/output variables listed in the configuration, there has to
+exist a computational graph node with the corresponding name.
+<strong>cxflow-tensorflow</strong> is not able to find the nodes if they are not properly
+named.</p>
+</div>
 <p>The <code class="docutils literal"><span class="pre">_create_model</span></code> method can accept arbitrary arguments - in our case, we allow to configure the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.</p>
-<p>Detailed description of <strong>cxflow</strong> models might be found in the <a class="reference internal" href="advanced/index.html"><span class="doc">advanced section</span></a>.</p>
+<p>You can find detailed descriptions of&nbsp;cxflow&nbsp;models in the&nbsp;<a class="reference internal" href="advanced/model.html"><span class="doc">advanced section</span></a>.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<p>Configuration of the training is the final, most important part of our tutorial.
+<p>The configuration of the training is the final, most important part of our tutorial.
 The configuration or <em>config</em> defines which dataset will be used as the data source
 and which model will be employed for training.</p>
 <p>The configuration file is in the form of a YAML document.
-Feel free to use JSON instead, but YAML makes a lot of things easier.</p>
+Feel free to use JSON instead, however, YAML makes a lot of things easier.</p>
 <p>The YAML document consists of four fundamental sections.
-A detailed description of cxflow configuration can be found in the <a class="reference internal" href="advanced/index.html"><span class="doc">advanced section</span></a>.</p>
+A detailed description of cxflow configuration can be found in the <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a>.</p>
 <ol class="arabic simple">
 <li>dataset</li>
 <li>model</li>
@@ -367,10 +380,10 @@ A detailed description of cxflow configuration can be found in the <a class="ref
 <p>Let us describe the sections one by one.</p>
 <div class="section" id="id2">
 <h3>Dataset<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>In our case, we only need to tell cxflow which dataset to use.
-This is done by specifying a <code class="docutils literal"><span class="pre">class</span></code> of the dataset.
+<p>In our case, we only need to tell <strong>cxflow</strong> which dataset to use.
+This is done by specifying the <code class="docutils literal"><span class="pre">class</span></code> of the dataset.
 In addition, we will specify the parameters of the dataset (those
-ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method).</p>
+are passed to the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method of the dataset).</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.MajorityDataset</span>
   <span class="l l-Scalar l-Scalar-Plain">n_examples</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
@@ -378,21 +391,21 @@ ones passed to dataset&#8217;s <code class="docutils literal"><span class="pre">
   <span class="l l-Scalar l-Scalar-Plain">batch_size</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>
 </pre></div>
 </div>
-<p>We can pass arbitrary other constants to the dataset as they will be hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>
-of the dataset&#8217;s <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.</p>
+<p>We can pass arbitrary constants to the dataset that will be hidden in the
+<code class="docutils literal"><span class="pre">**kwargs</span></code> parameter of the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method of the dataset.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The whole <code class="docutils literal"><span class="pre">dataset</span></code> section will be passed as a string-encoded YAML to the dataset constructor.
 In the case of using <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>, the YAML is automatically decoded and the individual
-variables are passed to <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.</p>
+variables are passed to the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.</p>
 </div>
 </div>
 <div class="section" id="id3">
 <h3>Model<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Similarly to the dataset, the model is defined in the <code class="docutils literal"><span class="pre">model</span></code> section.
-In our case, we want to specify  <code class="docutils literal"><span class="pre">class</span></code> of the model together with <code class="docutils literal"><span class="pre">optimizer</span></code> and
-<code class="docutils literal"><span class="pre">hidden</span></code> as required from the model&#8217;s <code class="docutils literal"><span class="pre">_create_model</span></code> method.
-In addition, we will specify the network <code class="docutils literal"><span class="pre">name</span></code> which will be used for naming the
+In our case, we want to specify the <code class="docutils literal"><span class="pre">class</span></code> of the model along with <code class="docutils literal"><span class="pre">optimizer</span></code> and
+<code class="docutils literal"><span class="pre">hidden</span></code> as required by the <code class="docutils literal"><span class="pre">_create_model</span></code> method of the model.
+In addition, we will specify the <code class="docutils literal"><span class="pre">name</span></code> of the network which will be used for naming the
 logging directory.</p>
 <p>In addition, we have to specify which TensorFlow variable names are the network inputs
 and which variable names are on the output.
@@ -418,39 +431,39 @@ This can be done by listing their names in the <code class="docutils literal"><s
 This loop (<a class="reference internal" href="cxflow/cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a>) can be extended, for example by adding more
 streams to the <code class="docutils literal"><span class="pre">train</span></code> stream.
 In our case, we also want to evaluate the <code class="docutils literal"><span class="pre">test</span></code> stream, so we will add it to the
-<code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> section of the config. The streams are named by the dataset
-methods they are created in. That is, the <code class="docutils literal"><span class="pre">test</span></code> stream corresponds to the
-<code class="docutils literal"><span class="pre">test_stream</span></code> method of the dataset.</p>
+<code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> section of the config. <strong>cxflow</strong> will then invoke
+the <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> method of the dataset to create the stream. In our case,
+the <code class="docutils literal"><span class="pre">test_stream</span></code> method will be invoked.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">evaluate additional streams</span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">main_loop</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">extra_streams</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="hooks">
 <h3>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h3>
-<p>Hooks are actions which happen on some events, e.g. after a batch or an epoch.
-Hooks represent an advanced topic which is covered in the advanced parts of the cxflow
-documentation.</p>
-<p>For now, we will simply use the following config snippet in order to register a few hooks.</p>
+<p>Hooks can observe, modify and control the training process. In particular, hook actions are triggered after certain events,
+such as after a batch or an epoch is completed (more info in <a class="reference internal" href="advanced/hook.html"><span class="doc">advanced section</span></a>).</p>
+<p>The hooks to be used are specified in <strong>cxflow</strong> configuration similar to the following one:</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">hook configuration section</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span>
-      <span class="l l-Scalar l-Scalar-Plain">loss</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">mean</span><span class="p p-Indicator">,</span> <span class="nv">std</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">accuracy</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">mean</span><span class="p p-Indicator">]</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">CatchSigint</span>
-<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopAfter</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">loss</span><span class="p p-Indicator">,</span> <span class="nv">accuracy</span><span class="p p-Indicator">]</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopAfter</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
 </pre></div>
 </div>
-<p>As it might be observed, we have registered four hooks.
-The first one computes various statistics: <code class="docutils literal"><span class="pre">loss</span></code> will be provided with its
-mean and standard deviation, <code class="docutils literal"><span class="pre">accuracy</span></code> will be provided with mean only.</p>
-<p>The second hook is the logging hook which simply logs everything it gets to a log file
-and to the standard error output (<code class="docutils literal"><span class="pre">/dev/stderr</span></code> in case of unix environment).</p>
-<p>The third hook makes sure the training safely stops on sigint signal and finishes
-the current batch in progress.</p>
-<p>The final hook stops the training after 10 epochs.</p>
+</div>
+<p>This section can be read quite naturally. <strong>cxflow</strong> will now compute <code class="docutils literal"><span class="pre">loss</span></code> and <code class="docutils literal"><span class="pre">accuracy</span></code>
+means for each epoch and log the respective values. The training will be stopped after 10 epochs.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">See <a class="reference external" href="cxflow/cxflow.hooks.html">API reference</a> for full list of <strong>cxflow</strong> hooks.</p>
+</div>
 </div>
 <div class="section" id="using-cxflow">
 <h3>Using cxflow<a class="headerlink" href="#using-cxflow" title="Permalink to this headline">¶</a></h3>
@@ -462,10 +475,10 @@ Let&#8217;s try it with</p>
 <p>The command produces a lot of output.
 The first section describes the creation of the components.
 The second part presents the output of the hooks.
-Finally, our logging hook is the one which produces the information after each epoch.
+Finally, our logging hook is the one that produces the information after each epoch.
 Now we can easily watch the progress of the training.</p>
 <p>After the training is finished, note that there is a new directory <code class="docutils literal"><span class="pre">log/MajorityExample_*</span></code>.
-This is the logging directory where everything cxflow produced is stored, including
+This is the logging directory where everything <strong>cxflow</strong> produces is stored, including
 saved models, the configuration file and various other artifacts.</p>
 <p>Let&#8217;s register one more hook which saves the best model according to the test stream:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveBest</span><span class="p p-Indicator">:</span>
@@ -478,11 +491,11 @@ the saved model as well.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow resume log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
-<p>Simple as that.</p>
+<p>It&#8217;s simple as that.</p>
 <p>In case the model is good enough to be used in the production, it is extremely
 easy to use cxflow for this purpose.
 See the configuration <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a> for more details.
-The usage is then extremely simple.</p>
+Then, you can just run the following command:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow predict log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
