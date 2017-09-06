@@ -1,22 +1,37 @@
 Dataset
 *******
 
-Dataset is an object that represents the data that should be fed into the model.
-In general, the dataset is an instance of an arbitrary class which is able handle
-a string-encoded YAML configuration in its constructor.
-Note that this configuration is parsed from the `config file <config.html>`_ section ``dataset``.
+Dataset is the essential component of every machine learning problem. In fact, the dataset is often the problem itself.
+Regardless of sizes, complexities and formats, all datasets are beautiful. At some point, though, we need to
+iterate through the data points or *examples* if you wish.
+
+As a matter of fact, the ability of providing example iterators is the only requirement from **cxflow** on datasets.
+A dataset used for training has to implement a ``train_stream`` method and similarly
+the dataset has to implement ``predict_stream`` when used for prediction later.
+
+To make a dataset compatible with **cxflow** one must implement a class which complies
+to the :py:class:`cxflow.datasets.AbstractDataset` concept.
+With that, **cxflow** can create and manage the dataset for you.
+
+To use the dataset in training, specify its fully-qualified name in ``dataset`` section of **cxflow** configuration
+file. See the `configuration section <config.html>`_ for more information.
+
+.. note::
+    **cxflow** datasets are configured from **cxflow** configuration files. When creating a dataset,
+    **cxflow** encodes the parameters as YAML string in order to ease interoperability in the case the dataset is
+    implemented in a different language such as in c++.
 
 BaseDataset
 -----------
 
-Inheriting from :py:class:`cxflow.datasets.BaseDataset` is recommended as it parses the YAML string automatically.
-Instead of the constructor, the developer is expected to implement :py:meth:`cxflow.datasets.BaseDataset._configure_dataset` method.
-This method should accept the parameters from the config file.
+To write your very first dataset in python, we recommend to inherit from :py:class:`cxflow.datasets.BaseDataset`
+as it parses the YAML string automatically. Parsed arguments are passed to the
+:py:meth:`cxflow.datasets.BaseDataset._configure_dataset` which is required from you implementation.
 
-Let us demonstrate :py:class:`cxflow.datasets.BaseDataset` on an example. First, we will create a class ``MyDataset`` located
-in ``datasets.my_dataset`` module:
+To give an example, we ll write a skeleton of ``MyDataset`` in ``datasets.my_dataset.py``:
 
 .. code-block:: python
+    :caption: ``datasets.my_dataset.py``
 
      from cxflow import BaseDataset
 
@@ -25,11 +40,12 @@ in ``datasets.my_dataset`` module:
            # ...
 
 This class requires two arguments, ``batch_size`` and ``augment``. Any other argument
-it is given is ignored and hidden in the ``**kwargs``.
+is ignored and hidden in the ``**kwargs``.
 
-Second, we define the ``dataset`` section in the config file:
+Next, we define the ``dataset`` section in the config file:
 
 .. code-block:: yaml
+    :caption: example usage of ``MyDataset`` in **cxflow** configuration
 
     dataset:
       class: datasets.MyDataset
@@ -37,91 +53,85 @@ Second, we define the ``dataset`` section in the config file:
       augment:
         rotate: true     # enable random rotations
         blur_prob: 0.05  # probability of blurring
-      width: 800
-      height: 600
 
-Data Processing
----------------
+Now given this configuration, **cxflow** can find, create and configure new ``MyDataset`` instance seamlessly.
 
-First, let us define a **data source**.
-We refer to the data source as to a unit (or type) of which the (training) example consists.
-Let's take a look at an artificial image-classification task in which we are supposed to
-classify the input image into various animal classes (dog, cat, rabbit, ...).
-In this setting, the sources could be e.g., ``image`` and ``animal``.
-The former is in the form of a tensor with the shape of 800x600x3 (i.e. a regular RGB 800x600 image).
-The latter is a string describing the animal depicted in the image.
+Data Streams
+------------
 
-Second, let us define a **batch of data**.
-We refer to a batch as to a collection of training examples.
-Note that the examples in the batch are represented source-wise, hence it
-is a Python ``dict`` mapping the source name to a collection of corresponding
-source of examples.
-The example of a single batch may look as follows (batch size is set ot four):
+In most cases, datasets are quite large and can not be fed to the model as whole. For this reason, **cxflow** operates
+with streams of so called *mini-batches*, i.e. small portions of the dataset.
+In particular, **cxflow** works with data on the following levels:
+
+- **stream** in an iterable of *batches* (:py:attr:`cxflow.Stream`)
+- **batch** is a dictionary of *stream sources* (:py:attr:`cxflow.BatchData`)
+- **stream source** is a list of example *fields*
+
+For instance, imagine you are classifying images of animals.
+An *example* in this case would be a tuple of two fields, *image* and *label*.
+
+Now, the *stream* would yield *batches* with *image* and *label* stream sources similar to this one:
 
 .. code-block:: python
+    :caption: *batch* example
 
-    batch = {
+    {
       'image': [img1, img2, img3, img4],
-      'animal': ['cat', 'cat', 'dog', 'rabbit']
+      'label': ['cat', 'cat', 'dog', 'rabbit']
     }
 
-Finally, **data stream** is an iterable of batches.
+Implementing a ``<name>_stream`` method which returns *stream* iterator allows **cxflow** to use the respective *stream*.
 
-The streams should be defined in dataset methods whose names follow the 
-``<name>_stream`` convention.
-
-An example of a simple training stream is as follows.
-The datasets contains a ``train_stream`` method which loads batches via function ``load_training_batch``.
-For simplicity, we assume this function is already implemented.
+When training, **cxflow** requires the train *stream* to be provided by ``train_stream`` method similar to the following one:
 
 .. code-block:: python
+    :caption: ``train_stream`` method example
 
     def train_stream(self):
         for i in range(10):
             yield load_training_batch(num=i)
-
-The training stream is used only when training is invoked either by ``cxflow train`` or ``cxflow resume`` commands.
 
 Analogously, additional methods such as ``valid_stream`` and ``test_stream`` can be easily implemented.
 If they are registered in the config file under ``main_loop.extra_streams``, they will be evaluated
 along with the train stream. The configuration may look as follows:
 
 .. code-block:: yaml
+    :caption: configuring extra stream to be evaluated
 
     main_loop:
       extra_streams: [valid, test]
 
-The extra streams, however, *are not* used for training, that is, the model is 
-not updated when it iterates through them.
+The extra streams, however, *are not* used for training, that is, the model is won`t be updated when it iterates through them.
 
-During prediction (i.e. ``cxflow predict`` CLI command), only the ``predict_stream`` method is employed in order
-to provide the data to be inferred.
-
+Finally, **cxflow** requires predict *stream* for the prediction command ``cxflow predict ..``.
 
 Additional Methods
 ------------------
 
-The dataset may contain various additional methods as well.
-For example, is can contain a ``fetch`` method which checks whether the dataset has all the data it requires.
-If not, it downloads them from the internet/database/drive.
+Alongside providing the streams, the dataset may implement additional methods
+downloading, validating or visualizing the data.
+
+For example, is can contain a ``download`` method, which checks whether the dataset has all the data it requires.
+If not, it downloads them from the internet/database/drive. These methods may be easily invoked with
+
+.. code-block:: bash
+
+    cxflow dataset <method-name> <config>
 
 Additional useful method could be ``statistics``, which would print various statistics of provided data,
 plot some figures etc.
 Sometimes, we need to split the whole dataset into training, validation and testing sets.
 For this purpose, we would implement a ``split`` function.
 
-The suggested methods are completely arbitrary and they may or may not be implemented.
-The key concept is to keep data-related function encapsuled together in the dataset object,
-so that one don't need to implement several separate script for fetching/visualization/statistics etc.
-
-An elegant way of executing the dataset methods is via ``cxflow dataset <method-name> <config-file>``.
-It constructs the dataset specified in the config file and invokes the proper method.
+The suggested methods are completely arbitrary. The key concept is to keep data-related functions
+bundled together in the dataset object, so that one doesn't need to implement
+several separate scripts for fetching/visualization/statistics etc.
 
 A typical pipeline contains the following commands.
 We leave them without further comments as they are self-describing.
 
-- ``cxflow dataset fetch config/my-data.yaml``
-- ``cxflow dataset checksum config/my-data.yaml``
+- ``cxflow dataset download config/my-data.yaml``
+- ``cxflow dataset validate config/my-data.yaml``
 - ``cxflow dataset print_statistics config/my-data.yaml``
 - ``cxflow dataset plot_histogram config/my-data.yaml``
 - ``cxflow train config/my-data.yaml``
@@ -130,9 +140,10 @@ We leave them without further comments as they are self-describing.
 The Philosophy of Laziness
 --------------------------
 
-In our experience, the best practice for the dataset is to implement it as lazily as possible.
-That is, constructor should not perform any time-consuming operation such as loading and decoding the data.
-Instead, the data should be loaded and encoded in the first moment they are really necessary (e.g.,
+In our experience, the best practice for the dataset is to perform all the initialization on demand.
+This technique is sometimes called *lazy initialization*.
+That is, the constructor should not perform any time-consuming operation such as loading and decoding the data.
+Instead, the data should be loaded and decoded in the first moment they are truly necessary (e.g.,
 in the ``train_stream`` method).
 
 The main reason for laziness is that the dataset doesn't know for which purpose it was constructed.

@@ -1,11 +1,11 @@
 CLI Reference
 =============
 Although the whole **cxflow** API can be accessed programmatically, the intended way of using it is through the
-command line instruments. The design goal is to allow to focus on defining the actual models, datasets etc.
-instead of the burdensome code which just puts all the components together.
+command line instruments. The design goal is to focus on defining the actual models, datasets etc.
+instead of the burdensome code, which just puts all the components together.
 
 With proper installation, the |cxflow| command should become available. The command comes with four basic sub-commands
-explained bellow.
+explained below.
 
 .. |cxflow| raw:: html
 

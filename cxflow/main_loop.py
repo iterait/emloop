@@ -148,7 +148,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         """
         stream_fn_name = '{}_stream'.format(stream_name)
         try:
-            return getattr(self._dataset, stream_fn_name)()
+            return iter(getattr(self._dataset, stream_fn_name)())
         except AttributeError as ex:
             raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
                                  'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex

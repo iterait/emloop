@@ -1,15 +1,16 @@
 Main Loop
 *********
 
-Main loop is the core of the **cxflow** responsible for the main lifecycle of the training of the model.
+Main loop is the core of **cxflow** responsible for
+the main lifecycle of model training.
 
 Dataset/Model Integration
 =========================
 
-The first thing **cxflow** does no matter what command has been executed, is
-creating the dataset and passing the section ``dataset`` from the `config <config.html>`_ to its constructor.
-Afterwards, cxflow creates the model and passes the ``model`` section from the
-`config <config.html>`_ to its constructor.
+No matter what command has been executed, **cxflow** always starts by creating
+the dataset and passing the ``dataset`` section from the `config <config.html>`_ 
+to its constructor. Consequently, **cxflow** continues with creating the model and passing the
+``model`` section from the `config <config.html>`_ to its constructor.
 One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.
 
@@ -29,10 +30,13 @@ By default, updates only happen when iterating the training stream.
 Training Lifecycle
 ==================
 
-The lifecycle of the training is very simple. The following are the steps performed by **cxflow**.
+The lifecycle of the training is very simple. Here are the steps performed by 
+**cxflow**.
 
-#. Create the dataset and pass the section ``dataset`` from the `config <config.html>`_ to its constructor.
-#. Create the model an pass the section ``model`` from the `config <config.html>`_ to its constructor.
+#. Create the dataset and pass the ``dataset`` section from the `config
+   <config.html>`_ to its constructor.
+#. Create the model an pass the ``model`` section from the `config
+   <config.html>`_ to its constructor.
 #. Evaluate the extra streams. Those are usually valid and test streams, depending on
    your ``main_loop.extra_streams`` `config <config.html>`_.
    During this phase, the model is not updated and therefore, it is perfectly fine
@@ -41,7 +45,7 @@ The lifecycle of the training is very simple. The following are the steps perfor
    In the training loop, the two following steps alternate: update the model based on the training data
    and evaluate the extra streams.
 
-The whole process might be described by the following pseudocode.
+The whole process can be described by the following pseudocode.
 
 .. code-block:: bash
 
@@ -57,14 +61,15 @@ Prediction Lifecycle
 ====================
 
 The prediction stream is used and the model is never updated.
-In addition, there is only a single pass through the stream and then cxflow terminates.
+In addition, there is only a single pass through the stream before cxflow 
+terminates.
 
-The whole process might be described by the following pseudocode.
+The whole process can be described by the following pseudocode.
 
 .. code-block:: bash
 
     1. create dataset
-    2. create model
+    2. restore model
     3. evaluate prediction stream
 
 Hook Integration
@@ -75,10 +80,12 @@ There are multiple events for which the main loop triggers the hook.
 
 The events are as follows:
 
-- **Before training** is triggered before the first epoch, i.e. even before the extra streams are evaluated.
+- **Before training** is triggered prior to the first epoch, i.e. even before 
+  the extra streams are evaluated.
 - **After batch** is triggered after each processed batch.
-- **After epoch** is triggered at the end od each epoch.
+- **After epoch** is triggered at the end of each epoch.
 - **After training** is triggered after the final epoch, i.e. right before the training process terminates.
-- **After training profile** is triggered after each epoch and it is passed profiling information.
+- **After training profile** is triggered after each epoch and receives 
+  profiling information.
 
 More details might be found in the `hooks section <hook.html>`_.

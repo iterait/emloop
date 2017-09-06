@@ -11,12 +11,11 @@ cxflow
    cli
    cxflow/index
 
-**cxflow** is a lightweight framework for machine learning with focus on modularization, re-usability and rapid experimenting.
+**cxflow** is a lightweight framework for machine learning with focus on 
+modularization, re-usability and rapid experimenting.
 
 Check out our :doc:`10 minutes tutorial <tutorial>`, dig into the :doc:`advanced section <advanced/index>` or
 see our :doc:`API reference <cxflow/index>`.
-
-**cxflow** provides convenient :doc:`documented <cli>` command line instruments.
 
 Contribute
 ----------
