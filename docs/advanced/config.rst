@@ -1,15 +1,13 @@
 Configuration
 *************
 
-Configuration is a crucial part of cxflow.
-It is possible to link a dataset and appropriate model with just a few lines of YAML.
+Configuration is a crucial part of **cxflow** linking all the components together with just a few lines of YAML.
 
-If you aren't comfortable with YAML, JSON documents are supported as well (YAML 
-is actually a superset of JSON).
+If you aren't comfortable with YAML, JSON documents are supported as well (YAML is actually a superset of JSON).
 However, JSON does not support advanced features such as `anchors <https://learnxinyminutes.com/docs/yaml/>`_
 or simple comments.
 
-Each configuration file is structured in the following sections.
+Each configuration file is divided into following sections:
 
 - ``dataset``
 - ``model``
@@ -17,25 +15,21 @@ Each configuration file is structured in the following sections.
 - ``main_loop``
 - ``predict``
 
-While ``dataset`` and ``model`` sections are mandatory, the remaining ones are not.
-Nevertheless, ``hooks`` are strongly recommended to be specified.
+wherein only ``dataset`` and ``model`` sections are mandatory.
 
 Dataset
 =======
 
-Dataset section specifies the configuration of the dataset.
-It contains a ``class`` entry which points to the module and the class name of the dataset, separated
-by a dot.
-The remaining parameters are passed to the dataset constructor in the form of a string-encoded YAML.
+The dataset section contains, unsurprisingly, the dataset configuration. First of all, one need to specify the
+fully qualified name of the dataset in the ``class`` entry.
 
-See `dataset documentation <dataset.html>`_ for more information.
+All the remaining parameters are passed to the dataset constructor in the form of a string-encoded YAML.
 
-The common dataset arguments might include e.g., augmentation setting for the training stream,
-the directory from whence the data will be loaded or a batch size.
-
-Example:
+The common dataset arguments can include augmentation setting for the training 
+stream, the data root directory or a batch size, to name but a few.
 
 .. code-block:: yaml
+    :caption: example dataset configuration
 
     dataset:
       class: datasets.my_dataset.MyDataset
@@ -46,25 +40,25 @@ Example:
         rotate: true     # enable random rotations
         blur_prob: 0.05  # probability of blurring
 
+See `dataset documentation <dataset.html>`_ for more information.
+
 Model
 =====
 
-The Model section specifies the configuration of the model to be trained or inferred.
-Again, it contains a ``class`` entry which is employed by cxflow in order to construct the model object.
+The model section specifies the configuration of the model to be trained.
+Again, it contains a ``class`` that **cxflow** uses for constructing the model.
 
 In addition, ``inputs`` and ``outputs`` entries are required as well.
 These arguments define what sources will be obtained from the dataset stream and which will
 be provided by the model.
-The remaining parameters are directly passed to the model constructor from whence they might
-(or might not) be used. See `model documentation <model.html>`_ for more information.
+The remaining parameters are directly passed to the model constructor from where they might
+(or might not) be used.
 
-The common arguments might include model-specific parameters.
 For example, an image-processing deep neural network might require the input image resolution,
-the number of hidden neurons or a learning rate.
-
-Example:
+the number of hidden neurons or a learning rate as in the following example:
 
 .. code-block:: yaml
+    :caption: model configuration with additional parameters
 
     model:
       class: models.my_model.MyModel
@@ -76,45 +70,45 @@ Example:
       learning_rate: 0.003
       n_hidden_neurons: 512
 
-Note that in addition to the passed variables from the configuration, to the model is automatically
-passed the dataset object.
-Therefore, the model might use dataset attributes and methods as well.
-For example, dataset might compute the number of target classes and the network can build the
-classifier in a way it suits the given dataset.
-Another example from natural language processing would be a number of distinct tokens for which the network
-train their embeddings.
+.. note::
+
+    Note that in addition to the passed variables from the configuration, the
+    dataset object is automatically passed to the model.
+    Therefore, the model might use attributes and methods of the dataset as well.
+    For example, the dataset might compute the number of target classes and the network can build the
+    classifier in a way that suits the given dataset.
+    Another example from natural language processing would be a number of distinct tokens for which the network
+    train their embeddings.
+
+
+See `model documentation <model.html>`_ for more information.
 
 Hooks
 =====
 
-Hooks section is an optional but a recommended section.
-The section contains a list of hooks to be registered in the main loop (see
-`main loop <main_loop.html>`_ documentation).
+The hooks section is optional yet omnipresent. It contains a list of hooks to be registered in the main loop (see
+`main loop <main_loop.html>`_ documentation) to save your model, terminate the training, visualize results etc.
 
-The list contains two types of entries.
-The first type specifies only the hook class name and optionally its module.
-In the case there is only the class name, the hook will be automatically
-loaded from the :py:mod:`cxflow.hooks` module.
-In case the hook class is fully specified including the module, e.g. ``my_module.my_hook``,
-this hook will be loaded as expected.
-
-Example:
+Hooks are specified by their fully qualified names as in the following example:
 
 .. code-block:: yaml
+    :caption: non-parametrized hooks
 
     hooks:
       - LogProfile  # cxflow.log_profile.LogProfile
       - cxflow_tensorflow.TensorBoardHook
       - my_hooks.my_hook.MyHook
 
-Second possible type of hook entries is a dict in the form of ``Hook : {config}``.
-Again, the ``Hook`` can be either standard hook name or a fully qualified name in the
-form of ``module.class``.
-The nested is passed to directly to the hook's constructor in the form of ``**kwargs``.
+.. tip::
 
-Example:
+    Standard **cxflow** hooks from ``cxflow.hooks`` module may be referenced only by their names,
+    e.g.: ``LogProfile`` instead of ``cxflow.log_profile.LogProfile``.
+
+In some cases, we need to configure the hooks being created with additional parameters. To do so, simply define a
+dictionary of parameters which will be passed to the hook constructor. E.g.:
 
 .. code-block:: yaml
+    :caption: parametrized hooks
 
     hooks:
       - cxflow_scikit.ClassificationInfoHook:
@@ -124,25 +118,16 @@ Example:
       - ComputeStats:
           variables: [loss]
 
-Both syntaxes might be mixed up arbitrarily.
-The reason for this approch is that the parameter-less hooks or the ones with convenient
-default values can be registred very easily.
-However, if there is the need, hooks might be configured at will.
-
 Main Loop
 =========
 
-Main loop section specifies various settings of the main loop.
-Currently, the following parameters matching to the :py:class:`cxflow.MainLoop` constructor are supported:
+The ``main_loop`` section is optional. Any parameter specified there is forwarded to the
+:py:class:`cxflow.MainLoop` constructor which takes the following arguments:
 
-- **extra_streams**: A list of additional streams that will be evalueted during training or inferred during ``cxflow predict``.
-- **on_unused_sources**: Behavior of the main loop when the dataset provides batches with sources not registered in model's ``inputs``. By default (``warn``), main loop warns the developer. Remaining options are ``ignore`` which suppresses the warning and ``error`` which terminates the process immediately.
-- **fixed_batch_size**: If this option is specified, the main loop will enforce the batches fed to the model will contain exactly the specified number of examples. Incorrectly sized batches will be skipped with a warning.
-- **skip_zeroth_epoch**: If set to ``True``, the evaluation of ``extra_streams`` before the first training epoch will be skipped.
-
-Example:
+.. automethod:: cxflow.MainLoop.__init__
 
 .. code-block:: yaml
+    :caption: main loop configuration
 
     main_loop:
       extra_streams: [valid, test]
@@ -151,12 +136,12 @@ Example:
 Inference
 =========
 
-Naturally, the inference (evaluation or prediction) of the model on new unanotated data differs from its training.
+Naturally, the inference (sometimes refered as *evaluation* or *prediction*) of the model on new unanotated data differs from its training.
 In this phase, we don't know the ground truth, hence the dataset sources are different.
-In such a situation, some of the metrics are impossible to measure, e.g., accuracy which requires the
+In such a situation, some of the metrics are impossible to measure, e.g. accuracy, which requires the
 ground truth. Most likely, we also need a different set of hooks to process the model outputs.
 
-For this reason, one can override the configuration with special ``predict`` section.
+For this reason, one can override the configuration with a special ``predict`` section.
 This section matches the overall configuration structure, i.e. it may contain the
 ``model``, ``dataset``, ``hooks`` and/or  ``main_loop`` sections.
 
@@ -165,6 +150,7 @@ a different list of hooks is specified. Yet another example is available in our
 `examples repository @GitHub <https://github.com/Cognexa/cxflow-examples/tree/master/imdb>`_.
 
 .. code-block:: yaml
+    :caption: predict section of **cxflow** configuration
 
     ...
 
@@ -182,9 +168,9 @@ Conclusion
 
 The main motivation for this type of configuration is its modularity.
 The developer might easily produce various general models that will be trained or evaluated
-on different datsets just by changing a few lines in the configuration file.
+on different datasets, just by changing a few lines in the configuration file.
 
-By this approach, the whole process of developing machine learning models is modularized.
+With this approach, the whole process of developing machine learning models is modularized.
 Once the interface (the names and the types of the data sources) are defined, the development
 of the model and the dataset might be done separately.
 In addition, the individual components are resusable for further experiments.
@@ -194,5 +180,4 @@ Therefore, it is clear what combination of model and dataset was used in the exp
 including all the parameters.
 
 By registering custom hooks, the training and inference process might be arbitrarily
-changed. For instance, the results may be saved into a file/database, or they can be
-deployed and served on you webpage.
+changed. For instance, the results may be saved into a file/database, or they can be streamed
