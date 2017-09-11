@@ -13,6 +13,7 @@ from ..hooks import AbstractHook
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
 from ..utils.reflection import get_class_module, parse_fully_qualified_name, create_object
 from ..utils.config import config_to_str, config_to_file
+from ..utils import get_random_name
 from ..main_loop import MainLoop
 
 
@@ -40,7 +41,8 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='N
         logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
         os.makedirs(output_root)
 
-    output_dir = tempfile.mkdtemp(prefix='{}_{}_'.format(model_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S')),
+    output_dir = tempfile.mkdtemp(prefix='{}_{}_{}_'.format(model_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
+                                                            get_random_name()),
                                   dir=output_root)
     logging.info('\tOutput dir: %s', output_dir)
 
