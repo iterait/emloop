@@ -5,7 +5,7 @@ Furthermore, TrainingTerminated exception is defined.
 """
 import logging
 import inspect
-from typing import Iterable, NewType, Mapping
+from typing import Iterable, Mapping
 
 from ..datasets import AbstractDataset
 from ..utils.profile import Timer
