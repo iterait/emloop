@@ -1,7 +1,7 @@
 """
 Module with ShowProgress hook which shows progress of the current epoch.
 """
-
+import logging
 import shutil
 import collections
 import time
@@ -12,7 +12,11 @@ from ..datasets import AbstractDataset
 
 class ShowProgress(AbstractHook):
     """
-    Show progress of a processed stream in the current epoch.
+    Show stream progresses and ETA in the current epoch.
+
+    .. tip::
+        If the dataset provides ``num_batches`` property, the hook will be able to display the progress and ETA for the
+        1st epoch as well. The property should return a mapping of ``<stream name>`` -> ``<batch count>``.
 
     .. code-block:: yaml
         :caption: show progress of the current epoch
@@ -21,11 +25,16 @@ class ShowProgress(AbstractHook):
           - ShowProgress
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, dataset: AbstractDataset, **kwargs):
         """Create new ShowProgress hook."""
         super().__init__(**kwargs)
-        self._batch_count_saved = {}
-        self._batch_count = collections.defaultdict(lambda: 0)
+        self._total_batch_count_saved = False
+        if hasattr(dataset, 'num_batches'):
+            logging.debug('Capturing batch counts from dataset')
+            self._total_batch_count = dataset.num_batches
+        else:
+            self._total_batch_count = {}
+        self._current_batch_count = collections.defaultdict(lambda: 0)
         self._first_batch_in_epoch = True
         self._current_stream_start = None
         self._first_stream_in_epoch = True
@@ -35,7 +44,7 @@ class ShowProgress(AbstractHook):
         Set ``_batch_count``, ``_first_batch_in_epoch``, ``_current_stream_start``
         and ``_first_stream_in_epoch`` to initial values.
         """
-        self._batch_count.clear()
+        self._current_batch_count.clear()
         self._first_batch_in_epoch = True
         self._current_stream_start = None
         self._first_stream_in_epoch = True
@@ -80,26 +89,26 @@ class ShowProgress(AbstractHook):
 
     def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
         """
-        For the first epoch just the count of processed batches is displayed, because the size of the
-        current stream is unknown. For the following epochs the progress bar is displayed.
+        Display the progress and ETA for the current stream in the epoch.
+        If the stream size (total batch count) is unknown (1st epoch), print only the number of processed batches.
         """
 
-        self._batch_count[stream_name] += 1
+        self._current_batch_count[stream_name] += 1
 
         if not self._first_batch_in_epoch:
             self._erase_line()
         else:
             self._first_batch_in_epoch = False
 
-        current_batch = self._batch_count[stream_name]
+        current_batch = self._current_batch_count[stream_name]
         prefix = 'Progress of {} stream:'.format(stream_name)
 
         terminal_width = shutil.get_terminal_size().columns
 
-        # not first epochs
-        if self._batch_count_saved:
+        # total batch count is available
+        if stream_name in self._total_batch_count:
 
-            total_batches = self._batch_count_saved[stream_name]
+            total_batches = self._total_batch_count[stream_name]
 
             eta = ''
             if self._current_stream_start:
@@ -126,7 +135,7 @@ class ShowProgress(AbstractHook):
                 self._current_stream_start = time.time()
                 self._first_stream_in_epoch = False
 
-        # first epoch
+        # total batch count is not available (1st epoch)
         else:
             progress_msg = '{} {}'.format(prefix, current_batch)
             if len(progress_msg) <= terminal_width:
@@ -137,9 +146,9 @@ class ShowProgress(AbstractHook):
 
     def after_epoch(self, **_) -> None:
         """
-        After the first epoch the count of batches is saved, because of displaying the progress bar.
-        After every epoch the current batch count is reseted.
+        Reset progress counters. Save ``total_batch_count`` after the 1st epoch.
         """
-        if not self._batch_count_saved:  # save batch counts from the 1st epoch
-            self._batch_count_saved = self._batch_count.copy()
+        if not self._total_batch_count_saved:
+            self._total_batch_count = self._current_batch_count.copy()
+            self._total_batch_count_saved = True
         self._reset()
