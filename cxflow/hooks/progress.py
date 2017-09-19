@@ -54,7 +54,7 @@ class ShowProgress(AbstractHook):
         param fill: char to be displayed as a step in the progress bar
         """
 
-        percent = "{0:.1f}".format(100 * (iteration / float(total)))
+        percent = '{0:.1f}'.format(100 * (iteration / float(total)))
         filled_len = int(length * iteration // total)
         bar = fill * filled_len + '-' * (length - filled_len)
 
@@ -73,9 +73,10 @@ class ShowProgress(AbstractHook):
         :param seconds: time in seconds
         :return: formatted human-readable time
         """
+        seconds = round(seconds)
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
-        return "{0:.0f}:{1:.0f}:{2:.2f}".format(h, m, s)
+        return '{:d}:{:02d}:{:02d}'.format(h, m, s)
 
     def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
         """
@@ -111,13 +112,13 @@ class ShowProgress(AbstractHook):
 
             extra_chars_count = 5
             bar_len = terminal_width - (extra_chars_count + len(prefix) +
-                                        len(eta) + len("{0}/{0}=100.0%".format(total_batches)))
+                                        len(eta) + len('{0}/{0}=100.0%'.format(total_batches)))
 
             if bar_len > 0:
                 self._print_progress_bar(current_batch, total_batches, prefix=prefix, suffix=eta, length=bar_len)
             else:
                 # print progress as short as possible
-                print("{}: {}/{}".format(stream_name, current_batch, total_batches), end='\r')
+                print('{}: {}/{}'.format(stream_name, current_batch, total_batches), end='\r')
 
             # erase progress bar after last batch
             if total_batches == current_batch:
@@ -127,12 +128,12 @@ class ShowProgress(AbstractHook):
 
         # first epoch
         else:
-            progress_msg = "{} {}".format(prefix, current_batch)
+            progress_msg = '{} {}'.format(prefix, current_batch)
             if len(progress_msg) <= terminal_width:
                 print(progress_msg, end='\r')
             else:
                 # print progress as short as possible
-                print("{}: {}".format(stream_name, current_batch), end='\r')
+                print('{}: {}'.format(stream_name, current_batch), end='\r')
 
     def after_epoch(self, **_) -> None:
         """
