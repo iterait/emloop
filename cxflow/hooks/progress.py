@@ -34,7 +34,6 @@ class ShowProgress(AbstractHook):
             self._total_batch_count = dataset.num_batches
         else:
             self._total_batch_count = {}
-        print(self._total_batch_count)
         self._current_batch_count = collections.defaultdict(lambda: 0)
         self._first_batch_in_epoch = True
         self._current_stream_start = None
