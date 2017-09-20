@@ -2,6 +2,7 @@
 Test module for config utils functions (cxflow.utils.config).
 """
 from os import path
+from collections import OrderedDict
 
 import yaml
 
@@ -103,12 +104,17 @@ class ConfigTest(CXTestCaseWithDir):
         with open(f_name, 'w') as file:
             file.write(_TEST_ANCHORED_YAML)
 
-        self.assertDictEqual(load_config(f_name, []), {'a': {'b': 'c', 'd': 11},
-                                                       'e': {'f': 'f', 'h': ['j', 'k'], 'b': 'c', 'd': 11}})
-        self.assertDictEqual(load_config(f_name, ['a.b=12']), {'a': {'b': 12, 'd': 11},
-                                                                   'e': {'f': 'f', 'h': ['j', 'k'], 'b': 12, 'd': 11}})
-        self.assertDictEqual(load_config(f_name, ['e.b=19']),
-                             {'a': {'b': 'c', 'd': 11}, 'e': {'f': 'f', 'h': ['j', 'k'], 'b': 19, 'd': 11}})
+        self.assertDictEqual(load_config(f_name, [])['a'], {'b': 'c', 'd': 11})
+        self.assertEqual(OrderedDict(load_config(f_name, [])['e']), OrderedDict([('f', 'f'), ('h', ['j', 'k']),
+                                                                                 ('b', 'c'), ('d', 11)]))
+
+        self.assertDictEqual(load_config(f_name, ['a.b=12'])['a'], {'b': 12, 'd': 11})
+        self.assertEqual(OrderedDict(load_config(f_name, ['a.b=12'])['e']),
+                         OrderedDict([('f', 'f'), ('h', ['j', 'k']), ('b', 12), ('d', 11)]))
+
+        self.assertDictEqual(load_config(f_name, ['e.b=19'])['a'], {'b': 'c', 'd': 11})
+        self.assertEqual(OrderedDict(load_config(f_name, ['e.b=19'])['e']),
+                         OrderedDict([('f', 'f'), ('h', ['j', 'k']), ('b', 19), ('d', 11)]))
 
     def test_dump_config(self):
         """Test config_to_file and config_to_str function."""
