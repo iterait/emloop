@@ -139,19 +139,29 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         """
         self._run_epoch(stream=stream, train=False, stream_name=stream_name)
 
+    def check_stream(self, stream_name: str) -> str:
+        """
+        Check if the dataset provides a stream with the given name and return the name of the respective dataset
+        function.
+
+        :param stream_name: stream name
+        :return: dataset function name providing the respective stream
+        :raise AttributeError: if the dataset does not provide the function creating the stream
+        """
+        stream_fn_name = '{}_stream'.format(stream_name)
+        if not hasattr(self._dataset, '{}_stream'.format(stream_name)):
+            raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
+                                 'The function has to be named `{}`.'.format(stream_name, stream_fn_name))
+        return stream_fn_name
+
     def get_stream(self, stream_name: str) -> AbstractDataset.Stream:
         """
         Get a stream iterator with the given name.
 
-        :param stream_name: name of the stream
-        :raise AttributeError: if the dataset does not provide the function creating the stream
+        :param stream_name: stream name
+        :return: stream iterator
         """
-        stream_fn_name = '{}_stream'.format(stream_name)
-        try:
-            return iter(getattr(self._dataset, stream_fn_name)())
-        except AttributeError as ex:
-            raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
-                                 'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
+        return iter(getattr(self._dataset, self.check_stream(stream_name))())
 
     def _run_zeroth_epoch(self, streams: Iterable[str]) -> None:
         """
@@ -203,6 +213,9 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
         """
+        for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams:
+            self.check_stream(stream_name)
+
         def training():
             logging.debug('Training started')
             epoch_id = 0
