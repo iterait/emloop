@@ -27,4 +27,4 @@ from .check import Check
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
-           'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'CatchSigint', 'ComputeStats', 'Check']
+           'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'CatchSigint', 'ComputeStats', 'Check', 'ShowProgress']
