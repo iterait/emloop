@@ -48,7 +48,6 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict
             conf = conf[key_part]
         conf[key] = value
 
-    config = yaml.load(ruamel.yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper))
     return config
 
 
@@ -63,7 +62,7 @@ def config_to_file(config, output_dir: str, name: str=CXF_CONFIG_FILE) -> str:
     """
     dumped_config_f = path.join(output_dir, name)
     with open(dumped_config_f, 'w') as file:
-        yaml.dump(config, file)
+        yaml.dump(config, file, Dumper=ruamel.yaml.RoundTripDumper)
     return dumped_config_f
 
 
@@ -74,6 +73,6 @@ def config_to_str(config: dict) -> str:
     :param config: configuration dict
     :return: given configuration as yaml str
     """
-    return yaml.dump(config)
+    return yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper)
 
 __all__ = []
