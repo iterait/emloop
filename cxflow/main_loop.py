@@ -13,6 +13,7 @@ from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils.profile import Timer
+from .datasets.stream_wrapper import StreamWrapper
 
 
 class MainLoop:   # pylint: disable=too-many-instance-attributes
@@ -31,17 +32,21 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                  model: AbstractModel, dataset: AbstractDataset,
                  hooks: Iterable[AbstractHook]=(),
                  extra_streams: List[str]=(),  # pylint: disable=invalid-sequence-index
+                 buffer: int=0,
                  on_unused_sources: str='warn',
                  fixed_batch_size: Optional[int]=None,
+                 fixed_epoch_size: Optional[int]=None,
                  skip_zeroth_epoch: bool=False):
         """
         :param model: trained model
         :param dataset: loaded dataset
         :param hooks: training hooks
         :param extra_streams: additional stream names to be evaluated between epochs
+        :param buffer: size of the batch buffer, 0 means no buffer
         :param on_unused_sources: action to take when stream provides an unused sources; one of
             :py:attr:`UNUSED_SOURCE_ACTIONS`
         :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
+        :param fixed_epoch_size: if specified, cut the train stream to epochs of at most ``fixed_epoch_size`` batches
         :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch
         """
         assert on_unused_sources in MainLoop.UNUSED_SOURCE_ACTIONS
@@ -49,12 +54,15 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._model = model
         self._dataset = dataset
         self._hooks = hooks
+        self._buffer = buffer
         self._on_unused_sources = on_unused_sources
         self._fixed_batch_size = fixed_batch_size
+        self._fixed_epoch_size = fixed_epoch_size
         self._extra_sources_warned = False
         self._epoch_profile = {}
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
+        self._streams = {}
 
     def _create_epoch_data(self) -> AbstractHook.EpochData:
         """Create empty epoch data double dict."""
@@ -86,7 +94,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             raise ValueError('Stream does not provide all required sources. Missing sources: {}'
                              .format(missing_sources))
 
-    def _run_epoch(self, stream: AbstractDataset.Stream, train: bool, stream_name: str) -> None:
+    def _run_epoch(self, stream: StreamWrapper, train: bool) -> None:
         """
         Iterate through the given stream and evaluate/train the model with the received batches.
 
@@ -96,16 +104,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         :param train: if set to ``True``, the model will be trained
         :param stream_name: stream name
         """
-        while True:
-            event_name = 'read_batch_{}'.format(stream_name)
-            try:
-                with Timer(event_name, self._epoch_profile):
-                    batch_input = next(stream)
-            except StopIteration:
-                # remove the last recorded event which is created by the StopIteration exception
-                self._epoch_profile[event_name].pop()
-                break
-
+        for batch_input in stream:
             if self._fixed_batch_size:
                 if len(batch_input[list(batch_input.keys())[0]]) != self._fixed_batch_size:
                     logging.debug('Incomplete batch skipped')
@@ -113,45 +112,52 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
 
             self._check_sources(batch_input)
 
-            with Timer('eval_batch_{}'.format(stream_name), self._epoch_profile):
+            with Timer('eval_batch_{}'.format(stream.name), self._epoch_profile):
                 batch_output = self._model.run(batch=batch_input, train=train)
             assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
 
-            with Timer('after_batch_hooks_{}'.format(stream_name), self._epoch_profile):
+            with Timer('after_batch_hooks_{}'.format(stream.name), self._epoch_profile):
                 for hook in self._hooks:
-                    hook.after_batch(stream_name=stream_name, batch_data={**batch_input, **batch_output})
+                    hook.after_batch(stream_name=stream.name, batch_data={**batch_input, **batch_output})
 
-    def train_by_stream(self, stream: AbstractDataset.Stream) -> None:
+    def train_by_stream(self, stream: StreamWrapper) -> None:
         """
         Train the model with the given stream.
 
         :param stream: stream to train with
         """
 
-        self._run_epoch(stream=stream, train=True, stream_name='train')
+        self._run_epoch(stream=stream, train=True)
 
-    def evaluate_stream(self, stream: AbstractDataset.Stream, stream_name: str) -> None:
+    def evaluate_stream(self, stream: StreamWrapper) -> None:
         """
         Evaluate the given stream.
 
         :param stream: stream to be evaluated
         :param stream_name: stream name
         """
-        self._run_epoch(stream=stream, train=False, stream_name=stream_name)
+        self._run_epoch(stream=stream, train=False)
 
-    def get_stream(self, stream_name: str) -> AbstractDataset.Stream:
+    def get_stream(self, stream_name: str) -> StreamWrapper:
         """
-        Get a stream iterator with the given name.
+        Get a :py:class:`StreamWrapper` with the given name.
 
-        :param stream_name: name of the stream
+        :param stream_name: stream name
+        :return: dataset function name providing the respective stream
         :raise AttributeError: if the dataset does not provide the function creating the stream
         """
-        stream_fn_name = '{}_stream'.format(stream_name)
-        try:
-            return iter(getattr(self._dataset, stream_fn_name)())
-        except AttributeError as ex:
-            raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
-                                 'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
+        if stream_name not in self._streams:
+            stream_fn_name = '{}_stream'.format(stream_name)
+            try:
+                stream_fn = getattr(self._dataset, stream_fn_name)
+                stream_epoch_limit = -1
+                if self._fixed_epoch_size is not None and stream_name == self.TRAIN_STREAM:
+                    stream_epoch_limit = self._fixed_epoch_size
+                self._streams[stream_name] = StreamWrapper(stream_fn, stream_name, self._buffer, stream_epoch_limit, self._epoch_profile)
+            except AttributeError as ex:
+                raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
+                                     'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
+        return self._streams[stream_name]
 
     def _run_zeroth_epoch(self, streams: Iterable[str]) -> None:
         """
@@ -163,7 +169,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         :param streams: stream names to be evaluated
         """
         for stream_name in streams:
-            self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
+            with self.get_stream(stream_name) as stream:
+                self.evaluate_stream(stream)
 
         epoch_data = self._create_epoch_data()
         for hook in self._hooks:
@@ -203,6 +210,9 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
         """
+        for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams:
+            self.get_stream(stream_name)
+
         def training():
             logging.debug('Training started')
             epoch_id = 0
@@ -214,12 +224,15 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             # Training loop: after_epoch, after_epoch_profile
             while True:
                 epoch_id += 1
-                self._epoch_profile = {}
+                self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
-                self.train_by_stream(stream=self.get_stream(MainLoop.TRAIN_STREAM))
+                with self.get_stream(self.TRAIN_STREAM) as stream:
+                    self.evaluate_stream(stream)
+
                 for stream_name in self._extra_streams:
-                    self.evaluate_stream(stream=self.get_stream(stream_name), stream_name=stream_name)
+                    with self.get_stream(stream_name) as stream:
+                        self.evaluate_stream(stream)
 
                 with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:

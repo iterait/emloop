@@ -8,11 +8,12 @@ from typing import Mapping, List, Iterable
 import numpy as np
 
 from cxflow import AbstractModel, MainLoop, AbstractDataset
+from cxflow.main_loop import StreamWrapper
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.hooks.stop_after import StopAfter
 from cxflow.utils.profile import Timer
 
-from .test_core import CXTestCaseWithDir
+from .test_core import CXTestCaseWithDir, CXTestCase
 
 _READ_DATA_SLEEP_S = 0.1
 _AFTER_BATCH_SLEEP_S = 0.2
@@ -433,3 +434,16 @@ class MainLoopTest(CXTestCaseWithDir):
         self.assertTrue(dataset.predict_used)
         self.assertFalse(dataset.valid_used)
         self.assertFalse(dataset.train_used)
+
+    def test_buffer(self):
+        """Check if buffer speeds up reading data."""
+        self.assertGreater(_MODEL_RUN_SLEEP_S, _READ_DATA_SLEEP_S)  # we need to hide read under run
+
+        profile_hook = SaveProfileHook()
+        _, _, mainloop = self.create_main_loop(epochs=2, extra_hooks=[profile_hook], model_class=DelayedModel,
+                                               dataset=DelayedDataset(), buffer=4)
+        mainloop.run_training()
+        profile = profile_hook.profile['read_batch_train']
+        expected_profile = [_READ_DATA_SLEEP_S] + [0]*(_DATASET_ITERS-1)
+
+        self.assertTrue(np.allclose(profile, expected_profile, atol=0.01))
