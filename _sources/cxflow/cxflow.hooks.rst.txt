@@ -29,6 +29,9 @@ Classes
 - :py:class:`LogProfile`:
   Summarize and log epoch profile via standard :py:mod:`logging`.
 
+- :py:class:`LogDir`:
+  Log the output dir before training, after each epoch and after training.
+
 - :py:class:`SaveEvery`:
   Save the model every ``n_epochs`` epochs.
 
@@ -124,6 +127,20 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: LogProfile
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: LogDir
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: LogDir
       :parts: 1
 
    |
