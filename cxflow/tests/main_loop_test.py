@@ -213,11 +213,13 @@ class RecordingModel(TrainableModel):
         super().__init__(**kwargs)
         self.output_data = []
         self.input_data = []
+        self.is_train_data = []
 
     def run(self, batch: Mapping[str, object], train: bool):
         outputs = super().run(batch, train)
         self.output_data.append(outputs)
         self.input_data.append(batch)
+        self.is_train_data.append(train)
         return outputs
 
 
@@ -286,6 +288,9 @@ class MainLoopTest(CXTestCaseWithDir):
 
         # check the epoch ids
         self.assertListEqual(recording_hook.epoch_ids, [1, 2, 3])
+        self.assertListEqual(model.is_train_data,
+                             [True]*_DATASET_ITERS+[False]*_DATASET_ITERS+[True]*_DATASET_ITERS+
+                             [False]*_DATASET_ITERS+[True]*_DATASET_ITERS+[False]*_DATASET_ITERS)
 
         # now the model recorded its outputs as a list of all the batches regardless the stream and epoch, i.e.:
         # [train_e1_b1, train_e1_b2, ..., valid_e1_b1, ... train_e2,b1, ...]

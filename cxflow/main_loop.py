@@ -153,7 +153,9 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 stream_epoch_limit = -1
                 if self._fixed_epoch_size is not None and stream_name == self.TRAIN_STREAM:
                     stream_epoch_limit = self._fixed_epoch_size
-                self._streams[stream_name] = StreamWrapper(stream_fn, stream_name, self._buffer, stream_epoch_limit, self._epoch_profile)
+                self._streams[stream_name] = StreamWrapper(stream_fn, buffer_size=self._buffer,
+                                                           epoch_size=stream_epoch_limit, name=stream_name,
+                                                           profile=self._epoch_profile)
             except AttributeError as ex:
                 raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
                                      'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
@@ -183,7 +185,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         Calls
             - :py:meth:`cxflow.hooks.AbstractHook.before_training`
             - :py:meth:`cxflow.hooks.AbstractHook.after_training`
-            
+
         :param run_func: function to be run
         """
         # Initialization: before_training
@@ -228,7 +230,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 epoch_data = self._create_epoch_data()
 
                 with self.get_stream(self.TRAIN_STREAM) as stream:
-                    self.evaluate_stream(stream)
+                    self.train_by_stream(stream)
 
                 for stream_name in self._extra_streams:
                     with self.get_stream(stream_name) as stream:
