@@ -23,6 +23,7 @@ from .save import SaveEvery, SaveBest
 from .catch_sigint import CatchSigint
 from .compute_stats import ComputeStats
 from .check import Check
+from .show_progress import ShowProgress
 
 AbstractHook.__module__ = '.hooks'
 
