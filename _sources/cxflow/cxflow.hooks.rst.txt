@@ -47,6 +47,9 @@ Classes
 - :py:class:`Check`:
   Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.
 
+- :py:class:`ShowProgress`:
+  Show stream progresses and ETA in the current epoch.
+
 
 
 .. autoclass:: AbstractHook
@@ -211,6 +214,20 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: Check
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: ShowProgress
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: ShowProgress
       :parts: 1
 
    |

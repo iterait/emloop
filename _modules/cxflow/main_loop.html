@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.main_loop &#8212; cxflow 0.9.1 documentation</title>
+    <title>cxflow.main_loop &#8212; cxflow 0.9.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.9.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -261,7 +261,9 @@
                 <span class="n">stream_epoch_limit</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stream_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">:</span>
                     <span class="n">stream_epoch_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">StreamWrapper</span><span class="p">(</span><span class="n">stream_fn</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">,</span> <span class="n">stream_epoch_limit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">StreamWrapper</span><span class="p">(</span><span class="n">stream_fn</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">,</span>
+                                                           <span class="n">epoch_size</span><span class="o">=</span><span class="n">stream_epoch_limit</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">stream_name</span><span class="p">,</span>
+                                                           <span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;The dataset does not have a function for creating a stream named `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
                                      <span class="s1">&#39;The function has to be named `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">stream_fn_name</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">ex</span>
@@ -291,7 +293,7 @@
 <span class="sd">        Calls</span>
 <span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.before_training`</span>
 <span class="sd">            - :py:meth:`cxflow.hooks.AbstractHook.after_training`</span>
-<span class="sd">            </span>
+
 <span class="sd">        :param run_func: function to be run</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialization: before_training</span>
@@ -336,7 +338,7 @@
                 <span class="n">epoch_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_epoch_data</span><span class="p">()</span>
 
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">train_by_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">:</span>
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>

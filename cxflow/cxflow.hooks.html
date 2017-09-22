@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks &#8212; cxflow 0.9.1 documentation</title>
+    <title>cxflow.hooks &#8212; cxflow 0.9.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.9.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -160,6 +160,8 @@ Catch SIGINT signals allowing to stop the training with grace.</li>
 Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.</li>
 <li><a class="reference internal" href="#cxflow.hooks.Check" title="cxflow.hooks.Check"><code class="xref py py-class docutils literal"><span class="pre">Check</span></code></a>:
 Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.</li>
+<li><a class="reference internal" href="#cxflow.hooks.ShowProgress" title="cxflow.hooks.ShowProgress"><code class="xref py py-class docutils literal"><span class="pre">ShowProgress</span></code></a>:
+Show stream progresses and ETA in the current epoch.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.hooks.AbstractHook">
@@ -1236,7 +1238,7 @@ Quit on any subsequent signal.</p>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'std', 'median', 'mean', 'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">AGGREGATIONS</code><em class="property"> = {'max', 'mean', 'median', 'min', 'std'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported numpy-like aggregation methods.</p>
 </dd></dl>
 
@@ -1381,6 +1383,76 @@ Quit on any subsequent signal.</p>
 <li><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the monitor variable is above the required level</li>
 </ul>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.hooks.ShowProgress">
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">ShowProgress</code><span class="sig-paren">(</span><em>dataset: .datasets.AbstractDataset</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/show_progress.html#ShowProgress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ShowProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
+<p>Show stream progresses and ETA in the current epoch.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If the dataset provides <code class="docutils literal"><span class="pre">num_batches</span></code> property, the hook will be able to display the progress and ETA for the
+1st epoch as well. The property should return a mapping of <code class="docutils literal"><span class="pre">&lt;stream</span> <span class="pre">name&gt;</span></code> -&gt; <code class="docutils literal"><span class="pre">&lt;batch</span> <span class="pre">count&gt;</span></code>.</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">show progress of the current epoch</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ShowProgress</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-2604fa39c417eb4cc229873d63e2c38e3bb75542.png" alt="Inheritance diagram of ShowProgress" usemap="#inheritance64997bd57c" class="inheritance"/>
+<map id="inheritance64997bd57c" name="inheritance64997bd57c">
+<area shape="rect" id="node2" title="Show stream progresses and ETA in the current epoch." alt="" coords="163,5,275,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="cxflow.hooks.ShowProgress.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>dataset</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/show_progress.html#ShowProgress.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ShowProgress.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new ShowProgress hook.</p>
+<p>Fetch the batch counts from <code class="docutils literal"><span class="pre">dataset.num_batches</span></code> property if available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dataset</strong> (<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>) &#8211; training dataset</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.ShowProgress.after_batch">
+<code class="descname">after_batch</code><span class="sig-paren">(</span><em>stream_name</em>, <em>batch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/show_progress.html#ShowProgress.after_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ShowProgress.after_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the progress and ETA for the current stream in the epoch.
+If the stream size (total batch count) is unknown (1st epoch), print only the number of processed batches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.ShowProgress.after_epoch">
+<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/show_progress.html#ShowProgress.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ShowProgress.after_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset progress counters. Save <code class="docutils literal"><span class="pre">total_batch_count</span></code> after the 1st epoch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>
