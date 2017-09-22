@@ -41,17 +41,17 @@ class StreamWrapper:
 
     def __init__(self,
                  stream_fn: Callable[[], AbstractDataset.Stream],
-                 name: str,
                  buffer_size: int=0,
                  epoch_size: int=-1,
+                 name: Optional[str]=None,
                  profile: Optional[Timer.TimeProfile]=None):
         """
         Create new StreamWrapper.
 
         :param stream_fn: callable which returns raw dataset stream
-        :param name: stream name
         :param buffer_size: buffer size, < 1 means no buffer
         :param epoch_size: if > 0, stop iteration after the specified number of batches
+        :param name: optional stream name
         :param profile: profile to record times
         """
         self._get_stream_fn = stream_fn
@@ -66,15 +66,15 @@ class StreamWrapper:
         self._enqueueing_thread = None
 
     @property
-    def name(self):
+    def name(self) -> Optional[str]:
         """Stream name."""
         return self._name
 
     def _get_stream(self) -> Iterator:
         """Possibly create and return raw dataset stream iterator."""
         if self._stream is None:
-            self._stream = self._get_stream_fn()
-        return iter(self._stream)
+            self._stream = iter(self._get_stream_fn())
+        return self._stream
 
     def _epoch_limit_reached(self) -> bool:
         """
@@ -154,7 +154,7 @@ class StreamWrapper:
             Signal the epoch end with ``None``.
 
         Stop when:
-        - stream ands and epoch size is not set
+        - stream ends and epoch size is not set
         - specified number of batches is returned
 
         :return: a single batch or ``None`` signaling epoch end
