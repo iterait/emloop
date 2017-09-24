@@ -75,4 +75,5 @@ def config_to_str(config: dict) -> str:
     """
     return yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper)
 
+
 __all__ = []

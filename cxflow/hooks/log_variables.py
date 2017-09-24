@@ -71,7 +71,7 @@ class LogVariables(AbstractHook):
             stream_data = epoch_data[stream_name]
             variables = self._variables if self._variables is not None else stream_data.keys()
             for variable in variables:
-                if not variable in stream_data:
+                if variable not in stream_data:
                     raise KeyError('Variable `{}` to be logged was not found in the batch data for stream `{}`. '
                                    'Available variables are `{}`.'.format(variable, stream_name, stream_data.keys()))
                 value = stream_data[variable]

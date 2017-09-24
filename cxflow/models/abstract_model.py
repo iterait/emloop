@@ -2,7 +2,7 @@
 This module contains the definition of a model trainable in **cxflow** framework.
 """
 from abc import abstractmethod, ABCMeta
-from typing import Iterable, Mapping, Optional
+from typing import Iterable, Optional
 
 from ..datasets import AbstractDataset
 
@@ -70,8 +70,8 @@ class AbstractModel(metaclass=ABCMeta):
         """
         Return the fully-qualified name of the fallback restore class (e.g. ``module.submodule.BaseClass``).
 
-        When restoring a model, **cxflow** tries to use the fallback class if the construction of the model object specified
-        in `model` configuration section fails.
+        When restoring a model, **cxflow** tries to use the fallback class if the construction of the model
+        object specified in `model` configuration section fails.
 
         :return: fully-qualified name of the fallback restore class
         """

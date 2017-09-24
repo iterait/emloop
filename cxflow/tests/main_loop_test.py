@@ -8,12 +8,11 @@ from typing import Mapping, List, Iterable
 import numpy as np
 
 from cxflow import AbstractModel, MainLoop, AbstractDataset
-from cxflow.main_loop import StreamWrapper
 from cxflow.hooks.abstract_hook import AbstractHook
 from cxflow.hooks.stop_after import StopAfter
 from cxflow.utils.profile import Timer
 
-from .test_core import CXTestCaseWithDir, CXTestCase
+from .test_core import CXTestCaseWithDir
 
 _READ_DATA_SLEEP_S = 0.1
 _AFTER_BATCH_SLEEP_S = 0.2
@@ -289,7 +288,7 @@ class MainLoopTest(CXTestCaseWithDir):
         # check the epoch ids
         self.assertListEqual(recording_hook.epoch_ids, [1, 2, 3])
         self.assertListEqual(model.is_train_data,
-                             [True]*_DATASET_ITERS+[False]*_DATASET_ITERS+[True]*_DATASET_ITERS+
+                             [True]*_DATASET_ITERS+[False]*_DATASET_ITERS+[True]*_DATASET_ITERS +
                              [False]*_DATASET_ITERS+[True]*_DATASET_ITERS+[False]*_DATASET_ITERS)
 
         # now the model recorded its outputs as a list of all the batches regardless the stream and epoch, i.e.:
