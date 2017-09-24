@@ -1,13 +1,9 @@
 import click
 import logging
 import os
-import urllib.request
-import re
 import requests
-import tarfile
 from typing import Iterable
 import shutil
-import zipfile
 
 
 def maybe_download_and_extract(data_root: str, url_root: str, filenames: Iterable[str]) -> None:
@@ -38,7 +34,7 @@ def maybe_download_and_extract(data_root: str, url_root: str, filenames: Iterabl
         expected_size = int(req.headers.get('content-length'))
         chunk_size = 1024
         with open(filepath, 'wb') as f_out,\
-             click.progressbar(req.iter_content(chunk_size=chunk_size), length=expected_size/chunk_size) as bar:
+                click.progressbar(req.iter_content(chunk_size=chunk_size), length=expected_size/chunk_size) as bar:
             for chunk in bar:
                 if chunk:
                     f_out.write(chunk)

@@ -63,4 +63,5 @@ class DisabledLogger:
         """Restore logging ."""
         logging.getLogger(self._name).disabled = self._orig
 
+
 __all__ = []

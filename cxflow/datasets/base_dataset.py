@@ -45,4 +45,3 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
         :param kwargs: dataset configuration as ``**kwargs`` parsed from ``config['dataset']``
         :raise NotImplementedError: if not overridden
         """
-        raise NotImplementedError('Dataset does not implement obligatory `_configure_dataset` method.')

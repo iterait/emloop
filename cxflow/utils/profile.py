@@ -51,4 +51,5 @@ class Timer:
             self._profile[self._name] = []
         self._profile[self._name].append(end - self._start)
 
+
 __all__ = []
