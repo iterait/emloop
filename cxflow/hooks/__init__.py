@@ -13,6 +13,7 @@ Module with official **cxflow** hooks.
 
 """
 from .abstract_hook import AbstractHook, TrainingTerminated
+from .every_n_epoch import EveryNEpoch
 from .accumulate_variables import AccumulateVariables
 from .write_csv import WriteCSV
 from .stop_after import StopAfter
@@ -28,4 +29,4 @@ from .show_progress import ShowProgress
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
-           'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'CatchSigint', 'ComputeStats', 'Check', 'ShowProgress']
+           'LogProfile', 'SaveEvery', 'SaveBest', 'CatchSigint', 'ComputeStats', 'Check', 'ShowProgress', 'EveryNEpoch']
