@@ -44,12 +44,13 @@ class Timer:
         Stop measuring time and append the time span from ``_start`` to ``end`` to the ``_profile`` under the
         ``_name`` entry.
         """
-        if not self._start:
+        if self._start is None:
             raise ValueError('Timer was ended but not started.')
         end = timeit.default_timer()
         if self._name not in self._profile:
             self._profile[self._name] = []
         self._profile[self._name].append(end - self._start)
+        self._start = None
 
 
 __all__ = []

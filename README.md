@@ -19,7 +19,9 @@ pip install cxflow
 - [Additional examples](https://github.com/cognexa/cxflow-examples)
 
 ## Requirements
-**cxflow** is supported (and tested) on [Arch Linux](https://www.archlinux.org) and [Ubuntu](http://releases.ubuntu.com) (latest LTS and rolling) with Python 3.6 and 3.5 respectively.
+ - **cxflow** is supported (and tested) on [Arch Linux](https://www.archlinux.org) and [Ubuntu](http://releases.ubuntu.com) (latest LTS and rolling) with Python 3.6 and 3.5 respectively.
+ - **cxflow** will most likely work on [Windows with Anaconda](https://www.anaconda.com/download/) and Python 3.6 yet **it is not tested regularly**
+
 
 ## Extensions
 **cxflow** is meant to be extremely lightweight.
