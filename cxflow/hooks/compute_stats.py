@@ -30,15 +30,17 @@ class ComputeStats(AccumulateVariables):
 
     """
 
-    AGGREGATIONS = {'mean', 'std', 'min', 'max', 'median'}
-    """Supported numpy-like aggregation methods."""
+    EXTRA_AGGREGATIONS = {'nanfraction', 'nancount'}
+    """Extra aggregation methods extending the set of all NumPy functions."""
 
     def __init__(self, variables, **kwargs):
         """
         Create new stats hook.
 
         :param variables: list of variables mapping: ``variable_name`` -> ``List`` [``aggregations``...] wherein
-            ``aggregations`` are one of :py:attr:`AGGREGATIONS` or ``variable_name`` only to compute its mean
+            ``aggregations`` are the names of arbitrary NumPy functions returning a scalar (e.g., ``'mean'``,
+            ``'nanmean'``, ``'max'``, etc.) or one of :py:attr:`EXTRA_AGGREGATIONS`. Passing just the
+            ``variable name`` instead of a mapping is the same as passing {variable_name: ['mean']}.
         :param kwargs: Ignored
         :raise ValueError: if the specified aggregation function is not supported
         """
@@ -53,32 +55,38 @@ class ComputeStats(AccumulateVariables):
 
         for variable, aggregations in self._variable_aggregations.items():
             for aggregation in aggregations:
-                if aggregation not in ComputeStats.AGGREGATIONS:
-                    raise ValueError('Aggregation `{}` for variable `{}` is not supported.'
-                                     .format(aggregation, variable))
+                ComputeStats._raise_check_aggregation(aggregation)
 
         super().__init__(variables=list(self._variable_aggregations.keys()), **kwargs)
+
+    @staticmethod
+    def _raise_check_aggregation(aggregation: str):
+        """
+        Check whether the given aggregation is present in NumPy or it is one of EXTRA_AGGREGATIONS.
+
+        :param aggregation: the aggregation name
+        :raise ValueError: if the specified aggregation is not supported or found in NumPy
+        """
+        if aggregation not in ComputeStats.EXTRA_AGGREGATIONS and not hasattr(np, aggregation):
+            raise ValueError('Aggregation `{}` is not a NumPy function or a member '
+                             'of EXTRA_AGGREGATIONS.'.format(aggregation))
 
     @staticmethod
     def _compute_aggregation(aggregation: str, data: Iterable[Any]):
         """
         Compute the specified aggregation on the given data.
 
-        :param aggregation: on of {mean, std, min, max, median}.
+        :param aggregation: the name of an arbitrary NumPy function (e.g., mean, max, median, nanmean, ...)
+                            or one of :py:attr:`EXTRA_AGGREGATIONS`.
         :param data: data to be aggregated
-        :raise ValueError: if the specified aggregation is not supported
+        :raise ValueError: if the specified aggregation is not supported or found in NumPy
         """
-        if aggregation == 'mean':
-            return np.mean(data)
-        elif aggregation == 'std':
-            return np.std(data)
-        elif aggregation == 'min':
-            return np.min(data)
-        elif aggregation == 'max':
-            return np.max(data)
-        elif aggregation == 'median':
-            return np.median(data)
-        raise ValueError('Aggregation `{}` is not supported.'.format(aggregation))
+        ComputeStats._raise_check_aggregation(aggregation)
+        if aggregation == 'nanfraction':
+            return np.sum(np.isnan(data)) / len(data)
+        if aggregation == 'nancount':
+            return int(np.sum(np.isnan(data)))
+        return getattr(np, aggregation)(data)
 
     def _save_stats(self, epoch_data: AbstractHook.EpochData) -> None:
         """
