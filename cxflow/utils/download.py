@@ -41,4 +41,8 @@ def maybe_download_and_extract(data_root: str, url_root: str, filenames: Iterabl
                     f_out.flush()
 
         # extract
-        shutil.unpack_archive(filepath, data_root)
+        try:
+            shutil.unpack_archive(filepath, data_root)
+        except (shutil.ReadError, ValueError):
+            logging.info('File `%s` could not be extracted by `shutil.unpack_archive`. Please process it manually.',
+                         filepath)
