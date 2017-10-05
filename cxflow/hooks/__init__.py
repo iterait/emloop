@@ -25,8 +25,11 @@ from .catch_sigint import CatchSigint
 from .compute_stats import ComputeStats
 from .check import Check
 from .show_progress import ShowProgress
+from .on_plateau import OnPlateau
+from .stop_on_plateau import StopOnPlateau
 
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
-           'LogProfile', 'SaveEvery', 'SaveBest', 'CatchSigint', 'ComputeStats', 'Check', 'ShowProgress', 'EveryNEpoch']
+           'LogProfile', 'SaveEvery', 'SaveBest', 'CatchSigint', 'ComputeStats', 'Check', 'ShowProgress', 'EveryNEpoch',
+           'OnPlateau', 'StopOnPlateau']

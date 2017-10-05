@@ -8,18 +8,28 @@ from cxflow.tests.test_core import CXTestCase
 from cxflow.hooks.stop_on_plateau import StopOnPlateau
 from cxflow.hooks.abstract_hook import TrainingTerminated
 
-_EXAMPLES = 10
-_STREAM = 'valid'
-_STREAM_UNUSED = 'train'
+
+def get_epoch_data():
+    """Return empty epoch data dict."""
+    return {'train': {}, 'valid': {}, 'test': {}}
 
 
 def get_batch_data(const=1):
     """
-    Return batch of data.
+    Return batch data.
 
     :param const: constant used for multiplying ``loss`` values
     """
-    return {'loss': const * np.ones(_EXAMPLES)}
+    return {'loss': const * np.ones(5),
+            'accuracy': const * np.ones(5)}
+
+
+def run_epoch(hook, const):
+    """Call ``after_batch`` events."""
+    for i in range(5):
+        hook.after_batch('train', get_batch_data())
+        hook.after_batch('valid', get_batch_data(const))
+        hook.after_batch('test', get_batch_data(const))
 
 
 class StopOnPlateauTest(CXTestCase):
@@ -32,30 +42,25 @@ class StopOnPlateauTest(CXTestCase):
             StopOnPlateau(long_term=100, short_term=500)
 
     def test_stop_on_plateau(self):
-        """Test raise ``TrainingTerminated`` if the ``loss`` stops improving."""
+        """Test raise ``TrainingTerminated`` on plateau."""
+        # test minimizing test loss
+        loss_hook = StopOnPlateau(short_term=3, long_term=6, stream='test')
 
-        hook = StopOnPlateau(short_term=15, long_term=25)
-        hook.after_batch(_STREAM, get_batch_data(10))
-        hook.after_batch(_STREAM, get_batch_data(5))
-        hook.after_batch(_STREAM, get_batch_data(5))
+        for value in [4, 3, 2, 2, 3]:
+            run_epoch(loss_hook, value)
+            loss_hook.after_epoch(0, get_epoch_data())
+        run_epoch(loss_hook, 10)
 
         with self.assertRaises(TrainingTerminated):
-            hook.after_batch(_STREAM, get_batch_data(20))
+            loss_hook.after_epoch(0, get_epoch_data())
 
-    def test_accumulator_reset(self):
-        """Test whether the accumulator is reseted correctly."""
+        # test maximizing valid accuracy
+        accuracy_hook = StopOnPlateau(short_term=3, long_term=6, variable='accuracy', objective='max')
 
-        long_term = 15
-        hook = StopOnPlateau(short_term=5, long_term=long_term)
-        hook.after_batch(_STREAM, get_batch_data())
-        hook.after_batch(_STREAM, get_batch_data())
-        hook.after_batch(_STREAM_UNUSED, get_batch_data())
-        hook.after_batch(_STREAM_UNUSED, get_batch_data())
+        for value in [1, 5, 20, 2, 2]:
+            run_epoch(accuracy_hook, value)
+            accuracy_hook.after_epoch(0, get_epoch_data())
+        run_epoch(accuracy_hook, 2)
 
-        self.assertTrue(np.array_equal(hook._accumulator[_STREAM]['loss'], np.ones(2 * _EXAMPLES)))
-        self.assertTrue(np.array_equal(hook._accumulator[_STREAM_UNUSED]['loss'], np.ones(2 * _EXAMPLES)))
-
-        hook.after_epoch(None, None)
-
-        self.assertTrue(np.array_equal(hook._accumulator[_STREAM]['loss'], np.ones(long_term)))
-        self.assertTrue(np.array_equal(hook._accumulator[_STREAM_UNUSED]['loss'], np.array([])))
+        with self.assertRaises(TrainingTerminated):
+            accuracy_hook.after_epoch(0, get_epoch_data())
