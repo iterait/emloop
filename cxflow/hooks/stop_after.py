@@ -70,9 +70,9 @@ class StopAfter(AbstractHook):
 
     def _check_train_time(self) -> None:
         """
-        Stop the training if the training time exceeded ``self.__minutes``.
+        Stop the training if the training time exceeded ``self._minutes``.
 
-        :raise TrainingTerminated: if the training time exceeded ``self.__minutes``
+        :raise TrainingTerminated: if the training time exceeded ``self._minutes``
         """
         if self._minutes is not None and (datetime.now() - self._training_start).total_seconds()/60 > self._minutes:
                 raise TrainingTerminated('Training terminated after more than {} minutes'.format(self._minutes))
@@ -83,8 +83,8 @@ class StopAfter(AbstractHook):
 
     def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
         """
-        If ``stream_name`` equals to :py:attr:`MainLoop.TRAIN_STREAM`,
-        increase the counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.
+        If ``stream_name`` equals to :py:attr:`cxflow.MainLoop.TRAIN_STREAM`,
+        increase the iterations counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.
 
         :param stream_name: stream name
         :param batch_data: ignored
@@ -98,11 +98,11 @@ class StopAfter(AbstractHook):
 
     def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
         """
-        Stop the training if the ``epoch_id`` reaches ``self._iters``; additionally, call :py:meth:`_check_train_time`.
+        Stop the training if the ``epoch_id`` reaches ``self._epochs``; additionally, call :py:meth:`_check_train_time`.
 
         :param epoch_id: epoch id
         :param epoch_data: ignored
-        :raise TrainingTerminated: if the ``epoch_id`` reaches ``self._iters``
+        :raise TrainingTerminated: if the ``epoch_id`` reaches ``self._epochs``
         """
         self._check_train_time()
         if self._epochs is not None and epoch_id >= self._epochs:
