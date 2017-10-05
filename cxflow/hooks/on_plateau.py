@@ -57,7 +57,7 @@ class OnPlateau(ComputeStats, metaclass=ABCMeta):
     @abstractmethod
     def _on_plateau_action(self, **kwargs) -> None:
         """
-        Abstract method which is called when the model stops improving.
+        Abstract method which is called when the observed variable reaches its plateau.
         """
 
     def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:

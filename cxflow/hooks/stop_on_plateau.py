@@ -10,7 +10,6 @@ class StopOnPlateau(OnPlateau):
     Terminate the training when the observed variable reaches its plateau.
 
     .. code-block:: yaml
-
         :caption: stop the training when the mean of last 100 valid ``loss`` values is
                   smaller than the mean of last 30 ``loss`` values.
 
@@ -21,7 +20,6 @@ class StopOnPlateau(OnPlateau):
 
 
     .. code-block:: yaml
-
         :caption: stop the training when accuracy stops improving (raising)
 
         hooks:
