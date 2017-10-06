@@ -39,16 +39,20 @@ def _get_epoch_data():
 class WriteCSVTest(CXTestCase):
     """Test case for :py:class:`cxflow.hooks.WriteCSV hook."""
 
+    @staticmethod
+    def get_tmp_filename():
+        file = tempfile.NamedTemporaryFile()
+        file.close()
+        return file.name
+
     def test_init_hook(self):
         """Test correct hook initialization."""
-
-        output_file = tempfile.NamedTemporaryFile().name
+        output_file = self.get_tmp_filename()
 
         hook = WriteCSV(output_dir="", output_file=output_file,
                         variables=_VARIABLES)
 
         self.assertEqual(hook._variables, _VARIABLES)
-        self.assertTrue(os.path.isfile(output_file))
 
         with self.assertRaises(AssertionError):
             WriteCSV(output_dir="", output_file=output_file,
@@ -60,16 +64,15 @@ class WriteCSVTest(CXTestCase):
 
     def test_write_header(self):
         """Test writing a correct header to csv file."""
-
-        output_file = tempfile.NamedTemporaryFile().name
+        output_file = self.get_tmp_filename()
         delimiter = ";"
         hook = WriteCSV(output_dir="", output_file=output_file,
                         variables=_VARIABLES, delimiter=delimiter)
         epoch_data = _get_epoch_data()
         hook._write_header(epoch_data)
 
-        with open(output_file, 'r') as f:
-            header = f.read()
+        with open(output_file, 'r') as file:
+            header = file.read()
 
         # header must ends with a newline symbol
         self.assertEqual(header[-1], "\n")
@@ -93,8 +96,7 @@ class WriteCSVTest(CXTestCase):
 
     def test_write_row(self):
         """Test writing one row to csv file."""
-
-        output_file = tempfile.NamedTemporaryFile().name
+        output_file = self.get_tmp_filename()
         delimiter = ";"
         default_value = '?'
         hook = WriteCSV(output_dir="", output_file=output_file,
@@ -106,8 +108,8 @@ class WriteCSVTest(CXTestCase):
         epoch_id = 6
         hook._write_row(epoch_id, epoch_data)
 
-        with open(output_file, 'r') as f:
-            content = f.readlines()
+        with open(output_file, 'r') as file:
+            content = file.readlines()
         row = content[1]
 
         # each line must ends with newline symbol
@@ -124,7 +126,7 @@ class WriteCSVTest(CXTestCase):
         """
 
         variables = _VARIABLES + ['missing']
-        output_file = tempfile.NamedTemporaryFile().name
+        output_file = self.get_tmp_filename()
         hook = WriteCSV(output_dir="", output_file=output_file,
                         variables=variables, on_missing_variable='error')
         epoch_data = _get_epoch_data()
@@ -138,8 +140,7 @@ class WriteCSVTest(CXTestCase):
         Test raising error when on_unknown_type option is set to 'error' and
         value of selected variable is not scalar.
         """
-
-        output_file = tempfile.NamedTemporaryFile().name
+        output_file = self.get_tmp_filename()
         hook = WriteCSV(output_dir="", output_file=output_file,
                         on_unknown_type='error')
         epoch_data = _get_epoch_data()
@@ -153,8 +154,7 @@ class WriteCSVTest(CXTestCase):
         Tests result of after_epoch method and whether it writes
         only one header at the beginning of csv file.
         """
-
-        output_file = tempfile.NamedTemporaryFile().name
+        output_file = self.get_tmp_filename()
         delimiter = "|"
         hook = WriteCSV(output_dir="", output_file=output_file,
                         delimiter=delimiter, variables=_VARIABLES)
@@ -163,8 +163,8 @@ class WriteCSVTest(CXTestCase):
         hook.after_epoch(6, epoch_data)
         hook.after_epoch(7, epoch_data)
 
-        with open(output_file) as f:
-            content = f.readlines()
+        with open(output_file) as file:
+            content = file.readlines()
 
         self.assertEqual(len(content), 3)
         header = content[0]

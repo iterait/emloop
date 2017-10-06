@@ -15,6 +15,17 @@ class CXTestCase(TestCase):
         logging.getLogger().disabled = True
         super().__init__(*args, **kwargs)
 
+    def tearDown(self):
+        """
+        Remove any FileHandler from the global logger.
+
+        This is a bugfix for Windows as the FileHandler does not release the files properly.
+        """
+        for handler in list(logging.getLogger().handlers):
+            if isinstance(handler, logging.FileHandler):
+                handler.close()
+                logging.getLogger().removeHandler(handler)
+
 
 class CXTestCaseWithDir(CXTestCase):
     """Cxflow test case with temp dir available."""
@@ -26,8 +37,10 @@ class CXTestCaseWithDir(CXTestCase):
 
     def setUp(self):
         """Create a temp dir before every test method."""
+        super().setUp()
         self.tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
         """Remove the respective temp dir after every test method."""
+        super().tearDown()
         shutil.rmtree(self.tmpdir)

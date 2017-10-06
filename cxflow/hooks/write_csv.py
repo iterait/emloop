@@ -71,8 +71,6 @@ class WriteCSV(AbstractHook):
         self._header_written = False
 
         self._file_path = path.join(output_dir, output_file)
-
-        os.mknod(self._file_path)
         logging.debug('CSV output file "%s"', self._file_path)
 
     def _write_header(self, epoch_data: AbstractHook.EpochData) -> None:

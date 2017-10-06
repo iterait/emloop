@@ -5,13 +5,13 @@ import logging
 
 import numpy as np
 
-from . import AbstractHook
+from . import AbstractHook, EveryNEpoch
 from ..models import AbstractModel
 
 
-class SaveEvery(AbstractHook):
+class SaveEvery(EveryNEpoch):
     """
-    Save the model every ``n_epochs`` epochs.
+    Save the model every ``n_epochs`` epoch.
 
     .. code-block:: yaml
         :caption: save every 10th epoch
@@ -32,27 +32,24 @@ class SaveEvery(AbstractHook):
     SAVE_FAILURE_ACTIONS = ['error', 'warn', 'ignore']
     """Action to be executed when model save fails."""
 
-    def __init__(self, model: AbstractModel, n_epochs: int=1, on_failure: str='error', **kwargs):
+    def __init__(self, model: AbstractModel, on_failure: str='error', **kwargs):
         """
         :param model: trained model
-        :param n_epochs: how often is the model saved
         :param on_failure: action to be taken when model fails to save itself; one of :py:attr:`SAVE_FAILURE_ACTIONS`
         """
         super().__init__(model=model, **kwargs)
         assert on_failure in SaveEvery.SAVE_FAILURE_ACTIONS
 
         self._model = model
-        self._n_epochs = n_epochs
         self._on_save_failure = on_failure
 
-    def after_epoch(self, epoch_id: int, **_) -> None:
+    def _after_n_epoch(self, epoch_id: int, **_) -> None:
         """
-        Save the model if ``epoch_id`` is divisible by ``self._save_every_n_epochs``.
+        Save the model every ``n_epochs`` epoch.
 
         :param epoch_id: number of the processed epoch
         """
-        if epoch_id % self._n_epochs == 0:
-            SaveEvery.save_model(model=self._model, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
+        SaveEvery.save_model(model=self._model, name_suffix=str(epoch_id), on_failure=self._on_save_failure)
 
     @staticmethod
     def save_model(model: AbstractModel, name_suffix: str, on_failure: str) -> None:

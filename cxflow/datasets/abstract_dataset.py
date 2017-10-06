@@ -4,7 +4,7 @@ This module contains AbstractDataset concept.
 At the moment it is for typing only.
 """
 
-from typing import Mapping, Iterable, Any, NewType
+from typing import Mapping, Iterable, Any
 
 
 class AbstractDataset:

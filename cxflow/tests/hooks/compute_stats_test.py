@@ -3,7 +3,6 @@ Test module for stats hook (cxflow.hooks.compute_stats_hook).
 """
 
 import numpy as np
-import collections
 
 from cxflow.tests.test_core import CXTestCase
 from cxflow.hooks.compute_stats import ComputeStats
@@ -13,9 +12,13 @@ class ComputeStatsTest(CXTestCase):
     """Test case for ComputeStats hook."""
 
     def get_batch(self, batch_id):
-        batch = {'accuracy': batch_id * (np.ones(5) + 1),
-                 'loss': batch_id * (np.ones(5) + 2)}
-        return batch
+        accuracy = batch_id * (np.ones(5) + 1)
+        nan_accuracy = batch_id * (np.ones(5) + 2)
+        nan_accuracy[0] = nan_accuracy[3] = np.nan
+        loss = batch_id * (np.ones(5) + 3)
+        return {'accuracy': accuracy,
+                'nan_accuracy': nan_accuracy,
+                'loss': loss}
 
     def test_raise_on_init(self):
         """Tests raising error if specified aggregation is not supported."""
@@ -23,17 +26,20 @@ class ComputeStatsTest(CXTestCase):
         variables = [{'loss': ['mean', 'median', 'max']},
                      {'accuracy': ['mean', 'median', 'not_supported']}]
         with self.assertRaises(ValueError):
-            hook = ComputeStats(variables=variables)
+            ComputeStats(variables=variables)
 
     def test_compute_save_stats(self):
         """Tests correctness of computed aggregations and their saving."""
 
-        variables = ['loss', {'accuracy': ['mean', 'std', 'min', 'max', 'median']}]
+        variables = ['loss',
+                     {'accuracy': ['mean', 'std', 'min', 'max', 'median',
+                                   'nanmean', 'nanfraction', 'nancount']},
+                     {'nan_accuracy': ['mean', 'nanmean', 'nanfraction', 'nancount']}]
 
         hook = ComputeStats(variables=variables)
 
-        epoch_data = {'train': {'accuracy': None, 'loss': None},
-                      'test': {'accuracy': None, 'loss': None}}
+        epoch_data = {'train': {'accuracy': None, 'nan_accuracy': None, 'loss': None},
+                      'test': {'accuracy': None, 'nan_accuracy': None, 'loss': None}}
 
         for batch_id in range(1, 3):
             for stream in epoch_data.keys():
@@ -41,12 +47,12 @@ class ComputeStatsTest(CXTestCase):
 
         hook.after_epoch(epoch_data)
 
-        valid_aggrs = {'train':
-                       {'loss': {'mean': 4.5},
-                        'accuracy': {'mean': 3, 'std': 1, 'min': 2, 'max': 4, 'median': 3}},
-                       'test':
-                       {'loss': {'mean': 4.5},
-                        'accuracy': {'mean': 3, 'std': 1, 'min': 2, 'max': 4, 'median': 3}}}
+        valid_aggrs = {'loss': {'mean': 6.0},
+                       'accuracy': {'mean': 3, 'std': 1, 'min': 2, 'max': 4, 'median': 3,
+                                    'nanmean': 3, 'nanfraction': 0., 'nancount': 0},
+                       'nan_accuracy': {'mean': np.nan, 'nanmean': 4.5,
+                                        'nanfraction': 0.4, 'nancount': 4}}
+        valid_aggrs = {'train': valid_aggrs, 'test': valid_aggrs}
 
         self.assertEqual(epoch_data.keys(),
                          valid_aggrs.keys())
@@ -57,5 +63,6 @@ class ComputeStatsTest(CXTestCase):
                 self.assertEqual(epoch_data[stream][variable].keys(),
                                  valid_aggrs[stream][variable].keys())
                 for aggr in epoch_data[stream][variable]:
-                    self.assertEqual(epoch_data[stream][variable][aggr],
-                                     valid_aggrs[stream][variable][aggr])
+                    # to compare NaN values, NumPy assert is required
+                    np.testing.assert_equal(epoch_data[stream][variable][aggr],
+                                            valid_aggrs[stream][variable][aggr])

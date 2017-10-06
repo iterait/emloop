@@ -22,6 +22,7 @@ def print_progress_bar(done: int, total: int, prefix: str = '', suffix: str = ''
 
     percent = '{0:.1f}'.format(100 * (done / float(total)))
     base_len = shutil.get_terminal_size().columns - 7 - len(prefix) - len(suffix)
+    base_len = min([base_len, 50])
     min_length = base_len - 1 - len('{}/{}={}'.format(total, total, '100.0'))
     length = base_len - len('{}/{}={}'.format(done, total, percent))
     if min_length > 0:
@@ -63,6 +64,10 @@ class ShowProgress(AbstractHook):
         If the dataset provides ``num_batches`` property, the hook will be able to display the progress and ETA for the
         1st epoch as well. The property should return a mapping of ``<stream name>`` -> ``<batch count>``.
 
+    .. caution::
+        ``ShowProgress`` hook should be placed as the first in hooks config section, otherwise 
+        the progress bar may not be displayed correctly.
+
     .. code-block:: yaml
         :caption: show progress of the current epoch
 
@@ -95,8 +100,6 @@ class ShowProgress(AbstractHook):
         If the stream size (total batch count) is unknown (1st epoch), print only the number of processed batches.
         """
         if self._current_stream_name is None or self._current_stream_name != stream_name:
-            if self._current_stream_name is not None:
-                print()
             self._current_stream_name = stream_name
             self._current_stream_start = None
         erase_line()
@@ -137,3 +140,4 @@ class ShowProgress(AbstractHook):
         self._current_batch_count.clear()
         self._current_stream_start = None
         self._current_stream_name = None
+        erase_line()
