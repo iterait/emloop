@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.compute_stats &#8212; cxflow 0.9.2 documentation</title>
+    <title>cxflow.hooks.compute_stats &#8212; cxflow 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.9.2',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -100,6 +100,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -110,7 +111,7 @@
 <span class="sd">Module with a hook capable of computing accumulated variable statistics such as mean or median.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -138,15 +139,17 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">AGGREGATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">}</span>
-    <span class="sd">&quot;&quot;&quot;Supported numpy-like aggregation methods.&quot;&quot;&quot;</span>
+    <span class="n">EXTRA_AGGREGATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nanfraction&#39;</span><span class="p">,</span> <span class="s1">&#39;nancount&#39;</span><span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;Extra aggregation methods extending the set of all NumPy functions.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ComputeStats.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create new stats hook.</span>
 
 <span class="sd">        :param variables: list of variables mapping: ``variable_name`` -&gt; ``List`` [``aggregations``...] wherein</span>
-<span class="sd">            ``aggregations`` are one of :py:attr:`AGGREGATIONS` or ``variable_name`` only to compute its mean</span>
+<span class="sd">            ``aggregations`` are the names of arbitrary NumPy functions returning a scalar (e.g., ``&#39;mean&#39;``,</span>
+<span class="sd">            ``&#39;nanmean&#39;``, ``&#39;max&#39;``, etc.) or one of :py:attr:`EXTRA_AGGREGATIONS`. Passing just the</span>
+<span class="sd">            ``variable name`` instead of a mapping is the same as passing {variable_name: [&#39;mean&#39;]}.</span>
 <span class="sd">        :param kwargs: Ignored</span>
 <span class="sd">        :raise ValueError: if the specified aggregation function is not supported</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -161,32 +164,38 @@
 
         <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">aggregations</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable_aggregations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">aggregation</span> <span class="ow">in</span> <span class="n">aggregations</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">aggregation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ComputeStats</span><span class="o">.</span><span class="n">AGGREGATIONS</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Aggregation `</span><span class="si">{}</span><span class="s1">` for variable `</span><span class="si">{}</span><span class="s1">` is not supported.&#39;</span>
-                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aggregation</span><span class="p">,</span> <span class="n">variable</span><span class="p">))</span>
+                <span class="n">ComputeStats</span><span class="o">.</span><span class="n">_raise_check_aggregation</span><span class="p">(</span><span class="n">aggregation</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable_aggregations</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ComputeStats._raise_check_aggregation"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._raise_check_aggregation">[docs]</a>    <span class="k">def</span> <span class="nf">_raise_check_aggregation</span><span class="p">(</span><span class="n">aggregation</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether the given aggregation is present in NumPy or it is one of EXTRA_AGGREGATIONS.</span>
+
+<span class="sd">        :param aggregation: the aggregation name</span>
+<span class="sd">        :raise ValueError: if the specified aggregation is not supported or found in NumPy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">aggregation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ComputeStats</span><span class="o">.</span><span class="n">EXTRA_AGGREGATIONS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Aggregation `</span><span class="si">{}</span><span class="s1">` is not a NumPy function or a member &#39;</span>
+                             <span class="s1">&#39;of EXTRA_AGGREGATIONS.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aggregation</span><span class="p">))</span></div>
 
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="ComputeStats._compute_aggregation"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._compute_aggregation">[docs]</a>    <span class="k">def</span> <span class="nf">_compute_aggregation</span><span class="p">(</span><span class="n">aggregation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the specified aggregation on the given data.</span>
 
-<span class="sd">        :param aggregation: on of {mean, std, min, max, median}.</span>
+<span class="sd">        :param aggregation: the name of an arbitrary NumPy function (e.g., mean, max, median, nanmean, ...)</span>
+<span class="sd">                            or one of :py:attr:`EXTRA_AGGREGATIONS`.</span>
 <span class="sd">        :param data: data to be aggregated</span>
-<span class="sd">        :raise ValueError: if the specified aggregation is not supported</span>
+<span class="sd">        :raise ValueError: if the specified aggregation is not supported or found in NumPy</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;std&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;min&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;median&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Aggregation `</span><span class="si">{}</span><span class="s1">` is not supported.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aggregation</span><span class="p">))</span></div>
+        <span class="n">ComputeStats</span><span class="o">.</span><span class="n">_raise_check_aggregation</span><span class="p">(</span><span class="n">aggregation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;nanfraction&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">aggregation</span> <span class="o">==</span> <span class="s1">&#39;nancount&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">)(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ComputeStats._save_stats"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._save_stats">[docs]</a>    <span class="k">def</span> <span class="nf">_save_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>

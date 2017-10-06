@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &#8212; cxflow 0.9.2 documentation</title>
+    <title>Index &#8212; cxflow 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.2',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -101,6 +101,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -149,9 +150,11 @@
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.__init__">(cxflow.hooks.ComputeStats method)</a>
 </li>
-        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.__init__">(cxflow.hooks.LogDir method)</a>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch.__init__">(cxflow.hooks.EveryNEpoch method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.__init__">(cxflow.hooks.LogVariables method)</a>
+</li>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.OnPlateau.__init__">(cxflow.hooks.OnPlateau method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.__init__">(cxflow.hooks.SaveBest method)</a>
 </li>
@@ -164,6 +167,12 @@
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.WriteCSV.__init__">(cxflow.hooks.WriteCSV method)</a>
 </li>
         <li><a href="cxflow/cxflow.models.html#cxflow.models.AbstractModel.__init__">(cxflow.models.AbstractModel method)</a>
+</li>
+      </ul></li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch._after_n_epoch">_after_n_epoch() (cxflow.hooks.EveryNEpoch method)</a>
+
+      <ul>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery._after_n_epoch">(cxflow.hooks.SaveEvery method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -187,6 +196,14 @@
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest._is_value_better">_is_value_better() (cxflow.hooks.SaveBest method)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables._log_variables">_log_variables() (cxflow.hooks.LogVariables method)</a>
+</li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.OnPlateau._on_plateau_action">_on_plateau_action() (cxflow.hooks.OnPlateau method)</a>
+
+      <ul>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnPlateau._on_plateau_action">(cxflow.hooks.StopOnPlateau method)</a>
+</li>
+      </ul></li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._raise_check_aggregation">_raise_check_aggregation() (cxflow.hooks.ComputeStats static method)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.AccumulateVariables._reset_accumulator">_reset_accumulator() (cxflow.hooks.AccumulateVariables method)</a>
 </li>
@@ -239,13 +256,13 @@
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.after_epoch">(cxflow.hooks.ComputeStats method)</a>
 </li>
-        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.after_epoch">(cxflow.hooks.LogDir method)</a>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch.after_epoch">(cxflow.hooks.EveryNEpoch method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.after_epoch">(cxflow.hooks.LogVariables method)</a>
 </li>
-        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.after_epoch">(cxflow.hooks.SaveBest method)</a>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.OnPlateau.after_epoch">(cxflow.hooks.OnPlateau method)</a>
 </li>
-        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery.after_epoch">(cxflow.hooks.SaveEvery method)</a>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.after_epoch">(cxflow.hooks.SaveBest method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ShowProgress.after_epoch">(cxflow.hooks.ShowProgress method)</a>
 </li>
@@ -267,11 +284,7 @@
       <ul>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.CatchSigint.after_training">(cxflow.hooks.CatchSigint method)</a>
 </li>
-        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.after_training">(cxflow.hooks.LogDir method)</a>
-</li>
       </ul></li>
-      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.AGGREGATIONS">AGGREGATIONS (cxflow.hooks.ComputeStats attribute)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -284,8 +297,6 @@
 
       <ul>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.CatchSigint.before_training">(cxflow.hooks.CatchSigint method)</a>
-</li>
-        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.before_training">(cxflow.hooks.LogDir method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.before_training">(cxflow.hooks.StopAfter method)</a>
 </li>
@@ -351,6 +362,12 @@
       <li><a href="cxflow/cxflow.html#cxflow.MainLoop.evaluate_stream">evaluate_stream() (cxflow.MainLoop method)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch">EveryNEpoch (class in cxflow.hooks)</a>
+</li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS">EXTRA_AGGREGATIONS (cxflow.hooks.ComputeStats attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
@@ -372,12 +389,10 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogDir">LogDir (class in cxflow.hooks)</a>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogProfile">LogProfile (class in cxflow.hooks)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogProfile">LogProfile (class in cxflow.hooks)</a>
-</li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables">LogVariables (class in cxflow.hooks)</a>
 </li>
   </ul></td>
@@ -398,10 +413,16 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.OBJECTIVES">OBJECTIVES (cxflow.hooks.SaveBest attribute)</a>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.OnPlateau.OBJECTIVES">OBJECTIVES (cxflow.hooks.OnPlateau attribute)</a>
+
+      <ul>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest.OBJECTIVES">(cxflow.hooks.SaveBest attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.OnPlateau">OnPlateau (class in cxflow.hooks)</a>
+</li>
       <li><a href="cxflow/cxflow.models.html#cxflow.models.AbstractModel.output_names">output_names (cxflow.models.AbstractModel attribute)</a>
 </li>
   </ul></td>
@@ -440,15 +461,17 @@
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery.save_model">save_model() (cxflow.hooks.SaveEvery static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest">SaveBest (class in cxflow.hooks)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery">SaveEvery (class in cxflow.hooks)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ShowProgress">ShowProgress (class in cxflow.hooks)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter">StopAfter (class in cxflow.hooks)</a>
+</li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnPlateau">StopOnPlateau (class in cxflow.hooks)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets.abstract_dataset &#8212; cxflow 0.10.0 documentation</title>
+    <title>cxflow.hooks.stop_on_plateau &#8212; cxflow 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -106,42 +106,46 @@
       </div>
     <div class="col-md-9 content">
       
-  <h1>Source code for cxflow.datasets.abstract_dataset</h1><div class="highlight"><pre>
+  <h1>Source code for cxflow.hooks.stop_on_plateau</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains AbstractDataset concept.</span>
-
-<span class="sd">At the moment it is for typing only.</span>
+<span class="sd">Module with StopOnPlateau hook which terminates the training when the observed variable reaches its plateau.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">TrainingTerminated</span><span class="p">,</span> <span class="n">OnPlateau</span>
 
 
-<span class="k">class</span> <span class="nc">AbstractDataset</span><span class="p">:</span>
+<div class="viewcode-block" id="StopOnPlateau"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnPlateau">[docs]</a><span class="k">class</span> <span class="nc">StopOnPlateau</span><span class="p">(</span><span class="n">OnPlateau</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This concept prescribes the API that is required from every **cxflow** dataset.</span>
+<span class="sd">    Terminate the training when the observed variable reaches its plateau.</span>
 
-<span class="sd">    Every **cxflow** dataset has to have a constructor which takes YAML string config.</span>
-<span class="sd">    Additionally, one may implement any ``&lt;stream_name&gt;_stream`` method</span>
-<span class="sd">    in order to make ``stream_name`` stream available in the **cxflow** :py:class:`cxflow.MainLoop`.</span>
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: stop the training when the mean of last 100 valid ``loss`` values is</span>
+<span class="sd">                  smaller than the mean of last 30 ``loss`` values.</span>
 
-<span class="sd">    All the defined stream methods should return a :py:attr:`Stream`.</span>
+<span class="sd">        hooks:</span>
+<span class="sd">          - StopOnPlateau:</span>
+<span class="sd">              long_term: 100</span>
+<span class="sd">              short_term: 30</span>
+
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: stop the training when accuracy stops improving (raising)</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - StopOnPlateau:</span>
+<span class="sd">              variable: accuracy</span>
+<span class="sd">              objective: max</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">Batch</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
-    <span class="sd">&quot;&quot;&quot;Batch type: :py:class:`typing.Mapping` of ``variable_name`` to an :py:class:`typing.Iterable` of examples.&quot;&quot;&quot;</span>
-
-    <span class="n">Stream</span> <span class="o">=</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Batch</span><span class="p">]</span>
-    <span class="sd">&quot;&quot;&quot;Stream type: :py:class:`typing.Iterable` of :py:attr:`Batch` es.&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="AbstractDataset.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="StopOnPlateau._on_plateau_action"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnPlateau._on_plateau_action">[docs]</a>    <span class="k">def</span> <span class="nf">_on_plateau_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create new dataset configured with the given YAML string (obligatory).</span>
+<span class="sd">        Terminate the training when the observed variable reaches its plateau.</span>
 
-<span class="sd">        The configuration must contain ``dataset`` entry and may contain ``output_dir`` entry.</span>
-
-<span class="sd">        :param config_str: YAML string config</span>
+<span class="sd">        :raise TrainingTerminated: if the model stops improving</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Detected plateau of variable `</span><span class="si">{}</span><span class="s1">` in stream `</span><span class="si">{}</span><span class="s1">`&#39;</span><span class="o">.</span>
+                                 <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">))</span></div></div>
 </pre></div>
 
     </div>

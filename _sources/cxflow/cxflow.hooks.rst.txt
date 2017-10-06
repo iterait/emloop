@@ -29,11 +29,8 @@ Classes
 - :py:class:`LogProfile`:
   Summarize and log epoch profile via standard :py:mod:`logging`.
 
-- :py:class:`LogDir`:
-  Log the output dir before training, after each epoch and after training.
-
 - :py:class:`SaveEvery`:
-  Save the model every ``n_epochs`` epochs.
+  Save the model every ``n_epochs`` epoch.
 
 - :py:class:`SaveBest`:
   Maintain the best performing model given the specified criteria.
@@ -49,6 +46,15 @@ Classes
 
 - :py:class:`ShowProgress`:
   Show stream progresses and ETA in the current epoch.
+
+- :py:class:`EveryNEpoch`:
+  This hook should be used as base hook in the case when some action need to be processed every n epoch.
+
+- :py:class:`OnPlateau`:
+  Base hook for hooks taking actions when certain variable reaches its plateau.
+
+- :py:class:`StopOnPlateau`:
+  Terminate the training when the observed variable reaches its plateau.
 
 
 
@@ -136,20 +142,6 @@ Classes
 
 
 
-.. autoclass:: LogDir
-   :show-inheritance:
-   :members:
-   :private-members:
-   :special-members:
-   :exclude-members: __weakref__
-
-   .. inheritance-diagram:: LogDir
-      :parts: 1
-
-   |
-
-
-
 .. autoclass:: SaveEvery
    :show-inheritance:
    :members:
@@ -228,6 +220,48 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: ShowProgress
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: EveryNEpoch
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: EveryNEpoch
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: OnPlateau
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: OnPlateau
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: StopOnPlateau
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: StopOnPlateau
       :parts: 1
 
    |

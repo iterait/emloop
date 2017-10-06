@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.log_dir &#8212; cxflow 0.9.2 documentation</title>
+    <title>cxflow.hooks.every_n_epoch &#8212; cxflow 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.9.2',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -100,54 +100,53 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
 </ul>
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <h1>Source code for cxflow.hooks.log_dir</h1><div class="highlight"><pre>
+  <h1>Source code for cxflow.hooks.every_n_epoch</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Module with simple hook logging the output dir at various occasions just for convenience.</span>
+<span class="sd">Module with EveryNEpoch abstract hook which call ``_after_n_epoch`` method every n epoch.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
 
 
-<div class="viewcode-block" id="LogDir"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir">[docs]</a><span class="k">class</span> <span class="nc">LogDir</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
+<div class="viewcode-block" id="EveryNEpoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch">[docs]</a><span class="k">class</span> <span class="nc">EveryNEpoch</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Log the output dir before training, after each epoch and after training.</span>
-
-<span class="sd">    .. code-block:: yaml</span>
-<span class="sd">        :caption: log the training dir</span>
-
-<span class="sd">        hooks:</span>
-<span class="sd">          - LogDir</span>
-
+<span class="sd">    This hook should be used as base hook in the case when some action need to be processed every n epoch.</span>
+<span class="sd">    Call ``_after_n_epoch`` method every ``n_epochs`` epoch.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LogDir.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EveryNEpoch.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create new LogDir hook.</span>
+<span class="sd">        Create EveryNEpoch hook.</span>
 
-<span class="sd">        :param output_dir: training output directory</span>
+<span class="sd">        :param n_epochs: how often ``_after_n_epoch`` method is called</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">=</span> <span class="n">n_epochs</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="EveryNEpoch._after_n_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch._after_n_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">_after_n_epoch</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract method which is called every `n_epochs` epoch.</span>
+<span class="sd">        This method must be overridden.</span>
 
-<div class="viewcode-block" id="LogDir.before_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Log the output directory.&quot;&quot;&quot;</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div>
+<span class="sd">        :raise TypeError: if this method is not overridden</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="LogDir.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Log the output directory.&quot;&quot;&quot;</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div>
+<div class="viewcode-block" id="EveryNEpoch.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.EveryNEpoch.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call ``_after_n_epoch`` method every ``n_epochs`` epoch.</span>
 
-<div class="viewcode-block" id="LogDir.after_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.after_training">[docs]</a>    <span class="k">def</span> <span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Log the output directory.&quot;&quot;&quot;</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div></div>
+<span class="sd">        :param epoch_id: number of the processed epoch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">epoch_id</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_after_n_epoch</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="n">epoch_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
     </div>

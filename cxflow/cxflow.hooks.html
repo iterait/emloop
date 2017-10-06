@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks &#8212; cxflow 0.9.2 documentation</title>
+    <title>cxflow.hooks &#8212; cxflow 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.9.2',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -117,6 +117,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -148,10 +149,8 @@ Stop the training after any of the specified conditions is met.</li>
 Log the training results to stderr via standard <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#module-logging" title="(in Python v3.6)"><code class="xref py py-mod docutils literal"><span class="pre">logging</span></code></a> module.</li>
 <li><a class="reference internal" href="#cxflow.hooks.LogProfile" title="cxflow.hooks.LogProfile"><code class="xref py py-class docutils literal"><span class="pre">LogProfile</span></code></a>:
 Summarize and log epoch profile via standard <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#module-logging" title="(in Python v3.6)"><code class="xref py py-mod docutils literal"><span class="pre">logging</span></code></a>.</li>
-<li><a class="reference internal" href="#cxflow.hooks.LogDir" title="cxflow.hooks.LogDir"><code class="xref py py-class docutils literal"><span class="pre">LogDir</span></code></a>:
-Log the output dir before training, after each epoch and after training.</li>
 <li><a class="reference internal" href="#cxflow.hooks.SaveEvery" title="cxflow.hooks.SaveEvery"><code class="xref py py-class docutils literal"><span class="pre">SaveEvery</span></code></a>:
-Save the model every <code class="docutils literal"><span class="pre">n_epochs</span></code> epochs.</li>
+Save the model every <code class="docutils literal"><span class="pre">n_epochs</span></code> epoch.</li>
 <li><a class="reference internal" href="#cxflow.hooks.SaveBest" title="cxflow.hooks.SaveBest"><code class="xref py py-class docutils literal"><span class="pre">SaveBest</span></code></a>:
 Maintain the best performing model given the specified criteria.</li>
 <li><a class="reference internal" href="#cxflow.hooks.CatchSigint" title="cxflow.hooks.CatchSigint"><code class="xref py py-class docutils literal"><span class="pre">CatchSigint</span></code></a>:
@@ -162,6 +161,12 @@ Accumulate the specified variables, compute the specified aggregation values and
 Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.</li>
 <li><a class="reference internal" href="#cxflow.hooks.ShowProgress" title="cxflow.hooks.ShowProgress"><code class="xref py py-class docutils literal"><span class="pre">ShowProgress</span></code></a>:
 Show stream progresses and ETA in the current epoch.</li>
+<li><a class="reference internal" href="#cxflow.hooks.EveryNEpoch" title="cxflow.hooks.EveryNEpoch"><code class="xref py py-class docutils literal"><span class="pre">EveryNEpoch</span></code></a>:
+This hook should be used as base hook in the case when some action need to be processed every n epoch.</li>
+<li><a class="reference internal" href="#cxflow.hooks.OnPlateau" title="cxflow.hooks.OnPlateau"><code class="xref py py-class docutils literal"><span class="pre">OnPlateau</span></code></a>:
+Base hook for hooks taking actions when certain variable reaches its plateau.</li>
+<li><a class="reference internal" href="#cxflow.hooks.StopOnPlateau" title="cxflow.hooks.StopOnPlateau"><code class="xref py py-class docutils literal"><span class="pre">StopOnPlateau</span></code></a>:
+Terminate the training when the observed variable reaches its plateau.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.hooks.AbstractHook">
@@ -586,12 +591,12 @@ Variables and streams expected later on are stored in <code class="docutils lite
 <dl class="method">
 <dt id="cxflow.hooks.StopAfter._check_train_time">
 <code class="descname">_check_train_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_after.html#StopAfter._check_train_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopAfter._check_train_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop the training if the training time exceeded <code class="docutils literal"><span class="pre">self.__minutes</span></code>.</p>
+<dd><p>Stop the training if the training time exceeded <code class="docutils literal"><span class="pre">self._minutes</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the training time exceeded <code class="docutils literal"><span class="pre">self.__minutes</span></code></td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the training time exceeded <code class="docutils literal"><span class="pre">self._minutes</span></code></td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
@@ -602,8 +607,8 @@ Variables and streams expected later on are stored in <code class="docutils lite
 <dl class="method">
 <dt id="cxflow.hooks.StopAfter.after_batch">
 <code class="descname">after_batch</code><span class="sig-paren">(</span><em>stream_name</em>, <em>batch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_after.html#StopAfter.after_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopAfter.after_batch" title="Permalink to this definition">¶</a></dt>
-<dd><p>If <code class="docutils literal"><span class="pre">stream_name</span></code> equals to <code class="xref py py-attr docutils literal"><span class="pre">MainLoop.TRAIN_STREAM</span></code>,
-increase the counter and possibly stop the training; additionally, call <a class="reference internal" href="#cxflow.hooks.StopAfter._check_train_time" title="cxflow.hooks.StopAfter._check_train_time"><code class="xref py py-meth docutils literal"><span class="pre">_check_train_time()</span></code></a>.</p>
+<dd><p>If <code class="docutils literal"><span class="pre">stream_name</span></code> equals to <a class="reference internal" href="cxflow.html#cxflow.MainLoop.TRAIN_STREAM" title="cxflow.MainLoop.TRAIN_STREAM"><code class="xref py py-attr docutils literal"><span class="pre">cxflow.MainLoop.TRAIN_STREAM</span></code></a>,
+increase the iterations counter and possibly stop the training; additionally, call <a class="reference internal" href="#cxflow.hooks.StopAfter._check_train_time" title="cxflow.hooks.StopAfter._check_train_time"><code class="xref py py-meth docutils literal"><span class="pre">_check_train_time()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -627,7 +632,7 @@ increase the counter and possibly stop the training; additionally, call <a class
 <dl class="method">
 <dt id="cxflow.hooks.StopAfter.after_epoch">
 <code class="descname">after_epoch</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>epoch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_after.html#StopAfter.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopAfter.after_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop the training if the <code class="docutils literal"><span class="pre">epoch_id</span></code> reaches <code class="docutils literal"><span class="pre">self._iters</span></code>; additionally, call <a class="reference internal" href="#cxflow.hooks.StopAfter._check_train_time" title="cxflow.hooks.StopAfter._check_train_time"><code class="xref py py-meth docutils literal"><span class="pre">_check_train_time()</span></code></a>.</p>
+<dd><p>Stop the training if the <code class="docutils literal"><span class="pre">epoch_id</span></code> reaches <code class="docutils literal"><span class="pre">self._epochs</span></code>; additionally, call <a class="reference internal" href="#cxflow.hooks.StopAfter._check_train_time" title="cxflow.hooks.StopAfter._check_train_time"><code class="xref py py-meth docutils literal"><span class="pre">_check_train_time()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -638,7 +643,7 @@ increase the counter and possibly stop the training; additionally, call <a class
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the <code class="docutils literal"><span class="pre">epoch_id</span></code> reaches <code class="docutils literal"><span class="pre">self._iters</span></code></p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the <code class="docutils literal"><span class="pre">epoch_id</span></code> reaches <code class="docutils literal"><span class="pre">self._epochs</span></code></p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
@@ -820,106 +825,30 @@ stream</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="cxflow.hooks.LogDir">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">LogDir</code><span class="sig-paren">(</span><em>output_dir: str</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_dir.html#LogDir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogDir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
-<p>Log the output dir before training, after each epoch and after training.</p>
-<div class="literal-block-wrapper docutils container" id="id8">
-<div class="code-block-caption"><span class="caption-text">log the training dir</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogDir</span>
-</pre></div>
-</div>
-</div>
-<img src="../_images/inheritance-34bc9f8dab08a06801b7c2b1f5424b38b20af47a.png" alt="Inheritance diagram of LogDir" usemap="#inheritancee6f1bd7bc5" class="inheritance"/>
-<map id="inheritancee6f1bd7bc5" name="inheritancee6f1bd7bc5">
-<area shape="rect" id="node2" title="Log the output dir before training, after each epoch and after training." alt="" coords="163,5,235,31"/>
-</map>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<dl class="method">
-<dt id="cxflow.hooks.LogDir.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_dir.html#LogDir.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogDir.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new LogDir hook.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; training output directory</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cxflow.hooks.LogDir.after_epoch">
-<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_dir.html#LogDir.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogDir.after_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log the output directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cxflow.hooks.LogDir.after_training">
-<code class="descname">after_training</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_dir.html#LogDir.after_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogDir.after_training" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log the output directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cxflow.hooks.LogDir.before_training">
-<code class="descname">before_training</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/log_dir.html#LogDir.before_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.LogDir.before_training" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log the output directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="cxflow.hooks.SaveEvery">
-<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveEvery</code><span class="sig-paren">(</span><em>model: .models.AbstractModel</em>, <em>n_epochs: int = 1</em>, <em>on_failure: str = 'error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
-<p>Save the model every <code class="docutils literal"><span class="pre">n_epochs</span></code> epochs.</p>
-<div class="literal-block-wrapper docutils container" id="id9">
-<div class="code-block-caption"><span class="caption-text">save every 10th epoch</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveEvery</code><span class="sig-paren">(</span><em>model: .models.AbstractModel</em>, <em>on_failure: str = 'error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.every_n_epoch.EveryNEpoch</span></code></p>
+<p>Save the model every <code class="docutils literal"><span class="pre">n_epochs</span></code> epoch.</p>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">save every 10th epoch</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveEvery</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">n_epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id10">
-<div class="code-block-caption"><span class="caption-text">save every epoch and only warn on failure</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">save every epoch and only warn on failure</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveEvery</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">on_failure</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">warn</span>
 </pre></div>
 </div>
 </div>
-<img src="../_images/inheritance-77f39a9e934d6663cd4c1ad3e56a0fce21ca2b44.png" alt="Inheritance diagram of SaveEvery" usemap="#inheritance7abb4b3c46" class="inheritance"/>
+<img src="../_images/inheritance-2e3bfe7fb2405ba4e1023237180af7d97b512587.png" alt="Inheritance diagram of SaveEvery" usemap="#inheritance7abb4b3c46" class="inheritance"/>
 <map id="inheritance7abb4b3c46" name="inheritance7abb4b3c46">
-<area shape="rect" id="node2" title="Save the model every ``n_epochs`` epochs." alt="" coords="163,5,252,31"/>
+<area shape="rect" id="node2" title="This hook should be used as base hook in the case when some action need to be processed every n epoch." alt="" coords="163,5,269,31"/>
+<area shape="rect" id="node3" title="Save the model every ``n_epochs`` epoch." alt="" coords="317,5,407,31"/>
 </map>
 <div class="line-block">
 <div class="line"><br /></div>
@@ -932,14 +861,13 @@ stream</li>
 
 <dl class="method">
 <dt id="cxflow.hooks.SaveEvery.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>n_epochs=1</em>, <em>on_failure='error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>on_failure='error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>model</strong> (<a class="reference internal" href="cxflow.models.html#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code></a>) &#8211; trained model</li>
-<li><strong>n_epochs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; how often is the model saved</li>
 <li><strong>on_failure</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to be taken when model fails to save itself; one of <a class="reference internal" href="#cxflow.hooks.SaveEvery.SAVE_FAILURE_ACTIONS" title="cxflow.hooks.SaveEvery.SAVE_FAILURE_ACTIONS"><code class="xref py py-attr docutils literal"><span class="pre">SAVE_FAILURE_ACTIONS</span></code></a></li>
 </ul>
 </td>
@@ -949,9 +877,9 @@ stream</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="cxflow.hooks.SaveEvery.after_epoch">
-<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery.after_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the model if <code class="docutils literal"><span class="pre">epoch_id</span></code> is divisible by <code class="docutils literal"><span class="pre">self._save_every_n_epochs</span></code>.</p>
+<dt id="cxflow.hooks.SaveEvery._after_n_epoch">
+<code class="descname">_after_n_epoch</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveEvery._after_n_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveEvery._after_n_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the model every <code class="docutils literal"><span class="pre">n_epochs</span></code> epoch.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -996,15 +924,15 @@ stream</li>
 <em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveBest</code><span class="sig-paren">(</span><em>model: .models.AbstractModel</em>, <em>variable: str = 'loss'</em>, <em>condition: str = 'min'</em>, <em>stream: str = 'valid'</em>, <em>aggregation: str = 'mean'</em>, <em>output_name: str = 'best'</em>, <em>on_save_failure: str = 'error'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save.html#SaveBest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveBest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Maintain the best performing model given the specified criteria.</p>
-<div class="literal-block-wrapper docutils container" id="id11">
-<div class="code-block-caption"><span class="caption-text">save model with minimal valid loss</span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">save model with minimal valid loss</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">BestSaverHook</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id12">
-<div class="code-block-caption"><span class="caption-text">save model with max accuracy</span><a class="headerlink" href="#id12" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">save model with max accuracy</span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveBest</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">variable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">accuracy</span>
@@ -1115,8 +1043,8 @@ stream</li>
 <p>Catch SIGINT signals allowing to stop the training with grace.</p>
 <p>On first sigint finish the current batch and terminate training politely, i.e. trigger all <code class="docutils literal"><span class="pre">after_training</span></code> hooks.
 On second sigint quit immediately with exit code 1</p>
-<div class="literal-block-wrapper docutils container" id="id13">
-<div class="code-block-caption"><span class="caption-text">register SIGINT catching</span><a class="headerlink" href="#id13" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">register SIGINT catching</span><a class="headerlink" href="#id12" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">CatchSigint</span>
 </pre></div>
@@ -1211,16 +1139,16 @@ Quit on any subsequent signal.</p>
 <em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">ComputeStats</code><span class="sig-paren">(</span><em>variables</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/compute_stats.html#ComputeStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ComputeStats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.accumulate_variables.AccumulateVariables</span></code></p>
 <p>Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.</p>
-<div class="literal-block-wrapper docutils container" id="id14">
-<div class="code-block-caption"><span class="caption-text">compute loss and accuracy means after each epoch</span><a class="headerlink" href="#id14" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">compute loss and accuracy means after each epoch</span><a class="headerlink" href="#id13" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
 <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">loss</span><span class="p p-Indicator">,</span> <span class="nv">accuracy</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id15">
-<div class="code-block-caption"><span class="caption-text">compute min and max loss after each epoch</span><a class="headerlink" href="#id15" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text">compute min and max loss after each epoch</span><a class="headerlink" href="#id14" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ComputeStats</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span>
@@ -1237,9 +1165,9 @@ Quit on any subsequent signal.</p>
 <div class="line"><br /></div>
 </div>
 <dl class="attribute">
-<dt id="cxflow.hooks.ComputeStats.AGGREGATIONS">
-<code class="descname">AGGREGATIONS</code><em class="property"> = {'max', 'mean', 'median', 'min', 'std'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Supported numpy-like aggregation methods.</p>
+<dt id="cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS">
+<code class="descname">EXTRA_AGGREGATIONS</code><em class="property"> = {'nanfraction', 'nancount'}</em><a class="headerlink" href="#cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extra aggregation methods extending the set of all NumPy functions.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1252,7 +1180,9 @@ Quit on any subsequent signal.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>variables</strong> &#8211; list of variables mapping: <code class="docutils literal"><span class="pre">variable_name</span></code> -&gt; <code class="docutils literal"><span class="pre">List</span></code> [<code class="docutils literal"><span class="pre">aggregations</span></code>...] wherein
-<code class="docutils literal"><span class="pre">aggregations</span></code> are one of <a class="reference internal" href="#cxflow.hooks.ComputeStats.AGGREGATIONS" title="cxflow.hooks.ComputeStats.AGGREGATIONS"><code class="xref py py-attr docutils literal"><span class="pre">AGGREGATIONS</span></code></a> or <code class="docutils literal"><span class="pre">variable_name</span></code> only to compute its mean</li>
+<code class="docutils literal"><span class="pre">aggregations</span></code> are the names of arbitrary NumPy functions returning a scalar (e.g., <code class="docutils literal"><span class="pre">'mean'</span></code>,
+<code class="docutils literal"><span class="pre">'nanmean'</span></code>, <code class="docutils literal"><span class="pre">'max'</span></code>, etc.) or one of <a class="reference internal" href="#cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS" title="cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS"><code class="xref py py-attr docutils literal"><span class="pre">EXTRA_AGGREGATIONS</span></code></a>. Passing just the
+<code class="docutils literal"><span class="pre">variable</span> <span class="pre">name</span></code> instead of a mapping is the same as passing {variable_name: [&#8216;mean&#8217;]}.</li>
 <li><strong>kwargs</strong> &#8211; Ignored</li>
 </ul>
 </td>
@@ -1273,13 +1203,30 @@ Quit on any subsequent signal.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>aggregation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; on of {mean, std, min, max, median}.</li>
+<li><strong>aggregation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; the name of an arbitrary NumPy function (e.g., mean, max, median, nanmean, ...)
+or one of <a class="reference internal" href="#cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS" title="cxflow.hooks.ComputeStats.EXTRA_AGGREGATIONS"><code class="xref py py-attr docutils literal"><span class="pre">EXTRA_AGGREGATIONS</span></code></a>.</li>
 <li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]) &#8211; data to be aggregated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the specified aggregation is not supported</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the specified aggregation is not supported or found in NumPy</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cxflow.hooks.ComputeStats._raise_check_aggregation">
+<em class="property">static </em><code class="descname">_raise_check_aggregation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/compute_stats.html#ComputeStats._raise_check_aggregation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.ComputeStats._raise_check_aggregation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the given aggregation is present in NumPy or it is one of EXTRA_AGGREGATIONS.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>aggregation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; the aggregation name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the specified aggregation is not supported or found in NumPy</td>
 </tr>
 </tbody>
 </table>
@@ -1325,8 +1272,8 @@ Quit on any subsequent signal.</p>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
 <p>Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.</p>
 <p>Raise <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code></a> if the threshold was not exceeded in given number of epochs</p>
-<div class="literal-block-wrapper docutils container" id="id16">
-<div class="code-block-caption"><span class="caption-text">exceed 95% accuracy on valid (default) stream within at most 10 epochs</span><a class="headerlink" href="#id16" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">exceed 95% accuracy on valid (default) stream within at most 10 epochs</span><a class="headerlink" href="#id15" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Check</span><span class="p p-Indicator">:</span>
       <span class="l l-Scalar l-Scalar-Plain">variable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">accuracy</span>
@@ -1400,8 +1347,13 @@ Quit on any subsequent signal.</p>
 <p class="last">If the dataset provides <code class="docutils literal"><span class="pre">num_batches</span></code> property, the hook will be able to display the progress and ETA for the
 1st epoch as well. The property should return a mapping of <code class="docutils literal"><span class="pre">&lt;stream</span> <span class="pre">name&gt;</span></code> -&gt; <code class="docutils literal"><span class="pre">&lt;batch</span> <span class="pre">count&gt;</span></code>.</p>
 </div>
-<div class="literal-block-wrapper docutils container" id="id17">
-<div class="code-block-caption"><span class="caption-text">show progress of the current epoch</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p class="last"><code class="docutils literal"><span class="pre">ShowProgress</span></code> hook should be placed as the first in hooks config section, otherwise 
+the progress bar may not be displayed correctly.</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">show progress of the current epoch</span><a class="headerlink" href="#id16" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ShowProgress</span>
 </pre></div>
@@ -1453,6 +1405,197 @@ If the stream size (total batch count) is unknown (1st epoch), print only the nu
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.hooks.EveryNEpoch">
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">EveryNEpoch</code><span class="sig-paren">(</span><em>n_epochs: int = 1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/every_n_epoch.html#EveryNEpoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.EveryNEpoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
+<p>This hook should be used as base hook in the case when some action need to be processed every n epoch.
+Call <code class="docutils literal"><span class="pre">_after_n_epoch</span></code> method every <code class="docutils literal"><span class="pre">n_epochs</span></code> epoch.</p>
+<img src="../_images/inheritance-005a560090a404d04f99cf3e448359e71b0123ed.png" alt="Inheritance diagram of EveryNEpoch" usemap="#inheritance8669455b06" class="inheritance"/>
+<map id="inheritance8669455b06" name="inheritance8669455b06">
+<area shape="rect" id="node2" title="This hook should be used as base hook in the case when some action need to be processed every n epoch." alt="" coords="163,5,269,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="cxflow.hooks.EveryNEpoch.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>n_epochs=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/every_n_epoch.html#EveryNEpoch.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.EveryNEpoch.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create EveryNEpoch hook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_epochs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; how often <code class="docutils literal"><span class="pre">_after_n_epoch</span></code> method is called</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.EveryNEpoch._after_n_epoch">
+<code class="descname">_after_n_epoch</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/every_n_epoch.html#EveryNEpoch._after_n_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.EveryNEpoch._after_n_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method which is called every <cite>n_epochs</cite> epoch.
+This method must be overridden.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#TypeError" title="(in Python v3.6)"><strong>TypeError</strong></a> &#8211; if this method is not overridden</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.EveryNEpoch.after_epoch">
+<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/every_n_epoch.html#EveryNEpoch.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.EveryNEpoch.after_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call <code class="docutils literal"><span class="pre">_after_n_epoch</span></code> method every <code class="docutils literal"><span class="pre">n_epochs</span></code> epoch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; number of the processed epoch</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.hooks.OnPlateau">
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">OnPlateau</code><span class="sig-paren">(</span><em>long_term: int = 50</em>, <em>short_term: int = 10</em>, <em>stream: str = 'valid'</em>, <em>variable: str = 'loss'</em>, <em>objective: str = 'min'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/on_plateau.html#OnPlateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.OnPlateau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.compute_stats.ComputeStats</span></code></p>
+<p>Base hook for hooks taking actions when certain variable reaches its plateau.
+The variable is observed on epoch level and plateau is reached when
+its <code class="docutils literal"><span class="pre">long_term</span></code> mean is lower/greater than the <code class="docutils literal"><span class="pre">short_term</span></code> mean.</p>
+<p>Call <a class="reference internal" href="#cxflow.hooks.OnPlateau._on_plateau_action" title="cxflow.hooks.OnPlateau._on_plateau_action"><code class="xref py py-meth docutils literal"><span class="pre">_on_plateau_action()</span></code></a> method when the observed variable reaches its plateau.</p>
+<img src="../_images/inheritance-a36177f516ac7dfd30f57863f0ceea55f15da69f.png" alt="Inheritance diagram of OnPlateau" usemap="#inheritance8fb85b6f9f" class="inheritance"/>
+<map id="inheritance8fb85b6f9f" name="inheritance8fb85b6f9f">
+<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="163,5,319,31"/>
+<area shape="rect" id="node3" title="Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data." alt="" coords="367,5,481,31"/>
+<area shape="rect" id="node4" title="Base hook for hooks taking actions when certain variable reaches its plateau." alt="" coords="529,5,617,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="attribute">
+<dt id="cxflow.hooks.OnPlateau.OBJECTIVES">
+<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.OnPlateau.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possible objectives for the observed variable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.OnPlateau.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>long_term=50</em>, <em>short_term=10</em>, <em>stream='valid'</em>, <em>variable='loss'</em>, <em>objective='min'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/on_plateau.html#OnPlateau.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.OnPlateau.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new OnPlateau hook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>long_term</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; count of last epochs representing long training period</li>
+<li><strong>short_term</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; count of last epochs representing short training period</li>
+<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the processed stream</li>
+<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the observed variable</li>
+<li><strong>objective</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; observed variable objective; one of <a class="reference internal" href="#cxflow.hooks.OnPlateau.OBJECTIVES" title="cxflow.hooks.OnPlateau.OBJECTIVES"><code class="xref py py-attr docutils literal"><span class="pre">OnPlateau.OBJECTIVES</span></code></a></li>
+<li><strong>kwargs</strong> &#8211; ignored</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> &#8211; if <code class="docutils literal"><span class="pre">long_term</span></code> &lt; <code class="docutils literal"><span class="pre">short_term</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.OnPlateau._on_plateau_action">
+<code class="descname">_on_plateau_action</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/on_plateau.html#OnPlateau._on_plateau_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.OnPlateau._on_plateau_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method which is called when the observed variable reaches its plateau.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.OnPlateau.after_epoch">
+<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>epoch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/on_plateau.html#OnPlateau.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.OnPlateau.after_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call <a class="reference internal" href="#cxflow.hooks.OnPlateau._on_plateau_action" title="cxflow.hooks.OnPlateau._on_plateau_action"><code class="xref py py-meth docutils literal"><span class="pre">_on_plateau_action()</span></code></a> if the <code class="docutils literal"><span class="pre">long_term</span></code>
+variable mean is lower/greater than the <code class="docutils literal"><span class="pre">short_term</span></code> mean.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.hooks.StopOnPlateau">
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">StopOnPlateau</code><span class="sig-paren">(</span><em>long_term: int = 50</em>, <em>short_term: int = 10</em>, <em>stream: str = 'valid'</em>, <em>variable: str = 'loss'</em>, <em>objective: str = 'min'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_plateau.html#StopOnPlateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnPlateau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.on_plateau.OnPlateau</span></code></p>
+<p>Terminate the training when the observed variable reaches its plateau.</p>
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">stop the training when the mean of last 100 valid <code class="docutils literal"><span class="pre">loss</span></code> values is
+smaller than the mean of last 30 <code class="docutils literal"><span class="pre">loss</span></code> values.</span><a class="headerlink" href="#id17" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopOnPlateau</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">long_term</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">100</span>
+      <span class="l l-Scalar l-Scalar-Plain">short_term</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">30</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id18">
+<div class="code-block-caption"><span class="caption-text">stop the training when accuracy stops improving (raising)</span><a class="headerlink" href="#id18" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopOnPlateau</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">variable</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">accuracy</span>
+      <span class="l l-Scalar l-Scalar-Plain">objective</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">max</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-7b2ca9016eb558f3e7093027db0a6cc97e29f3df.png" alt="Inheritance diagram of StopOnPlateau" usemap="#inheritancee06f0c9832" class="inheritance"/>
+<map id="inheritancee06f0c9832" name="inheritancee06f0c9832">
+<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="158,5,310,30"/>
+<area shape="rect" id="node3" title="Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data." alt="" coords="357,5,468,30"/>
+<area shape="rect" id="node4" title="Base hook for hooks taking actions when certain variable reaches its plateau." alt="" coords="515,5,601,30"/>
+<area shape="rect" id="node5" title="Terminate the training when the observed variable reaches its plateau." alt="" coords="647,5,763,30"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="cxflow.hooks.StopOnPlateau._on_plateau_action">
+<code class="descname">_on_plateau_action</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_plateau.html#StopOnPlateau._on_plateau_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnPlateau._on_plateau_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminate the training when the observed variable reaches its plateau.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the model stops improving</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>

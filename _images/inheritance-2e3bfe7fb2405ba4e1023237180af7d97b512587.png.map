@@ -1,0 +1,4 @@
+<map id="inheritance7abb4b3c46" name="inheritance7abb4b3c46">
+<area shape="rect" id="node2" title="This hook should be used as base hook in the case when some action need to be processed every n epoch." alt="" coords="163,5,269,31"/>
+<area shape="rect" id="node3" title="Save the model every ``n_epochs`` epoch." alt="" coords="317,5,407,31"/>
+</map>

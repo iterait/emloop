@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.stop_after &#8212; cxflow 0.9.2 documentation</title>
+    <title>cxflow.hooks.stop_after &#8212; cxflow 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.9.2',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -100,6 +100,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -178,9 +179,9 @@
 
 <div class="viewcode-block" id="StopAfter._check_train_time"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter._check_train_time">[docs]</a>    <span class="k">def</span> <span class="nf">_check_train_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Stop the training if the training time exceeded ``self.__minutes``.</span>
+<span class="sd">        Stop the training if the training time exceeded ``self._minutes``.</span>
 
-<span class="sd">        :raise TrainingTerminated: if the training time exceeded ``self.__minutes``</span>
+<span class="sd">        :raise TrainingTerminated: if the training time exceeded ``self._minutes``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_training_start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mi">60</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Training terminated after more than </span><span class="si">{}</span><span class="s1"> minutes&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minutes</span><span class="p">))</span></div>
@@ -191,8 +192,8 @@
 
 <div class="viewcode-block" id="StopAfter.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If ``stream_name`` equals to :py:attr:`MainLoop.TRAIN_STREAM`,</span>
-<span class="sd">        increase the counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.</span>
+<span class="sd">        If ``stream_name`` equals to :py:attr:`cxflow.MainLoop.TRAIN_STREAM`,</span>
+<span class="sd">        increase the iterations counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.</span>
 
 <span class="sd">        :param stream_name: stream name</span>
 <span class="sd">        :param batch_data: ignored</span>
@@ -206,11 +207,11 @@
 
 <div class="viewcode-block" id="StopAfter.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Stop the training if the ``epoch_id`` reaches ``self._iters``; additionally, call :py:meth:`_check_train_time`.</span>
+<span class="sd">        Stop the training if the ``epoch_id`` reaches ``self._epochs``; additionally, call :py:meth:`_check_train_time`.</span>
 
 <span class="sd">        :param epoch_id: epoch id</span>
 <span class="sd">        :param epoch_data: ignored</span>
-<span class="sd">        :raise TrainingTerminated: if the ``epoch_id`` reaches ``self._iters``</span>
+<span class="sd">        :raise TrainingTerminated: if the ``epoch_id`` reaches ``self._epochs``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_train_time</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">epoch_id</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs</span><span class="p">:</span>
