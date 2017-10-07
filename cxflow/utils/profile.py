@@ -4,7 +4,8 @@ Module with time profiling utils.
 So far, it contains Timer object allowing to easily measure code execution time.
 """
 import timeit
-import typing
+
+from ..types import TimeProfile
 
 
 class Timer:
@@ -21,8 +22,6 @@ class Timer:
             pass
 
     """
-
-    TimeProfile = typing.Dict[str, typing.List[float]]   # pylint: disable=invalid-sequence-index
 
     def __init__(self, name: str, profile: TimeProfile):
         """

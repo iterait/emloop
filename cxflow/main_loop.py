@@ -12,8 +12,10 @@ from collections import OrderedDict
 from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
-from .utils.profile import Timer
+from .utils import Timer
 from .datasets.stream_wrapper import StreamWrapper
+from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
+from .types import EpochData
 
 
 class MainLoop:   # pylint: disable=too-many-instance-attributes
@@ -21,12 +23,6 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
 
     UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
     """Possible actions to be taken when a stream source is unused by the trained model."""
-
-    TRAIN_STREAM = 'train'
-    """Train stream name."""
-
-    PREDICT_STREAM = 'predict'
-    """Predict stream name."""
 
     def __init__(self,   # pylint: disable=too-many-arguments
                  model: AbstractModel, dataset: AbstractDataset,
@@ -64,10 +60,10 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._skip_zeroth_epoch = skip_zeroth_epoch
         self._streams = {}
 
-    def _create_epoch_data(self) -> AbstractHook.EpochData:
+    def _create_epoch_data(self) -> EpochData:
         """Create empty epoch data double dict."""
         return OrderedDict([(stream_name, OrderedDict())
-                            for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams])
+                            for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
         """
@@ -151,7 +147,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             try:
                 stream_fn = getattr(self._dataset, stream_fn_name)
                 stream_epoch_limit = -1
-                if self._fixed_epoch_size is not None and stream_name == self.TRAIN_STREAM:
+                if self._fixed_epoch_size is not None and stream_name == CXF_TRAIN_STREAM:
                     stream_epoch_limit = self._fixed_epoch_size
                 self._streams[stream_name] = StreamWrapper(stream_fn, buffer_size=self._buffer,
                                                            epoch_size=stream_epoch_limit, name=stream_name,
@@ -212,7 +208,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
         """
-        for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams:
+        for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams:
             self.get_stream(stream_name)
 
         def training():
@@ -221,7 +217,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
 
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
-                self._run_zeroth_epoch([MainLoop.TRAIN_STREAM] + self._extra_streams)
+                self._run_zeroth_epoch([CXF_TRAIN_STREAM] + self._extra_streams)
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
@@ -229,7 +225,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
-                with self.get_stream(self.TRAIN_STREAM) as stream:
+                with self.get_stream(CXF_TRAIN_STREAM) as stream:
                     self.train_by_stream(stream)
 
                 for stream_name in self._extra_streams:
@@ -251,5 +247,5 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         """Run the main loop for in the prediction mode."""
         def prediction():
             logging.debug('Prediction started')
-            self._run_zeroth_epoch([MainLoop.PREDICT_STREAM])
+            self._run_zeroth_epoch([CXF_PREDICT_STREAM])
         self._try_run(prediction)

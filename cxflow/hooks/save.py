@@ -7,6 +7,7 @@ import numpy as np
 
 from . import AbstractHook, EveryNEpoch
 from ..models import AbstractModel
+from ..types import EpochData
 
 
 class SaveEvery(EveryNEpoch):
@@ -125,7 +126,7 @@ class SaveBest(AbstractHook):
 
         self._best_value = None
 
-    def _get_value(self, epoch_data: AbstractHook.EpochData) -> float:
+    def _get_value(self, epoch_data: EpochData) -> float:
         """
         Retrieve the value of the monitored variable from the given epoch data.
 
@@ -171,7 +172,7 @@ class SaveBest(AbstractHook):
         if self._condition == 'max':
             return new_value > self._best_value
 
-    def after_epoch(self, epoch_data: AbstractHook.EpochData, **_) -> None:
+    def after_epoch(self, epoch_data: EpochData, **_) -> None:
         """
         Save the model if the new value of the monitored variable is better than the best value so far.
 

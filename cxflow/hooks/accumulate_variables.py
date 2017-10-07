@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from . import AbstractHook
 from ..datasets import AbstractDataset
+from ..types import Batch
 
 
 class AccumulateVariables(AbstractHook):
@@ -37,7 +38,7 @@ class AccumulateVariables(AbstractHook):
         """Set the accumulator to an empty double-index :py:class:`collections.defaultdict`."""
         self._accumulator = defaultdict(lambda: defaultdict(list))
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch):
+    def after_batch(self, stream_name: str, batch_data: Batch):
         """
         Extend the accumulated variables with the given batch data.
 

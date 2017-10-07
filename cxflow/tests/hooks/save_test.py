@@ -8,9 +8,10 @@ import collections
 from cxflow.tests.test_core import CXTestCase
 from cxflow.hooks.save import SaveEvery, SaveBest, AbstractHook
 from cxflow.models.abstract_model import AbstractModel
+from cxflow.types import EpochData
 
 
-def _get_epoch_data(valid_loss_mean_val: float=3) -> AbstractHook.EpochData:
+def _get_epoch_data(valid_loss_mean_val: float=3) -> EpochData:
     """Return testing epoch data."""
 
     epoch_data = collections.OrderedDict([

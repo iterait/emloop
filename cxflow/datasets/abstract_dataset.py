@@ -1,12 +1,7 @@
 """
-This module contains AbstractDataset concept.
+Module with AbstractDataset concept.
 
-At the moment it is for typing only.
 """
-
-from typing import Mapping, Iterable, Any
-
-
 class AbstractDataset:
     """
     This concept prescribes the API that is required from every **cxflow** dataset.
@@ -17,12 +12,6 @@ class AbstractDataset:
 
     All the defined stream methods should return a :py:attr:`Stream`.
     """
-
-    Batch = Mapping[str, Iterable[Any]]
-    """Batch type: :py:class:`typing.Mapping` of ``variable_name`` to an :py:class:`typing.Iterable` of examples."""
-
-    Stream = Iterable[Batch]
-    """Stream type: :py:class:`typing.Iterable` of :py:attr:`Batch` es."""
 
     def __init__(self, config_str: str):
         """
