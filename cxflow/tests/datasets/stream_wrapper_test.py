@@ -10,8 +10,8 @@ class FailingDataset(SimpleDataset):
 
     def train_stream(self) -> Stream:
         for batch in super().train_stream():
-            yield batch
             raise RuntimeError('Explosion.')
+            yield batch
 
 
 class StreamWrapperTest(CXTestCase):
