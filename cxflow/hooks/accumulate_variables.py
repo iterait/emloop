@@ -5,7 +5,6 @@ import typing
 from collections import defaultdict
 
 from . import AbstractHook
-from ..datasets import AbstractDataset
 from ..types import Batch
 
 

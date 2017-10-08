@@ -93,12 +93,14 @@ class SaveBest(AbstractHook):
 
     """
 
+    _OUTPUT_NAME = 'best'
+
     OBJECTIVES = {'min', 'max'}
     """Possible objectives for the monitor variable."""
 
     def __init__(self,  # pylint: disable=too-many-arguments
                  model: AbstractModel, variable: str='loss', condition: str='min', stream: str='valid',
-                 aggregation: str='mean', output_name: str='best', on_save_failure: str='error', **kwargs):
+                 aggregation: str='mean', on_save_failure: str='error', **kwargs):
         """
         Example: metric=loss, condition=min -> saved the model when the loss is best so far (on `stream`).
 
@@ -107,7 +109,6 @@ class SaveBest(AbstractHook):
         :param condition: performance objective; one of :py:attr:`OBJECTIVES`
         :param stream: stream name to be monitored
         :param aggregation: variable aggregation to be used (``mean`` by default)
-        :param output_name: suffix of the saved model
         :param on_save_failure: action to be taken when model fails to save itself, one of
             :py:attr:`SaveEvery.SAVE_FAILURE_ACTIONS`
         """
@@ -121,7 +122,6 @@ class SaveBest(AbstractHook):
         self._condition = condition
         self._stream_name = stream
         self._aggregation = aggregation
-        self._output_name = output_name
         self._on_save_failure = on_save_failure
 
         self._best_value = None
@@ -182,4 +182,37 @@ class SaveBest(AbstractHook):
 
         if self._is_value_better(new_value):
             self._best_value = new_value
-            SaveEvery.save_model(model=self._model, name_suffix='best', on_failure=self._on_save_failure)
+            SaveEvery.save_model(model=self._model, name_suffix=self._OUTPUT_NAME, on_failure=self._on_save_failure)
+
+
+class SaveLatest(AbstractHook):
+    """
+    Save the latest model.
+
+    .. code-block:: yaml
+        :caption: save the latest model
+
+        hooks:
+          - SaveLatest
+    """
+
+    _OUTPUT_NAME = 'latest'
+
+    def __init__(self, model: AbstractModel, on_save_failure: str='error', **kwargs):
+        """
+        Create new SaveLatest hook.
+
+        :param model: trained model
+        :param on_save_failure: action to be taken when model fails to save itself, one of
+            :py:attr:`SaveEvery.SAVE_FAILURE_ACTIONS`
+        """
+
+        assert on_save_failure in SaveEvery.SAVE_FAILURE_ACTIONS
+
+        super().__init__(**kwargs)
+        self._model = model
+        self._on_save_failure = on_save_failure
+
+    def after_epoch(self, **_) -> None:
+        """Save/override the latest model after every epoch."""
+        SaveEvery.save_model(model=self._model, name_suffix=self._OUTPUT_NAME, on_failure=self._on_save_failure)
