@@ -23,18 +23,13 @@ def invoke_dataset_method(config_path: str, method_name: str, output_root: str, 
     try:
         config_path = find_config(config_path)
         config = load_config(config_file=config_path, additional_args=cl_arguments)
-        validate_config(config)
+        assert 'dataset' in config, '`dataset` section not present in the config'
         logging.debug('\tLoaded config: %s', config)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Loading config failed', ex)
 
     try:
-        output_dir = create_output_dir(config=config, output_root=output_root)
-    except Exception as ex:  # pylint: disable=broad-except
-        fallback('Failed to create output dir', ex)
-
-    try:
-        dataset = create_dataset(config=config, output_dir=output_dir)
+        dataset = create_dataset(config)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating dataset failed', ex)
 
