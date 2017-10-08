@@ -6,7 +6,7 @@ from typing import Iterable, Any
 
 import numpy as np
 
-from . import AbstractHook, AccumulateVariables
+from . import AccumulateVariables
 from ..types import EpochData
 
 
