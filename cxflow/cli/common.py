@@ -265,9 +265,10 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
 
     try:
         logging.info('Running the main loop')
-        if predict:
-            main_loop.run_prediction()
-        else:
-            main_loop.run_training()
+        with main_loop:
+            if predict:
+                main_loop.run_prediction()
+            else:
+                main_loop.run_training()
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Running the main loop failed', ex)

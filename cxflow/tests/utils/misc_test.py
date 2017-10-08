@@ -1,14 +1,15 @@
 """
-Test module for :py:class:`cxflow.hooks.catch_sigint_hook`.
+Test module for :py:class:`cxflow.utils.misc.CatchSigint`.
 """
 import os
 import signal
 import threading
 import platform
 
-from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.catch_sigint import CatchSigint
-from cxflow.hooks.abstract_hook import TrainingTerminated
+from cxflow.hooks import TrainingTerminated
+from cxflow.utils.misc import CatchSigint
+
+from ..test_core import CXTestCase
 
 kill = os.kill
 
@@ -53,7 +54,7 @@ if 'Windows' in platform.system():
 
 
 class CatchSigintTest(CXTestCase):
-    """Test case for ``CatchSigint`` hook."""
+    """Test case for ``CatchSigint`` with-resource class."""
 
     def _sigint_handler(self, *_):
         self._sigint_unhandled = True
@@ -63,34 +64,24 @@ class CatchSigintTest(CXTestCase):
         signal.signal(signal.SIGINT, self._sigint_handler)
         self._sigint_unhandled = False
 
-    def test_before_training(self):
-        """Test SigintHook does not handle the sigint before the training itself."""
+    def test_catching_outside(self):
+        """Test ``CatchSigint`` does not handle sigints outside with-resource environment."""
         CatchSigint()
+        with CatchSigint():
+            pass
         kill(os.getpid(), signal.SIGINT)
-        self.assertTrue(self._sigint_unhandled, 'SigintHook handles SIGINT before training')
+        self.assertTrue(self._sigint_unhandled, 'CatchSigint handles SIGINT outside with-resource environment')
 
-    def test_inside_training_no_raise(self):
-        """Test ``SigintHook`` does handle the sigint during the training."""
-        hook = CatchSigint()
-        hook.before_training()
-        kill(os.getpid(), signal.SIGINT)
+    def test_catching_inside(self):
+        """Test ``CatchSigint`` does handle sigints inside with-resource environment."""
+        with CatchSigint():
+            kill(os.getpid(), signal.SIGINT)
         self.assertFalse(self._sigint_unhandled, 'SigintHook does not handle SIGINT while training')
         # double SIGINT cannot be easily tested (it quits(1))
 
-    def test_inside_training_raise(self):
-        """Test ``SigintHook`` does rise TrainingTerminated exception."""
-        with self.assertRaises(TrainingTerminated):
-            hook = CatchSigint()
-            hook.before_training()
+    def test_raising(self):
+        """Test ``CatchSigint`` does rise ``TrainingTerminated`` exception."""
+        with CatchSigint() as catch:
             kill(os.getpid(), signal.SIGINT)
-            hook.after_batch()
-
-    def test_after_training(self):
-        """Test ``SigintHook`` does not handle the sigint after the training."""
-        hook = CatchSigint()
-        hook.before_training()
-        hook.after_batch()
-        hook.after_epoch(epoch_id=1, epoch_data=None)
-        hook.after_training()
-        kill(os.getpid(), signal.SIGINT)
-        self.assertTrue(self._sigint_unhandled, 'SigintHook handles SIGINT after training')
+            with self.assertRaises(TrainingTerminated):
+                catch.raise_check_sigint()

@@ -21,7 +21,6 @@ from .log_variables import LogVariables
 from .log_profile import LogProfile
 from .log_dir import LogDir
 from .save import SaveEvery, SaveBest
-from .catch_sigint import CatchSigint
 from .compute_stats import ComputeStats
 from .check import Check
 from .show_progress import ShowProgress

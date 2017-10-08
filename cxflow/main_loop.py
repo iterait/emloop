@@ -13,12 +13,13 @@ from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils import Timer
+from .utils.misc import CatchSigint
 from .datasets.stream_wrapper import StreamWrapper
 from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
 from .types import EpochData
 
 
-class MainLoop:   # pylint: disable=too-many-instance-attributes
+class MainLoop(CatchSigint):   # pylint: disable=too-many-instance-attributes
     """**cxflow** main loop for training and model inference."""
 
     UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
@@ -59,6 +60,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
         self._streams = {}
+
+        super().__init__()
 
     def _create_epoch_data(self) -> EpochData:
         """Create empty epoch data double dict."""
@@ -101,6 +104,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         :param stream_name: stream name
         """
         for batch_input in stream:
+            self.raise_check_sigint()
+
             if self._fixed_batch_size:
                 if len(batch_input[list(batch_input.keys())[0]]) != self._fixed_batch_size:
                     logging.debug('Incomplete batch skipped')
@@ -191,7 +196,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         try:
             run_func()
         except TrainingTerminated as ex:
-            logging.info('Training terminated by a hook: %s', ex)
+            logging.info('Training terminated: %s', ex)
         except KeyboardInterrupt:
             logging.warning('Main loop run terminated by a keyboard interrupt')
             sys.exit(2)
