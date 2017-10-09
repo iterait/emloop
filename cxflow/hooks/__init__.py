@@ -30,5 +30,5 @@ from .stop_on_plateau import StopOnPlateau
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
-           'LogProfile', 'SaveEvery', 'SaveBest', 'SaveLatest', 'CatchSigint', 'ComputeStats', 'Check', 'ShowProgress',
-           'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'LogDir']
+           'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'SaveLatest', 'ComputeStats', 'Check', 'ShowProgress',
+           'EveryNEpoch', 'OnPlateau', 'StopOnPlateau']
