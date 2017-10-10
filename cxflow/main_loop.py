@@ -13,13 +13,13 @@ from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils import Timer
-from .utils.misc import CatchSigint
+from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
 from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
 from .types import EpochData
 
 
-class MainLoop(CatchSigint):   # pylint: disable=too-many-instance-attributes
+class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attributes
     """**cxflow** main loop for training and model inference."""
 
     UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
@@ -104,7 +104,7 @@ class MainLoop(CatchSigint):   # pylint: disable=too-many-instance-attributes
         :param stream_name: stream name
         """
         for batch_input in stream:
-            self.raise_check_sigint()
+            self.raise_check_interrupt()
 
             if self._fixed_batch_size:
                 if len(batch_input[list(batch_input.keys())[0]]) != self._fixed_batch_size:
@@ -197,9 +197,6 @@ class MainLoop(CatchSigint):   # pylint: disable=too-many-instance-attributes
             run_func()
         except TrainingTerminated as ex:
             logging.info('Training terminated: %s', ex)
-        except KeyboardInterrupt:
-            logging.warning('Main loop run terminated by a keyboard interrupt')
-            sys.exit(2)
 
         # After training: after_training
         for hook in self._hooks:

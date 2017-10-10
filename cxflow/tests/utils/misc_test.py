@@ -1,5 +1,5 @@
 """
-Test module for :py:class:`cxflow.utils.misc.CatchSigint`.
+Test module for :py:class:`cxflow.utils.misc.CaughtInterrupts`.
 """
 import os
 import signal
@@ -7,7 +7,7 @@ import threading
 import platform
 
 from cxflow.hooks import TrainingTerminated
-from cxflow.utils.misc import CatchSigint
+from cxflow.utils.misc import CaughtInterrupts
 
 from ..test_core import CXTestCase
 
@@ -53,35 +53,56 @@ if 'Windows' in platform.system():
     kill = kill_windows
 
 
-class CatchSigintTest(CXTestCase):
-    """Test case for ``CatchSigint`` with-resource class."""
+class CaughtInterruptsTest(CXTestCase):
+    """Test case for ``CaughtInterrupts`` with-resource class."""
 
-    def _sigint_handler(self, *_):
-        self._sigint_unhandled = True
+    def _interrupt_handler(self, *_):
+        self._signal_unhandled = True
 
     def setUp(self):
-        """Register the _sigint_handler."""
-        signal.signal(signal.SIGINT, self._sigint_handler)
-        self._sigint_unhandled = False
+        """Register interrupt signal handlers."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            signal.signal(sig, self._interrupt_handler)
+        self._signal_unhandled = False
 
     def test_catching_outside(self):
-        """Test ``CatchSigint`` does not handle sigints outside with-resource environment."""
-        CatchSigint()
-        with CatchSigint():
-            pass
-        kill(os.getpid(), signal.SIGINT)
-        self.assertTrue(self._sigint_unhandled, 'CatchSigint handles SIGINT outside with-resource environment')
+        """Test ``CaughtInterrupts`` does not handle interrupt signals outside with-resource environment."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            # without with-resource
+            CaughtInterrupts()
+            kill(os.getpid(), sig)
+            self.assertTrue(self._signal_unhandled,
+                            'CaughtInterrupts handles signal `{}` outside with-resource environment'.format(sig))
+            self._signal_unhandled = False
+            
+            # with with-resource
+            with CaughtInterrupts():
+                pass
+            kill(os.getpid(), sig)
+            self.assertTrue(self._signal_unhandled,
+                            'CaughtInterrupts handles signal `{}` outside with-resource environment'.format(sig))
+            self._signal_unhandled = False
 
     def test_catching_inside(self):
-        """Test ``CatchSigint`` does handle sigints inside with-resource environment."""
-        with CatchSigint():
-            kill(os.getpid(), signal.SIGINT)
-        self.assertFalse(self._sigint_unhandled, 'SigintHook does not handle SIGINT while training')
-        # double SIGINT cannot be easily tested (it quits(1))
+        """Test ``CaughtInterrupts`` does handle interrupt signals inside with-resource environment."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            with CaughtInterrupts():
+                kill(os.getpid(), sig)
+            self.assertFalse(self._signal_unhandled,
+                             'CaughtInterrupts does not handle signal `{}` inside with-resource environment'.format(sig))
 
     def test_raising(self):
-        """Test ``CatchSigint`` does rise ``TrainingTerminated`` exception."""
-        with CatchSigint() as catch:
-            kill(os.getpid(), signal.SIGINT)
-            with self.assertRaises(TrainingTerminated):
-                catch.raise_check_sigint()
+        """Test ``CaughtInterrupts`` does rise ``TrainingTerminated`` exception."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            with CaughtInterrupts() as catch:
+                kill(os.getpid(), sig)
+                with self.assertRaises(TrainingTerminated):
+                    catch.raise_check_interrupt()
+
+    def test_exit(self):
+        """Test ``CaughtInterrupts`` calls sys.exit after 2nd interrupt signal."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            with CaughtInterrupts():
+                kill(os.getpid(), sig)
+                with self.assertRaises(SystemExit):
+                    kill(os.getpid(), sig)
