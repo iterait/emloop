@@ -66,62 +66,66 @@ class DisabledLogger:
         logging.getLogger(self._name).disabled = self._orig
 
 
-class CatchSigint:
+class CaughtInterrupts:
     """
-    Catch SIGINT signals allowing to stop the training with grace in between ``__enter__`` and ``__exit__``.
+    Catch SIGINT and SIGTERM interrupt signals allowing to stop the training with grace in between
+    ``__enter__`` and ``__exit__``.
 
-    On first sigint raise :py:class:`TrainingTerminated` in :py:meth:`raise_check_sigint`.
-    On second sigint quit immediately with exit code 1.
+    On first signal raise :py:class:`TrainingTerminated` in :py:meth:`raise_check_interrupt`.
+    On second signal call ``sys.exit`` with exit status 1.
 
     .. code-block:: python
         :caption: Usage
 
-        with CatchSigint() as catch:
-            # sigint signals are captured here
+        with CaughtInterrupts() as catch:
+            # interrupt signals are captured here
             # do staff
-            catch.raise_check_sigint()  # raise TrainingTerminated if at least one sigint was caught
+            catch.raise_check_interrupt()  # raise TrainingTerminated if at least one signal was caught
 
     """
 
+    INTERRUPT_SIGNALS = [signal.SIGINT, signal.SIGTERM]
+    """List of interrupt signals being handled by :py:class:`CaughtInterrupts`."""
+
     def __init__(self):
-        """Create new CatchSigint."""
-        self._num_sigints = 0
-        self._original_handler = None
+        """Create new CaughtInterrupts instance."""
+        self._num_signals = 0
+        self._origin_handlers = {}
 
-    def _sigint_handler(self, signum, _) -> None:
+    def _signal_handler(self, *_) -> None:
         """
-        On the first signal, increase the ``self._num_sigints`` counter.
-        Quit on any subsequent signal.
-
-        :param signum: SIGINT signal number
+        On the first signal, increase the ``self._num_signals`` counter.
+        Call ``sys.exit`` on any subsequent signal.
         """
-        if self._num_sigints > 0:  # not the first sigint
+        if self._num_signals > 0:  # not the first signal
             logging.error('Another interrupt signal caught - terminating program immediately')
-            quit(1)
-        else:  # first sigint
+            sys.exit(1)
+        else:  # first signal
             logging.warning('Interrupt signal caught - training will be terminated')
             logging.warning('Another interrupt signal will terminate the program immediately')
-            self._num_sigints += 1
+            self._num_signals += 1
 
-    def raise_check_sigint(self) -> None:
+    def raise_check_interrupt(self) -> None:
         """
-        Stop the training if SIGINT signal was caught.
+        Stop the training if any interrupt signal was caught.
 
-        :raise TrainingTerminated: if a SIGINT signal was caught
+        :raise TrainingTerminated: if an interrupt signal was caught
         """
-        if self._num_sigints > 0:
+        if self._num_signals > 0:
             raise TrainingTerminated('Interrupt signal caught')
 
     def __enter__(self):
-        """Register the SIGINT signal handler."""
-        self._original_handler = signal.getsignal(signal.SIGINT)
-        signal.signal(signal.SIGINT, self._sigint_handler)
-        self._num_sigints = 0
+        """Register the interrupt signal handlers."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            self._origin_handlers[sig] = signal.getsignal(sig)
+            signal.signal(sig, self._signal_handler)
+        self._num_signals = 0
         return self
 
     def __exit__(self, *args) -> None:
-        """Switch to the original signal handler."""
-        signal.signal(signal.SIGINT, self._original_handler)
-
+        """Switch to the original signal handlers."""
+        for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
+            signal.signal(sig, self._origin_handlers[sig])
+        self._origin_handlers = {}
 
 __all__ = []
