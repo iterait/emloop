@@ -97,13 +97,13 @@ class CaughtInterrupts:
         On the first signal, increase the ``self._num_signals`` counter.
         Call ``sys.exit`` on any subsequent signal.
         """
-        if self._num_signals > 0:  # not the first signal
-            logging.error('Another interrupt signal caught - terminating program immediately')
-            sys.exit(1)
-        else:  # first signal
+        if self._num_signals == 0:
             logging.warning('Interrupt signal caught - training will be terminated')
             logging.warning('Another interrupt signal will terminate the program immediately')
             self._num_signals += 1
+        else:
+            logging.error('Another interrupt signal caught - terminating program immediately')
+            sys.exit(2)
 
     def raise_check_interrupt(self) -> None:
         """

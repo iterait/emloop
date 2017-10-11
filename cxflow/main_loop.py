@@ -4,7 +4,6 @@
 The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks.
 Having all that, it manages iterating through streams, training and hooks execution.
 """
-import sys
 import logging
 from typing import Iterable, Callable, List, Dict, Optional
 from collections import OrderedDict
@@ -60,8 +59,24 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
         self._streams = {}
+        self._epochs_done = None
 
         super().__init__()
+
+    @property
+    def epochs_done(self) -> Optional[int]:
+        """Number of training epochs done in the last call of :py:meth:`self._run_training`."""
+        return self._epochs_done
+
+    @property
+    def fixed_epoch_size(self) -> Optional[int]:
+        """Fixed epoch size parameter as specified in :py:meth:`self.__init__`."""
+        return self._fixed_epoch_size
+
+    @property
+    def extra_streams(self) -> List[str]:
+        """List of extra stream names as specified in :py:meth:`self.__init__`."""
+        return self._extra_streams
 
     def _create_epoch_data(self) -> EpochData:
         """Create empty epoch data double dict."""
@@ -215,7 +230,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         def training():
             logging.debug('Training started')
-            epoch_id = 0
+            self._epochs_done = 0
 
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
@@ -223,7 +238,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
-                epoch_id += 1
+                epoch_id = self._epochs_done + 1
                 self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
@@ -241,6 +256,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
                                              extra_streams=self._extra_streams)
+                self._epochs_done = epoch_id
                 logging.info('Epochs done: %s', epoch_id)
 
         self._try_run(training)

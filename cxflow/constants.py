@@ -18,6 +18,9 @@ CXF_CONFIG_FILE = 'config.yaml'
 CXF_LOG_FILE = 'train.log'
 """Log file (dumped in the output directory)."""
 
+CXF_TRACE_FILE = 'trace.yaml'
+"""Training trace filename."""
+
 CXF_TRAIN_STREAM = 'train'
 """Train stream name."""
 
@@ -25,4 +28,4 @@ CXF_PREDICT_STREAM = 'predict'
 """Predict stream name."""
 
 __all__ = ['CXF_LOG_FORMAT', 'CXF_LOG_DATE_FORMAT', 'CXF_FULL_DATE_FORMAT', 'CXF_HOOKS_MODULE', 'CXF_CONFIG_FILE',
-           'CXF_LOG_FILE', 'CXF_TRAIN_STREAM', 'CXF_PREDICT_STREAM']
+           'CXF_LOG_FILE', 'CXF_TRACE_FILE', 'CXF_TRAIN_STREAM', 'CXF_PREDICT_STREAM']

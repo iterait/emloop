@@ -5,5 +5,6 @@ from .profile import Timer
 from .reflection import _EMPTY_DICT, parse_fully_qualified_name, create_object, list_submodules, find_class_module,\
                         get_class_module
 from .names import get_random_name
+from .training_trace import TrainingTrace, TrainingTraceKeys
 
 __all__ = []

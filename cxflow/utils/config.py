@@ -26,7 +26,7 @@ def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     return key, value
 
 
-def load_config(config_file: str, additional_args: typing.Iterable[str]) -> dict:
+def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> dict:
     """
     Load config from YAML ``config_file`` and extend/override it with the given ``additional_args``.
 
