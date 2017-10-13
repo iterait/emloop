@@ -17,7 +17,7 @@ init:
   - ps: "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
 install:
-  - ps: "python.exe -m pip install -r requirements.txt"
+  - ps: "C:\\Python36\\python.exe -m pip install -r requirements.txt"
 
 test_script:
-  - ps: "python.exe setup.py test"
+  - ps: "C:\\Python36\\python.exe setup.py test"
