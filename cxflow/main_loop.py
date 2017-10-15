@@ -235,6 +235,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
                 self._run_zeroth_epoch([CXF_TRAIN_STREAM] + self._extra_streams)
+                logging.info('Zero epoch done\n\n')
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
@@ -249,6 +250,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     with self.get_stream(stream_name) as stream:
                         self.evaluate_stream(stream)
 
+                logging.info('After epoch %s', epoch_id)
+
                 with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:
                         hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
@@ -257,7 +260,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
                                              extra_streams=self._extra_streams)
                 self._epochs_done = epoch_id
-                logging.info('Epochs done: %s', epoch_id)
+                logging.info('Epochs done: %s\n\n', epoch_id)
 
         self._try_run(training)
 

@@ -63,7 +63,6 @@ class LogVariablesTest(CXTestCase):
             LogVariables().after_epoch(_EPOCH_ID, _get_epoch_data())
 
         log_capture.check(
-            ('root', 'INFO', 'After epoch {}'.format(_EPOCH_ID)),
             ('root', 'INFO', '\ttrain accuracy: 1.000000'),
             ('root', 'INFO', '\ttrain loss mean: 1.000000'),
             ('root', 'INFO', '\ttrain loss2:'),
@@ -84,7 +83,6 @@ class LogVariablesTest(CXTestCase):
             LogVariables(['accuracy', 'loss2']).after_epoch(_EPOCH_ID, _get_epoch_data())
 
         log_capture.check(
-            ('root', 'INFO', 'After epoch {}'.format(_EPOCH_ID)),
             ('root', 'INFO', '\ttrain accuracy: 1.000000'),
             ('root', 'INFO', '\ttrain loss2:'),
             ('root', 'INFO', '\t\tmean: 1.000000'),
@@ -111,7 +109,6 @@ class LogVariablesTest(CXTestCase):
         with LogCapture() as log_capture:
             LogVariables(['precision'], on_unknown_type='warn').after_epoch(_EPOCH_ID, _get_epoch_data())
         log_capture.check(
-            ('root', 'INFO', 'After epoch {}'.format(_EPOCH_ID)),
             ('root', 'WARNING', 'Variable type `ndarray` can not be logged. Variable name: `precision`.'),
             ('root', 'WARNING', 'Variable type `ndarray` can not be logged. Variable name: `precision`.')
         )
@@ -124,7 +121,6 @@ class LogVariablesTest(CXTestCase):
         with LogCapture() as log_capture:
             LogVariables(['precision'], on_unknown_type='str').after_epoch(_EPOCH_ID, _get_epoch_data())
         log_capture.check(
-            ('root', 'INFO', 'After epoch {}'.format(_EPOCH_ID)),
             ('root', 'INFO', '\ttrain precision: [ 1.  1.  1.  1.  1.  1.]'),
             ('root', 'INFO', '\ttest precision: [ 2.  2.  2.  2.  2.  2.]')
         )

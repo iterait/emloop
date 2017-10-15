@@ -2,7 +2,6 @@
 Module with standard logging hook.
 """
 import logging
-import sys
 from typing import Iterable
 
 import numpy as np
@@ -104,6 +103,4 @@ class LogVariables(AbstractHook):
         :param epoch_id: number of processed epoch
         :param epoch_data: epoch data to be logged
         """
-        print('\n\n', file=sys.stderr)
-        logging.info('After epoch %s', epoch_id)
         self._log_variables(epoch_data)
