@@ -1,13 +1,11 @@
 """
-Config module provides util functions for loading and dumping yaml configurations.
+Config module providing util functions for handling YAML configurations.
 """
 import typing
-from os import path
 
 import yaml
-import ruamel.yaml  # pylint: disable=import-error
 
-from ..constants import CXF_CONFIG_FILE
+from .yaml import load_yaml
 
 
 def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
@@ -35,8 +33,7 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> d
     :return: configuration as dict
     """
 
-    with open(config_file, 'r') as file:
-        config = ruamel.yaml.load(file, ruamel.yaml.RoundTripLoader)
+    config = load_yaml(config_file)
 
     for key_full, value in [parse_arg(arg) for arg in additional_args]:
         key_split = key_full.split('.')
@@ -49,31 +46,6 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> d
         conf[key] = value
 
     return config
-
-
-def config_to_file(config, output_dir: str, name: str=CXF_CONFIG_FILE) -> str:
-    """
-    Save the given config to the given path in YAML.
-
-    :param config: configuration dict
-    :param output_dir: target output directory
-    :param name: target filename
-    :return: target path
-    """
-    dumped_config_f = path.join(output_dir, name)
-    with open(dumped_config_f, 'w') as file:
-        yaml.dump(config, file, Dumper=ruamel.yaml.RoundTripDumper)
-    return dumped_config_f
-
-
-def config_to_str(config: dict) -> str:
-    """
-    Return the given given config as YAML str.
-
-    :param config: configuration dict
-    :return: given configuration as yaml str
-    """
-    return yaml.dump(config, Dumper=ruamel.yaml.RoundTripDumper)
 
 
 __all__ = []

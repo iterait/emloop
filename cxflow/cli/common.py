@@ -12,7 +12,7 @@ from ..models import AbstractModel
 from ..hooks import AbstractHook
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
 from ..utils.reflection import get_class_module, parse_fully_qualified_name, create_object
-from ..utils.config import config_to_str, config_to_file
+from ..utils.yaml import yaml_to_str, yaml_to_file
 from ..utils import get_random_name
 from ..utils.training_trace import TrainingTrace, TrainingTraceKeys
 from ..main_loop import MainLoop
@@ -77,7 +77,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     dataset_config = {'output_dir': output_dir, **config['dataset']}
     del dataset_config['class']
 
-    dataset = create_object(dataset_module, dataset_class, args=(config_to_str(dataset_config),))
+    dataset = create_object(dataset_module, dataset_class, args=(yaml_to_str(dataset_config),))
     logging.info('\t%s created', type(dataset).__name__)
     return dataset
 
@@ -246,7 +246,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     try:  # save the config to file
         # modify the config so that it contains fallback information
         config['model']['restore_fallback'] = model.restore_fallback
-        config_to_file(config=config, output_dir=output_dir, name=CXF_CONFIG_FILE)
+        yaml_to_file(data=config, output_dir=output_dir, name=CXF_CONFIG_FILE)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Saving config failed', ex)
 

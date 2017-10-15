@@ -1,9 +1,10 @@
 """Module with :py:class:`TrainingTrace` class."""
 from enum import Enum
+from .yaml import yaml_to_file
 from typing import Optional, Any
 from collections import OrderedDict
 
-from .config import config_to_file, load_config
+from .config import load_config
 from ..constants import CXF_TRACE_FILE
 
 
@@ -78,7 +79,7 @@ class TrainingTrace:
         """
         if self._output_dir is None:
             raise ValueError('Can not save TrainingTrace without output dir.')
-        config_to_file(self._trace, self._output_dir, CXF_TRACE_FILE)
+        yaml_to_file(self._trace, self._output_dir, CXF_TRACE_FILE)
 
     @staticmethod
     def from_file(filepath: str):
