@@ -7,10 +7,10 @@ from typing import Mapping, List, Iterable
 
 import numpy as np
 
-from cxflow import AbstractModel, MainLoop, AbstractDataset
-from cxflow.hooks.abstract_hook import AbstractHook
-from cxflow.hooks.stop_after import StopAfter
+import cxflow as cx
+from cxflow.hooks import StopAfter
 from cxflow.utils.profile import Timer
+from cxflow.types import EpochData, Batch, Stream, TimeProfile
 
 from .test_core import CXTestCaseWithDir
 
@@ -25,7 +25,7 @@ _DATASET_SHAPE = (11, 10)
 _EPOCH_DATA_VAR_VALUE = 11
 
 
-class SimpleDataset(AbstractDataset):
+class SimpleDataset(cx.AbstractDataset):
     """Simple dataset with train, valid and test streams."""
 
     def __init__(self):
@@ -37,7 +37,7 @@ class SimpleDataset(AbstractDataset):
         self.source_names = ['input', 'target']
         self._iter = 1
 
-    def stream(self, stream_name: str)-> AbstractDataset.Stream:
+    def stream(self, stream_name: str)-> Stream:
         """Generate a datastream with increasing inputs and constant target."""
         for _ in range(self.iters):
             batch = {'input': self._iter * np.ones(self.shape), 'target': np.zeros(self.shape)}
@@ -45,22 +45,22 @@ class SimpleDataset(AbstractDataset):
             self._iter += 1
             yield batch
 
-    def train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> Stream:
         self.train_used = True
         for batch in self.stream('train'):
             yield batch
 
-    def valid_stream(self) -> AbstractDataset.Stream:
+    def valid_stream(self) -> Stream:
         self.valid_used = True
         for batch in self.stream('valid'):
             yield batch
 
-    def test_stream(self) -> AbstractDataset.Stream:
+    def test_stream(self) -> Stream:
         self.test_used = True
         for batch in self.stream('test'):
             yield batch
 
-    def predict_stream(self) -> AbstractDataset.Stream:
+    def predict_stream(self) -> Stream:
         self.predict_used = True
         for batch in self.stream('predict'):
             yield batch
@@ -69,7 +69,7 @@ class SimpleDataset(AbstractDataset):
 class ExtendedDataset(SimpleDataset):
     """SimpleDataset extension with additional 'unused' source in the train stream."""
 
-    def train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> Stream:
         self.train_used = True
         for _ in range(self.iters):
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape), 'unused': np.zeros(self.shape)}
@@ -78,13 +78,13 @@ class ExtendedDataset(SimpleDataset):
 class DelayedDataset(SimpleDataset):
     """SimpleDataset extension which sleeps briefly before each train batch allowing to measure the data read time."""
 
-    def train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> Stream:
         for _ in range(self.iters):
             time.sleep(_READ_DATA_SLEEP_S)
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape)}
 
 
-class EventRecordingHook(AbstractHook):
+class EventRecordingHook(cx.AbstractHook):
     """EventRecordingHook records all the events and store their count and order."""
 
     def __init__(self, **kwargs):
@@ -100,15 +100,15 @@ class EventRecordingHook(AbstractHook):
         self.before_training_events.append(self._event_id)
         self._event_id += 1
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
+    def after_batch(self, stream_name: str, batch_data: Batch) -> None:
         self.after_batch_events.append(self._event_id)
         self._event_id += 1
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         self.after_epoch_events.append(self._event_id)
         self._event_id += 1
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, extra_streams: Iterable[str]) -> None:
         self.after_epoch_profile_events.append(self._event_id)
         self._event_id += 1
 
@@ -117,7 +117,7 @@ class EventRecordingHook(AbstractHook):
         self._event_id += 1
 
 
-class DataRecordingHook(AbstractHook):
+class DataRecordingHook(cx.AbstractHook):
     """DataRecordingHook records epoch_ids and all the batch_data."""
 
     def __init__(self, **kwargs):
@@ -125,52 +125,52 @@ class DataRecordingHook(AbstractHook):
         self.epoch_ids = []
         self.batch_data = defaultdict(lambda: [])
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
+    def after_batch(self, stream_name: str, batch_data: Batch) -> None:
         self.batch_data[stream_name].append(batch_data)
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         self.epoch_ids.append(epoch_id)
 
 
-class DelayedHook(AbstractHook):
+class DelayedHook(cx.AbstractHook):
     """DelayedHook sleeps briefly in after_batch and after_epoch events allowing to measure hook processing times."""
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
+    def after_batch(self, stream_name: str, batch_data: Batch) -> None:
         time.sleep(_AFTER_BATCH_SLEEP_S)
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         time.sleep(_AFTER_EPOCH_SLEEP_S)
 
 
-class SaveProfileHook(AbstractHook):
+class SaveProfileHook(cx.AbstractHook):
     """SaveProfileHook saves the epoch profile dict to self.profile."""
 
     def __init__(self):
         super().__init__()
         self.profile = None
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, extra_streams: Iterable[str]) -> None:
         """Save the profile to self.profile."""
         self.profile = profile
 
 
-class EpochDataProducer(AbstractHook):
+class EpochDataProducer(cx.AbstractHook):
     """Simple hook that adds my_variable to the train entry in the epoch_data."""
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         epoch_data['train']['my_variable'] = _EPOCH_DATA_VAR_VALUE
 
 
-class EpochDataConsumer(AbstractHook):
+class EpochDataConsumer(cx.AbstractHook):
     """Simple hook that asserts presence of my_variable in the train entry of the epoch_data."""
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         assert 'train' in epoch_data
         assert 'my_variable' in epoch_data['train']
         assert epoch_data['train']['my_variable'] == _EPOCH_DATA_VAR_VALUE
 
 
-class TrainableModel(AbstractModel):
+class TrainableModel(cx.AbstractModel):
     """Simple trainable model"""
     def __init__(self, io: dict, **kwargs):  # pylint: disable=unused-argument
         self._input_names = io['in']
@@ -246,8 +246,8 @@ class MainLoopTest(CXTestCaseWithDir):
             model_class = TrainableModel
         model = model_class(dataset=dataset, log_dir=self.tmpdir,  # pylint: disable=redefined-variable-type
                             io={'in': ['input', 'target'], 'out': ['output']})
-        mainloop = MainLoop(model=model, dataset=dataset, hooks=hooks,
-                            skip_zeroth_epoch=skip_zeroth_epoch, **main_loop_kwargs)
+        mainloop = cx.MainLoop(model=model, dataset=dataset, hooks=hooks,
+                               skip_zeroth_epoch=skip_zeroth_epoch, **main_loop_kwargs)
         return model, dataset, mainloop
 
     def test_events(self):

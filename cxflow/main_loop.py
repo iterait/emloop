@@ -4,7 +4,6 @@
 The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks.
 Having all that, it manages iterating through streams, training and hooks execution.
 """
-import sys
 import logging
 from typing import Iterable, Callable, List, Dict, Optional
 from collections import OrderedDict
@@ -12,21 +11,18 @@ from collections import OrderedDict
 from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
-from .utils.profile import Timer
+from .utils import Timer
+from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
+from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
+from .types import EpochData
 
 
-class MainLoop:   # pylint: disable=too-many-instance-attributes
+class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attributes
     """**cxflow** main loop for training and model inference."""
 
     UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
     """Possible actions to be taken when a stream source is unused by the trained model."""
-
-    TRAIN_STREAM = 'train'
-    """Train stream name."""
-
-    PREDICT_STREAM = 'predict'
-    """Predict stream name."""
 
     def __init__(self,   # pylint: disable=too-many-arguments
                  model: AbstractModel, dataset: AbstractDataset,
@@ -63,11 +59,29 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
         self._streams = {}
+        self._epochs_done = None
 
-    def _create_epoch_data(self) -> AbstractHook.EpochData:
+        super().__init__()
+
+    @property
+    def epochs_done(self) -> Optional[int]:
+        """Number of training epochs done in the last call of :py:meth:`self._run_training`."""
+        return self._epochs_done
+
+    @property
+    def fixed_epoch_size(self) -> Optional[int]:
+        """Fixed epoch size parameter as specified in :py:meth:`self.__init__`."""
+        return self._fixed_epoch_size
+
+    @property
+    def extra_streams(self) -> List[str]:
+        """List of extra stream names as specified in :py:meth:`self.__init__`."""
+        return self._extra_streams
+
+    def _create_epoch_data(self) -> EpochData:
         """Create empty epoch data double dict."""
         return OrderedDict([(stream_name, OrderedDict())
-                            for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams])
+                            for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
         """
@@ -105,6 +119,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         :param stream_name: stream name
         """
         for batch_input in stream:
+            self.raise_check_interrupt()
+
             if self._fixed_batch_size:
                 if len(batch_input[list(batch_input.keys())[0]]) != self._fixed_batch_size:
                     logging.debug('Incomplete batch skipped')
@@ -151,7 +167,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             try:
                 stream_fn = getattr(self._dataset, stream_fn_name)
                 stream_epoch_limit = -1
-                if self._fixed_epoch_size is not None and stream_name == self.TRAIN_STREAM:
+                if self._fixed_epoch_size is not None and stream_name == CXF_TRAIN_STREAM:
                     stream_epoch_limit = self._fixed_epoch_size
                 self._streams[stream_name] = StreamWrapper(stream_fn, buffer_size=self._buffer,
                                                            epoch_size=stream_epoch_limit, name=stream_name,
@@ -195,10 +211,7 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         try:
             run_func()
         except TrainingTerminated as ex:
-            logging.info('Training terminated by a hook: %s', ex)
-        except KeyboardInterrupt:
-            logging.warning('Main loop run terminated by a keyboard interrupt')
-            sys.exit(2)
+            logging.info('Training terminated: %s', ex)
 
         # After training: after_training
         for hook in self._hooks:
@@ -212,29 +225,32 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
         """
-        for stream_name in [MainLoop.TRAIN_STREAM] + self._extra_streams:
+        for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams:
             self.get_stream(stream_name)
 
         def training():
             logging.debug('Training started')
-            epoch_id = 0
+            self._epochs_done = 0
 
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
-                self._run_zeroth_epoch([MainLoop.TRAIN_STREAM] + self._extra_streams)
+                self._run_zeroth_epoch([CXF_TRAIN_STREAM] + self._extra_streams)
+                logging.info('Zero epoch done\n\n')
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
-                epoch_id += 1
+                epoch_id = self._epochs_done + 1
                 self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
-                with self.get_stream(self.TRAIN_STREAM) as stream:
+                with self.get_stream(CXF_TRAIN_STREAM) as stream:
                     self.train_by_stream(stream)
 
                 for stream_name in self._extra_streams:
                     with self.get_stream(stream_name) as stream:
                         self.evaluate_stream(stream)
+
+                logging.info('After epoch %s', epoch_id)
 
                 with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:
@@ -243,7 +259,8 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
                                              extra_streams=self._extra_streams)
-                logging.info('Epochs done: %s', epoch_id)
+                self._epochs_done = epoch_id
+                logging.info('Epochs done: %s\n\n', epoch_id)
 
         self._try_run(training)
 
@@ -251,5 +268,5 @@ class MainLoop:   # pylint: disable=too-many-instance-attributes
         """Run the main loop for in the prediction mode."""
         def prediction():
             logging.debug('Prediction started')
-            self._run_zeroth_epoch([MainLoop.PREDICT_STREAM])
+            self._run_zeroth_epoch([CXF_PREDICT_STREAM])
         self._try_run(prediction)

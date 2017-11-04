@@ -2,7 +2,7 @@ from typing import Callable, Optional, Iterator
 from threading import Thread, Event
 from queue import Queue, Empty
 
-from ..datasets import AbstractDataset
+from ..types import Batch, Stream, TimeProfile
 from ..utils.profile import Timer
 
 
@@ -40,11 +40,11 @@ class StreamWrapper:
     """
 
     def __init__(self,
-                 stream_fn: Callable[[], AbstractDataset.Stream],
+                 stream_fn: Callable[[], Stream],
                  buffer_size: int=0,
                  epoch_size: int=-1,
                  name: Optional[str]=None,
-                 profile: Optional[Timer.TimeProfile]=None):
+                 profile: Optional[TimeProfile]=None):
         """
         Create new StreamWrapper.
 
@@ -117,7 +117,7 @@ class StreamWrapper:
                 self._batch_count = 0
                 return
 
-    def _dequeue_batch(self) -> Optional[AbstractDataset.Batch]:
+    def _dequeue_batch(self) -> Optional[Batch]:
         """
         Return a single batch from queue or ``None`` signaling epoch end.
 
@@ -146,7 +146,7 @@ class StreamWrapper:
                         raise ChildProcessError('Enqueueing thread ended unexpectedly.')
         return batch
 
-    def _next_batch(self) -> Optional[AbstractDataset.Batch]:
+    def _next_batch(self) -> Optional[Batch]:
         """
         Return a single batch or ``None`` signaling epoch end.
 
@@ -200,7 +200,7 @@ class StreamWrapper:
         for batch in queue_content:
             self._queue.put(batch)
 
-    def __enter__(self) -> Iterator[AbstractDataset.Batch]:
+    def __enter__(self) -> Iterator[Batch]:
         """If buffered, start the enqueueing thread."""
         if self._buffer_size > 0:
             self._start_thread()
@@ -211,11 +211,11 @@ class StreamWrapper:
         if self._buffer_size > 0:
             self._stop_thread()
 
-    def __iter__(self) -> Iterator[AbstractDataset.Batch]:
+    def __iter__(self) -> Iterator[Batch]:
         """Get stream iterator."""
         return self
 
-    def __next__(self) -> AbstractDataset.Batch:
+    def __next__(self) -> Batch:
         """
         Return next batch or end epoch with ``StopIteration``.
 

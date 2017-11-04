@@ -1,16 +1,17 @@
 """
-Test module for saver hook (:py:mod:`cxflow.hooks.save_hook`).
+Test module for saver hooks (:py:mod:`cxflow.hooks.save`).
 """
 
 from typing import Mapping, List
 import collections
 
 from cxflow.tests.test_core import CXTestCase
-from cxflow.hooks.save import SaveEvery, SaveBest, AbstractHook
+from cxflow.hooks.save import SaveEvery, SaveBest, SaveLatest
 from cxflow.models.abstract_model import AbstractModel
+from cxflow.types import EpochData
 
 
-def _get_epoch_data(valid_loss_mean_val: float=3) -> AbstractHook.EpochData:
+def _get_epoch_data(valid_loss_mean_val: float=3) -> EpochData:
     """Return testing epoch data."""
 
     epoch_data = collections.OrderedDict([
@@ -144,3 +145,26 @@ class SaveBestTest(CXTestCase):
 
         test_max_min_cond('max', 3, 5, 2)
         test_max_min_cond('min', 5, 3, 3)
+
+
+class SaveLatestTest(CXTestCase):
+    """Test case for :py:class:`cxflow.hooks.SaveLatest` hook."""
+
+    def test_raise_invalid_on_save_failure(self):
+        """
+        Test raising an exception if ``on_save_failure``
+        parameter is not: error/warn/ignore.
+        """
+        with self.assertRaises(AssertionError):
+            SaveLatest(model=EmptyModel(), on_save_failure='unknown')
+
+    def test_save_latest(self):
+        """Test a model saving."""
+
+        hook = SaveLatest(model=EmptyModel())
+
+        with self.assertRaises(IOError):
+            hook.after_epoch()
+
+        with self.assertRaises(IOError):
+            hook.after_epoch()

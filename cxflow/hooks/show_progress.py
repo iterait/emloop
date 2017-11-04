@@ -8,6 +8,7 @@ import time
 
 from . import AbstractHook
 from ..datasets import AbstractDataset
+from ..types import Batch
 
 
 def print_progress_bar(done: int, total: int, prefix: str = '', suffix: str = '') -> None:
@@ -94,7 +95,7 @@ class ShowProgress(AbstractHook):
         self._current_stream_start = None
         self._current_stream_name = None
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
+    def after_batch(self, stream_name: str, batch_data: Batch) -> None:
         """
         Display the progress and ETA for the current stream in the epoch.
         If the stream size (total batch count) is unknown (1st epoch), print only the number of processed batches.

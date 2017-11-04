@@ -4,6 +4,7 @@ Module with a hook that checks if the specified variable reached the expected le
 import numpy as np
 
 from . import AbstractHook, TrainingTerminated
+from ..types import EpochData
 
 
 class Check(AbstractHook):
@@ -39,7 +40,7 @@ class Check(AbstractHook):
         self._required_min_value = required_min_value
         self._max_epoch = max_epoch
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData):
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData):
         """
         Check termination conditions.
 

@@ -5,6 +5,7 @@ from abc import abstractmethod, ABCMeta
 from typing import Iterable, Optional
 
 from ..datasets import AbstractDataset
+from ..types import Batch
 
 
 class AbstractModel(metaclass=ABCMeta):
@@ -42,7 +43,7 @@ class AbstractModel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run(self, batch: AbstractDataset.Batch, train: bool) -> AbstractDataset.Batch:
+    def run(self, batch: Batch, train: bool) -> Batch:
         """
         Run feed-forward pass with the given batch and return the results as dict.
 

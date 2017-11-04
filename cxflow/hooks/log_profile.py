@@ -6,7 +6,7 @@ from itertools import chain
 from typing import Iterable
 
 from . import AbstractHook
-from ..utils.profile import Timer
+from ..types import TimeProfile
 
 
 class LogProfile(AbstractHook):
@@ -24,7 +24,7 @@ class LogProfile(AbstractHook):
 
     """
 
-    def after_epoch_profile(self, epoch_id, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id, profile: TimeProfile, extra_streams: Iterable[str]) -> None:
         """
         Summarize and log the given epoch profile.
 

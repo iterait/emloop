@@ -7,9 +7,10 @@ from cxflow.main_loop import MainLoop
 from cxflow.tests.test_core import CXTestCase
 from cxflow.hooks.stop_after import StopAfter
 from cxflow.hooks.abstract_hook import TrainingTerminated
+from cxflow.constants import CXF_TRAIN_STREAM
 
 NOTRAIN_STREAM_NAME = 'valid'
-assert MainLoop.TRAIN_STREAM is not NOTRAIN_STREAM_NAME
+assert CXF_TRAIN_STREAM is not NOTRAIN_STREAM_NAME
 
 
 class StopAfterTest(CXTestCase):
@@ -38,12 +39,12 @@ class StopAfterTest(CXTestCase):
             hook.after_batch(stream_name=NOTRAIN_STREAM_NAME, batch_data=None)
 
         for i in range(9):
-            hook.after_batch(stream_name=MainLoop.TRAIN_STREAM, batch_data=None)
+            hook.after_batch(stream_name=CXF_TRAIN_STREAM, batch_data=None)
 
         hook.after_batch(stream_name=NOTRAIN_STREAM_NAME, batch_data=None)
 
         # Test hook does terminate the training correctly
-        self.assertRaises(TrainingTerminated, hook.after_batch, stream_name=MainLoop.TRAIN_STREAM, batch_data=None)
+        self.assertRaises(TrainingTerminated, hook.after_batch, stream_name=CXF_TRAIN_STREAM, batch_data=None)
 
     def test_stop_after_minutes(self):
         """Test iterations stopping condition."""

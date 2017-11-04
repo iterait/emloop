@@ -2,12 +2,12 @@
 Module with standard logging hook.
 """
 import logging
-import sys
 from typing import Iterable
 
 import numpy as np
 
 from . import AbstractHook
+from ..types import EpochData
 
 
 class LogVariables(AbstractHook):
@@ -53,7 +53,7 @@ class LogVariables(AbstractHook):
         self._on_unknown_type = on_unknown_type
         super().__init__(**kwargs)
 
-    def _log_variables(self, epoch_data: AbstractHook.EpochData):
+    def _log_variables(self, epoch_data: EpochData):
         """
         Log variables from the epoch data.
 
@@ -95,7 +95,7 @@ class LogVariables(AbstractHook):
                     elif self._on_unknown_type == 'str':
                         logging.info('\t%s %s: %s', stream_name, variable, value)
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         """
         Log the epoch data via :py:mod:`logging` API.
         Additionally, a blank line is printed directly to stderr to delimit the outputs from other epochs.
@@ -103,6 +103,4 @@ class LogVariables(AbstractHook):
         :param epoch_id: number of processed epoch
         :param epoch_data: epoch data to be logged
         """
-        print('\n\n', file=sys.stderr)
-        logging.info('After epoch %s', epoch_id)
         self._log_variables(epoch_data)
