@@ -17,6 +17,9 @@ Variables
 - :py:data:`CXF_HOOKS_MODULE`
 - :py:data:`CXF_CONFIG_FILE`
 - :py:data:`CXF_LOG_FILE`
+- :py:data:`CXF_TRACE_FILE`
+- :py:data:`CXF_TRAIN_STREAM`
+- :py:data:`CXF_PREDICT_STREAM`
 
 .. autodata:: CXF_LOG_FORMAT
    :annotation:
@@ -59,3 +62,24 @@ Variables
    .. code-block:: guess
 
       'train.log'
+
+.. autodata:: CXF_TRACE_FILE
+   :annotation:
+
+   .. code-block:: guess
+
+      'trace.yaml'
+
+.. autodata:: CXF_TRAIN_STREAM
+   :annotation:
+
+   .. code-block:: guess
+
+      'train'
+
+.. autodata:: CXF_PREDICT_STREAM
+   :annotation:
+
+   .. code-block:: guess
+
+      'predict'

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.log_variables &#8212; cxflow 0.10.0 documentation</title>
+    <title>cxflow.hooks.log_variables &#8212; cxflow 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -111,12 +111,12 @@
 <span class="sd">Module with standard logging hook.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">EpochData</span>
 
 
 <div class="viewcode-block" id="LogVariables"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables">[docs]</a><span class="k">class</span> <span class="nc">LogVariables</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
@@ -162,7 +162,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_unknown_type</span> <span class="o">=</span> <span class="n">on_unknown_type</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LogVariables._log_variables"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables._log_variables">[docs]</a>    <span class="k">def</span> <span class="nf">_log_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">):</span>
+<div class="viewcode-block" id="LogVariables._log_variables"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables._log_variables">[docs]</a>    <span class="k">def</span> <span class="nf">_log_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log variables from the epoch data.</span>
 
@@ -204,7 +204,7 @@
                     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_unknown_type</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LogVariables.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="LogVariables.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log the epoch data via :py:mod:`logging` API.</span>
 <span class="sd">        Additionally, a blank line is printed directly to stderr to delimit the outputs from other epochs.</span>
@@ -212,8 +212,6 @@
 <span class="sd">        :param epoch_id: number of processed epoch</span>
 <span class="sd">        :param epoch_data: epoch data to be logged</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;After epoch </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_variables</span><span class="p">(</span><span class="n">epoch_data</span><span class="p">)</span></div></div>
 </pre></div>
 
@@ -221,6 +219,7 @@
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -229,9 +228,20 @@
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
   </body>
 </html>

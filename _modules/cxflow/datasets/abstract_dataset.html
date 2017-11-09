@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets.abstract_dataset &#8212; cxflow 0.10.0 documentation</title>
+    <title>cxflow.datasets.abstract_dataset &#8212; cxflow 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -108,14 +108,9 @@
       
   <h1>Source code for cxflow.datasets.abstract_dataset</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains AbstractDataset concept.</span>
+<span class="sd">Module with AbstractDataset concept.</span>
 
-<span class="sd">At the moment it is for typing only.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Any</span>
-
-
 <span class="k">class</span> <span class="nc">AbstractDataset</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This concept prescribes the API that is required from every **cxflow** dataset.</span>
@@ -126,12 +121,6 @@
 
 <span class="sd">    All the defined stream methods should return a :py:attr:`Stream`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">Batch</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
-    <span class="sd">&quot;&quot;&quot;Batch type: :py:class:`typing.Mapping` of ``variable_name`` to an :py:class:`typing.Iterable` of examples.&quot;&quot;&quot;</span>
-
-    <span class="n">Stream</span> <span class="o">=</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Batch</span><span class="p">]</span>
-    <span class="sd">&quot;&quot;&quot;Stream type: :py:class:`typing.Iterable` of :py:attr:`Batch` es.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractDataset.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -148,6 +137,7 @@
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -156,9 +146,20 @@
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
   </body>
 </html>

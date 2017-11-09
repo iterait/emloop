@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.stop_after &#8212; cxflow 0.10.0 documentation</title>
+    <title>cxflow.hooks.stop_after &#8212; cxflow 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -115,8 +115,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
-<span class="kn">from</span> <span class="nn">..main_loop</span> <span class="k">import</span> <span class="n">MainLoop</span>
-<span class="kn">from</span> <span class="nn">..datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="k">import</span> <span class="n">CXF_TRAIN_STREAM</span>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">EpochData</span><span class="p">,</span> <span class="n">Batch</span>
 
 
 <div class="viewcode-block" id="StopAfter"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter">[docs]</a><span class="k">class</span> <span class="nc">StopAfter</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
@@ -190,9 +190,9 @@
         <span class="sd">&quot;&quot;&quot;Start measuring the train time.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_training_start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StopAfter.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="StopAfter.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If ``stream_name`` equals to :py:attr:`cxflow.MainLoop.TRAIN_STREAM`,</span>
+<span class="sd">        If ``stream_name`` equals to :py:attr:`cxflow.constants.TRAIN_STREAM`,</span>
 <span class="sd">        increase the iterations counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.</span>
 
 <span class="sd">        :param stream_name: stream name</span>
@@ -200,12 +200,12 @@
 <span class="sd">        :raise TrainingTerminated: if the number of iterations reaches ``self._iters``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_train_time</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stream_name</span> <span class="o">==</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">TRAIN_STREAM</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stream_name</span> <span class="o">==</span> <span class="n">CXF_TRAIN_STREAM</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iters</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Training terminated after iteration </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iters_done</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StopAfter.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="StopAfter.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stop the training if the ``epoch_id`` reaches ``self._epochs``; additionally, call :py:meth:`_check_train_time`.</span>
 
@@ -223,6 +223,7 @@
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -231,9 +232,20 @@
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
   </body>
 </html>

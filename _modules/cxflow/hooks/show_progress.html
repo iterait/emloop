@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.show_progress &#8212; cxflow 0.10.0 documentation</title>
+    <title>cxflow.hooks.show_progress &#8212; cxflow 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -117,6 +117,7 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
 <span class="kn">from</span> <span class="nn">..datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">Batch</span>
 
 
 <span class="k">def</span> <span class="nf">print_progress_bar</span><span class="p">(</span><span class="n">done</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -203,7 +204,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_stream_start</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_stream_name</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ShowProgress.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ShowProgress.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ShowProgress.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ShowProgress.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Display the progress and ETA for the current stream in the epoch.</span>
 <span class="sd">        If the stream size (total batch count) is unknown (1st epoch), print only the number of processed batches.</span>
@@ -256,6 +257,7 @@
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -264,9 +266,20 @@
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
   </body>
 </html>

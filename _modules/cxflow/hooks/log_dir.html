@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets.base_dataset &#8212; cxflow 0.10.1 documentation</title>
+    <title>cxflow.hooks.log_dir &#8212; cxflow 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -106,54 +106,49 @@
       </div>
     <div class="col-md-9 content">
       
-  <h1>Source code for cxflow.datasets.base_dataset</h1><div class="highlight"><pre>
+  <h1>Source code for cxflow.hooks.log_dir</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module contains :py:class:`cxflow.datasets.BaseDataset` which might be used as a base class for your</span>
-<span class="sd">dataset implemented in Python.</span>
+<span class="sd">Module with simple hook logging the output dir at various occasions just for convenience.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABCMeta</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span>
-
-<span class="kn">import</span> <span class="nn">yaml</span>
-
-<span class="kn">from</span> <span class="nn">.abstract_dataset</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 
-<span class="k">class</span> <span class="nc">BaseDataset</span><span class="p">(</span><span class="n">AbstractDataset</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+
+
+<div class="viewcode-block" id="LogDir"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir">[docs]</a><span class="k">class</span> <span class="nc">LogDir</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for datasets written in python.</span>
+<span class="sd">    Log the output dir before training, after each epoch and after training.</span>
 
-<span class="sd">    In the inherited class, one should:</span>
-<span class="sd">        - override the ``_configure_dataset``</span>
-<span class="sd">        - (optional) implement ``train_stream`` method if intended to be used with ``cxflow train ...``</span>
-<span class="sd">        - (optional) implement ``predict_stream`` method if intended to be used with ``cxflow predict ...``</span>
-<span class="sd">        - (optional) implement ``&lt;stream_name&gt;_stream`` method in order to make ``&lt;stream_name&gt;`` stream available</span>
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: log the training dir</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - LogDir</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BaseDataset.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="LogDir.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create new dataset.</span>
+<span class="sd">        Create new LogDir hook.</span>
 
-<span class="sd">        Decode the given YAML config string and pass the obtained ``**kwargs`` to :py:meth:`_configure_dataset`.</span>
-
-<span class="sd">        :param config_str: dataset configuration as YAML string</span>
+<span class="sd">        :param output_dir: training output directory</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_str</span><span class="p">)</span>
 
-        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_str</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_configure_dataset</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="BaseDataset._configure_dataset"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset._configure_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Configure the dataset with ``**kwargs`` decoded from YAML configuration.</span>
+<div class="viewcode-block" id="LogDir.before_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Log the output directory.&quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div>
 
-<span class="sd">        :param output_dir: output directory for logging and any additional outputs (None if no output dir is available)</span>
-<span class="sd">        :param kwargs: dataset configuration as ``**kwargs`` parsed from ``config[&#39;dataset&#39;]``</span>
-<span class="sd">        :raise NotImplementedError: if not overridden</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="LogDir.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Log the output directory.&quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogDir.after_training"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.LogDir.after_training">[docs]</a>    <span class="k">def</span> <span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Log the output directory.&quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div></div>
 </pre></div>
 
     </div>

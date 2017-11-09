@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.compute_stats &#8212; cxflow 0.10.0 documentation</title>
+    <title>cxflow.hooks.compute_stats &#8212; cxflow 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -115,7 +115,8 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">AccumulateVariables</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AccumulateVariables</span>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">EpochData</span>
 
 
 <div class="viewcode-block" id="ComputeStats"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats">[docs]</a><span class="k">class</span> <span class="nc">ComputeStats</span><span class="p">(</span><span class="n">AccumulateVariables</span><span class="p">):</span>
@@ -197,7 +198,7 @@
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">)(</span><span class="n">data</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ComputeStats._save_stats"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._save_stats">[docs]</a>    <span class="k">def</span> <span class="nf">_save_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ComputeStats._save_stats"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats._save_stats">[docs]</a>    <span class="k">def</span> <span class="nf">_save_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extend ``epoch_data`` by stream:variable:aggreagation data.</span>
 
@@ -211,7 +212,7 @@
                     <span class="p">{</span><span class="n">aggr</span><span class="p">:</span> <span class="n">ComputeStats</span><span class="o">.</span><span class="n">_compute_aggregation</span><span class="p">(</span><span class="n">aggr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_accumulator</span><span class="p">[</span><span class="n">stream_name</span><span class="p">][</span><span class="n">variable</span><span class="p">])</span>
                      <span class="k">for</span> <span class="n">aggr</span> <span class="ow">in</span> <span class="n">aggregations</span><span class="p">})</span></div>
 
-<div class="viewcode-block" id="ComputeStats.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">AbstractHook</span><span class="o">.</span><span class="n">EpochData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ComputeStats.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.ComputeStats.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the specified aggregations and save them to the given epoch data.</span>
 
@@ -225,6 +226,7 @@
       
   </div>
 </div>
+
 <footer class="footer">
   <div class="container">
     <p class="pull-right">
@@ -233,9 +235,20 @@
     </p>
     <p>
         &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
   </body>
 </html>

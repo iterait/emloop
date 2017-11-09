@@ -29,14 +29,17 @@ Classes
 - :py:class:`LogProfile`:
   Summarize and log epoch profile via standard :py:mod:`logging`.
 
+- :py:class:`LogDir`:
+  Log the output dir before training, after each epoch and after training.
+
 - :py:class:`SaveEvery`:
   Save the model every ``n_epochs`` epoch.
 
 - :py:class:`SaveBest`:
   Maintain the best performing model given the specified criteria.
 
-- :py:class:`CatchSigint`:
-  Catch SIGINT signals allowing to stop the training with grace.
+- :py:class:`SaveLatest`:
+  Save the latest model.
 
 - :py:class:`ComputeStats`:
   Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
@@ -142,6 +145,20 @@ Classes
 
 
 
+.. autoclass:: LogDir
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: LogDir
+      :parts: 1
+
+   |
+
+
+
 .. autoclass:: SaveEvery
    :show-inheritance:
    :members:
@@ -170,14 +187,14 @@ Classes
 
 
 
-.. autoclass:: CatchSigint
+.. autoclass:: SaveLatest
    :show-inheritance:
    :members:
    :private-members:
    :special-members:
    :exclude-members: __weakref__
 
-   .. inheritance-diagram:: CatchSigint
+   .. inheritance-diagram:: SaveLatest
       :parts: 1
 
    |
