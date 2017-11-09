@@ -6,6 +6,7 @@ import numpy as np
 from abc import abstractmethod, ABCMeta
 
 from . import AbstractHook, ComputeStats
+from ..types import EpochData
 
 
 
@@ -60,7 +61,7 @@ class OnPlateau(ComputeStats, metaclass=ABCMeta):
         Abstract method which is called when the observed variable reaches its plateau.
         """
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         """
         Call :py:meth:`_on_plateau_action` if the ``long_term``
         variable mean is lower/greater than the ``short_term`` mean.

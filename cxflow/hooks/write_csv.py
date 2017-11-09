@@ -9,6 +9,7 @@ from typing import Iterable, Optional
 import numpy as np
 
 from . import AbstractHook
+from ..types import EpochData
 
 
 class WriteCSV(AbstractHook):
@@ -73,7 +74,7 @@ class WriteCSV(AbstractHook):
         self._file_path = path.join(output_dir, output_file)
         logging.debug('CSV output file "%s"', self._file_path)
 
-    def _write_header(self, epoch_data: AbstractHook.EpochData) -> None:
+    def _write_header(self, epoch_data: EpochData) -> None:
         """
         Write CSV header row with column names.
 
@@ -92,7 +93,7 @@ class WriteCSV(AbstractHook):
             file.write(self._delimiter.join(header) + '\n')
         self._header_written = True
 
-    def _write_row(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def _write_row(self, epoch_id: int, epoch_data: EpochData) -> None:
         """
         Write a single epoch result row to the CSV file.
 
@@ -136,7 +137,7 @@ class WriteCSV(AbstractHook):
             row = self._delimiter.join([str(value) for value in values])
             file.write(row + '\n')
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         """
         Write a new row to the CSV file with the given epoch data.
 

@@ -6,8 +6,8 @@ from datetime import datetime
 from typing import Optional
 
 from . import AbstractHook, TrainingTerminated
-from ..main_loop import MainLoop
-from ..datasets import AbstractDataset
+from ..constants import CXF_TRAIN_STREAM
+from ..types import EpochData, Batch
 
 
 class StopAfter(AbstractHook):
@@ -81,9 +81,9 @@ class StopAfter(AbstractHook):
         """Start measuring the train time."""
         self._training_start = datetime.now()
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
+    def after_batch(self, stream_name: str, batch_data: Batch) -> None:
         """
-        If ``stream_name`` equals to :py:attr:`cxflow.MainLoop.TRAIN_STREAM`,
+        If ``stream_name`` equals to :py:attr:`cxflow.constants.TRAIN_STREAM`,
         increase the iterations counter and possibly stop the training; additionally, call :py:meth:`_check_train_time`.
 
         :param stream_name: stream name
@@ -91,12 +91,12 @@ class StopAfter(AbstractHook):
         :raise TrainingTerminated: if the number of iterations reaches ``self._iters``
         """
         self._check_train_time()
-        if self._iters is not None and stream_name == MainLoop.TRAIN_STREAM:
+        if self._iters is not None and stream_name == CXF_TRAIN_STREAM:
             self._iters_done += 1
             if self._iters_done >= self._iters:
                 raise TrainingTerminated('Training terminated after iteration {}'.format(self._iters_done))
 
-    def after_epoch(self, epoch_id: int, epoch_data: AbstractHook.EpochData) -> None:
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         """
         Stop the training if the ``epoch_id`` reaches ``self._epochs``; additionally, call :py:meth:`_check_train_time`.
 

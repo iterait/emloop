@@ -6,7 +6,8 @@ from typing import Iterable, Any
 
 import numpy as np
 
-from . import AbstractHook, AccumulateVariables
+from . import AccumulateVariables
+from ..types import EpochData
 
 
 class ComputeStats(AccumulateVariables):
@@ -88,7 +89,7 @@ class ComputeStats(AccumulateVariables):
             return int(np.sum(np.isnan(data)))
         return getattr(np, aggregation)(data)
 
-    def _save_stats(self, epoch_data: AbstractHook.EpochData) -> None:
+    def _save_stats(self, epoch_data: EpochData) -> None:
         """
         Extend ``epoch_data`` by stream:variable:aggreagation data.
 
@@ -102,7 +103,7 @@ class ComputeStats(AccumulateVariables):
                     {aggr: ComputeStats._compute_aggregation(aggr, self._accumulator[stream_name][variable])
                      for aggr in aggregations})
 
-    def after_epoch(self, epoch_data: AbstractHook.EpochData, **kwargs) -> None:
+    def after_epoch(self, epoch_data: EpochData, **kwargs) -> None:
         """
         Compute the specified aggregations and save them to the given epoch data.
 

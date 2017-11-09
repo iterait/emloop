@@ -22,6 +22,8 @@ version = '.'.join(pkg_resources.get_distribution("cxflow").version.split('.')[:
 # The full version, including alpha/beta/rc tags.
 release = pkg_resources.get_distribution("cxflow").version
 
+html_context.update(analytics_id="UA-108491604-2")
+
 html_theme_options.update({
     # Navigation bar title. (Default: ``project`` value)
     'navbar_title': "cxflow",

@@ -5,10 +5,8 @@ Furthermore, TrainingTerminated exception is defined.
 """
 import logging
 import inspect
-from typing import Iterable, Mapping
-
-from ..datasets import AbstractDataset
-from ..utils.profile import Timer
+from typing import Iterable
+from ..types import EpochData, Batch, TimeProfile
 
 
 class TrainingTerminated(Exception):
@@ -41,9 +39,6 @@ class AbstractHook:
     """Arguments which **cxflow** pass, in addition to the config args, to ``__init__``
     methods of every hook being created."""
 
-    EpochData = Mapping[str, AbstractDataset.Batch]
-    """Epoch data type."""
-
     def __init__(self, **kwargs):
         """
         Check and warn if there is any argument created by the user yet not recognized in the child hook ``__init__``
@@ -67,7 +62,7 @@ class AbstractHook:
         """
         pass
 
-    def after_batch(self, stream_name: str, batch_data: AbstractDataset.Batch) -> None:
+    def after_batch(self, stream_name: str, batch_data: Batch) -> None:
         """
         After batch event.
 
@@ -91,7 +86,7 @@ class AbstractHook:
         """
         pass
 
-    def after_epoch_profile(self, epoch_id: int, profile: Timer.TimeProfile, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, extra_streams: Iterable[str]) -> None:
         """
         After epoch profile event.
 

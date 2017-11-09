@@ -4,11 +4,8 @@ Test module for config utils functions (cxflow.utils.config).
 from os import path
 from collections import OrderedDict
 
-import yaml
-
 from cxflow.tests.test_core import CXTestCase, CXTestCaseWithDir
-from cxflow.utils.config import parse_arg, load_config, config_to_file, config_to_str
-from cxflow.constants import CXF_CONFIG_FILE
+from cxflow.utils.config import parse_arg, load_config
 
 
 class ConfigTestParseArg(CXTestCase):
@@ -83,7 +80,7 @@ e:
 
 
 class ConfigTest(CXTestCaseWithDir):
-    """Test case for load_config, config_to_file and config_to_str functions."""
+    """Test case for load_config, yaml_to_file and yaml_to_str functions."""
 
     def test_load_anchorless_config(self):
         """Test loading of a config without yaml anchors."""
@@ -115,23 +112,3 @@ class ConfigTest(CXTestCaseWithDir):
         self.assertDictEqual(load_config(f_name, ['e.b=19'])['a'], {'b': 'c', 'd': 11})
         self.assertEqual(OrderedDict(load_config(f_name, ['e.b=19'])['e']),
                          OrderedDict([('f', 'f'), ('h', ['j', 'k']), ('b', 19), ('d', 11)]))
-
-    def test_dump_config(self):
-        """Test config_to_file and config_to_str function."""
-
-        config = {'e': {'f': 'f', 'h': ['j', 'k']}}
-
-        # test if the return path is correct and re-loading does not change the config
-        config_path = config_to_file(config, output_dir=self.tmpdir, name=CXF_CONFIG_FILE)
-        self.assertTrue(path.exists(config_path))
-        self.assertDictEqual(load_config(config_path, []), config)
-
-        # test custom naming
-        dump_name = 'my-conf.yaml'
-        config_path = config_to_file(config, output_dir=self.tmpdir, name=dump_name)
-        self.assertEqual(path.join(self.tmpdir, dump_name), config_path)
-        self.assertTrue(path.exists(config_path))
-
-        # test dump to string (effectively, test pyaml)
-        yaml_str = config_to_str(config)
-        self.assertDictEqual(yaml.load(yaml_str), config)

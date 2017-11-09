@@ -1,5 +1,5 @@
-from cxflow import AbstractDataset
 from cxflow.datasets.stream_wrapper import StreamWrapper
+from cxflow.types import Stream
 
 from ..test_core import CXTestCase
 from ..main_loop_test import SimpleDataset, _DATASET_ITERS
@@ -8,7 +8,7 @@ from ..main_loop_test import SimpleDataset, _DATASET_ITERS
 class FailingDataset(SimpleDataset):
     """SimpleDataset extension which raises exception after first train batch."""
 
-    def train_stream(self) -> AbstractDataset.Stream:
+    def train_stream(self) -> Stream:
         for batch in super().train_stream():
             yield batch
             raise RuntimeError('Explosion.')
