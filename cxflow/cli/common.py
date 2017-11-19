@@ -277,7 +277,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
             with main_loop:
                 logging.info('Running the training')
                 trace[TrainingTraceKeys.TRAIN_BEGIN] = datetime.now()
-                main_loop.run_training()
+                main_loop.run_training(trace)
                 trace[TrainingTraceKeys.EXIT_STATUS] = 0
         except Exception as ex:  # pylint: disable=broad-except
             trace[TrainingTraceKeys.EXIT_STATUS] = 1

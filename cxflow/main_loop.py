@@ -11,7 +11,7 @@ from collections import OrderedDict
 from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
-from .utils import Timer
+from .utils import Timer, TrainingTrace, TrainingTraceKeys
 from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
 from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
@@ -217,7 +217,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         for hook in self._hooks:
             hook.after_training()
 
-    def run_training(self) -> None:
+    def run_training(self, trace: Optional[TrainingTrace]=None) -> None:
         """
         Run the main loop in the training mode.
 
@@ -260,6 +260,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
                                              extra_streams=self._extra_streams)
                 self._epochs_done = epoch_id
+                if trace is not None:
+                    trace[TrainingTraceKeys.EPOCHS_DONE] = self._epochs_done
                 logging.info('Epochs done: %s\n\n', epoch_id)
 
         self._try_run(training)
