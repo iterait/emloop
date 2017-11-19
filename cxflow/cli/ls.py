@@ -105,7 +105,7 @@ def _print_trainings_long(trainings: Iterable[Tuple[str, dict, TrainingTrace]]) 
             age = CXF_NA_STR
             duration = CXF_NA_STR
 
-        epochs_done = trace[TrainingTraceKeys.EPOCHS_DONE]+1 if trace[TrainingTraceKeys.EPOCHS_DONE] else 0
+        epochs_done = trace[TrainingTraceKeys.EPOCHS_DONE] if trace[TrainingTraceKeys.EPOCHS_DONE] else 0
 
         long_table.append([path.basename(train_dir), get_model_name(config)] +
                           list(get_classes(config)) +
