@@ -71,7 +71,7 @@ def walk_train_dirs(root_dir: str) -> Iterable[Tuple[str, Iterable[str]]]:
         yield dir_, train_subdirs
 
 
-def get_classes(config: dict):
+def get_classes(config: dict) -> Tuple[str, str]:
     """
     Return human readable model and dataset classes from the given config.
 
@@ -79,6 +79,11 @@ def get_classes(config: dict):
     :return: a tuple of (model.class, dataset.class)
     """
     return config['model']['class'], config['dataset']['class']
+
+
+def get_model_name(config: dict) -> str:
+    """Return model name or `Unnamed`."""
+    return config['model']['name'] if 'model' in config and 'name' in config['model'] else 'Unnamed'
 
 
 def _print_trainings_long(trainings: Iterable[Tuple[str, dict, TrainingTrace]]) -> None:
@@ -102,7 +107,7 @@ def _print_trainings_long(trainings: Iterable[Tuple[str, dict, TrainingTrace]]) 
 
         epochs_done = trace[TrainingTraceKeys.EPOCHS_DONE]+1 if trace[TrainingTraceKeys.EPOCHS_DONE] else 0
 
-        long_table.append([path.basename(train_dir), config['model']['name']] +
+        long_table.append([path.basename(train_dir), get_model_name(config)] +
                           list(get_classes(config)) +
                           [age, duration, epochs_done])
 
@@ -159,7 +164,7 @@ def _ls_print_summary(all_trainings: List[Tuple[str, dict, TrainingTrace]]) -> N
     counts_by_name = defaultdict(int)
     counts_by_classes = defaultdict(int)
     for _, config, _ in all_trainings:
-        counts_by_name[config['model']['name']] += 1
+        counts_by_name[get_model_name(config)] += 1
         counts_by_classes[get_classes(config)] += 1
 
     print_boxed('summary')
