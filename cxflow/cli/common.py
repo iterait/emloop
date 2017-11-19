@@ -18,7 +18,7 @@ from ..utils.training_trace import TrainingTrace, TrainingTraceKeys
 from ..main_loop import MainLoop
 
 
-def create_output_dir(config: dict, output_root: str, default_model_name: str='NonameModel') -> str:
+def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed') -> str:
     """
     Create output_dir under the given ``output_root`` and
         - dump the given config to YAML file under this dir
@@ -42,9 +42,9 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='N
         logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
         os.makedirs(output_root)
 
-    output_dir = tempfile.mkdtemp(prefix='{}_{}_{}_'.format(model_name, datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
-                                                            get_random_name()),
-                                  dir=output_root)
+    output_dir = path.join(output_root, '{}_{}_{}'.format(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'),
+                                                          model_name, get_random_name()))
+    os.makedirs(output_dir)
     logging.info('\tOutput dir: %s', output_dir)
 
     # create file logger
