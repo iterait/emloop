@@ -60,3 +60,9 @@ cxflow dataset
    :prog: cxflow
    :path: dataset
 
+cxflow ls
+--------------
+.. argparse::
+   :ref: cxflow.cli.get_cxflow_arg_parser
+   :prog: cxflow
+   :path: ls
