@@ -181,7 +181,7 @@ def _ls_print_summary(all_trainings: List[Tuple[str, dict, TrainingTrace]]) -> N
 
 def _ls_print_verbose(training: Tuple[str, dict, str]) -> None:
     """
-    Print config and artifacts info from the given training tuple (train_dir, configuration dict, trace)
+    Print config and artifacts info from the given training tuple (train_dir, configuration dict, trace).
 
     :param training: training tuple (train_dir, configuration dict, trace)
     """
@@ -203,7 +203,7 @@ def _ls_print_verbose(training: Tuple[str, dict, str]) -> None:
 def list_train_dirs(dir_: str, recursive: bool, all_: bool, long: bool, verbose: bool) -> None:
     """
     List training dirs contained in the given dir with options and outputs similar to the regular `ls` command.
-    The function is accessible through cxflow_cls CLI `cxflow_cls ls`.
+    The function is accessible through cxflow CLI `cxflow ls`.
 
     :param dir_: dir to be listed
     :param recursive: walk recursively in sub-directories, stop at train dirs (--recursive option)
