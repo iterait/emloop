@@ -122,3 +122,17 @@ workflows:
             - test_ubuntu_rolling
             - test_archlinux
             - generate_documentation
+
+  nightly-build:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+                - dev
+    jobs:
+      - test_ubuntu_latest
+      - test_ubuntu_rolling
+      - test_archlinux
