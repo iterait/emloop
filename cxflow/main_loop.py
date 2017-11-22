@@ -11,7 +11,7 @@ from collections import OrderedDict
 from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
-from .utils import Timer
+from .utils import Timer, TrainingTrace, TrainingTraceKeys
 from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
 from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
@@ -217,7 +217,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         for hook in self._hooks:
             hook.after_training()
 
-    def run_training(self) -> None:
+    def run_training(self, trace: Optional[TrainingTrace]=None) -> None:
         """
         Run the main loop in the training mode.
 
@@ -234,12 +234,14 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
+                logging.info('Evaluating 0th epoch')
                 self._run_zeroth_epoch([CXF_TRAIN_STREAM] + self._extra_streams)
-                logging.info('Zero epoch done\n\n')
+                logging.info('0th epoch done\n\n')
 
             # Training loop: after_epoch, after_epoch_profile
             while True:
                 epoch_id = self._epochs_done + 1
+                logging.info('Training epoch %s', epoch_id)
                 self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
@@ -250,8 +252,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     with self.get_stream(stream_name) as stream:
                         self.evaluate_stream(stream)
 
-                logging.info('After epoch %s', epoch_id)
-
                 with Timer('after_epoch_hooks', self._epoch_profile):
                     for hook in self._hooks:
                         hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
@@ -260,13 +260,16 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
                                              extra_streams=self._extra_streams)
                 self._epochs_done = epoch_id
-                logging.info('Epochs done: %s\n\n', epoch_id)
+                if trace is not None:
+                    trace[TrainingTraceKeys.EPOCHS_DONE] = self._epochs_done
+                logging.info('Epoch %s done\n\n', epoch_id)
 
         self._try_run(training)
 
     def run_prediction(self) -> None:
         """Run the main loop for in the prediction mode."""
         def prediction():
-            logging.debug('Prediction started')
+            logging.info('Running prediction')
             self._run_zeroth_epoch([CXF_PREDICT_STREAM])
+            logging.info('Prediction done\n\n')
         self._try_run(prediction)

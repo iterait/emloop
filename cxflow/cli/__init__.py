@@ -1,3 +1,4 @@
+from .ls import list_train_dirs
 from .train import train
 from .resume import resume
 from .grid_search import grid_search, _build_grid_search_commands

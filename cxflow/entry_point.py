@@ -16,7 +16,8 @@ import logging
 import os
 import sys
 
-from cxflow.cli import train, resume, predict, grid_search, get_cxflow_arg_parser, invoke_dataset_method
+from cxflow.cli import train, resume, predict, grid_search, get_cxflow_arg_parser, invoke_dataset_method, \
+    list_train_dirs
 from .constants import CXF_LOG_FORMAT, CXF_LOG_DATE_FORMAT
 
 
@@ -63,6 +64,9 @@ def entry_point() -> None:
 
     elif known_args.subcommand == 'gridsearch':
         grid_search(script=known_args.script, params=known_args.params, dry_run=known_args.dry_run)
+
+    elif known_args.subcommand == 'ls':
+        list_train_dirs(known_args.dir, known_args.recursive, known_args.all, known_args.long, known_args.verbose)
 
 
 if __name__ == '__main__':
