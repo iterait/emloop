@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.main_loop &#8212; cxflow 0.10.1 documentation</title>
+    <title>cxflow.main_loop &#8212; cxflow 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -120,7 +120,7 @@
 <span class="kn">from</span> <span class="nn">.datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
 <span class="kn">from</span> <span class="nn">.models.abstract_model</span> <span class="k">import</span> <span class="n">AbstractModel</span>
 <span class="kn">from</span> <span class="nn">.hooks.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">Timer</span><span class="p">,</span> <span class="n">TrainingTrace</span><span class="p">,</span> <span class="n">TrainingTraceKeys</span>
 <span class="kn">from</span> <span class="nn">.utils.misc</span> <span class="k">import</span> <span class="n">CaughtInterrupts</span>
 <span class="kn">from</span> <span class="nn">.datasets.stream_wrapper</span> <span class="k">import</span> <span class="n">StreamWrapper</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="k">import</span> <span class="n">CXF_TRAIN_STREAM</span><span class="p">,</span> <span class="n">CXF_PREDICT_STREAM</span>
@@ -326,7 +326,7 @@
         <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
             <span class="n">hook</span><span class="o">.</span><span class="n">after_training</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MainLoop.run_training"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.run_training">[docs]</a>    <span class="k">def</span> <span class="nf">run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MainLoop.run_training"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.run_training">[docs]</a>    <span class="k">def</span> <span class="nf">run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrainingTrace</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run the main loop in the training mode.</span>
 
@@ -343,12 +343,14 @@
 
             <span class="c1"># Zeroth epoch: after_epoch</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip_zeroth_epoch</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Evaluating 0th epoch&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_run_zeroth_epoch</span><span class="p">([</span><span class="n">CXF_TRAIN_STREAM</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">)</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Zero epoch done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;0th epoch done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
             <span class="c1"># Training loop: after_epoch, after_epoch_profile</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">epoch_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Training epoch </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
                 <span class="n">epoch_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_epoch_data</span><span class="p">()</span>
 
@@ -359,8 +361,6 @@
                     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
 
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;After epoch </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
-
                 <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;after_epoch_hooks&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">):</span>
                     <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
                         <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="n">epoch_id</span><span class="p">,</span> <span class="n">epoch_data</span><span class="o">=</span><span class="n">epoch_data</span><span class="p">)</span>
@@ -369,15 +369,18 @@
                     <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch_profile</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="n">epoch_id</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">,</span>
                                              <span class="n">extra_streams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span> <span class="o">=</span> <span class="n">epoch_id</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Epochs done: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">trace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">trace</span><span class="p">[</span><span class="n">TrainingTraceKeys</span><span class="o">.</span><span class="n">EPOCHS_DONE</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Epoch </span><span class="si">%s</span><span class="s1"> done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_run</span><span class="p">(</span><span class="n">training</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainLoop.run_prediction"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.run_prediction">[docs]</a>    <span class="k">def</span> <span class="nf">run_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Run the main loop for in the prediction mode.&quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">prediction</span><span class="p">():</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Prediction started&#39;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running prediction&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_zeroth_epoch</span><span class="p">([</span><span class="n">CXF_PREDICT_STREAM</span><span class="p">])</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Prediction done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_run</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span></div></div>
 </pre></div>
 

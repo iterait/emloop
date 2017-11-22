@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>CLI Reference &#8212; cxflow 0.10.1 documentation</title>
+    <title>CLI Reference &#8212; cxflow 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -113,6 +113,11 @@
 </li>
 <li><a class="reference internal" href="#cxflow-dataset">cxflow dataset</a><ul>
 <li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cxflow-ls">cxflow ls</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -240,6 +245,57 @@ explained below.</p>
 <tr><td class="option-group">
 <kbd>config_file</kbd></td>
 <td>path to the config file</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="cxflow-ls">
+<h2>cxflow ls<a class="headerlink" href="#cxflow-ls" title="Permalink to this headline">¶</a></h2>
+<p>List training log dirs in the given path.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cxflow</span> <span class="n">ls</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="nb">dir</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>dir</kbd></td>
+<td><p class="first">path to the log directory to be listed</p>
+<p class="last">Default: &#8221;./log&#8221;</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-l, &#8211;long</kbd></td>
+<td><p class="first">use long listing format</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-a, &#8211;all</kbd></td>
+<td><p class="first">include trainings with no epochs done</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-r, &#8211;recursive</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">list all the dirs recursively, stop at training dirs</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-v, &#8211;verbose</kbd></td>
+<td><p class="first">print more verbose output, applicable only when a single train dir is listed</p>
+<p class="last">Default: False</p>
+</td></tr>
 </tbody>
 </table>
 </div>

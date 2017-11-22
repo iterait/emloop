@@ -20,6 +20,8 @@ Variables
 - :py:data:`CXF_TRACE_FILE`
 - :py:data:`CXF_TRAIN_STREAM`
 - :py:data:`CXF_PREDICT_STREAM`
+- :py:data:`CXF_DEFAULT_LOG_DIR`
+- :py:data:`CXF_NA_STR`
 
 .. autodata:: CXF_LOG_FORMAT
    :annotation:
@@ -83,3 +85,17 @@ Variables
    .. code-block:: guess
 
       'predict'
+
+.. autodata:: CXF_DEFAULT_LOG_DIR
+   :annotation:
+
+   .. code-block:: guess
+
+      './log'
+
+.. autodata:: CXF_NA_STR
+   :annotation:
+
+   .. code-block:: guess
+
+      'N/A'

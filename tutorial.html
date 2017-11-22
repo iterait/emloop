@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &#8212; cxflow 0.10.1 documentation</title>
+    <title>Tutorial &#8212; cxflow 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.10</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -239,12 +239,12 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_y</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">)],</span> <span class="n">y</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_y</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">):],</span> <span class="n">y</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">):]</span>
 
-    <span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">],</span>
                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]}</span>
 
-    <span class="k">def</span> <span class="nf">test_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">AbstractDataset</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">test_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">],</span>
                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]}</span>
