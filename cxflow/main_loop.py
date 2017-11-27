@@ -133,8 +133,9 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
 
             with Timer('after_batch_hooks_{}'.format(stream.name), self._epoch_profile):
+                batch_data = {**batch_input, **batch_output}
                 for hook in self._hooks:
-                    hook.after_batch(stream_name=stream.name, batch_data={**batch_input, **batch_output})
+                    hook.after_batch(stream_name=stream.name, batch_data=batch_data)
 
     def train_by_stream(self, stream: StreamWrapper) -> None:
         """
