@@ -86,12 +86,6 @@ jobs:
       - checkout
       - *install
       - *test
-
-  report_coverage:
-    docker:
-      - image: pritunl/archlinux:2017-07-08
-    working_directory: ~/cxflow
-    steps:
       - *coverage
 
   generate_documentation:
@@ -122,9 +116,6 @@ workflows:
       - test_ubuntu_latest
       - test_ubuntu_rolling
       - test_archlinux
-      - report_coverage:
-          requires:
-            - test_archlinux
       - generate_documentation:
           filters:
             branches:
