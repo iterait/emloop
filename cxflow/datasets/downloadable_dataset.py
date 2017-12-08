@@ -20,18 +20,15 @@ class DownloadableDataset(BaseDataset, metaclass=ABCMeta):
     Alternatively, these properties might be directly implemented in their corresponding methods.
     """
 
-    def _configure_dataset(self, data_root: str=None, url_root: str=None, download_filenames: Iterable[str]=None,
-                           **kwargs) -> None:
+    def _configure_dataset(self, data_root: str=None, download_urls: Iterable[str]=None, **kwargs) -> None:
         """
         Save the passed values and use them as a default property implementation.
 
         :param data_root: directory to which the files will be downloaded
-        :param url_root: URL from where the files are downloaded
-        :param download_filenames: list of files to be downloaded
+        :param download_urls: list of URLs to be downloaded
         """
         self._data_root = data_root
-        self._url_root = url_root
-        self._download_filenames = download_filenames
+        self._download_urls = download_urls
 
     @property
     @abstractmethod
@@ -43,25 +40,18 @@ class DownloadableDataset(BaseDataset, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def url_root(self) -> str:
-        """URL representing the data root from which the files are downloaded."""
-        if self._url_root is None:
-            raise ValueError('`url_root` is not specified.')
-        return self._url_root
-
-    @property
-    @abstractmethod
-    def download_filenames(self) -> Iterable[str]:
-        """A list of filenames to be downloaded from :py:meth:`url_root`."""
-        if self._download_filenames is None:
-            raise ValueError('`download_filenames` is not specified.')
-        return self.download_filenames
+    def download_urls(self) -> Iterable[str]:
+        """A list of URLs to be downloaded."""
+        if self._download_urls is None:
+            raise ValueError('`download_urls` is not specified.')
+        return self._download_urls
 
     def download(self) -> None:
-        """Maybe download and extra files required for training.
+        """
+        Maybe download and extract the extra files required.
 
-        If not already downloaded, download all files specified by :py:meth:`download_filenames` which are supposed to
-        be located in URL specified by :py:meth:`url_root`. Then, extract the downloaded files to :py:meth:`data_root`.
+        If not already downloaded, download all files specified by :py:meth:`download_urls`. Then, extract
+        the downloaded files to :py:meth:`data_root`.
 
         .. code-block:: bash
             :caption: cxflow CLI example
@@ -69,4 +59,5 @@ class DownloadableDataset(BaseDataset, metaclass=ABCMeta):
             cxflow dataset download <path-to-config>
 
         """
-        maybe_download_and_extract(self.data_root, self.url_root, self.download_filenames)
+        for url in self.download_urls:
+            maybe_download_and_extract(self.data_root, url)
