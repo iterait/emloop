@@ -44,8 +44,24 @@ class LogProfileTest(CXTestCase):
 
     def test_missing_train(self):
         """Test KeyError raised on missing profile entries."""
-        self.assertRaises(KeyError, self._hook.after_epoch_profile, 0, {}, [])
-        self.assertRaises(KeyError, self._hook.after_epoch_profile, 0, {'some_contents': 1}, [])
+        with LogCapture() as log_capture:
+            self._hook.after_epoch_profile(0, {}, [])
+
+        log_capture.check(
+            ('root', 'INFO', '\tT read data:\t0.000000'),
+            ('root', 'INFO', '\tT train:\t0.000000'),
+            ('root', 'INFO', '\tT eval:\t0.000000'),
+            ('root', 'INFO', '\tT hooks:\t0.000000')
+        )
+        with LogCapture() as log_capture:
+            self._hook.after_epoch_profile(0, {'some_contents': 1}, [])
+
+        log_capture.check(
+            ('root', 'INFO', '\tT read data:\t0.000000'),
+            ('root', 'INFO', '\tT train:\t0.000000'),
+            ('root', 'INFO', '\tT eval:\t0.000000'),
+            ('root', 'INFO', '\tT hooks:\t0.000000')
+        )
 
     def test_train_only(self):
         """Test profile handling with only train stream."""
@@ -61,7 +77,15 @@ class LogProfileTest(CXTestCase):
 
     def test_extra_streams(self):
         """Test extra streams handling."""
-        self.assertRaises(KeyError, self._hook.after_epoch_profile, 0, _TRAIN_ONLY_PROFILE, ['valid'])
+        with LogCapture() as log_capture:
+            self._hook.after_epoch_profile(0, _TRAIN_ONLY_PROFILE, ['valid'])
+
+        log_capture.check(
+            ('root', 'INFO', '\tT read data:\t6.120000'),
+            ('root', 'INFO', '\tT train:\t21.900000'),
+            ('root', 'INFO', '\tT eval:\t0.000000'),
+            ('root', 'INFO', '\tT hooks:\t9.800000'),
+        )
 
         # test additional entries being ignored if the extra stream was not specified
         with LogCapture() as log_capture:
