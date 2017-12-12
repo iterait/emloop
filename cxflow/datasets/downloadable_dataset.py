@@ -31,7 +31,6 @@ class DownloadableDataset(BaseDataset, metaclass=ABCMeta):
         self._download_urls = download_urls
 
     @property
-    @abstractmethod
     def data_root(self) -> str:
         """Path to the data root directory."""
         if self._data_root is None:
@@ -39,7 +38,6 @@ class DownloadableDataset(BaseDataset, metaclass=ABCMeta):
         return self._data_root
 
     @property
-    @abstractmethod
     def download_urls(self) -> Iterable[str]:
         """A list of URLs to be downloaded."""
         if self._download_urls is None:
