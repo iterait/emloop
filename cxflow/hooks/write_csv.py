@@ -119,8 +119,11 @@ class WriteCSV(AbstractHook):
                         logging.warning(err_message)
                     values.append(self._default_value)
                     continue
+
                 if isinstance(value, dict) and 'mean' in value:
                     value = value['mean']
+                elif isinstance(value, dict) and 'nanmean' in value:
+                    value = value['nanmean']
 
                 if np.isscalar(value):
                     values.append(value)

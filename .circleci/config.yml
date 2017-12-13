@@ -8,12 +8,14 @@ references:
       command: |
         apt-get update -qy
         apt-get install -y git python3-dev python3-pip curl
+        pip3 install coveralls coverage
 
   arch_deps: &arch_deps
     run:
       name: Install dependencies on Arch Linux.
       command: |
         pacman -S --noconfirm python python-pip git base-devel curl
+        pip install coveralls coverage
 
   install: &install
     run:
@@ -44,6 +46,14 @@ references:
       name: Generate documentation
       command: |
         bash <(curl -fsSL https://raw.githubusercontent.com/Cognexa/ci-utils/master/doc_deploy.sh)
+
+  coverage: &coverage
+    run:
+      name: Report test coverage
+      command: |
+        coverage run setup.py test
+        coverage report
+        COVERALLS_REPO_TOKEN=IcZuMtRg3p15AtsuOoGQSDaSQxjpVF1tP coveralls
 
 jobs:
 
@@ -77,6 +87,16 @@ jobs:
       - *install
       - *test
 
+  coverage:
+    docker:
+      - image: pritunl/archlinux:2017-07-08
+    working_directory: ~/cxflow
+    steps:
+      - *arch_deps
+      - checkout
+      - *install
+      - *coverage
+
   generate_documentation:
     docker:
       - image: ubuntu:rolling
@@ -105,6 +125,11 @@ workflows:
       - test_ubuntu_latest
       - test_ubuntu_rolling
       - test_archlinux
+      - coverage:
+          requires:
+            - test_ubuntu_latest
+            - test_ubuntu_rolling
+            - test_archlinux
       - generate_documentation:
           filters:
             branches:

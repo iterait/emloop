@@ -25,7 +25,7 @@ def _get_epoch_data():
         ('test', collections.OrderedDict([
             ('accuracy', 2),
             ('precision', 2 * np.ones(_EXAMPLES)),
-            ('loss', collections.OrderedDict([('mean', 2)])),
+            ('loss', collections.OrderedDict([('nanmean', 2)])),
             ('omitted', 0)])),
         ('valid', collections.OrderedDict([
             ('accuracy', 3),

@@ -39,14 +39,14 @@ class LogProfile(AbstractHook):
 
         read_data_total = 0
         eval_total = 0
-        train_total = sum(profile['eval_batch_train'])
-        hooks_total = sum(profile['after_epoch_hooks'])
+        train_total = sum(profile.get('eval_batch_train', []))
+        hooks_total = sum(profile.get('after_epoch_hooks', []))
 
         for stream_name in chain(extra_streams, ['train']):
-            read_data_total += sum(profile['read_batch_' + stream_name])
-            hooks_total += sum(profile['after_batch_hooks_' + stream_name])
+            read_data_total += sum(profile.get('read_batch_' + stream_name, []))
+            hooks_total += sum(profile.get('after_batch_hooks_' + stream_name, []))
             if stream_name != 'train':
-                eval_total += sum(profile['eval_batch_' + stream_name])
+                eval_total += sum(profile.get('eval_batch_' + stream_name, []))
 
         logging.info('\tT read data:\t%f', read_data_total)
         logging.info('\tT train:\t%f', train_total)

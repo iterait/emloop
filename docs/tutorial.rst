@@ -1,7 +1,7 @@
 Tutorial
 ########
 
-In this tutorial, we are using an example task to demonstrate cxflow’s basic 
+In this tutorial, we are using an example task to demonstrate cxflow’s basic
 principles.
 
 Introduction
@@ -14,17 +14,17 @@ Introduction
 - providing convenient instruments to manage and run your experiments
 
 **cxflow** does not implement any building blocks, NN layers etc. Instead, you can use
-your favorite machine learning framework, such as `TensorFlow 
+your favorite machine learning framework, such as `TensorFlow
 <https://www.tensorflow.org/>`_,
-`CNTK <https://cntk.ai/>`_, or `Caffe2 <https://caffe2.ai/>`_. In other words, 
+`CNTK <https://cntk.ai/>`_, or `Caffe2 <https://caffe2.ai/>`_. In other words,
 **cxflow** is back-end agnostic.
 Therefore, you don't have to learn a new framework, if you already know one.
-In addition, you can easily convert the models you already have by making only 
+In addition, you can easily convert the models you already have by making only
 minimal changes.
 
-**cxflow** allows (and encourages) you to build modular projects, where the 
+**cxflow** allows (and encourages) you to build modular projects, where the
 dataset, the model, and the configuration are separated and reusable. In the following sections,
-we will describe how those reusable modules should look like on a simple 
+we will describe how those reusable modules should look like on a simple
 example.
 
 Task
@@ -44,9 +44,12 @@ Example of few 5-bit vectors:
 +--------------+-----------------+----------------+--------------------------+
 | 10101        | 2               | 3              | 1                        |
 +--------------+-----------------+----------------+--------------------------+
-| 11100        | 2               | 3              | 1                        |
+| 11101        | 1               | 4              | 1                        |
 +--------------+-----------------+----------------+--------------------------+
 
+.. tip::
+   Full example may be found in our
+   `cxflow examples repository @GitHub <https://github.com/Cognexa/cxflow-examples/tree/master/majority>`_.
 
 Dataset
 *******
@@ -69,7 +72,7 @@ A typical **cxflow** dataset will implement the following:
    To provide a stream named <name>, method ``<name>_stream`` needs to return its iterator.
    In our example, we will use *test* stream provided by ``test_stream`` method.
 #. **The constructor:** accepts a YAML configuration in the form of a string
-   (more on this later). We avoid the need to implement a constructor by 
+   (more on this later). We avoid the need to implement a constructor by
    extending :py:class:`cxflow.datasets.BaseDataset`.
 #. **Additional methods:** such as ``fetch``, ``split``, or anything else you may need.
    **cxflow** is able to call arbitrary dataset methods by invoking ``cxflow dataset <method-name>`` command.
@@ -77,7 +80,7 @@ A typical **cxflow** dataset will implement the following:
 To generate the *majority* data and provide the data streams we will implement a ``MajorityDataset``:
 
 .. code-block:: python
-    :caption: majority.py
+    :caption: majority_dataset.py
 
     import cxflow as cx
     import numpy.random as npr
@@ -87,6 +90,7 @@ To generate the *majority* data and provide the data streams we will implement a
 
         def _configure_dataset(self, n_examples: int, dim: int, batch_size: int, **kwargs) -> None:
             self.batch_size = batch_size
+            self.dim = dim
 
             x = npr.random_integers(0, 1, n_examples * dim).reshape(n_examples, dim)
             y = x.sum(axis=1) > int(dim/2)
@@ -152,7 +156,7 @@ A batch (with ``batch_size=4``) representing the example above looks like this:
 Similarly, there is a ``test_stream`` function that iterates over the testing data.
 
 A single iteration over the whole dataset is called an *epoch*.
-We train our machine learning models by iterating through the training stream 
+We train our machine learning models by iterating through the training stream
 for one or more epochs.
 The test stream is used only to estimate the performance of the model.
 
@@ -161,7 +165,7 @@ The test stream is used only to estimate the performance of the model.
     In this example, the training and testing streams are generated randomly and thus,
     they may slightly overlap and bias the performace estimation.
 
-A detailed description of **cxflow** datasets might be found in the 
+A detailed description of **cxflow** datasets might be found in the
 :doc:`advanced section <advanced/dataset>`.
 
 Model
@@ -193,7 +197,7 @@ Let us define a class called ``MajorityNet``.
 
         def _create_model(self, hidden):
             logging.debug('Constructing placeholders matching the model.inputs')
-            x = tf.placeholder(dtype=tf.float32, shape=[None, 11], name='x')
+            x = tf.placeholder(dtype=tf.float32, shape=[None, self._dataset.dim], name='x')
             y = tf.placeholder(dtype=tf.float32, shape=[None], name='y')
 
             logging.debug('Constructing MLP model')
@@ -213,14 +217,14 @@ To be precise, the model registered the following computational graph nodes:
 
 #. Placeholders ``x`` and ``y`` corresponding to a single batch from the stream (only the batch sources ``x`` and ``y`` will be mapped to these placeholders).
 #. Variable ``loss`` denoting the mean square error of the model.
-#. Variable ``predictions`` denoting the output of the network, i.e., the bit 
+#. Variable ``predictions`` denoting the output of the network, i.e., the bit
    predicted to be in majority.
 #. Variable ``accuracy`` denoting the fraction of correct predictions in the current batch.
 
 .. caution::
-   For each of input/output variables listed in the configuration, there has to 
+   For each of input/output variables listed in the configuration, there has to
    exist a computational graph node with the corresponding name.
-   **cxflow-tensorflow** is not able to find the nodes if they are not properly 
+   **cxflow-tensorflow** is not able to find the nodes if they are not properly
    named.
 
 The ``_create_model`` method can accept arbitrary arguments - in our case, we allow to configure the number of hidden units.
@@ -260,12 +264,12 @@ are passed to the ``_configure_dataset`` method of the dataset).
 .. code-block:: yaml
 
     dataset:
-      class: datasets.MajorityDataset
+      class: majority.MajorityDataset
       n_examples: 500
       dim: 11
       batch_size: 4
 
-We can pass arbitrary constants to the dataset that will be hidden in the 
+We can pass arbitrary constants to the dataset that will be hidden in the
 ``**kwargs`` parameter of the ``_configure_dataset`` method of the dataset.
 
 .. note::
@@ -305,11 +309,11 @@ Main Loop
 =========
 
 As the model training is executed in epochs, it is naturally implemented as a loop.
-This loop (:py:class:`cxflow.MainLoop`) can be extended, for example by adding more 
+This loop (:py:class:`cxflow.MainLoop`) can be extended, for example by adding more
 streams to the ``train`` stream.
 In our case, we also want to evaluate the ``test`` stream, so we will add it to the
-``main_loop.extra_streams`` section of the config. **cxflow** will then invoke 
-the ``<name>_stream`` method of the dataset to create the stream. In our case, 
+``main_loop.extra_streams`` section of the config. **cxflow** will then invoke
+the ``<name>_stream`` method of the dataset to create the stream. In our case,
 the ``test_stream`` method will be invoked.
 
 .. code-block:: yaml
