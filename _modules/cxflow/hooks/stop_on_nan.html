@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cxflow.hooks.stop_on_nan &#8212; cxflow 0.11.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.11.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../../cli.html">CLI Reference</a></li>
+                <li><a href="../../../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../../search.html" method="get" class="searchbox">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
+</ul>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for cxflow.hooks.stop_on_nan</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module with StopOnNaN hook.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">cxflow.types</span> <span class="k">import</span> <span class="n">EpochData</span>
+<span class="kn">from</span> <span class="nn">cxflow.hooks</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
+
+
+<div class="viewcode-block" id="StopOnNaN"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN">[docs]</a><span class="k">class</span> <span class="nc">StopOnNaN</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stop the training when any of the specified variables contain NaN.</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: stop as soon as any variable contains NaN</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - StopOnNaN</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: stop on NaN in loss variable</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - StopOnNan:</span>
+<span class="sd">              variables: [loss]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">UNKNOWN_TYPE_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Posible actions to take on unknown variable type.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StopOnNaN.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_unknown_type</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">stop_on_inf</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">after_batch</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">after_epoch</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create new StopOnNaN hook.</span>
+
+<span class="sd">        :param variables: variable names to be checked; check all variables in ``epoch_data`` by default</span>
+<span class="sd">        :param on_unkown_type: option for handling unknown data types, possible options are ``&#39;warn&#39;``, ``&#39;error&#39;`` and \</span>
+<span class="sd">               default ``&#39;ignore&#39;``</span>
+<span class="sd">        :param stop_on_inf: if `True` consider infinity values as NaN, default is `False`</span>
+<span class="sd">        :param after_batch: check data after each batch? default is `False`</span>
+<span class="sd">        :param after_epoch: check data after each epoch? default is `True`</span>
+<span class="sd">        :raise AssertionError: for undefined ``on_unknown_type``</span>
+<span class="sd">        :raise AssertionError: if both ``after_batch`` and ``after_epoch`` are `False`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">after_batch</span> <span class="ow">or</span> <span class="n">after_epoch</span>
+        <span class="k">assert</span> <span class="n">on_unknown_type</span> <span class="ow">in</span> <span class="n">StopOnNaN</span><span class="o">.</span><span class="n">UNKNOWN_TYPE_ACTIONS</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="o">=</span> <span class="n">variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_unkown_type</span> <span class="o">=</span> <span class="n">on_unknown_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stop_on_inf</span> <span class="o">=</span> <span class="n">stop_on_inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_after_batch</span> <span class="o">=</span> <span class="n">after_batch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_after_epoch</span> <span class="o">=</span> <span class="n">after_epoch</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StopOnNaN._is_nan"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN._is_nan">[docs]</a>    <span class="k">def</span> <span class="nf">_is_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively search passed data and find NaNs.</span>
+
+<span class="sd">        :param variable: name of variable to be checked</span>
+<span class="sd">        :param data: data object (dict, list, scalar)</span>
+<span class="sd">        :return: `True` if there is a NaN value in the data; `False` otherwise.</span>
+<span class="sd">        :raise ValueError: if the variable value is of unsupported type and ``on_unknown_type`` is set to ``error``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stop_on_inf</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stop_on_inf</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_nan</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` of type `</span><span class="si">{}</span><span class="s1">` can not be checked for NaNs.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_unkown_type</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_unkown_type</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="StopOnNaN._check_nan"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN._check_nan">[docs]</a>    <span class="k">def</span> <span class="nf">_check_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raise an exception when some of the monitored data is NaN.</span>
+
+<span class="sd">        :param epoch_data: epoch data checked</span>
+<span class="sd">        :raise KeyError: if the specified variable is not found in the stream</span>
+<span class="sd">        :raise ValueError: if the variable value is of unsupported type and ``self._on_unknown_type`` is set to ``error``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">epoch_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">stream_data</span> <span class="o">=</span> <span class="n">epoch_data</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stream_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stream_data</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` to be nan-checked was not found in the batch data for stream `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                                   <span class="s1">&#39;Available variables are `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">stream_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+                <span class="n">value</span> <span class="o">=</span> <span class="n">stream_data</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_nan</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` is NaN.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StopOnNaN.after_epoch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If initialized to check after each epoch, stop the training once the epoch data contains a monitored</span>
+<span class="sd">        variable equal to NaN.</span>
+
+<span class="sd">        :param epoch_data: epoch data to be checked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_epoch</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_nan</span><span class="p">(</span><span class="n">epoch_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StopOnNaN.after_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If initialized to check after each batch, stop the training once the batch data contains a monitored</span>
+<span class="sd">        variable equal to NaN.</span>
+
+<span class="sd">        :param stream_name: name of the stream to be checked</span>
+<span class="sd">        :param batch_data: batch data to be checked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_batch</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_nan</span><span class="p">({</span><span class="n">stream_name</span><span class="p">:</span> <span class="n">batch_data</span><span class="p">})</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+    </p>
+  </div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
+  </body>
+</html>

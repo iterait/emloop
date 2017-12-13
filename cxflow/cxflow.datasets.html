@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets &#8212; cxflow 0.11.0 documentation</title>
+    <title>cxflow.datasets &#8212; cxflow 0.11.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.11.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -237,7 +237,7 @@ Alternatively, these properties might be directly implemented in their correspon
 </div>
 <dl class="method">
 <dt id="cxflow.datasets.DownloadableDataset._configure_dataset">
-<code class="descname">_configure_dataset</code><span class="sig-paren">(</span><em>data_root=None</em>, <em>url_root=None</em>, <em>download_filenames=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/downloadable_dataset.html#DownloadableDataset._configure_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.DownloadableDataset._configure_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_configure_dataset</code><span class="sig-paren">(</span><em>data_root=None</em>, <em>download_urls=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/downloadable_dataset.html#DownloadableDataset._configure_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.DownloadableDataset._configure_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the passed values and use them as a default property implementation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -245,8 +245,7 @@ Alternatively, these properties might be directly implemented in their correspon
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data_root</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; directory to which the files will be downloaded</li>
-<li><strong>url_root</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; URL from where the files are downloaded</li>
-<li><strong>download_filenames</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; list of files to be downloaded</li>
+<li><strong>download_urls</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; list of URLs to be downloaded</li>
 </ul>
 </td>
 </tr>
@@ -274,9 +273,9 @@ Alternatively, these properties might be directly implemented in their correspon
 <dl class="method">
 <dt id="cxflow.datasets.DownloadableDataset.download">
 <code class="descname">download</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/downloadable_dataset.html#DownloadableDataset.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.DownloadableDataset.download" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maybe download and extra files required for training.</p>
-<p>If not already downloaded, download all files specified by <a class="reference internal" href="#cxflow.datasets.DownloadableDataset.download_filenames" title="cxflow.datasets.DownloadableDataset.download_filenames"><code class="xref py py-meth docutils literal"><span class="pre">download_filenames()</span></code></a> which are supposed to
-be located in URL specified by <a class="reference internal" href="#cxflow.datasets.DownloadableDataset.url_root" title="cxflow.datasets.DownloadableDataset.url_root"><code class="xref py py-meth docutils literal"><span class="pre">url_root()</span></code></a>. Then, extract the downloaded files to <a class="reference internal" href="#cxflow.datasets.DownloadableDataset.data_root" title="cxflow.datasets.DownloadableDataset.data_root"><code class="xref py py-meth docutils literal"><span class="pre">data_root()</span></code></a>.</p>
+<dd><p>Maybe download and extract the extra files required.</p>
+<p>If not already downloaded, download all files specified by <a class="reference internal" href="#cxflow.datasets.DownloadableDataset.download_urls" title="cxflow.datasets.DownloadableDataset.download_urls"><code class="xref py py-meth docutils literal"><span class="pre">download_urls()</span></code></a>. Then, extract
+the downloaded files to <a class="reference internal" href="#cxflow.datasets.DownloadableDataset.data_root" title="cxflow.datasets.DownloadableDataset.data_root"><code class="xref py py-meth docutils literal"><span class="pre">data_root()</span></code></a>.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">cxflow CLI example</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow dataset download &lt;path-to-config&gt;
@@ -294,28 +293,14 @@ be located in URL specified by <a class="reference internal" href="#cxflow.datas
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cxflow.datasets.DownloadableDataset.download_filenames">
-<code class="descname">download_filenames</code><a class="headerlink" href="#cxflow.datasets.DownloadableDataset.download_filenames" title="Permalink to this definition">¶</a></dt>
-<dd><p>A list of filenames to be downloaded from <a class="reference internal" href="#cxflow.datasets.DownloadableDataset.url_root" title="cxflow.datasets.DownloadableDataset.url_root"><code class="xref py py-meth docutils literal"><span class="pre">url_root()</span></code></a>.</p>
+<dt id="cxflow.datasets.DownloadableDataset.download_urls">
+<code class="descname">download_urls</code><a class="headerlink" href="#cxflow.datasets.DownloadableDataset.download_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of URLs to be downloaded.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cxflow.datasets.DownloadableDataset.url_root">
-<code class="descname">url_root</code><a class="headerlink" href="#cxflow.datasets.DownloadableDataset.url_root" title="Permalink to this definition">¶</a></dt>
-<dd><p>URL representing the data root from which the files are downloaded.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
 </tr>
 </tbody>
 </table>

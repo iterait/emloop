@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &#8212; cxflow 0.11.0 documentation</title>
+    <title>Tutorial &#8212; cxflow 0.11.1 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.11.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -190,13 +190,18 @@ Given a vector of N bits, which bit is in majority?</p>
 <td>3</td>
 <td>1</td>
 </tr>
-<tr class="row-odd"><td>11100</td>
-<td>2</td>
-<td>3</td>
+<tr class="row-odd"><td>11101</td>
+<td>1</td>
+<td>4</td>
 <td>1</td>
 </tr>
 </tbody>
 </table>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Full example may be found in our
+<a class="reference external" href="https://github.com/Cognexa/cxflow-examples/tree/master/majority">cxflow examples repository &#64;GitHub</a>.</p>
+</div>
 </div>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
@@ -223,7 +228,7 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
 </ol>
 <p>To generate the <em>majority</em> data and provide the data streams we will implement a <code class="docutils literal"><span class="pre">MajorityDataset</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">majority.py</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">majority_dataset.py</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cxflow</span> <span class="kn">as</span> <span class="nn">cx</span>
 <span class="kn">import</span> <span class="nn">numpy.random</span> <span class="kn">as</span> <span class="nn">npr</span>
 
@@ -232,6 +237,7 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
 
     <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">random_integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_examples</span> <span class="o">*</span> <span class="n">dim</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_examples</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">dim</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
@@ -327,7 +333,7 @@ extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxf
 
     <span class="k">def</span> <span class="nf">_create_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing placeholders matching the model.inputs&#39;</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="o">.</span><span class="n">dim</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Constructing MLP model&#39;</span><span class="p">)</span>
@@ -386,7 +392,7 @@ This is done by specifying the <code class="docutils literal"><span class="pre">
 In addition, we will specify the parameters of the dataset (those
 are passed to the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method of the dataset).</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.MajorityDataset</span>
+  <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">majority.MajorityDataset</span>
   <span class="l l-Scalar l-Scalar-Plain">n_examples</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">500</span>
   <span class="l l-Scalar l-Scalar-Plain">dim</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">11</span>
   <span class="l l-Scalar l-Scalar-Plain">batch_size</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.log_profile &#8212; cxflow 0.11.0 documentation</title>
+    <title>cxflow.hooks.log_profile &#8212; cxflow 0.11.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.11.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -148,14 +148,14 @@
 
         <span class="n">read_data_total</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">eval_total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">train_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;eval_batch_train&#39;</span><span class="p">])</span>
-        <span class="n">hooks_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;after_epoch_hooks&#39;</span><span class="p">])</span>
+        <span class="n">train_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eval_batch_train&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">hooks_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;after_epoch_hooks&#39;</span><span class="p">,</span> <span class="p">[]))</span>
 
         <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">extra_streams</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]):</span>
-            <span class="n">read_data_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;read_batch_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">])</span>
-            <span class="n">hooks_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;after_batch_hooks_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">])</span>
+            <span class="n">read_data_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;read_batch_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">hooks_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;after_batch_hooks_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">,</span> <span class="p">[]))</span>
             <span class="k">if</span> <span class="n">stream_name</span> <span class="o">!=</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
-                <span class="n">eval_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="p">[</span><span class="s1">&#39;eval_batch_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">])</span>
+                <span class="n">eval_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eval_batch_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">,</span> <span class="p">[]))</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">T read data:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">read_data_total</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">T train:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">train_total</span><span class="p">)</span>

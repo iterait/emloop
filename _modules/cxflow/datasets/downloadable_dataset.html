@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets.downloadable_dataset &#8212; cxflow 0.11.0 documentation</title>
+    <title>cxflow.datasets.downloadable_dataset &#8212; cxflow 0.11.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.11.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -129,21 +129,17 @@
 <span class="sd">    Alternatively, these properties might be directly implemented in their corresponding methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="DownloadableDataset._configure_dataset"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset._configure_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_root</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">url_root</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">download_filenames</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DownloadableDataset._configure_dataset"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset._configure_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_root</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">download_urls</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the passed values and use them as a default property implementation.</span>
 
 <span class="sd">        :param data_root: directory to which the files will be downloaded</span>
-<span class="sd">        :param url_root: URL from where the files are downloaded</span>
-<span class="sd">        :param download_filenames: list of files to be downloaded</span>
+<span class="sd">        :param download_urls: list of URLs to be downloaded</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_root</span> <span class="o">=</span> <span class="n">data_root</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_url_root</span> <span class="o">=</span> <span class="n">url_root</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_download_filenames</span> <span class="o">=</span> <span class="n">download_filenames</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_download_urls</span> <span class="o">=</span> <span class="n">download_urls</span></div>
 
     <span class="nd">@property</span>
-    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">data_root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Path to the data root directory.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -151,26 +147,18 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_root</span>
 
     <span class="nd">@property</span>
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">url_root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;URL representing the data root from which the files are downloaded.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`url_root` is not specified.&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url_root</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">download_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;A list of filenames to be downloaded from :py:meth:`url_root`.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_filenames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`download_filenames` is not specified.&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_filenames</span>
+    <span class="k">def</span> <span class="nf">download_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;A list of URLs to be downloaded.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_urls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`download_urls` is not specified.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_urls</span>
 
 <div class="viewcode-block" id="DownloadableDataset.download"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Maybe download and extra files required for training.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maybe download and extract the extra files required.</span>
 
-<span class="sd">        If not already downloaded, download all files specified by :py:meth:`download_filenames` which are supposed to</span>
-<span class="sd">        be located in URL specified by :py:meth:`url_root`. Then, extract the downloaded files to :py:meth:`data_root`.</span>
+<span class="sd">        If not already downloaded, download all files specified by :py:meth:`download_urls`. Then, extract</span>
+<span class="sd">        the downloaded files to :py:meth:`data_root`.</span>
 
 <span class="sd">        .. code-block:: bash</span>
 <span class="sd">            :caption: cxflow CLI example</span>
@@ -178,7 +166,8 @@
 <span class="sd">            cxflow dataset download &lt;path-to-config&gt;</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">maybe_download_and_extract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_filenames</span><span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_urls</span><span class="p">:</span>
+            <span class="n">maybe_download_and_extract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span></div>
 </pre></div>
 
     </div>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &#8212; cxflow 0.11.0 documentation</title>
+    <title>Index &#8212; cxflow 0.11.1 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.11.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -166,6 +166,8 @@
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.__init__">(cxflow.hooks.StopAfter method)</a>
 </li>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.__init__">(cxflow.hooks.StopOnNaN method)</a>
+</li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.WriteCSV.__init__">(cxflow.hooks.WriteCSV method)</a>
 </li>
         <li><a href="cxflow/cxflow.models.html#cxflow.models.AbstractModel.__init__">(cxflow.models.AbstractModel method)</a>
@@ -179,6 +181,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN._check_nan">_check_nan() (cxflow.hooks.StopOnNaN method)</a>
+</li>
       <li><a href="cxflow/cxflow.html#cxflow.MainLoop._check_sources">_check_sources() (cxflow.MainLoop method)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter._check_train_time">_check_train_time() (cxflow.hooks.StopAfter method)</a>
@@ -194,6 +198,8 @@
       <li><a href="cxflow/cxflow.html#cxflow.MainLoop._create_epoch_data">_create_epoch_data() (cxflow.MainLoop method)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest._get_value">_get_value() (cxflow.hooks.SaveBest method)</a>
+</li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN._is_nan">_is_nan() (cxflow.hooks.StopOnNaN method)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest._is_value_better">_is_value_better() (cxflow.hooks.SaveBest method)</a>
 </li>
@@ -244,6 +250,8 @@
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_batch">(cxflow.hooks.StopAfter method)</a>
 </li>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.after_batch">(cxflow.hooks.StopOnNaN method)</a>
+</li>
       </ul></li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.AbstractHook.after_epoch">after_epoch() (cxflow.hooks.AbstractHook method)</a>
 
@@ -269,6 +277,8 @@
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ShowProgress.after_epoch">(cxflow.hooks.ShowProgress method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter.after_epoch">(cxflow.hooks.StopAfter method)</a>
+</li>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.after_epoch">(cxflow.hooks.StopOnNaN method)</a>
 </li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.WriteCSV.after_epoch">(cxflow.hooks.WriteCSV method)</a>
 </li>
@@ -359,7 +369,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset.download_filenames">download_filenames (cxflow.datasets.DownloadableDataset attribute)</a>
+      <li><a href="cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset.download_urls">download_urls (cxflow.datasets.DownloadableDataset attribute)</a>
 </li>
       <li><a href="cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset">DownloadableDataset (class in cxflow.datasets)</a>
 </li>
@@ -479,15 +489,17 @@
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveBest">SaveBest (class in cxflow.hooks)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveEvery">SaveEvery (class in cxflow.hooks)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.SaveLatest">SaveLatest (class in cxflow.hooks)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.ShowProgress">ShowProgress (class in cxflow.hooks)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopAfter">StopAfter (class in cxflow.hooks)</a>
+</li>
+      <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN">StopOnNaN (class in cxflow.hooks)</a>
 </li>
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnPlateau">StopOnPlateau (class in cxflow.hooks)</a>
 </li>
@@ -512,14 +524,14 @@
       <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.LogVariables.UNKNOWN_TYPE_ACTIONS">UNKNOWN_TYPE_ACTIONS (cxflow.hooks.LogVariables attribute)</a>
 
       <ul>
+        <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.StopOnNaN.UNKNOWN_TYPE_ACTIONS">(cxflow.hooks.StopOnNaN attribute)</a>
+</li>
         <li><a href="cxflow/cxflow.hooks.html#cxflow.hooks.WriteCSV.UNKNOWN_TYPE_ACTIONS">(cxflow.hooks.WriteCSV attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cxflow/cxflow.html#cxflow.MainLoop.UNUSED_SOURCE_ACTIONS">UNUSED_SOURCE_ACTIONS (cxflow.MainLoop attribute)</a>
-</li>
-      <li><a href="cxflow/cxflow.datasets.html#cxflow.datasets.DownloadableDataset.url_root">url_root (cxflow.datasets.DownloadableDataset attribute)</a>
 </li>
   </ul></td>
 </tr></table>

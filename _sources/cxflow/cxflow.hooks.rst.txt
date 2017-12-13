@@ -59,6 +59,9 @@ Classes
 - :py:class:`StopOnPlateau`:
   Terminate the training when the observed variable reaches its plateau.
 
+- :py:class:`StopOnNaN`:
+  Stop the training when any of the specified variables contain NaN.
+
 
 
 .. autoclass:: AbstractHook
@@ -279,6 +282,20 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: StopOnPlateau
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: StopOnNaN
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: StopOnNaN
       :parts: 1
 
    |

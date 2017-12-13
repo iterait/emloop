@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks &#8212; cxflow 0.11.0 documentation</title>
+    <title>cxflow.hooks &#8212; cxflow 0.11.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.11.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -169,6 +169,8 @@ This hook should be used as base hook in the case when some action need to be pr
 Base hook for hooks taking actions when certain variable reaches its plateau.</li>
 <li><a class="reference internal" href="#cxflow.hooks.StopOnPlateau" title="cxflow.hooks.StopOnPlateau"><code class="xref py py-class docutils literal"><span class="pre">StopOnPlateau</span></code></a>:
 Terminate the training when the observed variable reaches its plateau.</li>
+<li><a class="reference internal" href="#cxflow.hooks.StopOnNaN" title="cxflow.hooks.StopOnNaN"><code class="xref py py-class docutils literal"><span class="pre">StopOnNaN</span></code></a>:
+Stop the training when any of the specified variables contain NaN.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.hooks.AbstractHook">
@@ -1028,7 +1030,7 @@ stream</li>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveBest.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the monitor variable.</p>
 </dd></dl>
 
@@ -1525,7 +1527,7 @@ its <code class="docutils literal"><span class="pre">long_term</span></code> mea
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.OnPlateau.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.OnPlateau.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.OnPlateau.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the observed variable.</p>
 </dd></dl>
 
@@ -1628,6 +1630,158 @@ smaller than the mean of last 30 <code class="docutils literal"><span class="pre
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#cxflow.hooks.TrainingTerminated" title="cxflow.hooks.TrainingTerminated"><strong>TrainingTerminated</strong></a> &#8211; if the model stops improving</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.hooks.StopOnNaN">
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">StopOnNaN</code><span class="sig-paren">(</span><em>variables: typing.Union[typing.Iterable[str], NoneType] = None, on_unknown_type: str = 'ignore', stop_on_inf: bool = False, after_batch: bool = False, after_epoch: bool = True, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_nan.html#StopOnNaN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnNaN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cxflow.hooks.AbstractHook" title="cxflow.hooks.AbstractHook"><code class="xref py py-class docutils literal"><span class="pre">hooks.AbstractHook</span></code></a></p>
+<p>Stop the training when any of the specified variables contain NaN.</p>
+<div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-text">stop as soon as any variable contains NaN</span><a class="headerlink" href="#id20" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopOnNaN</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id21">
+<div class="code-block-caption"><span class="caption-text">stop on NaN in loss variable</span><a class="headerlink" href="#id21" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopOnNan</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">loss</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-cd3b42cbd7dd6a5e49c802b37d9bae74ea4c322a.png" alt="Inheritance diagram of StopOnNaN" usemap="#inheritance620ed8728f" class="inheritance"/>
+<map id="inheritance620ed8728f" name="inheritance620ed8728f">
+<area shape="rect" id="node2" title="Stop the training when any of the specified variables contain NaN." alt="" coords="164,5,261,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="attribute">
+<dt id="cxflow.hooks.StopOnNaN.UNKNOWN_TYPE_ACTIONS">
+<code class="descname">UNKNOWN_TYPE_ACTIONS</code><em class="property"> = ['error', 'warn', 'ignore']</em><a class="headerlink" href="#cxflow.hooks.StopOnNaN.UNKNOWN_TYPE_ACTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posible actions to take on unknown variable type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.StopOnNaN.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>variables=None</em>, <em>on_unknown_type='ignore'</em>, <em>stop_on_inf=False</em>, <em>after_batch=False</em>, <em>after_epoch=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_nan.html#StopOnNaN.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnNaN.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new StopOnNaN hook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; variable names to be checked; check all variables in <code class="docutils literal"><span class="pre">epoch_data</span></code> by default</li>
+<li><strong>on_unkown_type</strong> &#8211; option for handling unknown data types, possible options are <code class="docutils literal"><span class="pre">'warn'</span></code>, <code class="docutils literal"><span class="pre">'error'</span></code> and                default <code class="docutils literal"><span class="pre">'ignore'</span></code></li>
+<li><strong>stop_on_inf</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; if <cite>True</cite> consider infinity values as NaN, default is <cite>False</cite></li>
+<li><strong>after_batch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; check data after each batch? default is <cite>False</cite></li>
+<li><strong>after_epoch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; check data after each epoch? default is <cite>True</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> &#8211; for undefined <code class="docutils literal"><span class="pre">on_unknown_type</span></code></li>
+<li><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> &#8211; if both <code class="docutils literal"><span class="pre">after_batch</span></code> and <code class="docutils literal"><span class="pre">after_epoch</span></code> are <cite>False</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.StopOnNaN._check_nan">
+<code class="descname">_check_nan</code><span class="sig-paren">(</span><em>epoch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_nan.html#StopOnNaN._check_nan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnNaN._check_nan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise an exception when some of the monitored data is NaN.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>epoch_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]) &#8211; epoch data checked</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#KeyError" title="(in Python v3.6)"><strong>KeyError</strong></a> &#8211; if the specified variable is not found in the stream</li>
+<li><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the variable value is of unsupported type and <code class="docutils literal"><span class="pre">self._on_unknown_type</span></code> is set to <code class="docutils literal"><span class="pre">error</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.StopOnNaN._is_nan">
+<code class="descname">_is_nan</code><span class="sig-paren">(</span><em>variable</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_nan.html#StopOnNaN._is_nan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnNaN._is_nan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively search passed data and find NaNs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of variable to be checked</li>
+<li><strong>data</strong> &#8211; data object (dict, list, scalar)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><cite>True</cite> if there is a NaN value in the data; <cite>False</cite> otherwise.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the variable value is of unsupported type and <code class="docutils literal"><span class="pre">on_unknown_type</span></code> is set to <code class="docutils literal"><span class="pre">error</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.StopOnNaN.after_batch">
+<code class="descname">after_batch</code><span class="sig-paren">(</span><em>stream_name</em>, <em>batch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_nan.html#StopOnNaN.after_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnNaN.after_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>If initialized to check after each batch, stop the training once the batch data contains a monitored
+variable equal to NaN.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the stream to be checked</li>
+<li><strong>batch_data</strong> &#8211; batch data to be checked</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.StopOnNaN.after_epoch">
+<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>epoch_data</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/stop_on_nan.html#StopOnNaN.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.StopOnNaN.after_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>If initialized to check after each epoch, stop the training once the epoch data contains a monitored
+variable equal to NaN.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]) &#8211; epoch data to be checked</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
