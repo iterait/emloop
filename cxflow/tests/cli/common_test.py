@@ -7,6 +7,7 @@ from copy import deepcopy
 from typing import Mapping, List
 
 import yaml
+from testfixtures import LogCapture
 
 from cxflow import AbstractModel
 from cxflow.cli.common import create_output_dir, create_dataset, create_hooks, create_model
@@ -191,6 +192,17 @@ class CLICommonTest(CXTestCaseWithDir):
         bad_hooks_config = {'hooks': ['IDoNotExist']}
         self.assertRaises(ValueError, create_hooks,
                           config=bad_hooks_config, dataset=dataset, model=model, output_dir=self.tmpdir)
+
+        empty_params_hooks_config = {'hooks': [{'cxflow.tests.cli.common_test.DummyHook': None}]}
+        with LogCapture() as log_capture:
+            hooks4 = create_hooks(config=empty_params_hooks_config, dataset=dataset, model=model, output_dir = self.tmpdir)
+        self.assertEqual(len(hooks4), 1)
+        self.assertTrue(isinstance(hooks4[0], DummyHook))
+        log_capture.check(
+            ('root', 'INFO', 'Creating hooks'),
+            ('root', 'WARNING', '\t\t Empty config of `cxflow.tests.cli.common_test.DummyHook` hook'),
+            ('root', 'INFO', '\tDummyHook created'))
+
 
     def test_create_model(self):
         """Test if model is created correctly."""
