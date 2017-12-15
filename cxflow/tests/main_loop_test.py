@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import Mapping, List, Iterable
 
 import numpy as np
+from testfixtures import LogCapture
 
 import cxflow as cx
 from cxflow.hooks import StopAfter
@@ -83,6 +84,39 @@ class DelayedDataset(SimpleDataset):
             time.sleep(_READ_DATA_SLEEP_S)
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape)}
 
+class ShortSimpleDataset(SimpleDataset):
+    """SimpleDataset extension with one batch and one variable"""
+
+    def stream(self, stream_name: str) -> Stream:
+        for _ in range(1):
+            yield {'input': self._iter * np.ones(self.shape)}
+
+class EmptyStreamDataset(SimpleDataset):
+    """SimpleDataset extension providing empty streams."""
+
+    def stream(self, stream_name: str):
+        return iter([])
+
+class SomeEmptyBatchDataset(SimpleDataset):
+    """SimpleDataset extension with empty first batch."""
+
+    def __init__(self):
+        super().__init__()
+
+    def stream(self, stream_name: str):
+        for i in range(self.iters):
+            if i == 0:
+                batch =  {'input': [], 'target': []}
+            else:
+                batch = {'input': self._iter * np.ones(self.shape), 'target': np.zeros(self.shape)}
+            yield batch
+
+class AllEmptyBatchDataset(SimpleDataset):
+    """SimpleDataset extension with all batches empty."""
+
+    def stream(self, stream_name: str):
+        for _ in range(10):
+            yield {'input': [], 'target': []}
 
 class EventRecordingHook(cx.AbstractHook):
     """EventRecordingHook records all the events and store their count and order."""
@@ -451,3 +485,55 @@ class MainLoopTest(CXTestCaseWithDir):
         expected_profile = [_READ_DATA_SLEEP_S] + [0]*(_DATASET_ITERS-1)
 
         self.assertTrue(np.allclose(profile, expected_profile, atol=0.01))
+
+    def test_stream_check(self):
+        """Test handling of empty batches, streams and checking batch variable lengths."""
+
+        with LogCapture() as log_capture:
+            _, _, mainloop = self.create_main_loop(dataset=SomeEmptyBatchDataset(), on_empty_batch='warn')
+            mainloop.run_training()
+
+            log_capture.check(
+                ('root', 'DEBUG', 'Training started'),
+                ('root', 'INFO', 'Training epoch 1'),
+                ('root', 'WARNING', '0-th batch in stream `train` appears to be empty (0-th empty batch in '
+                                    'total). Set `main_loop.on_empty_batch` to `ignore` in order to suppress '
+                                    'this warning.'),
+                 ('root', 'INFO', 'EpochStopperHook triggered'),
+                 ('root', 'INFO', 'Training terminated: Training terminated after epoch 1'))
+
+        with LogCapture() as log_capture:
+            _, _, mainloop = self.create_main_loop(dataset=EmptyStreamDataset(), on_empty_stream='warn')
+            mainloop.run_training()
+
+            self.check = log_capture.check(
+                ('root', 'DEBUG', 'Training started'), ('root', 'INFO', 'Training epoch 1'),
+                ('root', 'WARNING', 'Stream `train` appears to be empty. Set `main_loop.on_empty_stream` to '
+                                    '`ignore` in order to suppress this warning.'),
+                 ('root', 'INFO', 'EpochStopperHook triggered'),
+                 ('root', 'INFO', 'Training terminated: Training terminated after epoch 1'))
+
+        with self.assertRaises(ValueError):
+            _, _, mainloop = self.create_main_loop(dataset=EmptyStreamDataset())
+            mainloop.run_training()
+
+        with self.assertRaises(ValueError):
+            _, _, mainloop = self.create_main_loop(dataset=AllEmptyBatchDataset(), on_empty_batch='ignore')
+            mainloop.run_training()
+
+        with self.assertRaises(ValueError):
+            _, _, mainloop = self.create_main_loop(dataset=SomeEmptyBatchDataset())
+            mainloop.run_training()
+
+        _, _, mainloop = self.create_main_loop(dataset=AllEmptyBatchDataset(), on_empty_batch='ignore', on_empty_stream='ignore')
+        mainloop.run_training()
+
+        with LogCapture() as log_capture:
+            _, dataset, mainloop = self.create_main_loop(dataset=ShortSimpleDataset(), fixed_batch_size=47, on_empty_stream='ignore')
+            mainloop.run_prediction()
+
+            log_capture.check(
+                ('root', 'INFO', 'Running prediction'),
+                ('root', 'DEBUG', '0-th batch in stream `predict` has variable `input` of length 11 inconsistent with '
+                                  '`main_loop.fixed_size` = 47'),
+                ('root', 'INFO', 'Prediction done\n\n'))
