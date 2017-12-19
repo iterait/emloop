@@ -18,6 +18,8 @@ import sys
 
 from cxflow.cli import train, resume, predict, grid_search, get_cxflow_arg_parser, invoke_dataset_method, \
     list_train_dirs
+from cxflow.cli.prune import prune_train_dirs
+
 from .constants import CXF_LOG_FORMAT, CXF_LOG_DATE_FORMAT
 
 
@@ -67,6 +69,9 @@ def entry_point() -> None:
 
     elif known_args.subcommand == 'ls':
         list_train_dirs(known_args.dir, known_args.recursive, known_args.all, known_args.long, known_args.verbose)
+
+    elif known_args.subcommand == 'prune':
+        prune_train_dirs(known_args.dir, known_args.epochs, known_args.subdirs)
 
 
 if __name__ == '__main__':
