@@ -1,8 +1,12 @@
+import time
+
 from typing import Callable, Optional, Iterator
-from threading import Thread, Event
+from threading import Thread, Event, Semaphore
 from queue import Queue, Empty
 
+from ..constants import CXF_BUFFER_SLEEP
 from ..types import Batch, Stream, TimeProfile
+from ..utils.misc import ReleasedSemaphore
 from ..utils.profile import Timer
 
 
@@ -64,6 +68,7 @@ class StreamWrapper:
         self._queue = Queue(buffer_size) if buffer_size > 0 else None
         self._stopping_event = None
         self._enqueueing_thread = None
+        self._semaphore = Semaphore(0)
 
     @property
     def name(self) -> Optional[str]:
@@ -102,7 +107,22 @@ class StreamWrapper:
         :param stop_event: event signaling stop instruction
         """
         while True:
-            for batch in self._get_stream():
+            self._stream = self._get_stream()
+            while True:
+                # Acquire the semaphore before processing the next batch
+                # but immediately release it so that other threads
+                # are not blocked when they decide to acquire it again.
+                with self._semaphore:
+                    pass
+                # It always takes a short moment before the native call actually
+                # releases the GIL and we are free to compute. The following sleep
+                # is here to compensate for this short moment - we don't want to 
+                # slow down the native call before the GIL is released.
+                time.sleep(CXF_BUFFER_SLEEP)
+                try:
+                    batch = next(self._stream)
+                except StopIteration:
+                    break
                 self._queue.put(batch)
                 self._batch_count += 1
                 if stop_event.is_set():
@@ -207,13 +227,18 @@ class StreamWrapper:
         return self
 
     def __exit__(self, *args) -> None:
-        """If buffered, terminate the enqueueing thrad."""
+        """If buffered, terminate the enqueueing thread."""
         if self._buffer_size > 0:
-            self._stop_thread()
+            with self.allow_buffering:
+                self._stop_thread()
 
     def __iter__(self) -> Iterator[Batch]:
         """Get stream iterator."""
         return self
+
+    def empty(self) -> bool:
+        """Return whether the buffer is empty."""
+        return self._queue is None or self._queue.empty()
 
     def __next__(self) -> Batch:
         """
@@ -222,17 +247,53 @@ class StreamWrapper:
         :return: next batch
         :raises StopIteration: at the end of the epoch
         """
-        get_batch_fn = self._dequeue_batch if self._buffer_size > 0 else self._next_batch
+        # get the next batch and if the buffer is empty, allow buffering
+        def get_batch_maybe_buffer():
+            # buffering is fully disabled; just compute the next batch
+            if self._buffer_size <= 0:
+                return self._next_batch()
+            # something is in the buffer; get it
+            if not self.empty():
+                return self._dequeue_batch()
+            # the buffer is empty; allow buffering and wait
+            with self.allow_buffering:
+                return self._dequeue_batch()
+
+        # get the next batch and measure the read time if requested
+        def get_batch_maybe_profile(event_name):
+            if self._profile is not None:
+                with Timer(event_name, self._profile):
+                    return get_batch_maybe_buffer()
+            return get_batch_maybe_buffer()
+
         event_name = 'read_batch_{}'.format(self._name)
-
-        if self._profile is not None:
-            with Timer(event_name, self._profile):
-                batch = get_batch_fn()
-        else:
-            batch = get_batch_fn()
-
+        batch = get_batch_maybe_profile(event_name)
         if batch is None:
             if self._profile:
                 self._profile[event_name].pop()
             raise StopIteration
         return batch
+
+    @property
+    def allow_buffering(self) -> ReleasedSemaphore:
+        """
+        A resource that allows the stream object to prepare batches in advance.
+
+        After the construction of the stream wrapper, the buffering is disabled. This
+        function makes it possible to allow buffering only when there is some spare CPU
+        time. A good place to allow buffering is e.g., during the training procedure in the
+        :py:meth:`cxflow.models.AbstractModel.run` method, whenever the ``GIL`` is released.
+
+        .. code-block:: python
+            :caption: Usage
+
+            # the training method of a model
+            def run(self, batch, train, stream):
+                preprocess_batch_in_python(batch)  # this function holds the GIL and fully utilizes the CPU
+                with stream.allow_buffering:
+                    call_native_backend(batch)  # this function is blocking, but releases the GIL
+                                                # we can use the GIL and the spare CPU to prepare the next batch
+
+        :return: A resource object that allows buffering when in use.
+        """
+        return ReleasedSemaphore(self._semaphore)

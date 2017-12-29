@@ -4,7 +4,7 @@ This module contains the definition of a model trainable in **cxflow** framework
 from abc import abstractmethod, ABCMeta
 from typing import Iterable, Optional
 
-from ..datasets import AbstractDataset
+from ..datasets import AbstractDataset, StreamWrapper
 from ..types import Batch
 
 
@@ -43,7 +43,7 @@ class AbstractModel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run(self, batch: Batch, train: bool) -> Batch:
+    def run(self, batch: Batch, train: bool, stream: StreamWrapper) -> Batch:
         """
         Run feed-forward pass with the given batch and return the results as dict.
 
@@ -51,6 +51,7 @@ class AbstractModel(metaclass=ABCMeta):
 
         :param batch: batch to be processed
         :param train: ``True`` if this batch should be used for model update, ``False`` otherwise
+        :param stream: stream wrapper (useful for precise buffer management)
         :return: results dict
         """
         pass

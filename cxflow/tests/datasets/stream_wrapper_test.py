@@ -1,3 +1,5 @@
+import time
+
 from cxflow.datasets.stream_wrapper import StreamWrapper
 from cxflow.types import Stream
 
@@ -90,3 +92,19 @@ class StreamWrapperTest(CXTestCase):
         next(stream)
         self.assertEqual(next(stream), 2)
         self.assertRaises(StopIteration, next, stream)
+
+    def test_allow_buffering(self):
+        dataset = SimpleDataset()
+        buffered_stream = StreamWrapper(dataset.train_stream, buffer_size=4)
+        buffered_epochs = []
+        with buffered_stream:
+            with buffered_stream.allow_buffering:
+                time.sleep(0.5)
+                pass
+            buffered_epochs = list(buffered_stream)
+            with buffered_stream.allow_buffering:
+                buffered_epochs += list(buffered_stream)
+            with buffered_stream.allow_buffering:
+                with buffered_stream.allow_buffering:
+                    buffered_epochs += list(buffered_stream)
+        self.assertListEqual(buffered_epochs, dataset.batches['train'])

@@ -12,3 +12,7 @@ EpochData = Mapping[str, object]
 
 TimeProfile = Mapping[str, List[float]]
 """Time profile type."""
+
+class TrainingTerminated(Exception):
+    """Exception that is raised when a hook terminates the training."""
+    pass

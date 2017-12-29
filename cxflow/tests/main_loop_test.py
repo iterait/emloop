@@ -9,6 +9,8 @@ import numpy as np
 from testfixtures import LogCapture
 
 import cxflow as cx
+from cxflow.constants import CXF_BUFFER_SLEEP
+from cxflow.datasets import StreamWrapper
 from cxflow.hooks import StopAfter
 from cxflow.utils.profile import Timer
 from cxflow.types import EpochData, Batch, Stream, TimeProfile
@@ -210,7 +212,7 @@ class TrainableModel(cx.AbstractModel):
         self._input_names = io['in']
         self._output_names = io['out']
 
-    def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
+    def run(self, batch: Mapping[str, object], train: bool, stream: StreamWrapper) -> Mapping[str, object]:
         return {o: i for i, o in enumerate(self._output_names)}
 
     def save(self, name_suffix: str) -> str:
@@ -234,9 +236,10 @@ class TrainableModel(cx.AbstractModel):
 class DelayedModel(TrainableModel):
     """Trainable model which sleeps briefly when processing a batch allowing to measure the model eval time."""
 
-    def run(self, batch: Mapping[str, object], train: bool):
-        time.sleep(_MODEL_RUN_SLEEP_S)
-        return super().run(batch, train)
+    def run(self, batch: Mapping[str, object], train: bool, stream: StreamWrapper):
+        with stream.allow_buffering:
+            time.sleep(_MODEL_RUN_SLEEP_S)
+        return super().run(batch, train, stream)
 
 
 class RecordingModel(TrainableModel):
@@ -248,8 +251,8 @@ class RecordingModel(TrainableModel):
         self.input_data = []
         self.is_train_data = []
 
-    def run(self, batch: Mapping[str, object], train: bool):
-        outputs = super().run(batch, train)
+    def run(self, batch: Mapping[str, object], train: bool, stream: StreamWrapper):
+        outputs = super().run(batch, train, stream)
         self.output_data.append(outputs)
         self.input_data.append(batch)
         self.is_train_data.append(train)
@@ -482,7 +485,7 @@ class MainLoopTest(CXTestCaseWithDir):
                                                dataset=DelayedDataset(), buffer=4)
         mainloop.run_training()
         profile = profile_hook.profile['read_batch_train']
-        expected_profile = [_READ_DATA_SLEEP_S] + [0]*(_DATASET_ITERS-1)
+        expected_profile = [_READ_DATA_SLEEP_S + CXF_BUFFER_SLEEP] + [0]*(_DATASET_ITERS-1)
 
         self.assertTrue(np.allclose(profile, expected_profile, atol=0.01))
 
@@ -499,8 +502,8 @@ class MainLoopTest(CXTestCaseWithDir):
                 ('root', 'WARNING', '0-th batch in stream `train` appears to be empty (0-th empty batch in '
                                     'total). Set `main_loop.on_empty_batch` to `ignore` in order to suppress '
                                     'this warning.'),
-                 ('root', 'INFO', 'EpochStopperHook triggered'),
-                 ('root', 'INFO', 'Training terminated: Training terminated after epoch 1'))
+                ('root', 'INFO', 'EpochStopperHook triggered'),
+                ('root', 'INFO', 'Training terminated: Training terminated after epoch 1'))
 
         with LogCapture() as log_capture:
             _, _, mainloop = self.create_main_loop(dataset=EmptyStreamDataset(), on_empty_stream='warn')

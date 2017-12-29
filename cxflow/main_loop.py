@@ -158,7 +158,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             self._check_sources(batch_input)
 
             with Timer('eval_batch_{}'.format(stream.name), self._epoch_profile):
-                batch_output = self._model.run(batch=batch_input, train=train)
+                batch_output = self._model.run(batch=batch_input, train=train, stream=stream)
             assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
 
             with Timer('after_batch_hooks_{}'.format(stream.name), self._epoch_profile):
@@ -175,14 +175,12 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                                  'set to `ignore` to remove it.'.format(stream.name))
 
 
-
     def train_by_stream(self, stream: StreamWrapper) -> None:
         """
         Train the model with the given stream.
 
         :param stream: stream to train with
         """
-
         self._run_epoch(stream=stream, train=True)
 
     def evaluate_stream(self, stream: StreamWrapper) -> None:
