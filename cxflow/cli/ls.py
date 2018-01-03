@@ -107,8 +107,8 @@ def _print_trainings_long(trainings: Iterable[Tuple[str, dict, TrainingTrace]]) 
 
         epochs_done = trace[TrainingTraceKeys.EPOCHS_DONE] if trace[TrainingTraceKeys.EPOCHS_DONE] else 0
 
-        long_table.append([path.basename(train_dir), get_model_name(config)] +
-                          list(get_classes(config)) +
+        long_table.append([path.basename(train_dir)] +
+                          list(map(lambda fq_name: fq_name.split('.')[-1], get_classes(config))) +
                           [age, duration, epochs_done])
 
     print(tabulate(long_table, tablefmt='plain'))
