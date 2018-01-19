@@ -13,7 +13,7 @@ class FailingDataset(SimpleDataset):
     def train_stream(self) -> Stream:
         for batch in super().train_stream():
             yield batch
-            raise RuntimeError('Explosion.')
+            raise RuntimeError('This exception is thrown on purpose. 👑 Keep calm and do deep learning. 👑')
 
 
 class StreamWrapperTest(CXTestCase):

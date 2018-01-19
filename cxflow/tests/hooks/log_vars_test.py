@@ -121,6 +121,6 @@ class LogVariablesTest(CXTestCase):
         with LogCapture() as log_capture:
             LogVariables(['precision'], on_unknown_type='str').after_epoch(_EPOCH_ID, _get_epoch_data())
         log_capture.check(
-            ('root', 'INFO', '\ttrain precision: [ 1.  1.  1.  1.  1.  1.]'),
-            ('root', 'INFO', '\ttest precision: [ 2.  2.  2.  2.  2.  2.]')
+            ('root', 'INFO', '\ttrain precision: [1. 1. 1. 1. 1. 1.]'),
+            ('root', 'INFO', '\ttest precision: [2. 2. 2. 2. 2. 2.]')
         )
