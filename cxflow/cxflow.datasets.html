@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets &#8212; cxflow 0.11.1 documentation</title>
+    <title>cxflow.datasets &#8212; cxflow 0.11.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.1',
+        VERSION:     '0.11.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -134,10 +134,12 @@ This concept prescribes the API that is required from every <strong>cxflow</stro
 Base class for datasets written in python.</li>
 <li><a class="reference internal" href="#cxflow.datasets.DownloadableDataset" title="cxflow.datasets.DownloadableDataset"><code class="xref py py-class docutils literal"><span class="pre">DownloadableDataset</span></code></a>:
 DownloadableDataset is dataset base class implementing routines for downloading and extracting data via</li>
+<li><a class="reference internal" href="#cxflow.datasets.StreamWrapper" title="cxflow.datasets.StreamWrapper"><code class="xref py py-class docutils literal"><span class="pre">StreamWrapper</span></code></a>:
+Dataset stream wrapper which manages buffering, epoch cutting etc.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.datasets.AbstractDataset">
-<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">AbstractDataset</code><span class="sig-paren">(</span><em>config_str: str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.AbstractDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">AbstractDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.AbstractDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>This concept prescribes the API that is required from every <strong>cxflow</strong> dataset.</p>
 <p>Every <strong>cxflow</strong> dataset has to have a constructor which takes YAML string config.
@@ -167,7 +169,7 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 
 <dl class="class">
 <dt id="cxflow.datasets.BaseDataset">
-<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str: str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.BaseDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.BaseDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">datasets.AbstractDataset</span></code></a></p>
 <p>Base class for datasets written in python.</p>
 <dl class="docutils">
@@ -224,7 +226,7 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 
 <dl class="class">
 <dt id="cxflow.datasets.DownloadableDataset">
-<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">DownloadableDataset</code><span class="sig-paren">(</span><em>config_str: str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.DownloadableDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">DownloadableDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.DownloadableDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">datasets.BaseDataset</span></code></a></p>
 <p>DownloadableDataset is dataset base class implementing routines for downloading and extracting data via
 <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">download</span></code> command.</p>
@@ -301,6 +303,299 @@ the downloaded files to <a class="reference internal" href="#cxflow.datasets.Dow
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.datasets.StreamWrapper">
+<em class="property">class </em><code class="descclassname">cxflow.datasets.</code><code class="descname">StreamWrapper</code><span class="sig-paren">(</span><em>stream_fn</em>, <em>buffer_size=0</em>, <em>epoch_size=-1</em>, <em>name=None</em>, <em>profile=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cxflow.datasets.StreamWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Dataset stream wrapper which manages buffering, epoch cutting etc.</p>
+<dl class="docutils">
+<dt>The main features are:</dt>
+<dd><ul class="first last simple">
+<li>resets underlying dataset stream after the iteration reaches its end</li>
+<li>if specified, uses consumer-producer buffer for batches allowing simultaneous batch producing and training</li>
+<li>if specified, produces epochs of fixed size</li>
+<li>logs the timings to the given profile</li>
+</ul>
+</dd>
+</dl>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p class="last">Buffered <code class="docutils literal"><span class="pre">StreamWrapper</span></code> must be used in with-resource environment
+so that the enqueueing thread can be properly managed.</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">non-buffered StreamWrapper</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">stream</span> <span class="o">=</span> <span class="n">StreamWrapper</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">train_stream</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>  <span class="c1"># 1st batch</span>
+    <span class="c1"># do stuff</span>
+<span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>  <span class="c1"># 2nd batch</span>
+    <span class="c1"># do stuff</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">buffered StreamWrapper with fixed size epochs</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">stream</span> <span class="o">=</span> <span class="n">StreamWrapper</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">train_stream</span><span class="p">,</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="nb">buffer</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">epoch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">stream</span><span class="p">:</span>  <span class="c1"># we would get error without with-resource directive</span>
+    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>  <span class="c1"># 1st batch</span>
+        <span class="c1"># do stuff</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-bcb4c530fb5ebe0e62820cb37f1761f1f263f761.png" alt="Inheritance diagram of StreamWrapper" class="inheritance"/>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper.__enter__">
+<code class="descname">__enter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper.__enter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper.__enter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>If buffered, start the enqueueing thread.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterator" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterator</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper.__exit__">
+<code class="descname">__exit__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper.__exit__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper.__exit__" title="Permalink to this definition">¶</a></dt>
+<dd><p>If buffered, terminate the enqueueing thread.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>stream_fn</em>, <em>buffer_size=0</em>, <em>epoch_size=-1</em>, <em>name=None</em>, <em>profile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new StreamWrapper.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>stream_fn</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Callable" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Callable</span></code></a>[[], <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]]) &#8211; callable which returns raw dataset stream</li>
+<li><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; buffer size, &lt; 1 means no buffer</li>
+<li><strong>epoch_size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>) &#8211; if &gt; 0, stop iteration after the specified number of batches</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; optional stream name</li>
+<li><strong>profile</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.List" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>]]]) &#8211; profile to record times</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper.__iter__">
+<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get stream iterator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterator" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterator</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper.__next__">
+<code class="descname">__next__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper.__next__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper.__next__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return next batch or end epoch with <code class="docutils literal"><span class="pre">StopIteration</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">next batch</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#StopIteration" title="(in Python v3.6)"><strong>StopIteration</strong></a> &#8211; at the end of the epoch</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._dequeue_batch">
+<code class="descname">_dequeue_batch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._dequeue_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._dequeue_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a single batch from queue or <code class="docutils literal"><span class="pre">None</span></code> signaling epoch end.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ChildProcessError" title="(in Python v3.6)"><strong>ChildProcessError</strong></a> &#8211; if the enqueueing thread ended unexpectedly</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._enqueue_batches">
+<code class="descname">_enqueue_batches</code><span class="sig-paren">(</span><em>stop_event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._enqueue_batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._enqueue_batches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enqueue all the stream batches. If specified, stop after <code class="docutils literal"><span class="pre">epoch_size</span></code> batches.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Signal the epoch end with <code class="docutils literal"><span class="pre">None</span></code>.</p>
+</div>
+<p>Stop when:
+- <code class="docutils literal"><span class="pre">stop_event</span></code> is risen
+- stream ends and epoch size is not set
+- specified number of batches is enqueued</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is used only with <code class="docutils literal"><span class="pre">buffer</span></code> &gt; 0.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stop_event</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/threading.html#threading.Event" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Event</span></code></a>) &#8211; event signaling stop instruction</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._epoch_limit_reached">
+<code class="descname">_epoch_limit_reached</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._epoch_limit_reached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._epoch_limit_reached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the number of produced batches reached the specified <code class="docutils literal"><span class="pre">epoch_size</span></code>.</p>
+<p>Always return False if no limit was specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._get_stream">
+<code class="descname">_get_stream</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._get_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._get_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possibly create and return raw dataset stream iterator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterator" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterator</span></code></a>[+T_co]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._next_batch">
+<code class="descname">_next_batch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._next_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._next_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a single batch or <code class="docutils literal"><span class="pre">None</span></code> signaling epoch end.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Signal the epoch end with <code class="docutils literal"><span class="pre">None</span></code>.</p>
+</div>
+<p>Stop when:
+- stream ends and epoch size is not set
+- specified number of batches is returned</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a single batch or <code class="docutils literal"><span class="pre">None</span></code> signaling epoch end</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._start_thread">
+<code class="descname">_start_thread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._start_thread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._start_thread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start an enqueueing thread.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper._stop_thread">
+<code class="descname">_stop_thread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper._stop_thread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper._stop_thread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the enqueueing thread. Keep the queue content and stream state.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.datasets.StreamWrapper.allow_buffering">
+<code class="descname">allow_buffering</code><a class="headerlink" href="#cxflow.datasets.StreamWrapper.allow_buffering" title="Permalink to this definition">¶</a></dt>
+<dd><p>A resource that allows the stream object to prepare batches in advance.</p>
+<p>After the construction of the stream wrapper, the buffering is disabled. This
+function makes it possible to allow buffering only when there is some spare CPU
+time. A good place to allow buffering is e.g., during the training procedure in the
+<a class="reference internal" href="cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method, whenever the <code class="docutils literal"><span class="pre">GIL</span></code> is released.</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Usage</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># the training method of a model</span>
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">train</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+    <span class="n">preprocess_batch_in_python</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>  <span class="c1"># this function holds the GIL and fully utilizes the CPU</span>
+    <span class="k">with</span> <span class="n">stream</span><span class="o">.</span><span class="n">allow_buffering</span><span class="p">:</span>
+        <span class="n">call_native_backend</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>  <span class="c1"># this function is blocking, but releases the GIL</span>
+                                    <span class="c1"># we can use the GIL and the spare CPU to prepare the next batch</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">ReleasedSemaphore</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A resource object that allows buffering when in use.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.StreamWrapper.empty">
+<code class="descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/stream_wrapper.html#StreamWrapper.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.StreamWrapper.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the buffer is empty.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.datasets.StreamWrapper.name">
+<code class="descname">name</code><a class="headerlink" href="#cxflow.datasets.StreamWrapper.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
 </tr>
 </tbody>
 </table>

@@ -20,6 +20,9 @@ Classes
 - :py:class:`DownloadableDataset`:
   DownloadableDataset is dataset base class implementing routines for downloading and extracting data via
 
+- :py:class:`StreamWrapper`:
+  Dataset stream wrapper which manages buffering, epoch cutting etc.
+
 
 
 .. autoclass:: AbstractDataset
@@ -58,6 +61,20 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: DownloadableDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: StreamWrapper
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: StreamWrapper
       :parts: 1
 
    |

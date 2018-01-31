@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks.abstract_hook &#8212; cxflow 0.11.1 documentation</title>
+    <title>cxflow.hooks.abstract_hook &#8212; cxflow 0.11.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.11.1',
+        VERSION:     '0.11.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -115,12 +115,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span>
-<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">EpochData</span><span class="p">,</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">TimeProfile</span>
-
-
-<div class="viewcode-block" id="TrainingTerminated"><a class="viewcode-back" href="../../../cxflow/cxflow.hooks.html#cxflow.hooks.TrainingTerminated">[docs]</a><span class="k">class</span> <span class="nc">TrainingTerminated</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Exception that is raised when a hook terminates the training.&quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">EpochData</span><span class="p">,</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">TimeProfile</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
 
 
 <span class="k">class</span> <span class="nc">AbstractHook</span><span class="p">:</span>

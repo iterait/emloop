@@ -22,6 +22,7 @@ Variables
 - :py:data:`CXF_PREDICT_STREAM`
 - :py:data:`CXF_DEFAULT_LOG_DIR`
 - :py:data:`CXF_NA_STR`
+- :py:data:`CXF_BUFFER_SLEEP`
 
 .. autodata:: CXF_LOG_FORMAT
    :annotation:
@@ -99,3 +100,10 @@ Variables
    .. code-block:: guess
 
       'N/A'
+
+.. autodata:: CXF_BUFFER_SLEEP
+   :annotation:
+
+   .. code-block:: guess
+
+      0.02

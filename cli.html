@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>CLI Reference &#8212; cxflow 0.11.1 documentation</title>
+    <title>CLI Reference &#8212; cxflow 0.11.2 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.1',
+        VERSION:     '0.11.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -116,6 +116,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#cxflow-ls">cxflow ls</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cxflow-prune">cxflow prune</a><ul>
 <li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
 <li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
@@ -294,6 +299,46 @@ explained below.</p>
 <tr><td class="option-group">
 <kbd>-v, &#8211;verbose</kbd></td>
 <td><p class="first">print more verbose output, applicable only when a single train dir is listed</p>
+<p class="last">Default: False</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="cxflow-prune">
+<h2>cxflow prune<a class="headerlink" href="#cxflow-prune" title="Permalink to this headline">¶</a></h2>
+<p>Prune training log dirs in the given path without finished epochs.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cxflow</span> <span class="n">prune</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">EPOCHS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">]</span> <span class="p">[</span><span class="nb">dir</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>dir</kbd></td>
+<td><p class="first">path to the log directory to be pruned</p>
+<p class="last">Default: &#8221;./log&#8221;</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-e, &#8211;epochs</kbd></td>
+<td><p class="first">keep only training log dirs having at least this many completed epochs, default 1</p>
+<p class="last">Default: 1</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-s, &#8211;subdirs</kbd></td>
+<td><p class="first">delete all subdirectories in training directories</p>
 <p class="last">Default: False</p>
 </td></tr>
 </tbody>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.main_loop &#8212; cxflow 0.11.1 documentation</title>
+    <title>cxflow.main_loop &#8212; cxflow 0.11.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.11.1',
+        VERSION:     '0.11.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -130,6 +130,8 @@
 <div class="viewcode-block" id="MainLoop"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop">[docs]</a><span class="k">class</span> <span class="nc">MainLoop</span><span class="p">(</span><span class="n">CaughtInterrupts</span><span class="p">):</span>   <span class="c1"># pylint: disable=too-many-instance-attributes</span>
     <span class="sd">&quot;&quot;&quot;**cxflow** main loop for training and model inference.&quot;&quot;&quot;</span>
 
+    <span class="n">EMPTY_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Possible actions to be taken when a batch/stream is empty.&quot;&quot;&quot;</span>
     <span class="n">UNUSED_SOURCE_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]</span>
     <span class="sd">&quot;&quot;&quot;Possible actions to be taken when a stream source is unused by the trained model.&quot;&quot;&quot;</span>
 
@@ -138,6 +140,8 @@
                  <span class="n">hooks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AbstractHook</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>
                  <span class="n">extra_streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>  <span class="c1"># pylint: disable=invalid-sequence-index</span>
                  <span class="n">buffer</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">on_empty_batch</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+                 <span class="n">on_empty_stream</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
                  <span class="n">on_unused_sources</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span>
                  <span class="n">fixed_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">fixed_epoch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -148,18 +152,26 @@
 <span class="sd">        :param hooks: training hooks</span>
 <span class="sd">        :param extra_streams: additional stream names to be evaluated between epochs</span>
 <span class="sd">        :param buffer: size of the batch buffer, 0 means no buffer</span>
+<span class="sd">        :param on_empty_batch: action to take when batch is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`</span>
+<span class="sd">        :param on_empty_stream: action to take when stream is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`</span>
 <span class="sd">        :param on_unused_sources: action to take when stream provides an unused sources; one of</span>
 <span class="sd">            :py:attr:`UNUSED_SOURCE_ACTIONS`</span>
 <span class="sd">        :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size</span>
 <span class="sd">        :param fixed_epoch_size: if specified, cut the train stream to epochs of at most ``fixed_epoch_size`` batches</span>
 <span class="sd">        :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch</span>
+<span class="sd">        :raise AssertionError: in case of unsupported value of ``on_empty_batch``, ``on_empty_stream`` or \</span>
+<span class="sd">        ``on_unused_sources``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">on_empty_batch</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">EMPTY_ACTIONS</span>
+        <span class="k">assert</span> <span class="n">on_empty_stream</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">EMPTY_ACTIONS</span>
         <span class="k">assert</span> <span class="n">on_unused_sources</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">UNUSED_SOURCE_ACTIONS</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span> <span class="o">=</span> <span class="n">hooks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="n">buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_batch</span> <span class="o">=</span> <span class="n">on_empty_batch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_stream</span> <span class="o">=</span> <span class="n">on_empty_stream</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_unused_sources</span> <span class="o">=</span> <span class="n">on_unused_sources</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span> <span class="o">=</span> <span class="n">fixed_batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span> <span class="o">=</span> <span class="n">fixed_epoch_size</span>
@@ -225,26 +237,52 @@
 
 <span class="sd">        :param stream: stream to iterate</span>
 <span class="sd">        :param train: if set to ``True``, the model will be trained</span>
-<span class="sd">        :param stream_name: stream name</span>
+<span class="sd">        :raise ValueError: in case of empty batch when ``on_empty_batch`` is set to ``error``</span>
+<span class="sd">        :raise ValueError: in case of empty stream when ``on_empty_stream`` is set to ``error``</span>
+<span class="sd">        :raise ValueError: in case of two batch variables having different lengths</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">batch_input</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">nonempty_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">batch_input</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">raise_check_interrupt</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_input</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">batch_input</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">:</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Incomplete batch skipped&#39;</span><span class="p">)</span>
+            <span class="n">batch_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">batch_input</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_sizes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">batch_sizes</span> <span class="o">==</span> <span class="p">{</span><span class="mi">0</span><span class="p">}:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_batch</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">-th batch in stream `</span><span class="si">%s</span><span class="s1">` appears to be empty (</span><span class="si">%i</span><span class="s1">-th empty batch in total). Set &#39;</span>
+                                    <span class="s1">&#39;`main_loop.on_empty_batch` to `ignore` in order to suppress this warning.&#39;</span><span class="p">,</span>
+                                    <span class="n">i</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">nonempty_batch_count</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_batch</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-th batch in stream `</span><span class="si">{}</span><span class="s1">` appears to be empty (</span><span class="si">{}</span><span class="s1">-th empty batch in total). Set &#39;</span>
+                                     <span class="s1">&#39;`main_loop.on_empty_batch` to `warn` in order to change this error into warning; &#39;</span>
+                                     <span class="s1">&#39;set to `ignore` to remove it.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">nonempty_batch_count</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">batch_sizes</span> <span class="o">!=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">}:</span>
+                    <span class="n">var</span><span class="p">,</span> <span class="n">len_</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">batch_input</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">-th batch in stream `</span><span class="si">%s</span><span class="s1">` has variable `</span><span class="si">%s</span><span class="s1">` of length </span><span class="si">%i</span><span class="s1"> inconsistent with &#39;</span>
+                                  <span class="s1">&#39;`main_loop.fixed_size` = </span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">len_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">)</span>
                     <span class="k">continue</span>
+            <span class="n">nonempty_batch_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_check_sources</span><span class="p">(</span><span class="n">batch_input</span><span class="p">)</span>
 
             <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;eval_batch_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">):</span>
-                <span class="n">batch_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="n">batch_input</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="n">train</span><span class="p">)</span>
+                <span class="n">batch_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="n">batch_input</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
             <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">batch_input</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">batch_output</span><span class="p">)),</span> <span class="s1">&#39;Batch inputs and outputs must not overlap.&#39;</span>
 
             <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;after_batch_hooks_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">):</span>
                 <span class="n">batch_data</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">batch_input</span><span class="p">,</span> <span class="o">**</span><span class="n">batch_output</span><span class="p">}</span>
                 <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
-                    <span class="n">hook</span><span class="o">.</span><span class="n">after_batch</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">batch_data</span><span class="o">=</span><span class="n">batch_data</span><span class="p">)</span></div>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">after_batch</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">batch_data</span><span class="o">=</span><span class="n">batch_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nonempty_batch_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_stream</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Stream `</span><span class="si">%s</span><span class="s1">` appears to be empty. Set `main_loop.on_empty_stream` to `ignore` in order &#39;</span>
+                                <span class="s1">&#39;to suppress this warning.&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_stream</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Stream `</span><span class="si">{}</span><span class="s1">` appears to be empty. Set &#39;</span>
+                                 <span class="s1">&#39;`main_loop.on_empty_stream` to `warn` in order to change this error into warning; &#39;</span>
+                                 <span class="s1">&#39;set to `ignore` to remove it.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
 
 <div class="viewcode-block" id="MainLoop.train_by_stream"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.train_by_stream">[docs]</a>    <span class="k">def</span> <span class="nf">train_by_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">StreamWrapper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -252,7 +290,6 @@
 
 <span class="sd">        :param stream: stream to train with</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_epoch</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainLoop.evaluate_stream"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.evaluate_stream">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">StreamWrapper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

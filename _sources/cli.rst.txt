@@ -66,3 +66,11 @@ cxflow ls
    :ref: cxflow.cli.get_cxflow_arg_parser
    :prog: cxflow
    :path: ls
+
+
+cxflow prune
+--------------
+.. argparse::
+   :ref: cxflow.cli.get_cxflow_arg_parser
+   :prog: cxflow
+   :path: prune

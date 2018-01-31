@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cxflow.datasets.stream_wrapper &#8212; cxflow 0.11.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.11.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          cxflow</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../../cli.html">CLI Reference</a></li>
+                <li><a href="../../../cxflow/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../../search.html" method="get" class="searchbox">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
+</ul>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for cxflow.datasets.stream_wrapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterator</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Semaphore</span>
+<span class="kn">from</span> <span class="nn">queue</span> <span class="k">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
+
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="k">import</span> <span class="n">CXF_BUFFER_SLEEP</span>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">TimeProfile</span>
+<span class="kn">from</span> <span class="nn">..utils.misc</span> <span class="k">import</span> <span class="n">ReleasedSemaphore</span>
+<span class="kn">from</span> <span class="nn">..utils.profile</span> <span class="k">import</span> <span class="n">Timer</span>
+
+
+<span class="k">class</span> <span class="nc">StreamWrapper</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataset stream wrapper which manages buffering, epoch cutting etc.</span>
+
+<span class="sd">    The main features are:</span>
+<span class="sd">        - resets underlying dataset stream after the iteration reaches its end</span>
+<span class="sd">        - if specified, uses consumer-producer buffer for batches allowing simultaneous batch producing and training</span>
+<span class="sd">        - if specified, produces epochs of fixed size</span>
+<span class="sd">        - logs the timings to the given profile</span>
+
+<span class="sd">    .. caution::</span>
+<span class="sd">        Buffered ``StreamWrapper`` must be used in with-resource environment</span>
+<span class="sd">        so that the enqueueing thread can be properly managed.</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: non-buffered StreamWrapper</span>
+
+<span class="sd">        stream = StreamWrapper(dataset.train_stream, &#39;train&#39;)</span>
+<span class="sd">        for batch in stream:  # 1st batch</span>
+<span class="sd">            # do stuff</span>
+<span class="sd">        for batch in stream:  # 2nd batch</span>
+<span class="sd">            # do stuff</span>
+
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :caption: buffered StreamWrapper with fixed size epochs</span>
+
+<span class="sd">        stream = StreamWrapper(dataset.train_stream, &#39;train&#39;, buffer=16, epoch_size=1000)</span>
+<span class="sd">        with stream:  # we would get error without with-resource directive</span>
+<span class="sd">            for batch in stream:  # 1st batch</span>
+<span class="sd">                # do stuff</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StreamWrapper.__init__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">stream_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Stream</span><span class="p">],</span>
+                 <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">epoch_size</span><span class="p">:</span> <span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TimeProfile</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create new StreamWrapper.</span>
+
+<span class="sd">        :param stream_fn: callable which returns raw dataset stream</span>
+<span class="sd">        :param buffer_size: buffer size, &lt; 1 means no buffer</span>
+<span class="sd">        :param epoch_size: if &gt; 0, stop iteration after the specified number of batches</span>
+<span class="sd">        :param name: optional stream name</span>
+<span class="sd">        :param profile: profile to record times</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_stream_fn</span> <span class="o">=</span> <span class="n">stream_fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span> <span class="o">=</span> <span class="n">buffer_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_size</span> <span class="o">=</span> <span class="n">epoch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_profile</span> <span class="o">=</span> <span class="n">profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span> <span class="k">if</span> <span class="n">buffer_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stopping_event</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span> <span class="o">=</span> <span class="n">Semaphore</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Stream name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+<div class="viewcode-block" id="StreamWrapper._get_stream"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._get_stream">[docs]</a>    <span class="k">def</span> <span class="nf">_get_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Possibly create and return raw dataset stream iterator.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_stream_fn</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span></div>
+
+<div class="viewcode-block" id="StreamWrapper._epoch_limit_reached"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._epoch_limit_reached">[docs]</a>    <span class="k">def</span> <span class="nf">_epoch_limit_reached</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if the number of produced batches reached the specified ``epoch_size``.</span>
+
+<span class="sd">        Always return False if no limit was specified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_size</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span></div>
+
+<div class="viewcode-block" id="StreamWrapper._enqueue_batches"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._enqueue_batches">[docs]</a>    <span class="k">def</span> <span class="nf">_enqueue_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stop_event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enqueue all the stream batches. If specified, stop after ``epoch_size`` batches.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Signal the epoch end with ``None``.</span>
+
+<span class="sd">        Stop when:</span>
+<span class="sd">        - ``stop_event`` is risen</span>
+<span class="sd">        - stream ends and epoch size is not set</span>
+<span class="sd">        - specified number of batches is enqueued</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            This is used only with ``buffer`` &gt; 0.</span>
+
+<span class="sd">        :param stop_event: event signaling stop instruction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_stream</span><span class="p">()</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Acquire the semaphore before processing the next batch</span>
+                <span class="c1"># but immediately release it so that other threads</span>
+                <span class="c1"># are not blocked when they decide to acquire it again.</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># It always takes a short moment before the native call actually</span>
+                <span class="c1"># releases the GIL and we are free to compute. The following sleep</span>
+                <span class="c1"># is here to compensate for this short moment - we don&#39;t want to </span>
+                <span class="c1"># slow down the native call before the GIL is released.</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">CXF_BUFFER_SLEEP</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">stop_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_limit_reached</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># yield a new iterator next time</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># for non-fixed size epochs</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">return</span></div>
+
+<div class="viewcode-block" id="StreamWrapper._dequeue_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._dequeue_batch">[docs]</a>    <span class="k">def</span> <span class="nf">_dequeue_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Batch</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a single batch from queue or ``None`` signaling epoch end.</span>
+
+<span class="sd">        :raise ChildProcessError: if the enqueueing thread ended unexpectedly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;StreamWrapper `</span><span class="si">{}</span><span class="s1">` with buffer of size `</span><span class="si">{}</span><span class="s1">` was used outside with-resource environment.&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_thread</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># the enqueueing thread may just finished properly so lets check the queue eagerly</span>
+                        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+                        <span class="k">break</span>
+                    <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+                        <span class="c1"># so we failed to retrieve a batch and the enqueueing thread is dead</span>
+                        <span class="c1"># there is no hope, something must went wrong</span>
+                        <span class="k">raise</span> <span class="ne">ChildProcessError</span><span class="p">(</span><span class="s1">&#39;Enqueueing thread ended unexpectedly.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">batch</span></div>
+
+<div class="viewcode-block" id="StreamWrapper._next_batch"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._next_batch">[docs]</a>    <span class="k">def</span> <span class="nf">_next_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Batch</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a single batch or ``None`` signaling epoch end.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Signal the epoch end with ``None``.</span>
+
+<span class="sd">        Stop when:</span>
+<span class="sd">        - stream ends and epoch size is not set</span>
+<span class="sd">        - specified number of batches is returned</span>
+
+<span class="sd">        :return: a single batch or ``None`` signaling epoch end</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_limit_reached</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_stream</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">batch</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># yield a new iterator next time</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># underlying stream ended but our fixed size epoch did not</span>
+                <span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_stream</span><span class="p">())</span>  <span class="c1"># get another stream and return its 1st batch</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">return</span> <span class="n">batch</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="StreamWrapper._start_thread"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._start_thread">[docs]</a>    <span class="k">def</span> <span class="nf">_start_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start an enqueueing thread.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stopping_event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_enqueue_batches</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stopping_event</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StreamWrapper._stop_thread"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper._stop_thread">[docs]</a>    <span class="k">def</span> <span class="nf">_stop_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stop the enqueueing thread. Keep the queue content and stream state.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stopping_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">queue_content</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># give the enqueueing thread chance to put a batch to the queue and check the stopping event</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">queue_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">())</span>
+        <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enqueueing_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">queue_content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">())</span>  <span class="c1"># collect the very last item</span>
+        <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">queue_content</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span><span class="p">))</span>  <span class="c1"># queue content may be bigger than queue size</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">queue_content</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamWrapper.__enter__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Batch</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;If buffered, start the enqueueing thread.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_thread</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="StreamWrapper.__exit__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper.__exit__">[docs]</a>    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;If buffered, terminate the enqueueing thread.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_buffering</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stop_thread</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StreamWrapper.__iter__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Batch</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get stream iterator.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="StreamWrapper.empty"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return whether the buffer is empty.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StreamWrapper.__next__"><a class="viewcode-back" href="../../../cxflow/cxflow.datasets.html#cxflow.datasets.StreamWrapper.__next__">[docs]</a>    <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Batch</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return next batch or end epoch with ``StopIteration``.</span>
+
+<span class="sd">        :return: next batch</span>
+<span class="sd">        :raises StopIteration: at the end of the epoch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get the next batch and if the buffer is empty, allow buffering</span>
+        <span class="k">def</span> <span class="nf">get_batch_maybe_buffer</span><span class="p">():</span>
+            <span class="c1"># buffering is fully disabled; just compute the next batch</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_batch</span><span class="p">()</span>
+            <span class="c1"># something is in the buffer; get it</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dequeue_batch</span><span class="p">()</span>
+            <span class="c1"># the buffer is empty; allow buffering and wait</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_buffering</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dequeue_batch</span><span class="p">()</span>
+
+        <span class="c1"># get the next batch and measure the read time if requested</span>
+        <span class="k">def</span> <span class="nf">get_batch_maybe_profile</span><span class="p">(</span><span class="n">event_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_profile</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">get_batch_maybe_buffer</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">get_batch_maybe_buffer</span><span class="p">()</span>
+
+        <span class="n">event_name</span> <span class="o">=</span> <span class="s1">&#39;read_batch_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="n">get_batch_maybe_profile</span><span class="p">(</span><span class="n">event_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">batch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_profile</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_profile</span><span class="p">[</span><span class="n">event_name</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">return</span> <span class="n">batch</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">allow_buffering</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReleasedSemaphore</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A resource that allows the stream object to prepare batches in advance.</span>
+
+<span class="sd">        After the construction of the stream wrapper, the buffering is disabled. This</span>
+<span class="sd">        function makes it possible to allow buffering only when there is some spare CPU</span>
+<span class="sd">        time. A good place to allow buffering is e.g., during the training procedure in the</span>
+<span class="sd">        :py:meth:`cxflow.models.AbstractModel.run` method, whenever the ``GIL`` is released.</span>
+
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">            :caption: Usage</span>
+
+<span class="sd">            # the training method of a model</span>
+<span class="sd">            def run(self, batch, train, stream):</span>
+<span class="sd">                preprocess_batch_in_python(batch)  # this function holds the GIL and fully utilizes the CPU</span>
+<span class="sd">                with stream.allow_buffering:</span>
+<span class="sd">                    call_native_backend(batch)  # this function is blocking, but releases the GIL</span>
+<span class="sd">                                                # we can use the GIL and the spare CPU to prepare the next batch</span>
+
+<span class="sd">        :return: A resource object that allows buffering when in use.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ReleasedSemaphore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_semaphore</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+    </p>
+  </div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
+  </body>
+</html>
