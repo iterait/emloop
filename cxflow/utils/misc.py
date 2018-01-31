@@ -6,8 +6,8 @@ import os
 import sys
 import logging
 import signal
-from ..hooks.abstract_hook import TrainingTerminated
-
+import threading
+from ..types import TrainingTerminated
 
 class DisabledPrint:
     """
@@ -127,5 +127,40 @@ class CaughtInterrupts:
         for sig in CaughtInterrupts.INTERRUPT_SIGNALS:
             signal.signal(sig, self._origin_handlers[sig])
         self._origin_handlers = {}
+
+
+class ReleasedSemaphore:
+    """
+    Releases a :py:class:`threading.Semaphore` in between ``__enter__`` and ``__exit__``.
+
+    .. code-block:: python
+        :caption: Usage
+
+        semaphore = Semaphore()
+        semaphore.acquire()
+
+        Thread 1:
+            while True:
+                # each item needs an aquired semaphore
+                with semaphore:
+                    process_item()
+
+        Thread 2:
+            # Thread 1 processing is disallowed
+            do_something()
+            # Thread 1 processing is allowed
+            with ReleasedSemaphore(semaphore):
+                do_something()
+
+    """
+
+    def __init__(self, semaphore: threading.Semaphore):
+        self._semaphore = semaphore
+
+    def __enter__(self) -> None:
+        self._semaphore.release()
+
+    def __exit__(self, *args) -> None:
+        self._semaphore.acquire()
 
 __all__ = []

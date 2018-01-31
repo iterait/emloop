@@ -176,9 +176,13 @@ def create_hooks(config: dict, model: AbstractModel,
             if isinstance(hook_config, str):
                 hook_config = {hook_config: {}}
             assert len(hook_config) == 1, 'Hook configuration must have exactly one key (fully qualified name).'
-            hook_path = next(iter(hook_config.keys()))
-            hook_module, hook_class = parse_fully_qualified_name(hook_path)
 
+            hook_path, hook_params = next(iter(hook_config.items()))
+            if hook_params is None:
+                logging.warning('\t\t Empty config of `%s` hook', hook_path)
+                hook_params = {}
+
+            hook_module, hook_class = parse_fully_qualified_name(hook_path)
             # find the hook module if not specified
             if hook_module is None:
                 hook_module = get_class_module(CXF_HOOKS_MODULE, hook_class)
@@ -188,7 +192,7 @@ def create_hooks(config: dict, model: AbstractModel,
                                      'Make sure it is defined under `{}` sub-modules.'
                                      .format(hook_class, CXF_HOOKS_MODULE))
             # create hook kwargs
-            hook_kwargs = {'dataset': dataset, 'model': model, 'output_dir': output_dir, **hook_config[hook_path]}
+            hook_kwargs = {'dataset': dataset, 'model': model, 'output_dir': output_dir, **hook_params}
 
             # create new hook
             try:

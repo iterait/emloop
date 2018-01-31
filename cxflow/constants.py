@@ -33,6 +33,9 @@ CXF_PREDICT_STREAM = 'predict'
 CXF_NA_STR = 'N/A'
 """N/A string for pretty printing."""
 
+CXF_BUFFER_SLEEP = 0.02
+"""The duration for which the buffer sleeps before it starts to process the next batch."""
+
 __all__ = ['CXF_LOG_FORMAT', 'CXF_LOG_DATE_FORMAT', 'CXF_FULL_DATE_FORMAT', 'CXF_HOOKS_MODULE', 'CXF_CONFIG_FILE',
            'CXF_LOG_FILE', 'CXF_TRACE_FILE', 'CXF_TRAIN_STREAM', 'CXF_PREDICT_STREAM', 'CXF_DEFAULT_LOG_DIR',
-           'CXF_NA_STR']
+           'CXF_NA_STR', 'CXF_BUFFER_SLEEP']

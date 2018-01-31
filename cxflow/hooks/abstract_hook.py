@@ -6,12 +6,7 @@ Furthermore, TrainingTerminated exception is defined.
 import logging
 import inspect
 from typing import Iterable
-from ..types import EpochData, Batch, TimeProfile
-
-
-class TrainingTerminated(Exception):
-    """Exception that is raised when a hook terminates the training."""
-    pass
+from ..types import EpochData, Batch, TimeProfile, TrainingTerminated
 
 
 class AbstractHook:

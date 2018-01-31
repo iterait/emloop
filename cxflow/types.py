@@ -1,7 +1,7 @@
-from typing import Iterable, Any, Mapping, List
+from typing import Iterable, Any, Mapping, List, Sequence
 
 
-Batch = Mapping[str, Iterable[Any]]
+Batch = Mapping[str, Sequence[Any]]
 """Batch type: :py:class:`typing.Mapping` of ``variable_name`` to an :py:class:`typing.Iterable` of examples."""
 
 Stream = Iterable[Batch]
@@ -12,3 +12,7 @@ EpochData = Mapping[str, object]
 
 TimeProfile = Mapping[str, List[float]]
 """Time profile type."""
+
+class TrainingTerminated(Exception):
+    """Exception that is raised when a hook terminates the training."""
+    pass

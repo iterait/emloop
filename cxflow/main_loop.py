@@ -21,6 +21,8 @@ from .types import EpochData
 class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attributes
     """**cxflow** main loop for training and model inference."""
 
+    EMPTY_ACTIONS = ['ignore', 'warn', 'error']
+    """Possible actions to be taken when a batch/stream is empty."""
     UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
     """Possible actions to be taken when a stream source is unused by the trained model."""
 
@@ -29,6 +31,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                  hooks: Iterable[AbstractHook]=(),
                  extra_streams: List[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
+                 on_empty_batch: str='error',
+                 on_empty_stream: str='error',
                  on_unused_sources: str='warn',
                  fixed_batch_size: Optional[int]=None,
                  fixed_epoch_size: Optional[int]=None,
@@ -39,18 +43,26 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         :param hooks: training hooks
         :param extra_streams: additional stream names to be evaluated between epochs
         :param buffer: size of the batch buffer, 0 means no buffer
+        :param on_empty_batch: action to take when batch is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
+        :param on_empty_stream: action to take when stream is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
         :param on_unused_sources: action to take when stream provides an unused sources; one of
             :py:attr:`UNUSED_SOURCE_ACTIONS`
         :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
         :param fixed_epoch_size: if specified, cut the train stream to epochs of at most ``fixed_epoch_size`` batches
         :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch
+        :raise AssertionError: in case of unsupported value of ``on_empty_batch``, ``on_empty_stream`` or \
+        ``on_unused_sources``
         """
+        assert on_empty_batch in MainLoop.EMPTY_ACTIONS
+        assert on_empty_stream in MainLoop.EMPTY_ACTIONS
         assert on_unused_sources in MainLoop.UNUSED_SOURCE_ACTIONS
 
         self._model = model
         self._dataset = dataset
         self._hooks = hooks
         self._buffer = buffer
+        self._on_empty_batch = on_empty_batch
+        self._on_empty_stream = on_empty_stream
         self._on_unused_sources = on_unused_sources
         self._fixed_batch_size = fixed_batch_size
         self._fixed_epoch_size = fixed_epoch_size
@@ -116,26 +128,52 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         :param stream: stream to iterate
         :param train: if set to ``True``, the model will be trained
-        :param stream_name: stream name
+        :raise ValueError: in case of empty batch when ``on_empty_batch`` is set to ``error``
+        :raise ValueError: in case of empty stream when ``on_empty_stream`` is set to ``error``
+        :raise ValueError: in case of two batch variables having different lengths
         """
-        for batch_input in stream:
+        nonempty_batch_count = 0
+        for i, batch_input in enumerate(stream):
             self.raise_check_interrupt()
 
-            if self._fixed_batch_size:
-                if len(batch_input[list(batch_input.keys())[0]]) != self._fixed_batch_size:
-                    logging.debug('Incomplete batch skipped')
+            batch_sizes = {len(source) for source in batch_input.values()}
+            if len(batch_sizes) == 0 or batch_sizes == {0}:
+                if self._on_empty_batch == 'warn':
+                    logging.warning('%i-th batch in stream `%s` appears to be empty (%i-th empty batch in total). Set '
+                                    '`main_loop.on_empty_batch` to `ignore` in order to suppress this warning.',
+                                    i, stream.name, nonempty_batch_count)
+                elif self._on_empty_batch == 'error':
+                    raise ValueError('{}-th batch in stream `{}` appears to be empty ({}-th empty batch in total). Set '
+                                     '`main_loop.on_empty_batch` to `warn` in order to change this error into warning; '
+                                     'set to `ignore` to remove it.'.format(i, stream.name, nonempty_batch_count))
+                continue
+            elif self._fixed_batch_size:
+                if batch_sizes != {self._fixed_batch_size}:
+                    var, len_ = [(k, len(v)) for k, v in batch_input.items() if len(v) != self._fixed_batch_size][0]
+                    logging.debug('%i-th batch in stream `%s` has variable `%s` of length %i inconsistent with '
+                                  '`main_loop.fixed_size` = %i', i, stream.name, var, len_, self._fixed_batch_size)
                     continue
+            nonempty_batch_count += 1
 
             self._check_sources(batch_input)
 
             with Timer('eval_batch_{}'.format(stream.name), self._epoch_profile):
-                batch_output = self._model.run(batch=batch_input, train=train)
+                batch_output = self._model.run(batch=batch_input, train=train, stream=stream)
             assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
 
             with Timer('after_batch_hooks_{}'.format(stream.name), self._epoch_profile):
                 batch_data = {**batch_input, **batch_output}
                 for hook in self._hooks:
                     hook.after_batch(stream_name=stream.name, batch_data=batch_data)
+        if nonempty_batch_count == 0:
+            if self._on_empty_stream == 'warn':
+                logging.warning('Stream `%s` appears to be empty. Set `main_loop.on_empty_stream` to `ignore` in order '
+                                'to suppress this warning.', stream.name)
+            elif self._on_empty_stream == 'error':
+                raise ValueError('Stream `{}` appears to be empty. Set '
+                                 '`main_loop.on_empty_stream` to `warn` in order to change this error into warning; '
+                                 'set to `ignore` to remove it.'.format(stream.name))
+
 
     def train_by_stream(self, stream: StreamWrapper) -> None:
         """
@@ -143,7 +181,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         :param stream: stream to train with
         """
-
         self._run_epoch(stream=stream, train=True)
 
     def evaluate_stream(self, stream: StreamWrapper) -> None:

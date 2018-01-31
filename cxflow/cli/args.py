@@ -68,10 +68,20 @@ def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     ls_parser.add_argument('-v', '--verbose', action='store_true',
                            help='print more verbose output, applicable only when a single train dir is listed')
 
+    # create prune sub-parser
+    prune_parser = subparsers.add_parser('prune', description='Prune training log dirs in the given path without finished epochs.')
+    prune_parser.set_defaults(subcommand='prune')
+    prune_parser.add_argument('dir', nargs='?', default=CXF_DEFAULT_LOG_DIR,
+                           help='path to the log directory to be pruned')
+    prune_parser.add_argument('-e', '--epochs', default=1, type=int,
+                              help='keep only training log dirs having at least this many completed epochs, default 1')
+    prune_parser.add_argument('-s', '--subdirs', action='store_true',
+                              help='delete all subdirectories in training directories')
+
     # add common arguments
     if add_common_arguments:
         for parser in [main_parser, train_parser, resume_parser, predict_parser, dataset_parser]:
             parser.add_argument('--output_root', '-o', default='./log', help='output directory')
-            parser.add_argument('--verbose', '-v', action='store_true', help='increase verbosity do level DEBUG')
+            parser.add_argument('--verbose', '-v', action='store_true', help='increase verbosity to level DEBUG')
 
     return main_parser
