@@ -1,7 +1,7 @@
 import logging
 import os
 import os.path as path
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Optional, Sequence, Hashable
 from collections import Counter
 
 import numpy as np
@@ -14,7 +14,7 @@ from ..types import Batch
 from ..constants import CXF_CONFIG_FILE
 
 
-def major_vote(all_votes: Iterable[Iterable[object]]) -> Iterable[object]:
+def major_vote(all_votes: Iterable[Iterable[Hashable]]) -> Iterable[Hashable]:
     """
     For the given iterable of object iterations, return an iterable of the most common object at each position of the
     inner iterations.
@@ -60,7 +60,7 @@ class EnsembleModel(AbstractModel):
 
     """
 
-    AGGREGATION_METHODS = ['mean', 'major_vote', 'flatten_major_vote']
+    AGGREGATION_METHODS = ['mean', 'major_vote']
     """Possible ensemble aggregation methods."""
 
     def __init__(self,
@@ -164,8 +164,6 @@ class EnsembleModel(AbstractModel):
             if self._aggregation == 'mean':
                 aggregated[output_name] = np.mean(output_values, axis=0)
             elif self._aggregation == 'major_vote':
-                aggregated[output_name] = major_vote(output_values)
-            elif self._aggregation == 'flatten_major_vote':
                 output_values_arr = np.array(output_values)
                 output = major_vote(output_values_arr.reshape((output_values_arr.shape[0], -1)))
                 aggregated[output_name] = np.array(output).reshape(output_values_arr[0].shape)
