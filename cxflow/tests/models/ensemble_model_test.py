@@ -25,7 +25,7 @@ class DummyModel:
     def __init__(self,
                  inputs: str,
                  outputs: str,
-                 dataset: cx,
+                 dataset: cx.AbstractDataset,
                  restore_from: str,
                  **_):
 
@@ -59,12 +59,12 @@ class EnsembleModelTest(CXTestCaseWithDir):
         """Create three dummy models in the tmp dir."""
         for i in [1, 2, 3]:
             model_dir = path.join(self.tmpdir, str(i))
-            os.mkdir(model_dir )
+            os.mkdir(model_dir)
             with open(path.join(model_dir, CXF_CONFIG_FILE), 'w') as config:
                 config.write(_DUMMY_CONFIG)
 
     def test_init(self):
-        """Test if EnsembleModel __init__ works properly"""
+        """Test if EnsembleModel ``__init__`` works properly"""
         with self.assertRaises(AssertionError):
             EnsembleModel(inputs=['inputs'], outputs=['outputs'])
         with self.assertRaises(AssertionError):

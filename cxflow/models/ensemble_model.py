@@ -90,8 +90,10 @@ class EnsembleModel(AbstractModel):
         :raise AssertionError: if the specified ``aggregation`` is not one of
             :py:attr:`EnsembleModel.AGGREGATION_METHODS`
         """
-        assert aggregation in EnsembleModel.AGGREGATION_METHODS
-        assert models_root or model_paths
+        assert aggregation in EnsembleModel.AGGREGATION_METHODS, 'Unsupported aggregation {} (supported: {}).'.format(
+                                                                        aggregation, EnsembleModel.AGGREGATION_METHODS)
+        assert models_root is not None or model_paths is not None, 'Either `models_root` or `model_paths` ' \
+                                                                   'must be specified.'
 
         if model_paths is None:
             model_paths = next(os.walk(models_root))[1]
@@ -112,7 +114,7 @@ class EnsembleModel(AbstractModel):
     def _load_models(self) -> None:
         """Maybe load all the models to be assembled together and save them to the ``self._models`` attribute."""
         if self._models is None:
-            logging.info('Loading %s models', len(self._model_paths))
+            logging.info('Loading %d models', len(self._model_paths))
 
             def load_model(model_path: str):
                 logging.debug('\tloading %s', model_path)
@@ -151,7 +153,7 @@ class EnsembleModel(AbstractModel):
         :raise ValueError: if the ``train`` flag is set to ``True``
         """
         if train:
-            raise ValueError('Ensemble model can not be trained.')
+            raise ValueError('Ensemble model cannot be trained.')
         self._load_models()
 
         # run all the models
@@ -176,7 +178,7 @@ class EnsembleModel(AbstractModel):
 
         :raise NotImplementedError: when called
         """
-        raise NotImplementedError('Ensemble model can not be saved.')
+        raise NotImplementedError('Ensemble model cannot be saved.')
 
     @property
     def restore_fallback(self) -> None:
