@@ -90,7 +90,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     return dataset
 
 
-def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
+def create_model(config: dict, output_dir: Optional[str], dataset: AbstractDataset,
                  restore_from: Optional[str]=None) -> AbstractModel:
     """
     Create a model object either from scratch of from the checkpoint in ``resume_dir``.
