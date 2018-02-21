@@ -12,7 +12,7 @@ from ..models import AbstractModel
 from ..hooks import AbstractHook
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
 from ..utils.reflection import get_class_module, parse_fully_qualified_name, create_object
-from ..utils.yaml import yaml_to_str, yaml_to_file
+from ..utils.yaml import yaml_to_str, yaml_to_file, make_simple
 from ..utils import get_random_name
 from ..utils.training_trace import TrainingTrace, TrainingTraceKeys
 from ..main_loop import MainLoop
@@ -75,7 +75,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     """
     logging.info('Creating dataset')
 
-    dataset_config = config['dataset']
+    dataset_config = make_simple(config)['dataset']
     assert 'class' in dataset_config, '`dataset.class` not present in the config'
     dataset_module, dataset_class = parse_fully_qualified_name(dataset_config['class'])
 

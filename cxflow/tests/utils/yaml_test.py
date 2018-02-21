@@ -4,10 +4,11 @@ Test module for yaml utils functions (cxflow.utils.yaml).
 from os import path
 from collections import OrderedDict
 
+import ruamel.yaml
 import yaml
 
 from cxflow.tests.test_core import CXTestCaseWithDir
-from cxflow.utils.yaml import yaml_to_file, yaml_to_str, load_yaml
+from cxflow.utils.yaml import yaml_to_file, yaml_to_str, load_yaml, make_simple
 from cxflow.constants import CXF_CONFIG_FILE
 
 
@@ -77,3 +78,9 @@ class YAMLTest(CXTestCaseWithDir):
         # test dump to string (effectively, test pyaml)
         yaml_str = yaml_to_str(config)
         self.assertDictEqual(yaml.load(yaml_str), config)
+
+    def test_make_simple(self):
+        """Test yaml make_simple utility function."""
+        anchored = ruamel.yaml.load(_TEST_ANCHORED_YAML, Loader=ruamel.yaml.RoundTripLoader)
+        full_part = yaml.load(yaml_to_str(make_simple(anchored)['e']))
+        self.assertEqual(full_part['b'], 'c')

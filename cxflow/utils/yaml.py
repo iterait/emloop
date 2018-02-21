@@ -2,13 +2,13 @@
 YAML module providing util functions for handling YAMLs.
 """
 from os import path
-import typing
+from typing import Mapping, Any
 
 import ruamel.yaml  # pylint: disable=import-error
 import yaml
 
 
-def load_yaml(yaml_file: str) -> typing.Any:
+def load_yaml(yaml_file: str) -> Any:
     """
     Load YAML from file.
 
@@ -19,7 +19,7 @@ def load_yaml(yaml_file: str) -> typing.Any:
         return ruamel.yaml.load(file, ruamel.yaml.RoundTripLoader)
 
 
-def yaml_to_file(data, output_dir: str, name: str) -> str:
+def yaml_to_file(data: Mapping, output_dir: str, name: str) -> str:
     """
     Save the given object to the given path in YAML.
 
@@ -34,7 +34,7 @@ def yaml_to_file(data, output_dir: str, name: str) -> str:
     return dumped_config_f
 
 
-def yaml_to_str(data: dict) -> str:
+def yaml_to_str(data: Mapping) -> str:
     """
     Return the given given config as YAML str.
 
@@ -42,3 +42,17 @@ def yaml_to_str(data: dict) -> str:
     :return: given configuration as yaml str
     """
     return yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper)
+
+
+def make_simple(data: Any) -> Any:
+    """
+    Substitute all the references in the given data (typically a mapping or sequence) with the actual values.
+    This is useful, if you loaded a yaml with RoundTripLoader and you need to dump part of it safely.
+
+    :param data: data to be made simple (dict instead of CommentedMap etc.)
+    :return: simplified data
+    """
+    return yaml.load(yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper), ruamel.yaml.Loader)
+
+
+__all__ = []
