@@ -28,7 +28,7 @@ def major_vote(all_votes: Iterable[Iterable[Hashable]]) -> Iterable[Hashable]:
     return [Counter(votes).most_common()[0][0] for votes in zip(*all_votes)]
 
 
-class EnsembleModel(AbstractModel):
+class Ensemble(AbstractModel):
     """
     Ensemble model facilitates assembling multiple models into one for more accurate predictions.
 
@@ -42,7 +42,7 @@ class EnsembleModel(AbstractModel):
 
         model:
           name: MyEnsemble
-          class: cxflow.models.EnsembleModel
+          class: cxflow.models.Ensemble
 
           inputs: [images]
           outputs: [predictions]
@@ -54,8 +54,8 @@ class EnsembleModel(AbstractModel):
 
         import cxflow as cx
 
-        model = cx.models.EnsembleModel(inputs=['images'], outputs=['predictions'], aggregation='mean',
-                                        models_root='/my/directory/with/models')
+        model = cx.models.Ensemble(inputs=['images'], outputs=['predictions'], aggregation='mean',
+                                   models_root='/my/directory/with/models')
         # model.run(...)
 
     """
@@ -73,25 +73,24 @@ class EnsembleModel(AbstractModel):
                  eager_loading: bool=False,
                  **kwargs):
         """
-        Create new EnsembleModel.
+        Create new Ensemble.
 
         If no ``models_paths`` are specified, all the sub-directories of the ``models_root`` will be taken as the models
         to be assembled together.
 
         :param inputs: model input names
         :param outputs: model output names
-        :param aggregation: aggregation method, one of :py:attr:`EnsembleModel.AGGREGATION_METHODS`
+        :param aggregation: aggregation method, one of :py:attr:`Ensemble.AGGREGATION_METHODS`
         :param models_root: optional root directory of the models to be assembled together
         :param model_paths: optional list of model directory names/paths
         :param dataset: optional **cxflow** dataset (will be passed to the assembled models)
         :param eager_loading: load all the models in the constructor
         :param kwargs: additional kwargs (unused)
         :raise AssertionError: if neither one of ``models_root`` and ``model_paths`` is specified
-        :raise AssertionError: if the specified ``aggregation`` is not one of
-            :py:attr:`EnsembleModel.AGGREGATION_METHODS`
+        :raise AssertionError: if the specified ``aggregation`` is not one of :py:attr:`Ensemble.AGGREGATION_METHODS`
         """
-        assert aggregation in EnsembleModel.AGGREGATION_METHODS, 'Unsupported aggregation {} (supported: {}).'.format(
-                                                                        aggregation, EnsembleModel.AGGREGATION_METHODS)
+        assert aggregation in Ensemble.AGGREGATION_METHODS, 'Unsupported aggregation {} (supported: {}).'.format(
+                                                                        aggregation, Ensemble.AGGREGATION_METHODS)
         assert models_root is not None or model_paths is not None, 'Either `models_root` or `model_paths` ' \
                                                                    'must be specified.'
 
@@ -144,7 +143,7 @@ class EnsembleModel(AbstractModel):
         Run feed-forward pass with the given batch using all the models, aggregate and return the results.
 
         .. warning::
-            :py:class:`EnsembleModel` can not be trained.
+            :py:class:`Ensemble` can not be trained.
 
         :param batch: batch to be processed
         :param train: ``True`` if this batch should be used for model update, ``False`` otherwise

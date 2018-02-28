@@ -5,7 +5,7 @@ import numpy as np
 import cxflow as cx
 from cxflow.constants import CXF_CONFIG_FILE
 from cxflow.datasets import StreamWrapper
-from cxflow.models.ensemble_model import major_vote, EnsembleModel
+from cxflow.models.ensemble import major_vote, Ensemble
 
 from ..test_core import CXTestCase, CXTestCaseWithDir
 
@@ -13,7 +13,7 @@ from ..test_core import CXTestCase, CXTestCaseWithDir
 _DUMMY_CONFIG = """
 model:
   name: test
-  class: cxflow.tests.models.ensemble_model_test.DummyModel
+  class: cxflow.tests.models.ensemble_test.DummyModel
   inputs: [images, extra_input]
 
 """
@@ -52,8 +52,8 @@ class MajorVoteTest(CXTestCase):
         self.assertIn(result[-1], {1, 2, 12})
 
 
-class EnsembleModelTest(CXTestCaseWithDir):
-    """EnsembleModel function test case."""
+class EnsembleTest(CXTestCaseWithDir):
+    """Ensemble model function test case."""
 
     def _create_models(self):
         """Create three dummy models in the tmp dir."""
@@ -64,27 +64,27 @@ class EnsembleModelTest(CXTestCaseWithDir):
                 config.write(_DUMMY_CONFIG)
 
     def test_init(self):
-        """Test if EnsembleModel ``__init__`` works properly"""
+        """Test if Ensemble model ``__init__`` works properly"""
         with self.assertRaises(AssertionError):
-            EnsembleModel(inputs=['inputs'], outputs=['outputs'])
+            Ensemble(inputs=['inputs'], outputs=['outputs'])
         with self.assertRaises(AssertionError):
-            EnsembleModel(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, aggregation='unknown')
+            Ensemble(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, aggregation='unknown')
 
-        ensemble = EnsembleModel(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, aggregation='mean')
+        ensemble = Ensemble(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, aggregation='mean')
         self.assertIsNone(ensemble._models)
 
         # test eager loading
-        ensemble2 = EnsembleModel(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, eager_loading=True)
+        ensemble2 = Ensemble(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, eager_loading=True)
         self.assertIsNotNone(ensemble2._models)
 
         self.assertListEqual(ensemble2.input_names, ['inputs'])
         self.assertListEqual(ensemble2.output_names, ['outputs'])
 
     def test_propagation(self):
-        """Test if EnsembleModel propagates all the arguments properly."""
+        """Test if Ensemble model propagates all the arguments properly."""
         self._create_models()
-        ensemble = EnsembleModel(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, aggregation='mean',
-                                 dataset='my_dataset')
+        ensemble = Ensemble(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir, aggregation='mean',
+                            dataset='my_dataset')
 
         # test restore_from is propagated, test mean aggregation
         batch = {'inputs': [1., 1., 1.]}
@@ -100,8 +100,8 @@ class EnsembleModelTest(CXTestCaseWithDir):
     def test_major_vote(self):
         """Test if Ensemble model aggregates the results properly."""
         self._create_models()
-        ensemble = EnsembleModel(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir,
-                                 model_paths=['1', '1', '2'])
+        ensemble = Ensemble(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir,
+                            model_paths=['1', '1', '2'])
 
         # test major vote aggregation
         batch = {'inputs': [1., 1., 1.]}
@@ -116,8 +116,8 @@ class EnsembleModelTest(CXTestCaseWithDir):
     def test_raising(self):
         """Test if Ensemble model raises the exceptions as expected."""
         self._create_models()
-        ensemble = EnsembleModel(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir,
-                                 model_paths=['1', '1', '2'])
+        ensemble = Ensemble(inputs=['inputs'], outputs=['outputs'], models_root=self.tmpdir,
+                            model_paths=['1', '1', '2'])
 
         with self.assertRaises(ValueError):
             ensemble.run(None, True, None)

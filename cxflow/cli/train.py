@@ -3,7 +3,7 @@ import logging
 from typing import Iterable
 
 from .util import fallback, validate_config, find_config
-from ..models import EnsembleModel  # this will avoid circular dependency
+from ..models import Ensemble  # this will avoid circular dependency
 from .common import run
 from ..utils.config import load_config
 
