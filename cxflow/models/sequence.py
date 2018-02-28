@@ -91,7 +91,7 @@ class Sequence(AbstractModel):
         self._load_models()
         return chain.from_iterable(map(lambda m: m.output_names, self._models))
 
-    def run(self, batch: Batch, train: bool, stream: StreamWrapper) -> Batch:
+    def run(self, batch: Batch, train: bool=False, stream: StreamWrapper=None) -> Batch:
         """
         Run all the models in-order and return accumulated outputs.
 

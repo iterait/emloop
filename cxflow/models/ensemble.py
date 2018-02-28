@@ -138,7 +138,7 @@ class Ensemble(AbstractModel):
         """List of model output names."""
         return self._outputs
 
-    def run(self, batch: Batch, train: bool, stream: StreamWrapper) -> Batch:
+    def run(self, batch: Batch, train: bool=False, stream: StreamWrapper=None) -> Batch:
         """
         Run feed-forward pass with the given batch using all the models, aggregate and return the results.
 
