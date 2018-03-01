@@ -7,5 +7,6 @@ from .reflection import _EMPTY_DICT, parse_fully_qualified_name, create_object, 
                         get_class_module
 from .names import get_random_name
 from .training_trace import TrainingTrace, TrainingTraceKeys
+from .confusion_matrix import confusion_matrix
 
 __all__ = []

@@ -27,9 +27,10 @@ from .show_progress import ShowProgress
 from .on_plateau import OnPlateau
 from .stop_on_plateau import StopOnPlateau
 from .stop_on_nan import StopOnNaN
+from .save_cm import SaveConfusionMatrix
 
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
            'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'SaveLatest', 'ComputeStats', 'Check', 'ShowProgress',
-           'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'StopOnNaN']
+           'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'StopOnNaN', 'SaveConfusionMatrix']
