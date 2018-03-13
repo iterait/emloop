@@ -90,10 +90,11 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         """List of extra stream names as specified in :py:meth:`self.__init__`."""
         return self._extra_streams
 
-    def _create_epoch_data(self) -> EpochData:
+    def _create_epoch_data(self, streams: Optional[Iterable[str]]=None) -> EpochData:
         """Create empty epoch data double dict."""
-        return OrderedDict([(stream_name, OrderedDict())
-                            for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams])
+        if streams is None:
+            streams = [CXF_TRAIN_STREAM] + self._extra_streams
+        return OrderedDict([(stream_name, OrderedDict()) for stream_name in streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
         """
@@ -228,7 +229,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             with self.get_stream(stream_name) as stream:
                 self.evaluate_stream(stream)
 
-        epoch_data = self._create_epoch_data()
+        epoch_data = self._create_epoch_data(streams)
         for hook in self._hooks:
             hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
 
