@@ -81,7 +81,7 @@ class SaveBest(AbstractHook):
         :caption: save model with minimal valid loss
 
         hooks:
-          - BestSaverHook
+          - SaveBest
 
     .. code-block:: yaml
         :caption: save model with max accuracy
