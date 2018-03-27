@@ -205,7 +205,7 @@ def create_hooks(config: dict, model: AbstractModel,
     return hooks
 
 
-def run(config: dict, output_root: str, restore_from: str=None, predict: bool=False) -> None:
+def run(config: dict, output_root: str, restore_from: str=None, eval: Optional[str]=None) -> None:
     """
     Run **cxflow** training configured by the passed `config`.
 
@@ -236,6 +236,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     :param config: configuration
     :param output_root: dir under which output_dir shall be created
     :param restore_from: from whence the model should be restored (backend-specific information)
+    :param eval: optional name of the stream to be evaluated
     """
 
     output_dir = dataset = model = hooks = main_loop = None
@@ -270,19 +271,19 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     try:
         logging.info('Creating main loop')
         kwargs = config['main_loop'] if 'main_loop' in config else {}
-        if predict:
+        if eval is not None:
             kwargs['extra_streams'] = []
         main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **kwargs)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating main loop failed', ex)
 
-    if predict:
+    if eval is not None:
         try:
             with main_loop:
-                logging.info('Running the prediction')
-                main_loop.run_prediction()
+                logging.info('Running the evaluation of stream `%s`', eval)
+                main_loop.run_evaluation(eval)
         except Exception as ex:  # pylint: disable=broad-except
-            fallback('Running the prediction failed', ex)
+            fallback('Running the evaluation failed', ex)
     else:
         trace = TrainingTrace(output_dir)
         try:

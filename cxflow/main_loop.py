@@ -305,10 +305,14 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         self._try_run(training)
 
-    def run_prediction(self) -> None:
-        """Run the main loop for in the prediction mode."""
+    def run_evaluation(self, stream_name: str=CXF_PREDICT_STREAM) -> None:
+        """
+        Run the main loop with the given stream in the prediction mode.
+
+        :param stream_name: name of the stream to be evaluated
+        """
         def prediction():
             logging.info('Running prediction')
-            self._run_zeroth_epoch([CXF_PREDICT_STREAM])
+            self._run_zeroth_epoch([stream_name])
             logging.info('Prediction done\n\n')
         self._try_run(prediction)
