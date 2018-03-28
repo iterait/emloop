@@ -18,7 +18,6 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
     In the inherited class, one should:
         - override the ``_configure_dataset``
         - (optional) implement ``train_stream`` method if intended to be used with ``cxflow train ...``
-        - (optional) implement ``predict_stream`` method if intended to be used with ``cxflow predict ...``
         - (optional) implement ``<stream_name>_stream`` method in order to make ``<stream_name>`` stream available
 
     """

@@ -6,8 +6,8 @@ Regardless of sizes, complexities and formats, all datasets are beautiful. At so
 iterate through the data points or *examples* if you wish.
 
 As a matter of fact, the ability of providing example iterators is the only requirement from **cxflow** on datasets.
-A dataset used for training has to implement a ``train_stream`` method and similarly
-the dataset has to implement ``predict_stream`` when used for prediction later.
+A dataset used for training has to implement a ``train_stream``, in addition to that, any ``<stream_name>_stream``
+may be used for evaluation.
 
 To make a dataset compatible with **cxflow** one must implement a class which complies
 to the :py:class:`cxflow.datasets.AbstractDataset` concept.
@@ -103,7 +103,7 @@ along with the train stream. The configuration may look as follows:
 
 The extra streams, however, *are not* used for training, that is, the model is won`t be updated when it iterates through them.
 
-Finally, **cxflow** requires predict *stream* for the prediction command ``cxflow predict ..``.
+Finally, **cxflow** allows evaluation of any additional *stream* with  ``cxflow eval <stream_name> ..`` command.
 
 Additional Methods
 ------------------
@@ -135,7 +135,7 @@ We leave them without further comments as they are self-describing.
 - ``cxflow dataset print_statistics config/my-data.yaml``
 - ``cxflow dataset plot_histogram config/my-data.yaml``
 - ``cxflow train config/my-data.yaml``
-- ``cxflow predict config/my-data.yaml``
+- ``cxflow eval test log/my-model``
 
 The Philosophy of Laziness
 --------------------------
