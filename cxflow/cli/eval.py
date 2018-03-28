@@ -33,15 +33,14 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
 
         if stream_name == CXF_PREDICT_STREAM and stream_name in config:  # old style ``cxflow predict ...``
             logging.warning('Old style ``predict`` configuration section is deprecated and will not be supported, '
-                            'Use ``eval.predict`` section instead.')
+                            'use ``eval.predict`` section instead.')
             config['eval'] = {'predict': config['predict']}
 
         if 'eval' in config and stream_name in config['eval']:
             update_section = config['eval'][stream_name]
             for subsection in ['dataset', 'model', 'main_loop']:
                 if subsection in update_section:
-                    for key in update_section[subsection]:
-                        config[subsection][key] = update_section[subsection][key]
+                    config[subsection].update(update_section[subsection])
             if 'hooks' in update_section:
                 config['hooks'] = update_section['hooks']
             else:
@@ -83,12 +82,12 @@ def predict(config_path: str, restore_from: Optional[str], cl_arguments: Iterabl
         if 'predict' in config:
             for section in ['dataset', 'model', 'main_loop']:
                 if section in config['predict']:
-                    for key in config['predict'][section]:
-                        config[section][key] = config['predict'][section][key]
+                    config[section].update(config['predict'][section])
             if 'hooks' in config['predict']:
                 config['hooks'] = config['predict']['hooks']
             else:
-                logging.warning('Config does not contain `predict.hooks` section. No hook will be employed during the prediction.')
+                logging.warning('Config does not contain `predict.hooks` section. '
+                                'No hook will be employed during the prediction.')
                 config['hooks'] = []
 
         validate_config(config)

@@ -12,7 +12,7 @@ import cxflow as cx
 from cxflow.constants import CXF_BUFFER_SLEEP
 from cxflow.datasets import StreamWrapper
 from cxflow.hooks import StopAfter
-from cxflow.utils.profile import Timer
+from cxflow.constants import CXF_PREDICT_STREAM
 from cxflow.types import EpochData, Batch, Stream, TimeProfile
 
 from .test_core import CXTestCaseWithDir
@@ -490,12 +490,12 @@ class MainLoopTest(CXTestCaseWithDir):
         """Test if mainloop creates epoch_data correctly in the predict mode."""
         # test if the epoch data are created correctly
         _, _, mainloop = self.create_main_loop(epochs=3, extra_hooks=[EpochDataChecker(streams=['predict'])])
-        mainloop.run_evaluation()
+        mainloop.run_evaluation(CXF_PREDICT_STREAM)
 
     def test_predict(self):
         """Test if predict iterates only the predict stream."""
         _, dataset, mainloop = self.create_main_loop(extra_streams=['valid'])
-        mainloop.run_evaluation()
+        mainloop.run_evaluation(CXF_PREDICT_STREAM)
         self.assertTrue(dataset.predict_used)
         self.assertFalse(dataset.valid_used)
         self.assertFalse(dataset.train_used)
@@ -557,7 +557,7 @@ class MainLoopTest(CXTestCaseWithDir):
 
         with LogCapture() as log_capture:
             _, dataset, mainloop = self.create_main_loop(dataset=ShortSimpleDataset(), fixed_batch_size=47, on_empty_stream='ignore')
-            mainloop.run_evaluation()
+            mainloop.run_evaluation(CXF_PREDICT_STREAM)
 
             log_capture.check(
                 ('root', 'INFO', 'Running prediction'),

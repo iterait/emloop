@@ -305,7 +305,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         self._try_run(training)
 
-    def run_evaluation(self, stream_name: str=CXF_PREDICT_STREAM) -> None:
+    def run_evaluation(self, stream_name: str) -> None:
         """
         Run the main loop with the given stream in the prediction mode.
 
