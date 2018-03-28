@@ -16,7 +16,7 @@ import logging
 import os
 import sys
 
-from cxflow.cli import train, resume, predict, grid_search, get_cxflow_arg_parser, invoke_dataset_method, \
+from cxflow.cli import train, resume, predict, evaluate, grid_search, get_cxflow_arg_parser, invoke_dataset_method, \
     list_train_dirs
 from cxflow.cli.prune import prune_train_dirs
 
@@ -57,8 +57,13 @@ def entry_point() -> None:
                output_root=known_args.output_root)
 
     elif known_args.subcommand == 'predict':
+        logging.warning('Predict command is deprecated and will be removed, use ``cxflow eval predict ...`` instead')
         predict(config_path=known_args.config_path, restore_from=known_args.restore_from, cl_arguments=unknown_args,
                 output_root=known_args.output_root)
+
+    elif known_args.subcommand == 'eval':
+        evaluate(model_path=known_args.model_path, stream_name=known_args.stream_name,
+                 config_path=known_args.config, cl_arguments=unknown_args, output_root=known_args.output_root)
 
     elif known_args.subcommand == 'dataset':
         invoke_dataset_method(config_path=known_args.config_file, method_name=known_args.method,

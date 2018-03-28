@@ -51,7 +51,8 @@ Restoring the Model
 -------------------
 
 Once the model is successfully saved, it can be also restored.
-This is done when the training is about to continue (``cxflow resume``) or in a production environemt (``cxflow predict``).
+This is done when the training is about to continue (``cxflow resume``)
+or in a production environemt (``cxflow eval <stream_name>``).
 Both commands expect a single positional argument specifying from where the model shall be loaded.
 This argument is called ``restore_from`` and it is passed to the model constructor (see below).
 

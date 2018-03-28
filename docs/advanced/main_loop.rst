@@ -15,7 +15,7 @@ One of the arguments of the model is also the dataset itself, so the model can q
 it for information such as the number of outputs, data size, etc.
 
 After the dataset and the model are created, **cxflow** calls one of the dataset stream functions
-based on whether it is training, testing or predicting (more on this is described in the following
+based on whether it is training, testing or evaluation (more on this is described in the following
 sections).
 The selected stream method (e.g., ``train_stream``) returns an iterable where each
 item corresponds to a single batch of data.
@@ -57,11 +57,10 @@ The whole process can be described by the following pseudocode.
     6.     evaluate extra streams
 
 
-Prediction Lifecycle
+Evaluation Lifecycle
 ====================
 
-The prediction stream is used and the model is never updated.
-In addition, there is only a single pass through the stream before cxflow 
+Any stream may be evaluated leaving the model intact. There is only a single pass through the stream before cxflow
 terminates.
 
 The whole process can be described by the following pseudocode.
@@ -70,7 +69,7 @@ The whole process can be described by the following pseudocode.
 
     1. create dataset
     2. restore model
-    3. evaluate prediction stream
+    3. evaluate the specified stream
 
 Hook Integration
 ================
