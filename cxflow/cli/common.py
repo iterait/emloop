@@ -181,6 +181,7 @@ def create_hooks(config: dict, model: AbstractModel,
             if hook_params is None:
                 logging.warning('\t\t Empty config of `%s` hook', hook_path)
                 hook_params = {}
+            hook_params = dict(hook_params.items())
 
             hook_module, hook_class = parse_fully_qualified_name(hook_path)
             # find the hook module if not specified
