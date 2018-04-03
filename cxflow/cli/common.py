@@ -110,6 +110,10 @@ def create_model(config: dict, output_dir: Optional[str], dataset: AbstractDatas
     logging.info('Creating a model')
 
     model_config = config['model']
+
+    # workaround for ruamel.yaml expansion bug; see #222
+    model_config = dict(model_config.items())
+
     assert 'class' in model_config, '`model.class` not present in the config'
     model_module, model_class = parse_fully_qualified_name(model_config['class'])
 
@@ -181,6 +185,8 @@ def create_hooks(config: dict, model: AbstractModel,
             if hook_params is None:
                 logging.warning('\t\t Empty config of `%s` hook', hook_path)
                 hook_params = {}
+
+            # workaround for ruamel.yaml expansion bug; see #222
             hook_params = dict(hook_params.items())
 
             hook_module, hook_class = parse_fully_qualified_name(hook_path)
