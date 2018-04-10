@@ -1,6 +1,6 @@
 import numpy as np
 import os.path as path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 import itertools
 import matplotlib
@@ -47,6 +47,7 @@ class SaveConfusionMatrix(AccumulateVariables):
                  labels_name: str='labels',
                  predictions_name: str='predictions',
                  classes_names: Optional[Sequence[str]]=None,
+                 figsize: Optional[Tuple[int, int]]=None,
                  figure_action: str='save',
                  num_classes_method_name: str='num_classes',
                  classes_names_method_name: str='classes_names',
@@ -60,6 +61,7 @@ class SaveConfusionMatrix(AccumulateVariables):
         :param labels_name: annotation variable name
         :param predictions_name: prediction variable name
         :param classes_names: List of classes' names
+        :param figsize: the size of the matplotlib figure
         :param figure_action: action to be taken with the plotted figure, one of :py:attr:`FIGURE_ACTIONS`
         :param normalize: False for plotting absolute values in confusion matrix, True for relative
         :param num_classes_method_name: ``self._dataset`` method name to get number of classes
@@ -77,6 +79,7 @@ class SaveConfusionMatrix(AccumulateVariables):
         self._labels_name = labels_name
         self._predictions_name = predictions_name
         self._classes_names = classes_names
+        self._figsize = figsize
         self._figure_action = figure_action
         self._num_classes_method_name = num_classes_method_name
         self._classes_names_method_name = classes_names_method_name
@@ -116,6 +119,7 @@ class SaveConfusionMatrix(AccumulateVariables):
             cm = cm_norm if self._normalize else cm_abs
 
             # Save the heatmap of confusion matrix
+            plt.figure(figsize=self._figsize)
             plt.imshow(cm, interpolation='nearest', cmap=self._cmap)
             plt.title('Predicted', y=1.1)
             plt.ylabel('Expected')
