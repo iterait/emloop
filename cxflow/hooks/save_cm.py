@@ -101,7 +101,6 @@ class SaveConfusionMatrix(AccumulateVariables):
 
             # Only use the masked data if requested
             if self._mask_name is not None:
-                assert self._mask_name in variables
                 mask = np.asarray(variables[self._mask_name]).astype(np.bool)
                 predicted = predicted[mask]
                 expected = expected[mask]
@@ -126,7 +125,7 @@ class SaveConfusionMatrix(AccumulateVariables):
             # Calculate confusion matrix (cm) with absolute values
             cm_abs = confusion_matrix(expected=expected, predicted=predicted, num_classes=num_classes)
             # Calculate cm with relative values
-            cm_norm = cm_abs.astype('float') / np.sum(cm_abs, axis=1)[:, np.newaxis]
+            cm_norm = cm_abs.astype(np.float) / np.sum(cm_abs, axis=1)[:, np.newaxis]
             cm_norm[np.isnan(cm_norm)] = 0  # Is `np.nan`s appeared, replace them by zero
             # Choose cm type
             cm = cm_norm if self._normalize else cm_abs
@@ -136,7 +135,7 @@ class SaveConfusionMatrix(AccumulateVariables):
             plt.imshow(cm, interpolation='nearest', cmap=self._cmap)
             plt.title('Predicted', y=1.1)
             plt.ylabel('Expected')
-            plt.tick_params(labeltop='on', labelbottom='off', top='on', bottom='off')
+            plt.tick_params(labeltop=True, labelbottom=False, top=True, bottom=False)
             plt.colorbar()
 
             # Change ticks if `classes_names` found
@@ -158,7 +157,7 @@ class SaveConfusionMatrix(AccumulateVariables):
                 # Draw the figure first
                 fig.canvas.draw()
                 # Now we can save it to a numpy array
-                data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
                 data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
                 epoch_data[stream_name]['confusion_heatmap'] = data
             else:
