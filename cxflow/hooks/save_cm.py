@@ -51,6 +51,7 @@ class SaveConfusionMatrix(AccumulateVariables):
                  figure_action: str='save',
                  num_classes_method_name: str='num_classes',
                  classes_names_method_name: str='classes_names',
+                 mask_name: Optional[str]=None,
                  normalize: bool=True,
                  cmap: str='Blues', **kwargs):
         """
@@ -67,6 +68,7 @@ class SaveConfusionMatrix(AccumulateVariables):
         :param num_classes_method_name: ``self._dataset`` method name to get number of classes
         :param classes_names_method_name: ``self._dataset`` method name to get classes' names
                                             Parameter is ignored when ``classes_names`` is provided
+        :param mask_name: the variable masking valid records (1 = valid, 0 = invalid)
         :param cmap: type of colorbar  # http://matplotlib.org/examples/color/colormaps_reference.html
         :raise ValueError: if the ``figure_action`` is not in ``FIGURE_ACTIONS``
         """
@@ -83,15 +85,26 @@ class SaveConfusionMatrix(AccumulateVariables):
         self._figure_action = figure_action
         self._num_classes_method_name = num_classes_method_name
         self._classes_names_method_name = classes_names_method_name
+        self._mask_name = mask_name
         self._normalize = normalize
         self._cmap = cmap
 
-        super().__init__(variables=[labels_name, predictions_name], **kwargs)
+        accum_variables = [labels_name, predictions_name]
+        if self._mask_name is not None:
+            accum_variables.append(self._mask_name)
+        super().__init__(variables=accum_variables, **kwargs)
 
     def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         for stream_name, variables in self._accumulator.items():
             predicted = np.array(variables[self._predictions_name])
             expected = np.array(variables[self._labels_name])
+
+            # Only use the masked data if requested
+            if self._mask_name is not None:
+                assert self._mask_name in variables
+                mask = np.asarray(variables[self._mask_name]).astype(np.bool)
+                predicted = predicted[mask]
+                expected = expected[mask]
 
             # Try to get names of classes from possible sources
             classes_names = False
