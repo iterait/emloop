@@ -1,4 +1,5 @@
 import os
+import matplotlib
 
 from cxflow.tests.test_core import CXTestCaseWithDir
 from cxflow.hooks.save_cm import SaveConfusionMatrix
@@ -80,6 +81,14 @@ class SaveConfusionMatrixTest(CXTestCaseWithDir):
                                    figure_action='store')
         epoch_data = SaveConfusionMatrixTest.run_hook(hook)
         self.assertTupleEqual(tuple(epoch_data['train']['confusion_heatmap'].shape), (480, 640, 3))
+
+        # test changing figure size
+        hook = SaveConfusionMatrix(dataset=TestDataset(), output_dir='', figure_action='store',
+                                   figsize=(10, 15))
+        epoch_data = SaveConfusionMatrixTest.run_hook(hook)
+        dpi = matplotlib.rcParams['figure.dpi']
+        self.assertTupleEqual(tuple(epoch_data['train']['confusion_heatmap'].shape), (15*dpi, 10*dpi, 3))
+
         # test hook is working if each argument is OK
         hook = SaveConfusionMatrix(dataset=TestDataset(), output_dir=self.tmpdir,
                                    classes_names=['first', 'second'])
