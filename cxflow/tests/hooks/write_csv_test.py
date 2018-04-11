@@ -31,7 +31,8 @@ def _get_epoch_data():
             ('accuracy', 3),
             ('precision', 3 * np.ones(_EXAMPLES)),
             ('loss', collections.OrderedDict([('mean', 3)])),
-            ('omitted', 0)]))
+            ('omitted', 0),
+            ('specific', 9)]))
     ])
     return epoch_data
 
@@ -176,3 +177,21 @@ class WriteCSVTest(CXTestCase):
             row = row[:-1]
             valid_row = [epoch_id, '1', '', '1', '2', '', '2', '3', '', '3']
             self.assertEqual(valid_row, row.split(delimiter))
+
+    def test_variable_deduction(self):
+        """
+        Test that the variable names are automatically deduced from the
+        first available stream.
+        """
+        output_file = self.get_tmp_filename()
+
+        hook_train = WriteCSV(output_dir="", output_file=output_file)
+        epoch_data = _get_epoch_data()
+        hook_train._write_header(collections.OrderedDict([('train', epoch_data['train']),
+                                                          ('valid', epoch_data['valid'])]))
+        self.assertEqual(hook_train._variables, ['accuracy', 'precision', 'loss', 'omitted'])
+
+        hook_valid = WriteCSV(output_dir="", output_file=output_file)
+        epoch_data = _get_epoch_data()
+        hook_valid._write_header({'valid': epoch_data['valid']})
+        self.assertEqual(hook_valid._variables, ['accuracy', 'precision', 'loss', 'omitted', 'specific'])
