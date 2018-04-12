@@ -1,4 +1,5 @@
 import os
+import matplotlib
 
 from cxflow.tests.test_core import CXTestCaseWithDir
 from cxflow.hooks.save_cm import SaveConfusionMatrix
@@ -29,7 +30,7 @@ class SaveConfusionMatrixTest(CXTestCaseWithDir):
 
     @staticmethod
     def run_hook(hook,
-                 batch_data: dict={'labels': [0, 1], 'predictions': [0, 1]},
+                 batch_data: dict={'labels': [0, 1], 'predictions': [0, 1], 'masks': [1, 0]},
                  epoch_data: dict={'train': {'accuracy': 1}}):
         """
         Run hook's methods `after_batch` and `after_epoch`
@@ -80,6 +81,19 @@ class SaveConfusionMatrixTest(CXTestCaseWithDir):
                                    figure_action='store')
         epoch_data = SaveConfusionMatrixTest.run_hook(hook)
         self.assertTupleEqual(tuple(epoch_data['train']['confusion_heatmap'].shape), (480, 640, 3))
+
+        # test changing figure size
+        hook = SaveConfusionMatrix(dataset=TestDataset(), output_dir='', figure_action='store',
+                                   figsize=(10, 15))
+        epoch_data = SaveConfusionMatrixTest.run_hook(hook)
+        dpi = matplotlib.rcParams['figure.dpi']
+        self.assertTupleEqual(tuple(epoch_data['train']['confusion_heatmap'].shape), (15*dpi, 10*dpi, 3))
+
+        # test whether using mask_name does not crash
+        hook = SaveConfusionMatrix(dataset=TestDataset(), output_dir=self.tmpdir,
+                                   classes_names=['first', 'second'], mask_name='masks')
+        SaveConfusionMatrixTest.run_hook(hook)
+
         # test hook is working if each argument is OK
         hook = SaveConfusionMatrix(dataset=TestDataset(), output_dir=self.tmpdir,
                                    classes_names=['first', 'second'])

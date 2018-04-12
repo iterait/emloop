@@ -1,6 +1,6 @@
 import numpy as np
 import os.path as path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
 import itertools
 import matplotlib
@@ -47,9 +47,11 @@ class SaveConfusionMatrix(AccumulateVariables):
                  labels_name: str='labels',
                  predictions_name: str='predictions',
                  classes_names: Optional[Sequence[str]]=None,
+                 figsize: Optional[Tuple[int, int]]=None,
                  figure_action: str='save',
                  num_classes_method_name: str='num_classes',
                  classes_names_method_name: str='classes_names',
+                 mask_name: Optional[str]=None,
                  normalize: bool=True,
                  cmap: str='Blues', **kwargs):
         """
@@ -60,11 +62,13 @@ class SaveConfusionMatrix(AccumulateVariables):
         :param labels_name: annotation variable name
         :param predictions_name: prediction variable name
         :param classes_names: List of classes' names
+        :param figsize: the size of the matplotlib figure
         :param figure_action: action to be taken with the plotted figure, one of :py:attr:`FIGURE_ACTIONS`
         :param normalize: False for plotting absolute values in confusion matrix, True for relative
         :param num_classes_method_name: ``self._dataset`` method name to get number of classes
         :param classes_names_method_name: ``self._dataset`` method name to get classes' names
                                             Parameter is ignored when ``classes_names`` is provided
+        :param mask_name: the variable masking valid records (1 = valid, 0 = invalid)
         :param cmap: type of colorbar  # http://matplotlib.org/examples/color/colormaps_reference.html
         :raise ValueError: if the ``figure_action`` is not in ``FIGURE_ACTIONS``
         """
@@ -77,18 +81,29 @@ class SaveConfusionMatrix(AccumulateVariables):
         self._labels_name = labels_name
         self._predictions_name = predictions_name
         self._classes_names = classes_names
+        self._figsize = figsize
         self._figure_action = figure_action
         self._num_classes_method_name = num_classes_method_name
         self._classes_names_method_name = classes_names_method_name
+        self._mask_name = mask_name
         self._normalize = normalize
         self._cmap = cmap
 
-        super().__init__(variables=[labels_name, predictions_name], **kwargs)
+        accum_variables = [labels_name, predictions_name]
+        if self._mask_name is not None:
+            accum_variables.append(self._mask_name)
+        super().__init__(variables=accum_variables, **kwargs)
 
     def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
         for stream_name, variables in self._accumulator.items():
             predicted = np.array(variables[self._predictions_name])
             expected = np.array(variables[self._labels_name])
+
+            # Only use the masked data if requested
+            if self._mask_name is not None:
+                mask = np.asarray(variables[self._mask_name]).astype(np.bool)
+                predicted = predicted[mask]
+                expected = expected[mask]
 
             # Try to get names of classes from possible sources
             classes_names = False
@@ -110,16 +125,17 @@ class SaveConfusionMatrix(AccumulateVariables):
             # Calculate confusion matrix (cm) with absolute values
             cm_abs = confusion_matrix(expected=expected, predicted=predicted, num_classes=num_classes)
             # Calculate cm with relative values
-            cm_norm = cm_abs.astype('float') / np.sum(cm_abs, axis=1)[:, np.newaxis]
+            cm_norm = cm_abs.astype(np.float) / np.sum(cm_abs, axis=1)[:, np.newaxis]
             cm_norm[np.isnan(cm_norm)] = 0  # Is `np.nan`s appeared, replace them by zero
             # Choose cm type
             cm = cm_norm if self._normalize else cm_abs
 
             # Save the heatmap of confusion matrix
+            plt.figure(figsize=self._figsize)
             plt.imshow(cm, interpolation='nearest', cmap=self._cmap)
             plt.title('Predicted', y=1.1)
             plt.ylabel('Expected')
-            plt.tick_params(labeltop='on', labelbottom='off', top='on', bottom='off')
+            plt.tick_params(labeltop=True, labelbottom=False, top=True, bottom=False)
             plt.colorbar()
 
             # Change ticks if `classes_names` found
@@ -141,7 +157,7 @@ class SaveConfusionMatrix(AccumulateVariables):
                 # Draw the figure first
                 fig.canvas.draw()
                 # Now we can save it to a numpy array
-                data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
+                data = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
                 data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
                 epoch_data[stream_name]['confusion_heatmap'] = data
             else:
