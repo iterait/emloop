@@ -83,7 +83,7 @@ class WriteCSV(AbstractHook):
 
         :param epoch_data: epoch data to be logged
         """
-        self._variables = self._variables or list(epoch_data['train'].keys())
+        self._variables = self._variables or list(next(iter(epoch_data.values())).keys())
         self._streams = epoch_data.keys()
 
         header = ['"epoch_id"']

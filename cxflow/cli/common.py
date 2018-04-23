@@ -12,7 +12,7 @@ from ..models import AbstractModel
 from ..hooks import AbstractHook
 from ..constants import CXF_LOG_FILE, CXF_HOOKS_MODULE, CXF_CONFIG_FILE, CXF_LOG_DATE_FORMAT, CXF_LOG_FORMAT
 from ..utils.reflection import get_class_module, parse_fully_qualified_name, create_object
-from ..utils.yaml import yaml_to_str, yaml_to_file
+from ..utils.yaml import yaml_to_str, yaml_to_file, make_simple
 from ..utils import get_random_name
 from ..utils.training_trace import TrainingTrace, TrainingTraceKeys
 from ..main_loop import MainLoop
@@ -75,7 +75,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     """
     logging.info('Creating dataset')
 
-    dataset_config = config['dataset']
+    dataset_config = make_simple(config)['dataset']
     assert 'class' in dataset_config, '`dataset.class` not present in the config'
     dataset_module, dataset_class = parse_fully_qualified_name(dataset_config['class'])
 
@@ -90,7 +90,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     return dataset
 
 
-def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
+def create_model(config: dict, output_dir: Optional[str], dataset: AbstractDataset,
                  restore_from: Optional[str]=None) -> AbstractModel:
     """
     Create a model object either from scratch of from the checkpoint in ``resume_dir``.
@@ -110,6 +110,10 @@ def create_model(config: dict, output_dir: str, dataset: AbstractDataset,
     logging.info('Creating a model')
 
     model_config = config['model']
+
+    # workaround for ruamel.yaml expansion bug; see #222
+    model_config = dict(model_config.items())
+
     assert 'class' in model_config, '`model.class` not present in the config'
     model_module, model_class = parse_fully_qualified_name(model_config['class'])
 
@@ -182,6 +186,9 @@ def create_hooks(config: dict, model: AbstractModel,
                 logging.warning('\t\t Empty config of `%s` hook', hook_path)
                 hook_params = {}
 
+            # workaround for ruamel.yaml expansion bug; see #222
+            hook_params = dict(hook_params.items())
+
             hook_module, hook_class = parse_fully_qualified_name(hook_path)
             # find the hook module if not specified
             if hook_module is None:
@@ -205,7 +212,7 @@ def create_hooks(config: dict, model: AbstractModel,
     return hooks
 
 
-def run(config: dict, output_root: str, restore_from: str=None, predict: bool=False) -> None:
+def run(config: dict, output_root: str, restore_from: str=None, eval: Optional[str]=None) -> None:
     """
     Run **cxflow** training configured by the passed `config`.
 
@@ -236,6 +243,7 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     :param config: configuration
     :param output_root: dir under which output_dir shall be created
     :param restore_from: from whence the model should be restored (backend-specific information)
+    :param eval: optional name of the stream to be evaluated
     """
 
     output_dir = dataset = model = hooks = main_loop = None
@@ -270,19 +278,19 @@ def run(config: dict, output_root: str, restore_from: str=None, predict: bool=Fa
     try:
         logging.info('Creating main loop')
         kwargs = config['main_loop'] if 'main_loop' in config else {}
-        if predict:
+        if eval is not None:
             kwargs['extra_streams'] = []
         main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **kwargs)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating main loop failed', ex)
 
-    if predict:
+    if eval is not None:
         try:
             with main_loop:
-                logging.info('Running the prediction')
-                main_loop.run_prediction()
+                logging.info('Running the evaluation of stream `%s`', eval)
+                main_loop.run_evaluation(eval)
         except Exception as ex:  # pylint: disable=broad-except
-            fallback('Running the prediction failed', ex)
+            fallback('Running the evaluation failed', ex)
     else:
         trace = TrainingTrace(output_dir)
         try:

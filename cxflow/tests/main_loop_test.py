@@ -12,7 +12,7 @@ import cxflow as cx
 from cxflow.constants import CXF_BUFFER_SLEEP
 from cxflow.datasets import StreamWrapper
 from cxflow.hooks import StopAfter
-from cxflow.utils.profile import Timer
+from cxflow.constants import CXF_PREDICT_STREAM
 from cxflow.types import EpochData, Batch, Stream, TimeProfile
 
 from .test_core import CXTestCaseWithDir
@@ -86,6 +86,7 @@ class DelayedDataset(SimpleDataset):
             time.sleep(_READ_DATA_SLEEP_S)
             yield {'input': np.ones(self.shape), 'target': np.zeros(self.shape)}
 
+
 class ShortSimpleDataset(SimpleDataset):
     """SimpleDataset extension with one batch and one variable"""
 
@@ -93,11 +94,13 @@ class ShortSimpleDataset(SimpleDataset):
         for _ in range(1):
             yield {'input': self._iter * np.ones(self.shape)}
 
+
 class EmptyStreamDataset(SimpleDataset):
     """SimpleDataset extension providing empty streams."""
 
     def stream(self, stream_name: str):
         return iter([])
+
 
 class SomeEmptyBatchDataset(SimpleDataset):
     """SimpleDataset extension with empty first batch."""
@@ -113,12 +116,14 @@ class SomeEmptyBatchDataset(SimpleDataset):
                 batch = {'input': self._iter * np.ones(self.shape), 'target': np.zeros(self.shape)}
             yield batch
 
+
 class AllEmptyBatchDataset(SimpleDataset):
     """SimpleDataset extension with all batches empty."""
 
     def stream(self, stream_name: str):
         for _ in range(10):
             yield {'input': [], 'target': []}
+
 
 class EventRecordingHook(cx.AbstractHook):
     """EventRecordingHook records all the events and store their count and order."""
@@ -204,6 +209,19 @@ class EpochDataConsumer(cx.AbstractHook):
         assert 'train' in epoch_data
         assert 'my_variable' in epoch_data['train']
         assert epoch_data['train']['my_variable'] == _EPOCH_DATA_VAR_VALUE
+
+
+class EpochDataChecker(cx.AbstractHook):
+    """Simple hook asserts that the specified streams match the epoch_data keys."""
+
+    def __init__(self, streams):
+        self._streams = streams
+
+    def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:
+        for stream in self._streams:
+            assert stream in epoch_data
+        for stream in epoch_data.keys():
+            assert stream in self._streams
 
 
 class TrainableModel(cx.AbstractModel):
@@ -468,10 +486,16 @@ class MainLoopTest(CXTestCaseWithDir):
         _, _, mainloop2 = self.create_main_loop(epochs=3, extra_hooks=[EpochDataConsumer(), EpochDataProducer()])
         self.assertRaises(AssertionError, mainloop2.run_training)
 
+    def test_epoch_data_predict(self):
+        """Test if mainloop creates epoch_data correctly in the predict mode."""
+        # test if the epoch data are created correctly
+        _, _, mainloop = self.create_main_loop(epochs=3, extra_hooks=[EpochDataChecker(streams=['predict'])])
+        mainloop.run_evaluation(CXF_PREDICT_STREAM)
+
     def test_predict(self):
         """Test if predict iterates only the predict stream."""
         _, dataset, mainloop = self.create_main_loop(extra_streams=['valid'])
-        mainloop.run_prediction()
+        mainloop.run_evaluation(CXF_PREDICT_STREAM)
         self.assertTrue(dataset.predict_used)
         self.assertFalse(dataset.valid_used)
         self.assertFalse(dataset.train_used)
@@ -533,7 +557,7 @@ class MainLoopTest(CXTestCaseWithDir):
 
         with LogCapture() as log_capture:
             _, dataset, mainloop = self.create_main_loop(dataset=ShortSimpleDataset(), fixed_batch_size=47, on_empty_stream='ignore')
-            mainloop.run_prediction()
+            mainloop.run_evaluation(CXF_PREDICT_STREAM)
 
             log_capture.check(
                 ('root', 'INFO', 'Running prediction'),

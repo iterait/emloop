@@ -13,7 +13,7 @@ Each configuration file is divided into following sections:
 - ``model``
 - ``hooks``
 - ``main_loop``
-- ``predict``
+- ``eval``
 
 wherein only ``dataset`` and ``model`` sections are mandatory.
 
@@ -133,35 +133,42 @@ The ``main_loop`` section is optional. Any parameter specified there is forwarde
       extra_streams: [valid, test]
       skip_zeroth_epoch: True
 
-Inference
-=========
+Evaluation
+==========
 
-Naturally, the inference (sometimes refered as *evaluation* or *prediction*) of the model on new unanotated data differs from its training.
+Naturally, the evaluation (sometimes referred as *prediction* or *inference*)
+of the model on new unannotated data differs from its training.
 In this phase, we don't know the ground truth, hence the dataset sources are different.
 In such a situation, some of the metrics are impossible to measure, e.g. accuracy, which requires the
 ground truth. Most likely, we also need a different set of hooks to process the model outputs.
 
-For this reason, one can override the configuration with a special ``predict`` section.
-This section matches the overall configuration structure, i.e. it may contain the
-``model``, ``dataset``, ``hooks`` and/or  ``main_loop`` sections.
+For this reason, one can override the configuration with a special ``eval`` section.
+For each data stream, a sub-section (e.g.: ``eval.my_stream``) is expected to match the overall configuration structure,
+i.e. it **may** contain the ``model``, ``dataset``, ``hooks`` and/or  ``main_loop`` sections.
 
-In the following example, we use all the original setings but the model inputs and ouputs are overriden. Furthermore,
+In the following example, we use all the original settings but the model inputs and outputs are overridden. Furthermore,
 a different list of hooks is specified. Yet another example is available in our
 `examples repository @GitHub <https://github.com/Cognexa/cxflow-examples/tree/master/imdb>`_.
 
 .. code-block:: yaml
-    :caption: predict section of **cxflow** configuration
+    :caption: eval section of **cxflow** configuration
 
     ...
+    eval:
+      predict:  # configuration for the predict_stream
+        model:
+          inputs: [images]
+          outputs: [predictions]
 
-    predict:
-      model:
-        inputs: [images]
-        outputs: [predictions]
+        hooks:
+          - hooks.inference_logging_hook.InferenceLoggingHook:
+              variables: [ids, predictions]
 
-      hooks:
-        - hooks.inference_logging_hook.InferenceLoggingHook:
-            variables: [ids, predictions]
+Evaluation of the predict stream can then be invoked with:
+
+```
+cxflow eval predict path/to/model
+```
 
 Conclusion
 ==========

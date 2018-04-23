@@ -391,4 +391,4 @@ Then, you can just run the following command:
 
 .. code-block:: bash
 
-    cxflow predict log/MajorityExample_<some-suffix>
+    cxflow eval predict log/MajorityExample_<some-suffix>

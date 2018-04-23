@@ -90,10 +90,11 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         """List of extra stream names as specified in :py:meth:`self.__init__`."""
         return self._extra_streams
 
-    def _create_epoch_data(self) -> EpochData:
+    def _create_epoch_data(self, streams: Optional[Iterable[str]]=None) -> EpochData:
         """Create empty epoch data double dict."""
-        return OrderedDict([(stream_name, OrderedDict())
-                            for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams])
+        if streams is None:
+            streams = [CXF_TRAIN_STREAM] + self._extra_streams
+        return OrderedDict([(stream_name, OrderedDict()) for stream_name in streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
         """
@@ -228,7 +229,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             with self.get_stream(stream_name) as stream:
                 self.evaluate_stream(stream)
 
-        epoch_data = self._create_epoch_data()
+        epoch_data = self._create_epoch_data(streams)
         for hook in self._hooks:
             hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
 
@@ -304,10 +305,14 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         self._try_run(training)
 
-    def run_prediction(self) -> None:
-        """Run the main loop for in the prediction mode."""
+    def run_evaluation(self, stream_name: str) -> None:
+        """
+        Run the main loop with the given stream in the prediction mode.
+
+        :param stream_name: name of the stream to be evaluated
+        """
         def prediction():
             logging.info('Running prediction')
-            self._run_zeroth_epoch([CXF_PREDICT_STREAM])
+            self._run_zeroth_epoch([stream_name])
             logging.info('Prediction done\n\n')
         self._try_run(prediction)
