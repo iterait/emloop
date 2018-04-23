@@ -1,8 +1,7 @@
-from pip.req import parse_requirements
 from setuptools import setup
 
 setup(name='cxflow',
-      version='0.11.2',
+      version='0.12.0',
       description='Smart machine learning trainer',
       long_description='Trainer of machine learning models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
@@ -35,7 +34,7 @@ setup(name='cxflow',
       include_package_data=True,
       zip_safe=False,
       test_suite='cxflow.tests',
-      install_requires=[str(ir.req) for ir in parse_requirements('requirements.txt', session='hack')],
+      install_requires=[line for line in open('requirements.txt', 'r').readlines() if not line.startswith('#')],
       entry_points={
           'console_scripts': [
               'cxflow=cxflow.entry_point:entry_point'
