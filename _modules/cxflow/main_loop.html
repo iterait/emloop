@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.main_loop &#8212; cxflow 0.11.2 documentation</title>
+    <title>cxflow.main_loop &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,7 +50,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -199,10 +199,11 @@
         <span class="sd">&quot;&quot;&quot;List of extra stream names as specified in :py:meth:`self.__init__`.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span>
 
-<div class="viewcode-block" id="MainLoop._create_epoch_data"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._create_epoch_data">[docs]</a>    <span class="k">def</span> <span class="nf">_create_epoch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EpochData</span><span class="p">:</span>
+<div class="viewcode-block" id="MainLoop._create_epoch_data"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._create_epoch_data">[docs]</a>    <span class="k">def</span> <span class="nf">_create_epoch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EpochData</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create empty epoch data double dict.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">())</span>
-                            <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CXF_TRAIN_STREAM</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">])</span></div>
+        <span class="k">if</span> <span class="n">streams</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">CXF_TRAIN_STREAM</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">())</span> <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="MainLoop._check_sources"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop._check_sources">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -337,7 +338,7 @@
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
 
-        <span class="n">epoch_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_epoch_data</span><span class="p">()</span>
+        <span class="n">epoch_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_epoch_data</span><span class="p">(</span><span class="n">streams</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
             <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">epoch_data</span><span class="o">=</span><span class="n">epoch_data</span><span class="p">)</span></div>
 
@@ -413,11 +414,15 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_run</span><span class="p">(</span><span class="n">training</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MainLoop.run_prediction"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.run_prediction">[docs]</a>    <span class="k">def</span> <span class="nf">run_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Run the main loop for in the prediction mode.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MainLoop.run_evaluation"><a class="viewcode-back" href="../../cxflow/cxflow.html#cxflow.MainLoop.run_evaluation">[docs]</a>    <span class="k">def</span> <span class="nf">run_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the main loop with the given stream in the prediction mode.</span>
+
+<span class="sd">        :param stream_name: name of the stream to be evaluated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">prediction</span><span class="p">():</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running prediction&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_run_zeroth_epoch</span><span class="p">([</span><span class="n">CXF_PREDICT_STREAM</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_zeroth_epoch</span><span class="p">([</span><span class="n">stream_name</span><span class="p">])</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Prediction done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_run</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span></div></div>
 </pre></div>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.hooks &#8212; cxflow 0.11.2 documentation</title>
+    <title>cxflow.hooks &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -171,6 +171,8 @@ Base hook for hooks taking actions when certain variable reaches its plateau.</l
 Terminate the training when the observed variable reaches its plateau.</li>
 <li><a class="reference internal" href="#cxflow.hooks.StopOnNaN" title="cxflow.hooks.StopOnNaN"><code class="xref py py-class docutils literal"><span class="pre">StopOnNaN</span></code></a>:
 Stop the training when any of the specified variables contain NaN.</li>
+<li><a class="reference internal" href="#cxflow.hooks.SaveConfusionMatrix" title="cxflow.hooks.SaveConfusionMatrix"><code class="xref py py-class docutils literal"><span class="pre">SaveConfusionMatrix</span></code></a>:
+After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.hooks.AbstractHook">
@@ -1008,7 +1010,7 @@ stream</li>
 <div class="literal-block-wrapper docutils container" id="id11">
 <div class="code-block-caption"><span class="caption-text">save model with minimal valid loss</span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">BestSaverHook</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveBest</span>
 </pre></div>
 </div>
 </div>
@@ -1030,7 +1032,7 @@ stream</li>
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.SaveBest.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.SaveBest.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the monitor variable.</p>
 </dd></dl>
 
@@ -1527,7 +1529,7 @@ its <code class="docutils literal"><span class="pre">long_term</span></code> mea
 </div>
 <dl class="attribute">
 <dt id="cxflow.hooks.OnPlateau.OBJECTIVES">
-<code class="descname">OBJECTIVES</code><em class="property"> = {'max', 'min'}</em><a class="headerlink" href="#cxflow.hooks.OnPlateau.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OBJECTIVES</code><em class="property"> = {'min', 'max'}</em><a class="headerlink" href="#cxflow.hooks.OnPlateau.OBJECTIVES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Possible objectives for the observed variable.</p>
 </dd></dl>
 
@@ -1784,6 +1786,78 @@ variable equal to NaN.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>epoch_data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a>]) &#8211; epoch data to be checked</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.hooks.SaveConfusionMatrix">
+<em class="property">class </em><code class="descclassname">cxflow.hooks.</code><code class="descname">SaveConfusionMatrix</code><span class="sig-paren">(</span><em>output_dir</em>, <em>dataset</em>, <em>labels_name='labels'</em>, <em>predictions_name='predictions'</em>, <em>classes_names=None</em>, <em>figsize=None</em>, <em>figure_action='save'</em>, <em>num_classes_method_name='num_classes'</em>, <em>classes_names_method_name='classes_names'</em>, <em>mask_name=None</em>, <em>normalize=True</em>, <em>cmap='Blues'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save_cm.html#SaveConfusionMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveConfusionMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cxflow.hooks.accumulate_variables.AccumulateVariables</span></code></p>
+<p>After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels.</p>
+<div class="literal-block-wrapper docutils container" id="id22">
+<div class="code-block-caption"><span class="caption-text">Store confusion matrix figure to epoch data with green colorbar</span><a class="headerlink" href="#id22" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveConfusionMatrix</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">figure_action</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">store</span>
+      <span class="l l-Scalar l-Scalar-Plain">cmap</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Greens</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-text">Defined classes&#8217; names and save confusion matrix figure to training logdir with absolute values</span><a class="headerlink" href="#id23" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveConfusionMatrix</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">classes_names</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">class_with_index_zero</span><span class="p p-Indicator">,</span> <span class="nv">class_with_index_one</span><span class="p p-Indicator">,</span> <span class="nv">class_with_index_three</span><span class="p p-Indicator">]</span>
+      <span class="l l-Scalar l-Scalar-Plain">normalize</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-6c8c76ab13436eb338225b0f2b2fe2b75c40e668.png" alt="Inheritance diagram of SaveConfusionMatrix" usemap="#inheritance5ea32bbab7" class="inheritance"/>
+<map id="inheritance5ea32bbab7" name="inheritance5ea32bbab7">
+<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="164,5,323,31"/>
+<area shape="rect" id="node3" title="After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels." alt="" coords="371,5,531,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="attribute">
+<dt id="cxflow.hooks.SaveConfusionMatrix.FIGURE_ACTIONS">
+<code class="descname">FIGURE_ACTIONS</code><em class="property"> = ['save', 'store']</em><a class="headerlink" href="#cxflow.hooks.SaveConfusionMatrix.FIGURE_ACTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possible actions to be taken with the plotted figure.
+It can be either saved to a file or stored in the epoch data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.hooks.SaveConfusionMatrix.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>output_dir</em>, <em>dataset</em>, <em>labels_name='labels'</em>, <em>predictions_name='predictions'</em>, <em>classes_names=None</em>, <em>figsize=None</em>, <em>figure_action='save'</em>, <em>num_classes_method_name='num_classes'</em>, <em>classes_names_method_name='classes_names'</em>, <em>mask_name=None</em>, <em>normalize=True</em>, <em>cmap='Blues'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/hooks/save_cm.html#SaveConfusionMatrix.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.hooks.SaveConfusionMatrix.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new <a class="reference internal" href="#cxflow.hooks.SaveConfusionMatrix" title="cxflow.hooks.SaveConfusionMatrix"><code class="xref py py-class docutils literal"><span class="pre">SaveConfusionMatrix</span></code></a> hook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; output directory</li>
+<li><strong>dataset</strong> (<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">BaseDataset</span></code></a>) &#8211; dataset (needed to translate predictions to strings)</li>
+<li><strong>labels_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; annotation variable name</li>
+<li><strong>predictions_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; prediction variable name</li>
+<li><strong>classes_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; List of classes&#8217; names</li>
+<li><strong>figsize</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<code class="xref py py-class docutils literal"><span class="pre">Tuple</span></code>[<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>]]) &#8211; the size of the matplotlib figure</li>
+<li><strong>figure_action</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; action to be taken with the plotted figure, one of <a class="reference internal" href="#cxflow.hooks.SaveConfusionMatrix.FIGURE_ACTIONS" title="cxflow.hooks.SaveConfusionMatrix.FIGURE_ACTIONS"><code class="xref py py-attr docutils literal"><span class="pre">FIGURE_ACTIONS</span></code></a></li>
+<li><strong>normalize</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; False for plotting absolute values in confusion matrix, True for relative</li>
+<li><strong>num_classes_method_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; <code class="docutils literal"><span class="pre">self._dataset</span></code> method name to get number of classes</li>
+<li><strong>classes_names_method_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; <code class="docutils literal"><span class="pre">self._dataset</span></code> method name to get classes&#8217; names
+Parameter is ignored when <code class="docutils literal"><span class="pre">classes_names</span></code> is provided</li>
+<li><strong>mask_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; the variable masking valid records (1 = valid, 0 = invalid)</li>
+<li><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; type of colorbar  # <a class="reference external" href="http://matplotlib.org/examples/color/colormaps_reference.html">http://matplotlib.org/examples/color/colormaps_reference.html</a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the <code class="docutils literal"><span class="pre">figure_action</span></code> is not in <code class="docutils literal"><span class="pre">FIGURE_ACTIONS</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>

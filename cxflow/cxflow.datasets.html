@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.datasets &#8212; cxflow 0.11.2 documentation</title>
+    <title>cxflow.datasets &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -177,7 +177,6 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 <dd><ul class="first last simple">
 <li>override the <code class="docutils literal"><span class="pre">_configure_dataset</span></code></li>
 <li>(optional) implement <code class="docutils literal"><span class="pre">train_stream</span></code> method if intended to be used with <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">...</span></code></li>
-<li>(optional) implement <code class="docutils literal"><span class="pre">predict_stream</span></code> method if intended to be used with <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span> <span class="pre">...</span></code></li>
 <li>(optional) implement <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code> method in order to make <code class="docutils literal"><span class="pre">&lt;stream_name&gt;</span></code> stream available</li>
 </ul>
 </dd>
@@ -217,6 +216,20 @@ in order to make <code class="docutils literal"><span class="pre">stream_name</s
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#NotImplementedError" title="(in Python v3.6)"><strong>NotImplementedError</strong></a> &#8211; if not overridden</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.datasets.BaseDataset.stream_info">
+<code class="descname">stream_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/datasets/base_dataset.html#BaseDataset.stream_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.datasets.BaseDataset.stream_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check and report source names, dtypes and shapes of all the streams available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Dataset &#8212; cxflow 0.11.2 documentation</title>
+    <title>Dataset &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -131,8 +131,8 @@
 Regardless of sizes, complexities and formats, all datasets are beautiful. At some point, though, we need to
 iterate through the data points or <em>examples</em> if you wish.</p>
 <p>As a matter of fact, the ability of providing example iterators is the only requirement from <strong>cxflow</strong> on datasets.
-A dataset used for training has to implement a <code class="docutils literal"><span class="pre">train_stream</span></code> method and similarly
-the dataset has to implement <code class="docutils literal"><span class="pre">predict_stream</span></code> when used for prediction later.</p>
+A dataset used for training has to implement a <code class="docutils literal"><span class="pre">train_stream</span></code>, in addition to that, any <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code>
+may be used for evaluation.</p>
 <p>To make a dataset compatible with <strong>cxflow</strong> one must implement a class which complies
 to the <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a> concept.
 With that, <strong>cxflow</strong> can create and manage the dataset for you.</p>
@@ -219,7 +219,7 @@ along with the train stream. The configuration may look as follows:</p>
 </div>
 </div>
 <p>The extra streams, however, <em>are not</em> used for training, that is, the model is won`t be updated when it iterates through them.</p>
-<p>Finally, <strong>cxflow</strong> requires predict <em>stream</em> for the prediction command <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span> <span class="pre">..</span></code>.</p>
+<p>Finally, <strong>cxflow</strong> allows evaluation of any additional <em>stream</em> with  <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">eval</span> <span class="pre">&lt;stream_name&gt;</span> <span class="pre">..</span></code> command.</p>
 </div>
 <div class="section" id="additional-methods">
 <h2>Additional Methods<a class="headerlink" href="#additional-methods" title="Permalink to this headline">¶</a></h2>
@@ -245,7 +245,7 @@ We leave them without further comments as they are self-describing.</p>
 <li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">print_statistics</span> <span class="pre">config/my-data.yaml</span></code></li>
 <li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">plot_histogram</span> <span class="pre">config/my-data.yaml</span></code></li>
 <li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">config/my-data.yaml</span></code></li>
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">eval</span> <span class="pre">test</span> <span class="pre">log/my-model</span></code></li>
 </ul>
 </div>
 <div class="section" id="the-philosophy-of-laziness">

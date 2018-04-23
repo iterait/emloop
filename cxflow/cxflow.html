@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow &#8212; cxflow 0.11.2 documentation</title>
+    <title>cxflow &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -218,7 +218,7 @@
 
 <dl class="method">
 <dt id="cxflow.MainLoop._create_epoch_data">
-<code class="descname">_create_epoch_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._create_epoch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._create_epoch_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_create_epoch_data</code><span class="sig-paren">(</span><em>streams=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop._create_epoch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop._create_epoch_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create empty epoch data double dict.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -390,14 +390,16 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="cxflow.MainLoop.run_prediction">
-<code class="descname">run_prediction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop.run_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop.run_prediction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the main loop for in the prediction mode.</p>
+<dt id="cxflow.MainLoop.run_evaluation">
+<code class="descname">run_evaluation</code><span class="sig-paren">(</span><em>stream_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/main_loop.html#MainLoop.run_evaluation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.MainLoop.run_evaluation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the main loop with the given stream in the prediction mode.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; name of the stream to be evaluated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &#8212; cxflow 0.11.2 documentation</title>
+    <title>Tutorial &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -316,8 +316,8 @@ A simple <a class="reference external" href="https://www.tensorflow.org/">Tensor
 We will use the official <a class="reference external" href="https://github.com/Cognexa/cxflow-tensorflow">cxflow-tensorflow</a> package that provides
 convenient TensorFlow integration with <strong>cxflow</strong>. Please install this package before you proceed
 with this tutorial.</p>
-<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.3)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class that is expected to
-extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.3)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>.</p>
+<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class that is expected to
+extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>.</p>
 <p>Let us define a class called <code class="docutils literal"><span class="pre">MajorityNet</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">majority_net.py</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
@@ -347,7 +347,7 @@ extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxf
 </pre></div>
 </div>
 </div>
-<p>The only method that is necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.3)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
+<p>The only method that is necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
 In our case, the <code class="docutils literal"><span class="pre">_create_model</span></code> method creates a simple MLP.
 If you know the fundamentals of TensorFlow, it should be easy to understand what is going on.</p>
 <p>To be precise, the model registered the following computational graph nodes:</p>
@@ -503,7 +503,7 @@ the saved model as well.</p>
 easy to use cxflow for this purpose.
 See the configuration <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a> for more details.
 Then, you can just run the following command:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow predict log/MajorityExample_&lt;some-suffix&gt;
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow <span class="nb">eval</span> predict log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
 </div>

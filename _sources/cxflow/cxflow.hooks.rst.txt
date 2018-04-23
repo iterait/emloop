@@ -62,6 +62,9 @@ Classes
 - :py:class:`StopOnNaN`:
   Stop the training when any of the specified variables contain NaN.
 
+- :py:class:`SaveConfusionMatrix`:
+  After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels.
+
 
 
 .. autoclass:: AbstractHook
@@ -296,6 +299,20 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: StopOnNaN
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SaveConfusionMatrix
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SaveConfusionMatrix
       :parts: 1
 
    |

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &#8212; cxflow 0.11.2 documentation</title>
+    <title>Configuration &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -103,7 +103,7 @@
 <li><a class="reference internal" href="#model">Model</a></li>
 <li><a class="reference internal" href="#hooks">Hooks</a></li>
 <li><a class="reference internal" href="#id1">Main Loop</a></li>
-<li><a class="reference internal" href="#inference">Inference</a></li>
+<li><a class="reference internal" href="#evaluation">Evaluation</a></li>
 <li><a class="reference internal" href="#conclusion">Conclusion</a></li>
 </ul>
 </li>
@@ -139,7 +139,7 @@ or simple comments.</p>
 <li><code class="docutils literal"><span class="pre">model</span></code></li>
 <li><code class="docutils literal"><span class="pre">hooks</span></code></li>
 <li><code class="docutils literal"><span class="pre">main_loop</span></code></li>
-<li><code class="docutils literal"><span class="pre">predict</span></code></li>
+<li><code class="docutils literal"><span class="pre">eval</span></code></li>
 </ul>
 <p>wherein only <code class="docutils literal"><span class="pre">dataset</span></code> and <code class="docutils literal"><span class="pre">model</span></code> sections are mandatory.</p>
 <div class="section" id="dataset">
@@ -278,33 +278,38 @@ dictionary of parameters which will be passed to the hook constructor. E.g.:</p>
 </div>
 </div>
 </div>
-<div class="section" id="inference">
-<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
-<p>Naturally, the inference (sometimes refered as <em>evaluation</em> or <em>prediction</em>) of the model on new unanotated data differs from its training.
+<div class="section" id="evaluation">
+<h2>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this headline">¶</a></h2>
+<p>Naturally, the evaluation (sometimes referred as <em>prediction</em> or <em>inference</em>)
+of the model on new unannotated data differs from its training.
 In this phase, we don&#8217;t know the ground truth, hence the dataset sources are different.
 In such a situation, some of the metrics are impossible to measure, e.g. accuracy, which requires the
 ground truth. Most likely, we also need a different set of hooks to process the model outputs.</p>
-<p>For this reason, one can override the configuration with a special <code class="docutils literal"><span class="pre">predict</span></code> section.
-This section matches the overall configuration structure, i.e. it may contain the
-<code class="docutils literal"><span class="pre">model</span></code>, <code class="docutils literal"><span class="pre">dataset</span></code>, <code class="docutils literal"><span class="pre">hooks</span></code> and/or  <code class="docutils literal"><span class="pre">main_loop</span></code> sections.</p>
-<p>In the following example, we use all the original setings but the model inputs and ouputs are overriden. Furthermore,
+<p>For this reason, one can override the configuration with a special <code class="docutils literal"><span class="pre">eval</span></code> section.
+For each data stream, a sub-section (e.g.: <code class="docutils literal"><span class="pre">eval.my_stream</span></code>) is expected to match the overall configuration structure,
+i.e. it <strong>may</strong> contain the <code class="docutils literal"><span class="pre">model</span></code>, <code class="docutils literal"><span class="pre">dataset</span></code>, <code class="docutils literal"><span class="pre">hooks</span></code> and/or  <code class="docutils literal"><span class="pre">main_loop</span></code> sections.</p>
+<p>In the following example, we use all the original settings but the model inputs and outputs are overridden. Furthermore,
 a different list of hooks is specified. Yet another example is available in our
 <a class="reference external" href="https://github.com/Cognexa/cxflow-examples/tree/master/imdb">examples repository &#64;GitHub</a>.</p>
 <div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">predict section of <strong>cxflow</strong> configuration</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">eval section of <strong>cxflow</strong> configuration</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">eval</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">predict</span><span class="p p-Indicator">:</span>  <span class="c1"># configuration for the predict_stream</span>
+    <span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">images</span><span class="p p-Indicator">]</span>
+      <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">]</span>
 
-<span class="l l-Scalar l-Scalar-Plain">predict</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">images</span><span class="p p-Indicator">]</span>
-    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">]</span>
-
-  <span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">hooks.inference_logging_hook.InferenceLoggingHook</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">ids</span><span class="p p-Indicator">,</span> <span class="nv">predictions</span><span class="p p-Indicator">]</span>
+    <span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">hooks.inference_logging_hook.InferenceLoggingHook</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">ids</span><span class="p p-Indicator">,</span> <span class="nv">predictions</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 </div>
+<p>Evaluation of the predict stream can then be invoked with:</p>
+<p><code class="docutils literal"><span class="pre">`</span>
+<span class="pre">cxflow</span> <span class="pre">eval</span> <span class="pre">predict</span> <span class="pre">path/to/model</span>
+<span class="pre">`</span></code></p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>

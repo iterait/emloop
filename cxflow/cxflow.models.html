@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cxflow.models &#8212; cxflow 0.11.2 documentation</title>
+    <title>cxflow.models &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -124,6 +124,10 @@
 <ul class="simple">
 <li><a class="reference internal" href="#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">AbstractModel</span></code></a>:
 Abstract machine learning model which exposes input and output names, run and save methods.</li>
+<li><a class="reference internal" href="#cxflow.models.Ensemble" title="cxflow.models.Ensemble"><code class="xref py py-class docutils literal"><span class="pre">Ensemble</span></code></a>:
+Ensemble model facilitates assembling multiple models into one for more accurate predictions.</li>
+<li><a class="reference internal" href="#cxflow.models.Sequence" title="cxflow.models.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>:
+Model sequence provides simple abstraction for sequential application of multiple models to input batches.</li>
 </ul>
 <dl class="class">
 <dt id="cxflow.models.AbstractModel">
@@ -243,6 +247,355 @@ object specified in <cite>model</cite> configuration section fails.</p>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">path to the saved file/dir</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.models.Ensemble">
+<em class="property">class </em><code class="descclassname">cxflow.models.</code><code class="descname">Ensemble</code><span class="sig-paren">(</span><em>inputs</em>, <em>outputs</em>, <em>aggregation='major_vote'</em>, <em>models_root=None</em>, <em>model_paths=None</em>, <em>dataset=None</em>, <em>eager_loading=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/ensemble.html#Ensemble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">models.AbstractModel</span></code></a></p>
+<p>Ensemble model facilitates assembling multiple models into one for more accurate predictions.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Ensemble model can be used for inference only (i.e. no training is supported).</p>
+</div>
+<p>The typical usage is to train multiple (possibly different) models and assemble them with this class.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">usage from config</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MyEnsemble</span>
+  <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cxflow.models.Ensemble</span>
+
+  <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">images</span><span class="p p-Indicator">]</span>
+  <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">]</span>
+
+  <span class="l l-Scalar l-Scalar-Plain">models_root</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/var/project/models</span>  <span class="c1"># will load all the models under this directory</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">usage from python</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cxflow</span> <span class="kn">as</span> <span class="nn">cx</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Ensemble</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;images&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;predictions&#39;</span><span class="p">],</span> <span class="n">aggregation</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                           <span class="n">models_root</span><span class="o">=</span><span class="s1">&#39;/my/directory/with/models&#39;</span><span class="p">)</span>
+<span class="c1"># model.run(...)</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-ee4f756d1670277aed2624c5bcd8ffea2198fe70.png" alt="Inheritance diagram of Ensemble" usemap="#inheritance2bb50beb95" class="inheritance"/>
+<map id="inheritance2bb50beb95" name="inheritance2bb50beb95">
+<area shape="rect" id="node2" title="Ensemble model facilitates assembling multiple models into one for more accurate predictions." alt="" coords="168,5,255,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="attribute">
+<dt id="cxflow.models.Ensemble.AGGREGATION_METHODS">
+<code class="descname">AGGREGATION_METHODS</code><em class="property"> = ['mean', 'major_vote']</em><a class="headerlink" href="#cxflow.models.Ensemble.AGGREGATION_METHODS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possible ensemble aggregation methods.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Ensemble.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>inputs</em>, <em>outputs</em>, <em>aggregation='major_vote'</em>, <em>models_root=None</em>, <em>model_paths=None</em>, <em>dataset=None</em>, <em>eager_loading=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/ensemble.html#Ensemble.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Ensemble.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new Ensemble.</p>
+<p>If no <code class="docutils literal"><span class="pre">models_paths</span></code> are specified, all the sub-directories of the <code class="docutils literal"><span class="pre">models_root</span></code> will be taken as the models
+to be assembled together.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; model input names</li>
+<li><strong>outputs</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; model output names</li>
+<li><strong>aggregation</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>) &#8211; aggregation method, one of <a class="reference internal" href="#cxflow.models.Ensemble.AGGREGATION_METHODS" title="cxflow.models.Ensemble.AGGREGATION_METHODS"><code class="xref py py-attr docutils literal"><span class="pre">Ensemble.AGGREGATION_METHODS</span></code></a></li>
+<li><strong>models_root</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; optional root directory of the models to be assembled together</li>
+<li><strong>model_paths</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]]) &#8211; optional list of model directory names/paths</li>
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>]) &#8211; optional <strong>cxflow</strong> dataset (will be passed to the assembled models)</li>
+<li><strong>eager_loading</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; load all the models in the constructor</li>
+<li><strong>kwargs</strong> &#8211; additional kwargs (unused)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> &#8211; if neither one of <code class="docutils literal"><span class="pre">models_root</span></code> and <code class="docutils literal"><span class="pre">model_paths</span></code> is specified</li>
+<li><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#AssertionError" title="(in Python v3.6)"><strong>AssertionError</strong></a> &#8211; if the specified <code class="docutils literal"><span class="pre">aggregation</span></code> is not one of <a class="reference internal" href="#cxflow.models.Ensemble.AGGREGATION_METHODS" title="cxflow.models.Ensemble.AGGREGATION_METHODS"><code class="xref py py-attr docutils literal"><span class="pre">Ensemble.AGGREGATION_METHODS</span></code></a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Ensemble._load_models">
+<code class="descname">_load_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/ensemble.html#Ensemble._load_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Ensemble._load_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maybe load all the models to be assembled together and save them to the <code class="docutils literal"><span class="pre">self._models</span></code> attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.models.Ensemble.input_names">
+<code class="descname">input_names</code><a class="headerlink" href="#cxflow.models.Ensemble.input_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of model input names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.models.Ensemble.output_names">
+<code class="descname">output_names</code><a class="headerlink" href="#cxflow.models.Ensemble.output_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of model output names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.models.Ensemble.restore_fallback">
+<code class="descname">restore_fallback</code><a class="headerlink" href="#cxflow.models.Ensemble.restore_fallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensemble model does not provide restore_fallback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Ensemble.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>batch</em>, <em>train=False</em>, <em>stream=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/ensemble.html#Ensemble.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Ensemble.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run feed-forward pass with the given batch using all the models, aggregate and return the results.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><a class="reference internal" href="#cxflow.models.Ensemble" title="cxflow.models.Ensemble"><code class="xref py py-class docutils literal"><span class="pre">Ensemble</span></code></a> can not be trained.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]) &#8211; batch to be processed</li>
+<li><strong>train</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; <code class="docutils literal"><span class="pre">True</span></code> if this batch should be used for model update, <code class="docutils literal"><span class="pre">False</span></code> otherwise</li>
+<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.StreamWrapper" title="cxflow.datasets.StreamWrapper"><code class="xref py py-class docutils literal"><span class="pre">StreamWrapper</span></code></a>]) &#8211; stream wrapper (useful for precise buffer management)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">aggregated results dict</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the <code class="docutils literal"><span class="pre">train</span></code> flag is set to <code class="docutils literal"><span class="pre">True</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Ensemble.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/ensemble.html#Ensemble.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Ensemble.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensemble model can not be saved.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#NotImplementedError" title="(in Python v3.6)"><strong>NotImplementedError</strong></a> &#8211; when called</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cxflow.models.Sequence">
+<em class="property">class </em><code class="descclassname">cxflow.models.</code><code class="descname">Sequence</code><span class="sig-paren">(</span><em>model_paths</em>, <em>models_root=None</em>, <em>dataset=None</em>, <em>eager_loading=False</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/sequence.html#Sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cxflow.models.AbstractModel" title="cxflow.models.AbstractModel"><code class="xref py py-class docutils literal"><span class="pre">models.AbstractModel</span></code></a></p>
+<p>Model sequence provides simple abstraction for sequential application of multiple models to input batches.
+All the models are fed with the original inputs as well as the outputs of the preceeding models.
+Ultimately, all the model outputs are returned.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Model sequence can be used for inference only (i.e. no training is supported).</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">usage from config</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MyPipeline</span>
+  <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cxflow.models.Sequence</span>
+
+  <span class="l l-Scalar l-Scalar-Plain">models_root</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/var/project/models</span>
+  <span class="l l-Scalar l-Scalar-Plain">model_paths</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">step1</span><span class="p p-Indicator">,</span> <span class="nv">step2</span><span class="p p-Indicator">,</span> <span class="nv">step3</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">usage from python</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cxflow</span> <span class="kn">as</span> <span class="nn">cx</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">cx</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span><span class="n">model_paths</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;/path/to/step/step1&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/step/step2&#39;</span><span class="p">])</span>
+<span class="c1"># model.run(...)</span>
+</pre></div>
+</div>
+</div>
+<img src="../_images/inheritance-c0afb6b86799d85e038c08feecb0a58d21cf1ca9.png" alt="Inheritance diagram of Sequence" usemap="#inheritance073049eef1" class="inheritance"/>
+<map id="inheritance073049eef1" name="inheritance073049eef1">
+<area shape="rect" id="node2" title="Model sequence provides simple abstraction for sequential application of multiple models to input batches." alt="" coords="168,5,253,31"/>
+</map>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="cxflow.models.Sequence.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model_paths</em>, <em>models_root=None</em>, <em>dataset=None</em>, <em>eager_loading=False</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/sequence.html#Sequence.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Sequence.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new model <code class="docutils literal"><span class="pre">Sequence</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>models_root</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; optional root directory of the models to be assembled together</li>
+<li><strong>model_paths</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]) &#8211; list of model directory names/paths</li>
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">AbstractDataset</span></code></a>]) &#8211; optional <strong>cxflow</strong> dataset (will be passed to the underlying models)</li>
+<li><strong>eager_loading</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; load all the models in the constructor</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Sequence._load_models">
+<code class="descname">_load_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/sequence.html#Sequence._load_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Sequence._load_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maybe load all the models to be applied and save them to the <code class="docutils literal"><span class="pre">self._models</span></code> attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.models.Sequence.input_names">
+<code class="descname">input_names</code><a class="headerlink" href="#cxflow.models.Sequence.input_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of model input names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.models.Sequence.output_names">
+<code class="descname">output_names</code><a class="headerlink" href="#cxflow.models.Sequence.output_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of model output names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Iterable" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cxflow.models.Sequence.restore_fallback">
+<code class="descname">restore_fallback</code><a class="headerlink" href="#cxflow.models.Sequence.restore_fallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence model does not provide restore_fallback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Sequence.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>batch</em>, <em>train=False</em>, <em>stream=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/sequence.html#Sequence.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Sequence.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all the models in-order and return accumulated outputs.</p>
+<p>N-th model is fed with the original inputs and outputs of all the models that were run before it.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><a class="reference internal" href="#cxflow.models.Sequence" title="cxflow.models.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> model can not be trained.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]) &#8211; batch to be processed</li>
+<li><strong>train</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>) &#8211; <code class="docutils literal"><span class="pre">True</span></code> if this batch should be used for model update, <code class="docutils literal"><span class="pre">False</span></code> otherwise</li>
+<li><strong>stream</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Optional" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="cxflow.datasets.html#cxflow.datasets.StreamWrapper" title="cxflow.datasets.StreamWrapper"><code class="xref py py-class docutils literal"><span class="pre">StreamWrapper</span></code></a>]) &#8211; stream wrapper (useful for precise buffer management)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Mapping" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Sequence" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.6/library/typing.html#typing.Any" title="(in Python v3.6)"><code class="xref py py-data docutils literal"><span class="pre">Any</span></code></a>]]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">accumulated model outputs</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> &#8211; if the <code class="docutils literal"><span class="pre">train</span></code> flag is set to <code class="docutils literal"><span class="pre">True</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cxflow.models.Sequence.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cxflow/models/sequence.html#Sequence.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cxflow.models.Sequence.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence model can not be saved.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#NotImplementedError" title="(in Python v3.6)"><strong>NotImplementedError</strong></a> &#8211; when called</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
 </tr>
 </tbody>
 </table>

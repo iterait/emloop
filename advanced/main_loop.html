@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Loop &#8212; cxflow 0.11.2 documentation</title>
+    <title>Main Loop &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -101,7 +101,7 @@
 <li><a class="reference internal" href="#">Main Loop</a><ul>
 <li><a class="reference internal" href="#dataset-model-integration">Dataset/Model Integration</a></li>
 <li><a class="reference internal" href="#training-lifecycle">Training Lifecycle</a></li>
-<li><a class="reference internal" href="#prediction-lifecycle">Prediction Lifecycle</a></li>
+<li><a class="reference internal" href="#evaluation-lifecycle">Evaluation Lifecycle</a></li>
 <li><a class="reference internal" href="#hook-integration">Hook Integration</a></li>
 </ul>
 </li>
@@ -138,7 +138,7 @@ to its constructor. Consequently, <strong>cxflow</strong> continues with creatin
 One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.</p>
 <p>After the dataset and the model are created, <strong>cxflow</strong> calls one of the dataset stream functions
-based on whether it is training, testing or predicting (more on this is described in the following
+based on whether it is training, testing or evaluation (more on this is described in the following
 sections).
 The selected stream method (e.g., <code class="docutils literal"><span class="pre">train_stream</span></code>) returns an iterable where each
 item corresponds to a single batch of data.</p>
@@ -175,15 +175,14 @@ and evaluate the extra streams.</li>
 </pre></div>
 </div>
 </div>
-<div class="section" id="prediction-lifecycle">
-<h2>Prediction Lifecycle<a class="headerlink" href="#prediction-lifecycle" title="Permalink to this headline">¶</a></h2>
-<p>The prediction stream is used and the model is never updated.
-In addition, there is only a single pass through the stream before cxflow
+<div class="section" id="evaluation-lifecycle">
+<h2>Evaluation Lifecycle<a class="headerlink" href="#evaluation-lifecycle" title="Permalink to this headline">¶</a></h2>
+<p>Any stream may be evaluated leaving the model intact. There is only a single pass through the stream before cxflow
 terminates.</p>
 <p>The whole process can be described by the following pseudocode.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. create dataset
 <span class="m">2</span>. restore model
-<span class="m">3</span>. evaluate prediction stream
+<span class="m">3</span>. evaluate the specified stream
 </pre></div>
 </div>
 </div>

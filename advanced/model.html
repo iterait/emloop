@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Model &#8212; cxflow 0.11.2 documentation</title>
+    <title>Model &#8212; cxflow 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.11.2',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -166,7 +166,8 @@ demonstrate the process.</p>
 <div class="section" id="restoring-the-model">
 <h2>Restoring the Model<a class="headerlink" href="#restoring-the-model" title="Permalink to this headline">¶</a></h2>
 <p>Once the model is successfully saved, it can be also restored.
-This is done when the training is about to continue (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">resume</span></code>) or in a production environemt (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">predict</span></code>).
+This is done when the training is about to continue (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">resume</span></code>)
+or in a production environemt (<code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">eval</span> <span class="pre">&lt;stream_name&gt;</span></code>).
 Both commands expect a single positional argument specifying from where the model shall be loaded.
 This argument is called <code class="docutils literal"><span class="pre">restore_from</span></code> and it is passed to the model constructor (see below).</p>
 <p>If the <code class="docutils literal"><span class="pre">restore_from</span></code> argument is passed to the constructor, the model attempts to restore itself.
@@ -181,7 +182,7 @@ with the model object implementations etc.).
 For these cases, each model should implement a <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.restore_fallback" title="cxflow.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.restore_fallback()</span></code></a> method, which usually points
 to a backend-specific base class, which is able to restore the saved files of all its subclasses.
 For instance, in the <code class="docutils literal"><span class="pre">cxflow-tensorflow</span></code> backend, the <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.restore_fallback" title="cxflow.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.restore_fallback()</span></code></a> class returns
-<a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.3)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>, which it is able to load any checkpoint
+<a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>, which it is able to load any checkpoint
 without the need for the original model source codes.</p>
 </div>
 </div>
