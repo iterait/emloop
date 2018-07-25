@@ -51,6 +51,7 @@ class AccumulateVariablesTest(CXTestCase):
         with self.assertRaises(KeyError):
             accum_hook.after_batch(stream_name, batch)
 
+
     def test_raise_var_not_iterable(self):
         """Test raising an exception if selected variable is not iterable."""
 
