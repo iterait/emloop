@@ -32,11 +32,10 @@ from .flatten import Flatten
 from .plot_lines import PlotLines
 from .logits_to_csv import LogitsToCsv
 from .sequence_to_csv import SequenceToCsv
-from .save_masks import SaveMasks
 
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
            'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'SaveLatest', 'ComputeStats', 'Check', 'ShowProgress',
            'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'StopOnNaN', 'SaveConfusionMatrix', 'Flatten', 'PlotLines',
-           'LogitsToCsv', 'SequenceToCsv', 'SaveMasks']
+           'LogitsToCsv', 'SequenceToCsv']
