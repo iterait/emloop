@@ -12,7 +12,6 @@ from cxflow.hooks.plot_lines import PlotLines
 _ITERS = 3
 _EXAMPLES = 5
 _FEATURES = 6
-_ROOT_DIR = 'visual'
 _EPOCH_ID = '_'
 _STREAM_NAME = 'train'
 
@@ -40,7 +39,7 @@ def test_plotting_lines_without_optional_arguments(tmpdir):
 
         for id_var in batch['ids']:
             filename = '{}_batch_{}_plot-{}.{}'.format(id_var, i+1, suffix, 'png')
-            assert os.path.exists(os.path.join(tmpdir, _ROOT_DIR, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+            assert os.path.exists(os.path.join(tmpdir, 'visual', 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
 
 
 def test_plotting_lines_with_optional_arguments(tmpdir):
@@ -54,11 +53,12 @@ def test_plotting_lines_with_optional_arguments(tmpdir):
     out_format = 'jpg'
     examples = 2
     batches = 2
+    root_dir = 'dir'
     suffix = '-vs-'.join(selected_vars)
 
     plot_lines = PlotLines(output_dir=tmpdir, variables=selected_vars, streams=['train'], id_variable=id_variable,
                            pad_mask_variable='accuracy', out_format=out_format, ymin=0, ymax=1, example_count=examples,
-                           batch_count=batches)
+                           batch_count=batches, root_dir=root_dir)
 
     for _ in range(_ITERS):
         batch = get_batch()
@@ -69,16 +69,16 @@ def test_plotting_lines_with_optional_arguments(tmpdir):
             filename = '{}_batch_{}_plot-{}.{}'.format(id_var, i+1, suffix, out_format)
             if e < examples:
                 assert os.path.exists(
-                    os.path.join(tmpdir, _ROOT_DIR, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+                    os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
             else:
                 assert not os.path.exists(
-                    os.path.join(tmpdir, _ROOT_DIR, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+                    os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
 
     for i_not in range(batches, _ITERS):
         for id_not in batch['ids']:
             filename = '{}_batch_{}_plot-{}.{}'.format(id_not, i_not+1, suffix, out_format)
             assert not os.path.exists(
-                os.path.join(tmpdir, _ROOT_DIR, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+                os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
 
 
 _VARS = [['not-there', 'cost'],
@@ -94,7 +94,7 @@ def test_plotting_lines_raises_error(vars, id_var, mask_var, tmpdir):
 
     plot_lines = PlotLines(output_dir=tmpdir, variables=vars, id_variable=id_var, pad_mask_variable=mask_var)
     batch = get_batch()
-    with pytest.raises(AssertionError):
+    with pytest.raises(KeyError):
         plot_lines.after_batch(_STREAM_NAME, batch)
 
 
@@ -112,7 +112,7 @@ def test_plotting_lines_stream_not_in_specified(tmpdir):
         for id_var in batch['ids']:
             filename = '{}_batch_{}_plot-{}.{}'.format(id_var, i+1, suffix, 'png')
             assert not os.path.exists(
-                os.path.join(tmpdir, _ROOT_DIR, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+                os.path.join(tmpdir, 'visual', 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
 
 
 def test_resetting_batch_count(tmpdir):

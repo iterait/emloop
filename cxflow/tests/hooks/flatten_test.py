@@ -58,5 +58,5 @@ def test_flattening_variables_raises_error():
 
     for _ in range(_ITERS):
         batch = get_batch()
-        with pytest.raises(AssertionError):
+        with pytest.raises(KeyError):
             flatten_vars.after_batch(_STREAM_NAME, batch)

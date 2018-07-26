@@ -40,8 +40,14 @@ class Flatten(AbstractHook):
         self._streams = streams
 
     def after_batch(self, stream_name: str, batch_data: Batch) -> None:
-        if self._streams is None or stream_name in self._streams:
-            for variable in self._variables:
-                assert variable in batch_data
-            for src, dst in self._variables.items():
-                batch_data[dst] = np.array(batch_data[src]).flatten()
+        """Flatten given variables."""
+        if self._streams is not None and stream_name not in self._streams:
+            return
+
+        for variable in self._variables:
+            if variable not in batch_data:
+                raise KeyError('Variable `{}` to be flattened was not found in the batch data for stream `{}`. '
+                               'Available variables are `{}`.'.format(variable, stream_name, batch_data.keys()))
+
+        for src, dst in self._variables.items():
+            batch_data[dst] = np.array(batch_data[src]).flatten()

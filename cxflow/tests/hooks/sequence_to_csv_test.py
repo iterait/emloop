@@ -72,10 +72,11 @@ def test_saving_sequence_to_csv_with_optional_arguments(tmpdir):
 _VARS = [['not-there'], ['color'], ['area'], ['area', 'incorrect_0'], ['area', 'incorrect_1'], [], ['color'], ['color']]
 _ID_VAR = ['pic_id', 'not-there', 'pic_id', 'pic_id', 'pic_id', 'pic_id', 'pic_id', 'pic_id']
 _MASK = ['mask', 'mask', 'not-there', 'mask', 'mask', 'mask', 'incorrect_0', 'incorrect_1']
+_ERRORS = [KeyError, KeyError, KeyError, AssertionError, AssertionError, AssertionError, AssertionError, AssertionError]
 
 
-@pytest.mark.parametrize('var, id_var, mask', zip(_VARS, _ID_VAR, _MASK))
-def test_saving_sequence_to_csv_raises_error(tmpdir, var, id_var, mask):
+@pytest.mark.parametrize('var, id_var, mask, error', zip(_VARS, _ID_VAR, _MASK, _ERRORS))
+def test_saving_sequence_to_csv_raises_error(tmpdir, var, id_var, mask, error):
     """Test raising an assertion error if variable is not present in a batch/variable lengths are not same."""
 
     filename = os.path.join(tmpdir, 'colors.csv')
@@ -83,7 +84,7 @@ def test_saving_sequence_to_csv_raises_error(tmpdir, var, id_var, mask):
 
     batch = get_batch()
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(error):
         sequence_to_csv.after_batch(_STREAM_NAME, batch)
 
 

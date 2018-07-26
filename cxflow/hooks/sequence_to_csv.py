@@ -50,31 +50,41 @@ class SequenceToCsv(AbstractHook):
         self._accumulator = []
 
     def after_batch(self, stream_name: str, batch_data: Batch) -> None:
-        """
-        Accumulate the given sequences.
-        """
+        """Accumulate the given sequences."""
         if self._streams is not None and stream_name not in self._streams:
             return
 
-        assert len(self._variables) > 0
+        assert len(self._variables) > 0, 'You have to specify at least one variable.'
+
         # Assert variables in batch data.
-        assert self._id_variable in batch_data
-        assert self._pad_mask_variable is None or self._pad_mask_variable in batch_data
+        if self._id_variable not in batch_data:
+            raise KeyError('Variable `{}` to be used as unique id was not found in the batch data for stream `{}`. '
+                           'Available variables are `{}`.'.format(self._id_variable, stream_name, batch_data.keys()))
+        if self._pad_mask_variable is not None and self._pad_mask_variable not in batch_data:
+            raise KeyError('Variable `{}` to be used as padding mask was not found in the batch data for stream `{}`. '
+                           'Available variables are `{}`.'.format(self._pad_mask_variable, stream_name,
+                                                                  batch_data.keys()))
         for variable in self._variables:
-            assert variable in batch_data
+            if variable not in batch_data:
+                raise KeyError('Variable `{}` to be saved to csv was not found in the batch data for stream `{}`. '
+                               'Available variables are `{}`.'.format(variable, stream_name, batch_data.keys()))
+
         # Assert equal batch sizes.
         batch_size = -1
         for variable in self._variables:
-            assert batch_size == -1 or batch_size == len(batch_data[variable])
+            assert batch_size == -1 or batch_size == len(batch_data[variable]), 'Batch sizes of variables to save ' \
+                'are not equal.'
             batch_size = len(batch_data[variable])
         # Assert equal sequence sizes for each example.
         seq_lens = [-1] * batch_size
         for variable in self._variables:
             for example_idx, example_seq in enumerate(batch_data[variable]):
-                assert seq_lens[example_idx] == -1 or seq_lens[example_idx] == len(example_seq)
+                assert seq_lens[example_idx] == -1 or seq_lens[example_idx] == len(example_seq), 'Sequence sizes ' \
+                    'of variables to save are not equal.'
                 seq_lens[example_idx] = len(example_seq)
         if self._pad_mask_variable is not None:
-            assert batch_size == len(batch_data[self._pad_mask_variable])
+            assert batch_size == len(batch_data[self._pad_mask_variable]), 'Batch sizes of variables to save ' \
+                '`{}` and padding mask variable `{}` are not equal.'.format(self._variables, self._pad_mask_variable)
             for var, mask in zip(batch_data[self._variables[0]], batch_data[self._pad_mask_variable]):
                 assert len(var) == len(mask)
 
@@ -98,9 +108,8 @@ class SequenceToCsv(AbstractHook):
                 self._accumulator.append(record)
 
     def after_epoch(self, epoch_id: int, **_) -> None:
-        """
-        Save all the accumulated data to csv.
-        """
-        if self._accumulator != []:
-            logging.info('Saving ' + ', '.join(self._variables) + ' to %s.', self._output_file)
-            pd.DataFrame.from_records(self._accumulator).to_csv(self._output_file, index=False)
+        """Save all the accumulated data to csv."""
+        if len(self._accumulator) == 0:
+            return
+        logging.info('Saving ' + ', '.join(self._variables) + ' to %s.', self._output_file)
+        pd.DataFrame.from_records(self._accumulator).to_csv(self._output_file, index=False)

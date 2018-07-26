@@ -39,11 +39,10 @@ class PlotLines(AbstractHook):
               batch_count: 10
     """
 
-    _ROOT_DIR = 'visual'
-
     def __init__(self, output_dir: str, variables: Iterable[str], streams: Optional[Iterable[str]]=None,
                  id_variable: str='ids', pad_mask_variable: Optional[str]=None, out_format: str='png',
-                 ymin: float=None, ymax: float=None, example_count: int=None, batch_count: int=None, **kwargs):
+                 ymin: float=None, ymax: float=None, example_count: int=None, batch_count: int=None,
+                 root_dir: str='visual', **kwargs):
         """
         Hook constructor.
 
@@ -59,6 +58,7 @@ class PlotLines(AbstractHook):
                               (first ``example_count`` examples will be plotted)
         :param batch_count: count of batches from which the plot will be saved
                             (first ``batch_count`` will be processed)
+        :param root_dir: default directory where the plots will be saved
         """
         super().__init__(**kwargs)
 
@@ -72,6 +72,7 @@ class PlotLines(AbstractHook):
         self._ymax = ymax
         self._example_count = example_count
         self._batch_count = batch_count
+        self._root_dir = root_dir
 
         self._current_epoch_id = '_'
         self._reset()
@@ -108,34 +109,43 @@ class PlotLines(AbstractHook):
         Save images in provided streams from selected variable. The amount of batches and images to be processed is
         possible to control by ``batch_count`` and ``example_count`` parameters.
         """
-        if self._streams is None or stream_name in self._streams:
-            # assert variables in batch data
-            assert self._id_variable in batch_data
-            assert self._pad_mask_variable is None or self._pad_mask_variable in batch_data
-            for variable in self._variables:
-                assert variable in batch_data
+        if self._streams is not None and stream_name not in self._streams:
+            return
 
-            # only plot the requested number of batches
-            self._batch_done[stream_name] += 1
-            if self._batch_count and self._batch_done[stream_name] > self._batch_count:
-                return
+        # assert variables in batch data
+        if self._id_variable not in batch_data:
+            raise KeyError('Variable `{}` to be used as unique id was not found in the batch data for stream `{}`. '
+                           'Available variables are `{}`.'.format(self._id_variable, stream_name, batch_data.keys()))
+        if self._pad_mask_variable is not None and self._pad_mask_variable not in batch_data:
+            raise KeyError('Variable `{}` to be used as padding mask was not found in the batch data for stream `{}`. '
+                           'Available variables are `{}`.'.format(self._pad_mask_variable, stream_name,
+                                                                  batch_data.keys()))
+        for variable in self._variables:
+            if variable not in batch_data:
+                raise KeyError('Variable `{}` to be plotted was not found in the batch data for stream `{}`. '
+                               'Available variables are `{}`.'.format(variable, stream_name, batch_data.keys()))
 
-            # create the output directory
-            stream_out_dir = os.path.join(self._output_dir, self._ROOT_DIR,
-                                          'epoch_{}'.format(self._current_epoch_id), stream_name)
-            os.makedirs(stream_out_dir, exist_ok=True)
+        # only plot the requested number of batches
+        self._batch_done[stream_name] += 1
+        if self._batch_count and self._batch_done[stream_name] > self._batch_count:
+            return
 
-            # iterate through the examples and generate plots
-            for i, ex_id in enumerate(batch_data[self._id_variable]):
-                # only plot the requested number of examples
-                if self._example_count and i + 1 > self._example_count:
-                    break
-                ex_id = ex_id.replace(os.sep, '___')
-                filename = '{}_batch_{}_plot-{}.{}'.format(ex_id, self._batch_done[stream_name],
-                                                           self.figure_suffix, self._out_format)
-                fig = self.plot_figure(i, batch_data)
-                fig.savefig(os.path.join(stream_out_dir, filename))
-                plt.close(fig)
+        # create the output directory
+        stream_out_dir = os.path.join(self._output_dir, self._root_dir,
+                                      'epoch_{}'.format(self._current_epoch_id), stream_name)
+        os.makedirs(stream_out_dir, exist_ok=True)
+
+        # iterate through the examples and generate plots
+        for i, ex_id in enumerate(batch_data[self._id_variable]):
+            # only plot the requested number of examples
+            if self._example_count and i + 1 > self._example_count:
+                break
+            ex_id = ex_id.replace(os.sep, '___')
+            filename = '{}_batch_{}_plot-{}.{}'.format(ex_id, self._batch_done[stream_name],
+                                                       self.figure_suffix, self._out_format)
+            fig = self.plot_figure(i, batch_data)
+            fig.savefig(os.path.join(stream_out_dir, filename))
+            plt.close(fig)
 
     def after_epoch(self, epoch_id: int, **_):
         """
