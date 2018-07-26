@@ -5,7 +5,7 @@ import pytest
 
 import cxflow.utils.download as download
 
-_URL_ZIP = 'https://github.com/Cognexa/cxflow/archive/v0.12.0.zip'
+_URL_ZIP = 'https://github.com/Cognexa/cxflow-examples/releases/download/example-files/cxflow-0.12.0.zip'
 _URL_ZIP_BASE = os.path.basename(_URL_ZIP)
 _URL_RAR = 'https://github.com/Cognexa/cxflow-examples/releases/download/example-files/anomalousTrafficTest.rar'
 _URL_RAR_BASE = os.path.basename(_URL_RAR)
