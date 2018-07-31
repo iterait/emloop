@@ -102,5 +102,5 @@ def test_saving_sequence_to_csv_stream_not_in_specified(tmpdir):
 
     sequence_to_csv.after_epoch(0)
 
-    assert sequence_to_csv._accumulator == []
+    assert len(sequence_to_csv._accumulator) == 0
     assert not os.path.exists(filename)

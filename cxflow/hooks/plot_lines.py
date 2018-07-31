@@ -41,8 +41,8 @@ class PlotLines(AbstractHook):
 
     def __init__(self, output_dir: str, variables: Iterable[str], streams: Optional[Iterable[str]]=None,
                  id_variable: str='ids', pad_mask_variable: Optional[str]=None, out_format: str='png',
-                 ymin: float=None, ymax: float=None, example_count: int=None, batch_count: int=None,
-                 root_dir: str='visual', **kwargs):
+                 ymin: Optional[float]=None, ymax: Optional[float]=None, example_count: Optional[int]=None,
+                 batch_count: Optional[int]=None, root_dir: str='visual', **kwargs):
         """
         Hook constructor.
 
@@ -138,7 +138,7 @@ class PlotLines(AbstractHook):
         # iterate through the examples and generate plots
         for i, ex_id in enumerate(batch_data[self._id_variable]):
             # only plot the requested number of examples
-            if self._example_count and i + 1 > self._example_count:
+            if self._example_count and i >= self._example_count:
                 break
             ex_id = ex_id.replace(os.sep, '___')
             filename = '{}_batch_{}_plot-{}.{}'.format(ex_id, self._batch_done[stream_name],

@@ -80,5 +80,5 @@ def test_saving_logits_to_csv_stream_not_in_specified(tmpdir):
 
     logits_to_csv.after_epoch(0)
 
-    assert logits_to_csv._accumulator == []
+    assert len(logits_to_csv._accumulator) == 0
     assert not os.path.exists(filename)

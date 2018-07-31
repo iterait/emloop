@@ -23,8 +23,8 @@ def get_batch():
 def test_flattening_variables():
     """Test flattening selected variables when hook applied to all available streams."""
 
-    selected_vars = OrderedDict([('1d', '1d_flat'), ('2d', '2d_flat'), ('3d', '3d_flat')])
-    expected_flat_vars = [np.array([1.11]), np.array(range(10)), np.array(range(20))]
+    selected_vars = OrderedDict([('1d', '1d_flat'), ('3d', '3d_flat')])
+    expected_flat_vars = [np.array([1.11]), np.array(range(20))]
     flatten_vars = Flatten(variables=selected_vars)
 
     for _ in range(_ITERS):
@@ -34,11 +34,14 @@ def test_flattening_variables():
     for var_flat, exp_flat in zip(selected_vars.values(), expected_flat_vars):
         assert np.array_equal(batch[var_flat], exp_flat)
 
+    with pytest.raises(KeyError):
+        not_flattened = batch['2d_flat']
+
 
 def test_flattening_variables_stream_not_in_specified():
     """Test flattening selected variables is not done when stream is not in available streams."""
 
-    selected_vars = OrderedDict([('1d', '1d_flat'), ('3d', '3d_flat')])
+    selected_vars = OrderedDict([('1d', '1d_flat'), ('2d', '2d_flat'), ('3d', '3d_flat')])
     flatten_vars = Flatten(variables=selected_vars, streams=['test'])
 
     for _ in range(_ITERS):

@@ -67,12 +67,8 @@ def test_plotting_lines_with_optional_arguments(tmpdir):
     for i in range(batches):
         for e, id_var in zip(range(_EXAMPLES), batch[id_variable]):
             filename = '{}_batch_{}_plot-{}.{}'.format(id_var, i+1, suffix, out_format)
-            if e < examples:
-                assert os.path.exists(
-                    os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
-            else:
-                assert not os.path.exists(
-                    os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+            assert (e < examples) == os.path.exists(
+                os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
 
     for i_not in range(batches, _ITERS):
         for id_not in batch['ids']:
