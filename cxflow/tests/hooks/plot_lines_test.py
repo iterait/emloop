@@ -50,7 +50,7 @@ def test_plotting_lines_with_optional_arguments(tmpdir):
 
     selected_vars = ['input', 'cost']
     id_variable = 'a_ids'
-    out_format = 'jpg'
+    out_format = 'pdf'
     examples = 2
     batches = 2
     root_dir = 'dir'
