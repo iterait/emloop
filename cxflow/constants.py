@@ -1,6 +1,6 @@
 """**cxflow** module containing various constants."""
 
-CXF_LOG_FORMAT = '%(asctime)s.%(msecs)06d: %(levelname)-8s@%(module)-15s: %(message)s'
+CXF_LOG_FORMAT = '%(asctime)s.%(msecs)03d: %(levelname)-8s@%(module)-12s: %(message)s'
 """General logging format."""
 
 CXF_LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
