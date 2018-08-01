@@ -30,16 +30,21 @@ def test_plotting_lines_without_optional_arguments(tmpdir):
     """Test plotting variables with minimum specification creates correctly named file."""
 
     selected_vars = ['input', 'cost']
+    id_variable = 'ids'
+    out_format = 'png'
+    root_dir = 'visual'
     suffix = '-vs-'.join(selected_vars)
-    plot_lines = PlotLines(output_dir=tmpdir, variables=selected_vars)
+
+    plot_lines = PlotLines(output_dir=tmpdir, variables=selected_vars, id_variable=id_variable, out_format=out_format,
+                           root_dir=root_dir)
 
     for i in range(_ITERS):
         batch = get_batch()
         plot_lines.after_batch(_STREAM_NAME, batch)
 
-        for id_var in batch['ids']:
-            filename = '{}_batch_{}_plot-{}.{}'.format(id_var, i+1, suffix, 'png')
-            assert os.path.exists(os.path.join(tmpdir, 'visual', 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
+        for id_var in batch[id_variable]:
+            filename = '{}_batch_{}_plot-{}.{}'.format(id_var, i+1, suffix, out_format)
+            assert os.path.exists(os.path.join(tmpdir, root_dir, 'epoch_{}'.format(_EPOCH_ID), _STREAM_NAME, filename))
 
 
 def test_plotting_lines_with_optional_arguments(tmpdir):
