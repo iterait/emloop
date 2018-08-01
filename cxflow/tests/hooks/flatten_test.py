@@ -34,8 +34,7 @@ def test_flattening_variables():
     for var_flat, exp_flat in zip(selected_vars.values(), expected_flat_vars):
         assert np.array_equal(batch[var_flat], exp_flat)
 
-    with pytest.raises(KeyError):
-        not_flattened = batch['2d_flat']
+    assert '2d_flat' not in batch
 
 
 def test_flattening_variables_stream_not_in_specified():
@@ -49,8 +48,7 @@ def test_flattening_variables_stream_not_in_specified():
         flatten_vars.after_batch(_STREAM_NAME, batch)
 
     for var_flat in selected_vars.values():
-        with pytest.raises(KeyError):
-            not_flattened = batch[var_flat]
+        assert var_flat not in batch
 
 
 def test_flattening_variables_raises_error():
