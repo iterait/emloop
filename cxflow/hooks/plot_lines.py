@@ -53,7 +53,7 @@ class PlotLines(AbstractHook):
         :param pad_mask_variable: name of the source which represents the padding mask
         :param out_format: extension of the saved image
         :param ymin: minimum on the Y axis
-        :param ymin: maximum on the Y axis
+        :param ymax: maximum on the Y axis
         :param example_count: count of examples which will be plotted from each batch
                               (first ``example_count`` examples will be plotted)
         :param batch_count: count of batches from which the plot will be saved
