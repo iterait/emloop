@@ -30,8 +30,8 @@ class StopAfter(AbstractHook):
               iterations: 1000
     """
 
-    def __init__(self, epochs: Optional[int]=None, iterations: Optional[int]=None, minutes: Optional[float]=None, train_stream: str="train",
-                 **kwargs):
+    def __init__(self, epochs: Optional[int]=None, iterations: Optional[int]=None, minutes: Optional[float]=None,
+                 train_stream: str='train', **kwargs):
         """
         Create new StopAfter hook.
 

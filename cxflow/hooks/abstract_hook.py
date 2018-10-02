@@ -81,7 +81,8 @@ class AbstractHook:
         """
         pass
 
-    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, train_stream_name: str, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, 
+                            train_stream_name: str, extra_streams: Iterable[str]) -> None:
         """
         After epoch profile event.
 
