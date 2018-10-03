@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Optional
 
 from . import AbstractHook, TrainingTerminated
-from ..constants import CXF_TRAIN_STREAM
+from ..constants import EL_TRAIN_STREAM
 from ..types import EpochData, Batch
 
 
@@ -91,7 +91,7 @@ class StopAfter(AbstractHook):
         :raise TrainingTerminated: if the number of iterations reaches ``self._iters``
         """
         self._check_train_time()
-        if self._iters is not None and stream_name == CXF_TRAIN_STREAM:
+        if self._iters is not None and stream_name == EL_TRAIN_STREAM:
             self._iters_done += 1
             if self._iters_done >= self._iters:
                 raise TrainingTerminated('Training terminated after iteration {}'.format(self._iters_done))

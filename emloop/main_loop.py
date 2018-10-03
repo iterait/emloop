@@ -14,11 +14,7 @@ from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils import Timer, TrainingTrace, TrainingTraceKeys
 from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
-<<<<<<< HEAD:emloop/main_loop.py
-from .constants import EL_PREDICT_STREAM
-=======
-from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
->>>>>>> e6964db84b6942fc8ab45a7a5381a457ca907501:cxflow/main_loop.py
+from .constants import EL_TRAIN_STREAM, EL_PREDICT_STREAM
 from .types import EpochData
 
 
@@ -97,7 +93,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
     def _create_epoch_data(self, streams: Optional[Iterable[str]]=None) -> EpochData:
         """Create empty epoch data double dict."""
         if streams is None:
-            streams = [CXF_TRAIN_STREAM] + self._extra_streams
+            streams = [EL_TRAIN_STREAM] + self._extra_streams
         return OrderedDict([(stream_name, OrderedDict()) for stream_name in streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
@@ -210,7 +206,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             try:
                 stream_fn = getattr(self._dataset, stream_fn_name)
                 stream_epoch_limit = -1
-                if self._fixed_epoch_size is not None and stream_name == CXF_TRAIN_STREAM:
+                if self._fixed_epoch_size is not None and stream_name == EL_TRAIN_STREAM:
                     stream_epoch_limit = self._fixed_epoch_size
                 self._streams[stream_name] = StreamWrapper(stream_fn, buffer_size=self._buffer,
                                                            epoch_size=stream_epoch_limit, name=stream_name,
@@ -268,7 +264,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             - :py:meth:`emloop.hooks.AbstractHook.after_epoch`
             - :py:meth:`emloop.hooks.AbstractHook.after_epoch_profile`
         """
-        for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams:
+        for stream_name in [EL_TRAIN_STREAM] + self._extra_streams:
             self.get_stream(stream_name)
 
         def training():
@@ -278,7 +274,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
                 logging.info('Evaluating 0th epoch')
-                self._run_zeroth_epoch([CXF_TRAIN_STREAM] + self._extra_streams)
+                self._run_zeroth_epoch([EL_TRAIN_STREAM] + self._extra_streams)
                 logging.info('0th epoch done\n\n')
 
             # Training loop: after_epoch, after_epoch_profile
@@ -288,7 +284,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
-                with self.get_stream(CXF_TRAIN_STREAM) as stream:
+                with self.get_stream(EL_TRAIN_STREAM) as stream:
                     self.train_by_stream(stream)
 
                 for stream_name in self._extra_streams:

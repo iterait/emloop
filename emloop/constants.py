@@ -33,7 +33,7 @@ EL_NA_STR = 'N/A'
 EL_BUFFER_SLEEP = 0.02
 """The duration for which the buffer sleeps before it starts to process the next batch."""
 
-EL_TRAIN_STREAM = "train"
+EL_TRAIN_STREAM = 'train'
 """The stream to be used for training."""
 
 __all__ = ['EL_LOG_FORMAT', 'EL_LOG_DATE_FORMAT', 'EL_FULL_DATE_FORMAT', 'EL_HOOKS_MODULE', 'EL_CONFIG_FILE',
