@@ -1,7 +1,7 @@
 Configuration
 *************
 
-Configuration is a crucial part of **cxflow** linking all the components together with just a few lines of YAML.
+Configuration is a crucial part of **emloop** linking all the components together with just a few lines of YAML.
 
 If you aren't comfortable with YAML, JSON documents are supported as well (YAML is actually a superset of JSON).
 However, JSON does not support advanced features such as `anchors <https://learnxinyminutes.com/docs/yaml/>`_
@@ -46,7 +46,7 @@ Model
 =====
 
 The model section specifies the configuration of the model to be trained.
-Again, it contains a ``class`` that **cxflow** uses for constructing the model.
+Again, it contains a ``class`` that **emloop** uses for constructing the model.
 
 In addition, ``inputs`` and ``outputs`` entries are required as well.
 These arguments define what sources will be obtained from the dataset stream and which will
@@ -95,14 +95,14 @@ Hooks are specified by their fully qualified names as in the following example:
     :caption: non-parametrized hooks
 
     hooks:
-      - LogProfile  # cxflow.log_profile.LogProfile
-      - cxflow_tensorflow.TensorBoardHook
+      - LogProfile  # emloop.log_profile.LogProfile
+      - emloop_tensorflow.TensorBoardHook
       - my_hooks.my_hook.MyHook
 
 .. tip::
 
-    Standard **cxflow** hooks from ``cxflow.hooks`` module may be referenced only by their names,
-    e.g.: ``LogProfile`` instead of ``cxflow.log_profile.LogProfile``.
+    Standard **emloop** hooks from ``emloop.hooks`` module may be referenced only by their names,
+    e.g.: ``LogProfile`` instead of ``emloop.log_profile.LogProfile``.
 
 In some cases, we need to configure the hooks being created with additional parameters. To do so, simply define a
 dictionary of parameters which will be passed to the hook constructor. E.g.:
@@ -111,7 +111,7 @@ dictionary of parameters which will be passed to the hook constructor. E.g.:
     :caption: parametrized hooks
 
     hooks:
-      - cxflow_scikit.ClassificationInfoHook:
+      - emloop_scikit.ClassificationInfoHook:
           predicted_variable: predictions
           gold_variable: labels
 
@@ -122,9 +122,9 @@ Main Loop
 =========
 
 The ``main_loop`` section is optional. Any parameter specified there is forwarded to the
-:py:class:`cxflow.MainLoop` constructor which takes the following arguments:
+:py:class:`emloop.MainLoop` constructor which takes the following arguments:
 
-.. automethod:: cxflow.MainLoop.__init__
+.. automethod:: emloop.MainLoop.__init__
 
 .. code-block:: yaml
     :caption: main loop configuration
@@ -148,10 +148,10 @@ i.e. it **may** contain the ``model``, ``dataset``, ``hooks`` and/or  ``main_loo
 
 In the following example, we use all the original settings but the model inputs and outputs are overridden. Furthermore,
 a different list of hooks is specified. Yet another example is available in our
-`examples repository @GitHub <https://github.com/iterait/cxflow-examples/tree/master/imdb>`_.
+`examples repository @GitHub <https://github.com/iterait/emloop-examples/tree/master/imdb>`_.
 
 .. code-block:: yaml
-    :caption: eval section of **cxflow** configuration
+    :caption: eval section of **emloop** configuration
 
     ...
     eval:
@@ -167,7 +167,7 @@ a different list of hooks is specified. Yet another example is available in our
 Evaluation of the predict stream can then be invoked with:
 
 ```
-cxflow eval predict path/to/model
+emloop eval predict path/to/model
 ```
 
 Conclusion

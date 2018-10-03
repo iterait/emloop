@@ -1,11 +1,11 @@
 Hooks
 *****
 
-In this short tutorial, we learn how to use standard **cxflow** hooks and also how 
+In this short tutorial, we learn how to use standard **emloop** hooks and also how 
 to write new ones.
 
-**cxflow** hooks allow to observe, modify and act upon the training process.
-Hook actions are triggered by the following events invoked by the **cxflow** `main loop <main_loop.html>`_:
+**emloop** hooks allow to observe, modify and act upon the training process.
+Hook actions are triggered by the following events invoked by the **emloop** `main loop <main_loop.html>`_:
 
 - **before_training** invoked once before entering the training loop, ``no args``
 - **after_batch** invoked after each batch regardless of the stream, ``(stream_name, batch_data)``
@@ -14,7 +14,7 @@ Hook actions are triggered by the following events invoked by the **cxflow** `ma
 - **after_training** invoked once after the trainig finishes, ``no args``
 
 Before we dig into the details, we peek on how to use some of the standard hooks 
-available in **cxflow** framework.
+available in **emloop** framework.
 
 In your `configuration <config.html>`_, hooks are listed under the ``hooks`` 
 entry, for example:
@@ -27,16 +27,16 @@ entry, for example:
 
       - LogVariables
 
-This example would instruct **cxflow** to create two hooks which will keep track of 
+This example would instruct **emloop** to create two hooks which will keep track of 
 the mean loss during the training.
-In fact, the :py:class:`cxflow.hooks.ComputeStats` stores the loss from every batch and means the accumulated values after
+In fact, the :py:class:`emloop.hooks.ComputeStats` stores the loss from every batch and means the accumulated values after
 each epoch.
-Subsequently, the :py:class:`cxflow.hooks.LogVariables` logs all the variables available in the ``epoch_data``, which
-in the example above is only the mean loss computed by the :py:class:`cxflow.hooks.ComputeStats` hook.
+Subsequently, the :py:class:`emloop.hooks.LogVariables` logs all the variables available in the ``epoch_data``, which
+in the example above is only the mean loss computed by the :py:class:`emloop.hooks.ComputeStats` hook.
 
 The names of the hooks are nothing more than the names of their respective classes.
-For hooks that are built-in inside **cxflow**, only the class name needs to be specified,
-however, for hooks outside of cxflow, you also have to specify their module. For instance,
+For hooks that are built-in inside **emloop**, only the class name needs to be specified,
+however, for hooks outside of emloop, you also have to specify their module. For instance,
 for a class called ``MyHook`` inside a module ``my_project.hooks``, you would write:
 
 .. code-block:: yaml
@@ -60,9 +60,9 @@ will be roughly translated to
 
     from my_project.hooks import MyHook
     hook = MyHook(arg1=10, arg2=['a', 'b'])
-    # use hook in the **cxflow** main_loop
+    # use hook in the **emloop** main_loop
 
-In addition to the specified arguments, **cxflow** supplies the constructor with the model,
+In addition to the specified arguments, **emloop** supplies the constructor with the model,
 the dataset and the log output directory.
 Hence, the hook creation looks actually more like this:
 
@@ -76,7 +76,7 @@ For example, a hook that would stop the training after the specified number of e
 .. code-block:: python
 
     import logging
-    from cxflow.hooks.abstract_hook import AbstractHook, TrainingTerminated
+    from emloop.hooks.abstract_hook import AbstractHook, TrainingTerminated
 
     class EpochStopperHook(AbstractHook):
         def __init__(self, epoch_limit: int, **kwargs):
@@ -114,7 +114,7 @@ In this case, the ``batch_data`` would contain the following dict:
 Now, the hook decides how to process this data. Usually, it is useful to accumulate the data over
 the whole epoch and process them in the ``after_epoch`` event all at once.
 Luckily, you do not have to implement this behavior on your own, it is already
-available in our :py:class:`cxflow.hooks.AccumulateVariables` hook from which
+available in our :py:class:`emloop.hooks.AccumulateVariables` hook from which
 you may derive your own hook.
 
 ``after_epoch`` event
@@ -135,9 +135,9 @@ With train, valid and test streams it initially looks as following:
       'test': {}
     }
 
-Now, for instance, our :py:class:`cxflow.hooks.ComputeStats` from the first example computes the mean over the
+Now, for instance, our :py:class:`emloop.hooks.ComputeStats` from the first example computes the mean over the
 accumulated loss data and stores the result to the given ``epoch_data``. So after
-the :py:class:`cxflow.hooks.ComputeStats` hook has been called, the ``epoch_data`` will look as follows:
+the :py:class:`emloop.hooks.ComputeStats` hook has been called, the ``epoch_data`` will look as follows:
 
 .. code-block:: python
 
@@ -147,11 +147,11 @@ the :py:class:`cxflow.hooks.ComputeStats` hook has been called, the ``epoch_data
       'test': {'loss': {'mean': 0.35}
     }
 
-The :py:class:`cxflow.hooks.LogVariables` already expects this structure and logs everything it gets.
+The :py:class:`emloop.hooks.LogVariables` already expects this structure and logs everything it gets.
 
 .. warning::
     Note that the order of hooks matters! We would see nothing if 
-    :py:class:`cxflow.hooks.LogVariables` is placed before :py:class:`cxflow.hooks.ComputeStats`.
+    :py:class:`emloop.hooks.LogVariables` is placed before :py:class:`emloop.hooks.ComputeStats`.
 
 Regular hook configuration
 ==========================
@@ -171,7 +171,7 @@ The following config is a good starting point for your own hook configuration.
       - LogVariables
       - WriteCSV
       - LogProfile
-      - cxflow_tensorflow.hooks.WriteTensorboard
+      - emloop_tensorflow.hooks.WriteTensorboard
 
       # save the best model
       - SaveBest

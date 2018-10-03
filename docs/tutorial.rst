@@ -1,28 +1,28 @@
 Tutorial
 ########
 
-In this tutorial, we are using an example task to demonstrate cxflow’s basic
+In this tutorial, we are using an example task to demonstrate emloop’s basic
 principles.
 
 Introduction
 ************
 
-**cxflow** is a lightweight framework for machine learning which focuses on:
+**emloop** is a lightweight framework for machine learning which focuses on:
 
 - modularization and re-usability of ML components (datasets, models etc.)
 - rapid experimenting with different configurations
 - providing convenient instruments to manage and run your experiments
 
-**cxflow** does not implement any building blocks, NN layers etc. Instead, you can use
+**emloop** does not implement any building blocks, NN layers etc. Instead, you can use
 your favorite machine learning framework, such as `TensorFlow
 <https://www.tensorflow.org/>`_,
 `CNTK <https://cntk.ai/>`_, or `Caffe2 <https://caffe2.ai/>`_. In other words,
-**cxflow** is back-end agnostic.
+**emloop** is back-end agnostic.
 Therefore, you don't have to learn a new framework, if you already know one.
 In addition, you can easily convert the models you already have by making only
 minimal changes.
 
-**cxflow** allows (and encourages) you to build modular projects, where the
+**emloop** allows (and encourages) you to build modular projects, where the
 dataset, the model, and the configuration are separated and reusable. In the following sections,
 we will describe how those reusable modules should look like on a simple
 example.
@@ -49,15 +49,15 @@ Example of few 5-bit vectors:
 
 .. tip::
    Full example may be found in our
-   `cxflow examples repository @GitHub <https://github.com/iterait/cxflow-examples/tree/master/majority>`_.
+   `emloop examples repository @GitHub <https://github.com/iterait/emloop-examples/tree/master/majority>`_.
 
 Dataset
 *******
 
 The very first step in any machine learning task is to load and process the data.
-Every **cxflow** dataset is expected to implement the interface defined by :py:class:`cxflow.datasets.AbstractDataset`.
+Every **emloop** dataset is expected to implement the interface defined by :py:class:`emloop.datasets.AbstractDataset`.
 At the moment, the interfaces defines only the constructor API which accepts a string-encoded YAML.
-For regular projects, we recommend extending :py:class:`cxflow.datasets.BaseDataset` which decodes the YAML
+For regular projects, we recommend extending :py:class:`emloop.datasets.BaseDataset` which decodes the YAML
 configuration string for you.
 
 The dataset is meant to wrap all data-related operations.
@@ -65,7 +65,7 @@ It is responsible for correct data loading, verification and other useful operat
 The main purpose of the dataset is providing various data streams that will be consequently used for training,
 validation and prediction in the production environment.
 
-A typical **cxflow** dataset will implement the following:
+A typical **emloop** dataset will implement the following:
 
 #. **Training stream:** an iteration of training data batches (``train_stream`` method)
 #. **Eval streams:** iterations of additional streams not used for training.
@@ -73,20 +73,20 @@ A typical **cxflow** dataset will implement the following:
    In our example, we will use *test* stream provided by ``test_stream`` method.
 #. **The constructor:** accepts a YAML configuration in the form of a string
    (more on this later). We avoid the need to implement a constructor by
-   extending :py:class:`cxflow.datasets.BaseDataset`.
+   extending :py:class:`emloop.datasets.BaseDataset`.
 #. **Additional methods:** such as ``fetch``, ``split``, or anything else you may need.
-   **cxflow** is able to call arbitrary dataset methods by invoking ``cxflow dataset <method-name>`` command.
+   **emloop** is able to call arbitrary dataset methods by invoking ``emloop dataset <method-name>`` command.
 
 To generate the *majority* data and provide the data streams we will implement a ``MajorityDataset``:
 
 .. code-block:: python
     :caption: majority_dataset.py
 
-    import cxflow as cx
+    import emloop as el
     import numpy.random as npr
 
 
-    class MajorityDataset(cx.BaseDataset):
+    class MajorityDataset(el.BaseDataset):
 
         def _configure_dataset(self, n_examples: int, dim: int, batch_size: int, **kwargs) -> None:
             self.batch_size = batch_size
@@ -98,12 +98,12 @@ To generate the *majority* data and provide the data streams we will implement a
             self._train_x, self._train_y = x[:int(.8 * n_examples)], y[:int(.8 * n_examples)]
             self._test_x, self._test_y = x[int(.8 * n_examples):], y[int(.8 * n_examples):]
 
-        def train_stream(self) -> cx.Stream:
+        def train_stream(self) -> el.Stream:
             for i in range(0, len(self._train_x), self.batch_size):
                 yield {'x': self._train_x[i: i + self.batch_size],
                        'y': self._train_y[i: i + self.batch_size]}
 
-        def test_stream(self) -> cx.Stream:
+        def test_stream(self) -> el.Stream:
             for i in range(0, len(self._test_x), self.batch_size):
                 yield {'x': self._test_x[i: i + self.batch_size],
                        'y': self._test_y[i: i + self.batch_size]}
@@ -165,7 +165,7 @@ The test stream is used only to estimate the performance of the model.
     In this example, the training and testing streams are generated randomly and thus,
     they may slightly overlap and bias the performace estimation.
 
-A detailed description of **cxflow** datasets might be found in the
+A detailed description of **emloop** datasets might be found in the
 :doc:`advanced section <advanced/dataset>`.
 
 Model
@@ -173,12 +173,12 @@ Model
 
 With the dataset ready, we now must define the model that is to be trained.
 A simple `TensorFlow <https://www.tensorflow.org/>`_ graph can solve our task.
-We will use the official `cxflow-tensorflow <https://github.com/iterait/cxflow-tensorflow>`_ package that provides
-convenient TensorFlow integration with **cxflow**. Please install this package before you proceed
+We will use the official `emloop-tensorflow <https://github.com/iterait/emloop-tensorflow>`_ package that provides
+convenient TensorFlow integration with **emloop**. Please install this package before you proceed
 with this tutorial.
 
-In :py:mod:`cxflow_tensorflow`, every model is a python class that is expected to
-extend the :py:class:`cxflow_tensorflow.BaseModel`.
+In :py:mod:`emloop_tensorflow`, every model is a python class that is expected to
+extend the :py:class:`emloop_tensorflow.BaseModel`.
 
 Let us define a class called ``MajorityNet``.
 
@@ -187,12 +187,12 @@ Let us define a class called ``MajorityNet``.
 
     import logging
 
-    import cxflow_tensorflow as cxtf
+    import emloop_tensorflow as eltf
     import tensorflow as tf
     import tensorflow.contrib.keras as K
 
 
-    class MajorityNet(cxtf.BaseModel):
+    class MajorityNet(eltf.BaseModel):
         """Simple 2-layered MLP for majority task."""
 
         def _create_model(self, hidden):
@@ -209,7 +209,7 @@ Let us define a class called ``MajorityNet``.
             predictions = tf.greater_equal(y_hat, 0.5, name='predictions')
             tf.equal(predictions, tf.cast(y, tf.bool), name='accuracy')
 
-The only method that is necessary to implement is :py:meth:`cxflow_tensorflow.BaseModel._create_model`.
+The only method that is necessary to implement is :py:meth:`emloop_tensorflow.BaseModel._create_model`.
 In our case, the ``_create_model`` method creates a simple MLP.
 If you know the fundamentals of TensorFlow, it should be easy to understand what is going on.
 
@@ -224,13 +224,13 @@ To be precise, the model registered the following computational graph nodes:
 .. caution::
    For each of input/output variables listed in the configuration, there has to
    exist a computational graph node with the corresponding name.
-   **cxflow-tensorflow** is not able to find the nodes if they are not properly
+   **emloop-tensorflow** is not able to find the nodes if they are not properly
    named.
 
 The ``_create_model`` method can accept arbitrary arguments - in our case, we allow to configure the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.
 
-You can find detailed descriptions of cxflow models in the :doc:`advanced section <advanced/model>`.
+You can find detailed descriptions of emloop models in the :doc:`advanced section <advanced/model>`.
 
 Configuration
 *************
@@ -243,7 +243,7 @@ The configuration file is in the form of a YAML document.
 Feel free to use JSON instead, however, YAML makes a lot of things easier.
 
 The YAML document consists of four fundamental sections.
-A detailed description of cxflow configuration can be found in the :doc:`advanced section <advanced/config>`.
+A detailed description of emloop configuration can be found in the :doc:`advanced section <advanced/config>`.
 
 
 #. dataset
@@ -256,7 +256,7 @@ Let us describe the sections one by one.
 Dataset
 =======
 
-In our case, we only need to tell **cxflow** which dataset to use.
+In our case, we only need to tell **emloop** which dataset to use.
 This is done by specifying the ``class`` of the dataset.
 In addition, we will specify the parameters of the dataset (those
 are passed to the ``_configure_dataset`` method of the dataset).
@@ -274,7 +274,7 @@ We can pass arbitrary constants to the dataset that will be hidden in the
 
 .. note::
     The whole ``dataset`` section will be passed as a string-encoded YAML to the dataset constructor.
-    In the case of using :py:class:`cxflow.datasets.BaseDataset`, the YAML is automatically decoded and the individual
+    In the case of using :py:class:`emloop.datasets.BaseDataset`, the YAML is automatically decoded and the individual
     variables are passed to the ``_configure_dataset`` method.
 
 Model
@@ -309,10 +309,10 @@ Main Loop
 =========
 
 As the model training is executed in epochs, it is naturally implemented as a loop.
-This loop (:py:class:`cxflow.MainLoop`) can be extended, for example by adding more
+This loop (:py:class:`emloop.MainLoop`) can be extended, for example by adding more
 streams to the ``train`` stream.
 In our case, we also want to evaluate the ``test`` stream, so we will add it to the
-``main_loop.extra_streams`` section of the config. **cxflow** will then invoke
+``main_loop.extra_streams`` section of the config. **emloop** will then invoke
 the ``<name>_stream`` method of the dataset to create the stream. In our case,
 the ``test_stream`` method will be invoked.
 
@@ -328,7 +328,7 @@ Hooks
 Hooks can observe, modify and control the training process. In particular, hook actions are triggered after certain events,
 such as after a batch or an epoch is completed (more info in :doc:`advanced section <advanced/hook>`).
 
-The hooks to be used are specified in **cxflow** configuration similar to the following one:
+The hooks to be used are specified in **emloop** configuration similar to the following one:
 
 .. code-block:: yaml
     :caption: hook configuration section
@@ -340,13 +340,13 @@ The hooks to be used are specified in **cxflow** configuration similar to the fo
       - StopAfter:
           epochs: 10
 
-This section can be read quite naturally. **cxflow** will now compute ``loss`` and ``accuracy``
+This section can be read quite naturally. **emloop** will now compute ``loss`` and ``accuracy``
 means for each epoch and log the respective values. The training will be stopped after 10 epochs.
 
 .. tip::
-    See `API reference <cxflow/cxflow.hooks.html>`_ for full list of **cxflow** hooks.
+    See `API reference <emloop/emloop.hooks.html>`_ for full list of **emloop** hooks.
 
-Using cxflow
+Using emloop
 ============
 
 Once the classes and config are implemented, the training can begin.
@@ -354,7 +354,7 @@ Let's try it with
 
 .. code-block:: bash
 
-    cxflow train majority/config.yaml
+    emloop train majority/config.yaml
 
 The command produces a lot of output.
 The first section describes the creation of the components.
@@ -363,7 +363,7 @@ Finally, our logging hook is the one that produces the information after each ep
 Now we can easily watch the progress of the training.
 
 After the training is finished, note that there is a new directory ``log/MajorityExample_*``.
-This is the logging directory where everything **cxflow** produces is stored, including
+This is the logging directory where everything **emloop** produces is stored, including
 saved models, the configuration file and various other artifacts.
 
 Let's register one more hook which saves the best model according to the test stream:
@@ -380,15 +380,15 @@ Let's resume the training from this model.
 
 .. code-block:: bash
 
-    cxflow resume log/MajorityExample_<some-suffix>
+    emloop resume log/MajorityExample_<some-suffix>
 
 It's simple as that.
 
 In case the model is good enough to be used in the production, it is extremely
-easy to use cxflow for this purpose.
+easy to use emloop for this purpose.
 See the configuration :doc:`advanced section <advanced/config>` for more details.
 Then, you can just run the following command:
 
 .. code-block:: bash
 
-    cxflow eval predict log/MajorityExample_<some-suffix>
+    emloop eval predict log/MajorityExample_<some-suffix>

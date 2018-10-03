@@ -1,4 +1,4 @@
-cxflow
+emloop
 ======
 
 .. toctree::
@@ -9,25 +9,25 @@ cxflow
    tutorial
    advanced/index
    cli
-   cxflow/index
+   emloop/index
 
-**cxflow** is a lightweight framework for machine learning with focus on 
+**emloop** is a lightweight framework for machine learning with focus on 
 modularization, re-usability and rapid experimenting.
 
 Check out our :doc:`10 minutes tutorial <tutorial>`, dig into the :doc:`advanced section <advanced/index>` or
-see our :doc:`API reference <cxflow/index>`.
+see our :doc:`API reference <emloop/index>`.
 
 Contribute
 ----------
 
-- `Issue Tracker @GitHub <https://github.com/iterait/cxflow/issues>`_
-- `Source Code @GitHub <https://github.com/iterait/cxflow>`_
+- `Issue Tracker @GitHub <https://github.com/iterait/emloop/issues>`_
+- `Source Code @GitHub <https://github.com/iterait/emloop>`_
 
 Support
 -------
 
 If you are having issues, please let us know either via the official
-`issue tracker <https://github.com/iterait/cxflow/issues>`_ or via e-mail cxflow (at) iterait (dot) com.
+`issue tracker <https://github.com/iterait/emloop/issues>`_ or via e-mail emloop (at) iterait (dot) com.
 
 License
 -------

@@ -1,37 +1,37 @@
 Main Loop
 *********
 
-Main loop is the core of **cxflow** responsible for
+Main loop is the core of **emloop** responsible for
 the main lifecycle of model training.
 
 Dataset/Model Integration
 =========================
 
-No matter what command has been executed, **cxflow** always starts by creating
+No matter what command has been executed, **emloop** always starts by creating
 the dataset and passing the ``dataset`` section from the `config <config.html>`_ 
-to its constructor. Consequently, **cxflow** continues with creating the model and passing the
+to its constructor. Consequently, **emloop** continues with creating the model and passing the
 ``model`` section from the `config <config.html>`_ to its constructor.
 One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.
 
-After the dataset and the model are created, **cxflow** calls one of the dataset stream functions
+After the dataset and the model are created, **emloop** calls one of the dataset stream functions
 based on whether it is training, testing or evaluation (more on this is described in the following
 sections).
 The selected stream method (e.g., ``train_stream``) returns an iterable where each
 item corresponds to a single batch of data.
 
-Finally, the stream is iterated through and each batch is fed to the model's :py:meth:`cxflow.models.AbstractModel.run`
+Finally, the stream is iterated through and each batch is fed to the model's :py:meth:`emloop.models.AbstractModel.run`
 method along with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.
 
 .. note::
-    The implementation of :py:meth:`cxflow.models.AbstractModel.run` method is backend specific.
+    The implementation of :py:meth:`emloop.models.AbstractModel.run` method is backend specific.
 
 Training Lifecycle
 ==================
 
 The lifecycle of the training is very simple. Here are the steps performed by 
-**cxflow**.
+**emloop**.
 
 #. Create the dataset and pass the ``dataset`` section from the `config
    <config.html>`_ to its constructor.
@@ -60,7 +60,7 @@ The whole process can be described by the following pseudocode.
 Evaluation Lifecycle
 ====================
 
-Any stream may be evaluated leaving the model intact. There is only a single pass through the stream before cxflow
+Any stream may be evaluated leaving the model intact. There is only a single pass through the stream before emloop
 terminates.
 
 The whole process can be described by the following pseudocode.
