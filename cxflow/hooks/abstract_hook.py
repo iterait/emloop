@@ -81,8 +81,7 @@ class AbstractHook:
         """
         pass
 
-    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, 
-                            train_stream_name: str, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, extra_streams: Iterable[str]) -> None:
         """
         After epoch profile event.
 
@@ -90,7 +89,6 @@ class AbstractHook:
 
         :param epoch_id: finished epoch id
         :param profile: dictionary of lists of event timings that were measured during the epoch
-        :param train_stream_name: name of the training stream (usually 'train')
         :param extra_streams: enumeration of additional stream names
         """
         pass
