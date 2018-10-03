@@ -148,7 +148,7 @@ i.e. it **may** contain the ``model``, ``dataset``, ``hooks`` and/or  ``main_loo
 
 In the following example, we use all the original settings but the model inputs and outputs are overridden. Furthermore,
 a different list of hooks is specified. Yet another example is available in our
-`examples repository @GitHub <https://github.com/Cognexa/cxflow-examples/tree/master/imdb>`_.
+`examples repository @GitHub <https://github.com/iterait/cxflow-examples/tree/master/imdb>`_.
 
 .. code-block:: yaml
     :caption: eval section of **cxflow** configuration

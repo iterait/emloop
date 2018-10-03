@@ -34,7 +34,7 @@ references:
       name: PyPI deploy
       command: |
         pip3 install wheel setuptools --upgrade
-        bash <(curl -fsSL https://raw.githubusercontent.com/Cognexa/ci-utils/master/pypi_deploy.sh)
+        bash <(curl -fsSL https://raw.githubusercontent.com/iterait/ci-utils/master/pypi_deploy.sh)
 
   add_rw_key: &add_rw_key
     add_ssh_keys:
@@ -45,7 +45,7 @@ references:
     run:
       name: Generate documentation
       command: |
-        bash <(curl -fsSL https://raw.githubusercontent.com/Cognexa/ci-utils/master/doc_deploy.sh)
+        bash <(curl -fsSL https://raw.githubusercontent.com/iterait/ci-utils/master/doc_deploy.sh)
 
   coverage: &coverage
     run:

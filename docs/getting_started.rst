@@ -35,7 +35,7 @@ repository (``dev`` branch).
 
 .. code-block:: bash
 
-    pip install -U git+https://github.com/Cognexa/cxflow.git@dev
+    pip install -U git+https://github.com/iterait/cxflow.git@dev
 
 Developer Installation
 **********************
@@ -44,7 +44,7 @@ Finally, cxflow might be installed directly for development purposes.
 
 .. code-block:: bash
 
-    git clone git@github.com:Cognexa/cxflow.git
+    git clone git@github.com:iterait/cxflow.git
     cd cxflow
     pip install -e .
 

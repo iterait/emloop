@@ -1,11 +1,11 @@
 # How to Contribute
 
 There are two ways of contributing to cxflow.
-One can either report a bug (or feature request) to the official [issue tracker](https://github.com/Cognexa/cxflow/issues) or implement a tested piece of code.
-Do not hesitate to get in touch with us at cxflow@cognexa.com.
+One can either report a bug (or feature request) to the official [issue tracker](https://github.com/iterait/cxflow/issues) or implement a tested piece of code.
+Do not hesitate to get in touch with us at cxflow@iterait.com.
 
 ## Creating an Issue
-When you find a bug or feel like there is a feature you miss, please do not hesitate to report it to the [issue tracker](https://github.com/Cognexa/cxflow/issues).
+When you find a bug or feel like there is a feature you miss, please do not hesitate to report it to the [issue tracker](https://github.com/iterait/cxflow/issues).
 
 A great issue should contain the following:
 

@@ -1,8 +1,8 @@
 # cxflow
-[![CircleCI](https://circleci.com/gh/Cognexa/cxflow/tree/master.svg?style=shield)](https://circleci.com/gh/Cognexa/cxflow/tree/master)
+[![CircleCI](https://circleci.com/gh/iterait/cxflow/tree/master.svg?style=shield)](https://circleci.com/gh/iterait/cxflow/tree/master)
 [![PyPI version](https://badge.fury.io/py/cxflow.svg)](https://badge.fury.io/py/cxflow)
 [![Coverage 
-Status](https://coveralls.io/repos/github/Cognexa/cxflow/badge.svg?branch=master)](https://coveralls.io/github/Cognexa/cxflow?branch=master)
+Status](https://coveralls.io/repos/github/iterait/cxflow/badge.svg?branch=master)](https://coveralls.io/github/iterait/cxflow?branch=master)
 [![Development Status](https://img.shields.io/badge/status-CX%20Regular-brightgreen.svg?style=flat)]()
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![Master Developer](https://img.shields.io/badge/master-Petr%20Bělohlávek-lightgrey.svg?style=flat)]()
@@ -16,9 +16,9 @@ pip install cxflow
 
 ## Quick start
 
-- [10 minutes tutorial](https://cxflow.org/tutorial) ([code](https://github.com/Cognexa/cxflow-examples/tree/master/majority))
+- [10 minutes tutorial](https://cxflow.org/tutorial) ([code](https://github.com/iterait/cxflow-examples/tree/master/majority))
 - [Documentation & API Reference](https://cxflow.org/)
-- [Additional examples](https://github.com/cognexa/cxflow-examples)
+- [Additional examples](https://github.com/iterait/cxflow-examples)
 
 ## Requirements
  - **cxflow** is supported (and tested) on [Arch Linux](https://www.archlinux.org) and [Ubuntu](http://releases.ubuntu.com) (latest LTS and rolling) with Python 3.6 and 3.5 respectively.
@@ -31,9 +31,9 @@ For that reason the whole functionality is divided into various extensions with 
 
 At the moment we support the following extensions:
 
-- [cxflow-tensorflow](https://github.com/Cognexa/cxflow-tensorflow) - TensorFlow support
-- [cxflow-scikit](https://github.com/Cognexa/cxflow-scikit) - scientific computations and statistics
-- [cxflow-rethinkdb](https://github.com/Cognexa/cxflow-rethinkdb) - RethinkDB hook for training management with NoSQL (experimental)
+- [cxflow-tensorflow](https://github.com/iterait/cxflow-tensorflow) - TensorFlow support
+- [cxflow-scikit](https://github.com/iterait/cxflow-scikit) - scientific computations and statistics
+- [cxflow-rethinkdb](https://github.com/iterait/cxflow-rethinkdb) - RethinkDB hook for training management with NoSQL (experimental)
 
 ## Contributions
 

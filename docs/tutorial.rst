@@ -49,7 +49,7 @@ Example of few 5-bit vectors:
 
 .. tip::
    Full example may be found in our
-   `cxflow examples repository @GitHub <https://github.com/Cognexa/cxflow-examples/tree/master/majority>`_.
+   `cxflow examples repository @GitHub <https://github.com/iterait/cxflow-examples/tree/master/majority>`_.
 
 Dataset
 *******
@@ -173,7 +173,7 @@ Model
 
 With the dataset ready, we now must define the model that is to be trained.
 A simple `TensorFlow <https://www.tensorflow.org/>`_ graph can solve our task.
-We will use the official `cxflow-tensorflow <https://github.com/Cognexa/cxflow-tensorflow>`_ package that provides
+We will use the official `cxflow-tensorflow <https://github.com/iterait/cxflow-tensorflow>`_ package that provides
 convenient TensorFlow integration with **cxflow**. Please install this package before you proceed
 with this tutorial.
 

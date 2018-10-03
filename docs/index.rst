@@ -20,14 +20,14 @@ see our :doc:`API reference <cxflow/index>`.
 Contribute
 ----------
 
-- `Issue Tracker @GitHub <https://github.com/Cognexa/cxflow/issues>`_
-- `Source Code @GitHub <https://github.com/Cognexa/cxflow>`_
+- `Issue Tracker @GitHub <https://github.com/iterait/cxflow/issues>`_
+- `Source Code @GitHub <https://github.com/iterait/cxflow>`_
 
 Support
 -------
 
 If you are having issues, please let us know either via the official
-`issue tracker <https://github.com/Cognexa/cxflow/issues>`_ or via e-mail cxflow (at) cognexa (dot) com.
+`issue tracker <https://github.com/iterait/cxflow/issues>`_ or via e-mail cxflow (at) iterait (dot) com.
 
 License
 -------

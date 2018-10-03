@@ -14,7 +14,7 @@ autoapi_modules = {
 
 # General information about the project.
 project = 'cxflow'
-copyright = '2017, Cognexa Solutions s.r.o.'
+copyright = '2018, Iterait a.s.'
 author = 'Petr Belohlavek, Adam Blazek, Filip Matzner'
 
 # The short X.Y version.

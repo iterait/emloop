@@ -14,7 +14,7 @@ def get_cxflow_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     main_parser = ArgumentParser('cxflow',
                                  description='cxflow: lightweight framework for machine learning with '
                                              'focus on modularization, re-usability and rapid experimenting.',
-                                 epilog='For more info see <https://cognexa.github.io/cxflow>')
+                                 epilog='For more info see <https://iterait.github.io/cxflow>')
 
     main_parser.add_argument('--version', action='version', help='Print cxflow version and quit.',
                              version='cxflow {}'.format(pkg_resources.get_distribution('cxflow').version))
