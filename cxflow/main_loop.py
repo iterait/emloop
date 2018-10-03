@@ -14,7 +14,7 @@ from .hooks.abstract_hook import AbstractHook, TrainingTerminated
 from .utils import Timer, TrainingTrace, TrainingTraceKeys
 from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
-from .constants import CXF_TRAIN_STREAM, CXF_PREDICT_STREAM
+from .constants import CXF_PREDICT_STREAM
 from .types import EpochData
 
 
@@ -29,6 +29,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
     def __init__(self,   # pylint: disable=too-many-arguments
                  model: AbstractModel, dataset: AbstractDataset,
                  hooks: Iterable[AbstractHook]=(),
+                 train_stream: str='train',
                  extra_streams: List[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
                  on_empty_batch: str='error',
@@ -68,6 +69,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         self._fixed_epoch_size = fixed_epoch_size
         self._extra_sources_warned = False
         self._epoch_profile = {}
+        self._train_stream = train_stream
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
         self._streams = {}
@@ -93,7 +95,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
     def _create_epoch_data(self, streams: Optional[Iterable[str]]=None) -> EpochData:
         """Create empty epoch data double dict."""
         if streams is None:
-            streams = [CXF_TRAIN_STREAM] + self._extra_streams
+            streams = [self._train_stream] + self._extra_streams
         return OrderedDict([(stream_name, OrderedDict()) for stream_name in streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
@@ -206,7 +208,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             try:
                 stream_fn = getattr(self._dataset, stream_fn_name)
                 stream_epoch_limit = -1
-                if self._fixed_epoch_size is not None and stream_name == CXF_TRAIN_STREAM:
+                if self._fixed_epoch_size is not None and stream_name == self._train_stream:
                     stream_epoch_limit = self._fixed_epoch_size
                 self._streams[stream_name] = StreamWrapper(stream_fn, buffer_size=self._buffer,
                                                            epoch_size=stream_epoch_limit, name=stream_name,
@@ -264,7 +266,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch`
             - :py:meth:`cxflow.hooks.AbstractHook.after_epoch_profile`
         """
-        for stream_name in [CXF_TRAIN_STREAM] + self._extra_streams:
+        for stream_name in [self._train_stream] + self._extra_streams:
             self.get_stream(stream_name)
 
         def training():
@@ -274,7 +276,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             # Zeroth epoch: after_epoch
             if not self._skip_zeroth_epoch:
                 logging.info('Evaluating 0th epoch')
-                self._run_zeroth_epoch([CXF_TRAIN_STREAM] + self._extra_streams)
+                self._run_zeroth_epoch([self._train_stream] + self._extra_streams)
                 logging.info('0th epoch done\n\n')
 
             # Training loop: after_epoch, after_epoch_profile
@@ -284,7 +286,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 self._epoch_profile.clear()
                 epoch_data = self._create_epoch_data()
 
-                with self.get_stream(CXF_TRAIN_STREAM) as stream:
+                with self.get_stream(self._train_stream) as stream:
                     self.train_by_stream(stream)
 
                 for stream_name in self._extra_streams:
@@ -297,6 +299,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
+                                             train_stream_name=self._train_stream,
                                              extra_streams=self._extra_streams)
                 self._epochs_done = epoch_id
                 if trace is not None:
