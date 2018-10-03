@@ -1,7 +1,7 @@
 Advanced
 ========
 
-This section dives into the implementation details of the **cxflow** components.
+This section dives into the implementation details of the **emloop** components.
 See the following sections for more information.
 
 .. toctree::
@@ -15,7 +15,7 @@ See the following sections for more information.
 
 .. Architecture
    ------------
-   As already mentioned, cxflow consists of multiple mutually orthogonal components.
+   As already mentioned, emloop consists of multiple mutually orthogonal components.
    The following figure demonstrate their relationships.
    Each solid rectangle represents a single component.
    The public methods and attributes are listed below in order to provide an insight of the component API.
@@ -24,7 +24,7 @@ See the following sections for more information.
    On the contrary, Model is passed only to Hook and MainLoop.
    The dashed lines represent the possible method invocations among the components.
    For example, MainLoop can invoke Hook's ``after_batch`` method once another batch is processed.
-   .. figure:: cxflow-architecture.svg
+   .. figure:: emloop-architecture.svg
       :scale: 100%
       :align: center
-      Cxflow overall architecture.
+      emloop overall architecture.

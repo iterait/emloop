@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='cxflow',
+setup(name='emloop',
       version='0.12.0',
       description='Smart machine learning trainer',
       long_description='Trainer of machine learning models that automatically manages the whole process of training,'
@@ -19,17 +19,17 @@ setup(name='cxflow',
         'Programming Language :: Python :: 3.6'
       ],
       keywords='machine learning training framework',
-      url='https://github.com/cognexa/cxflow',
-      author='Cognexa Solutions s.r.o.',
-      author_email='info@cognexa.com',
+      url='https://github.com/iterait/emloop',
+      author='Iterait a.s.',
+      author_email='hello@iterait.com',
       license='MIT',
-      packages=['cxflow',
-                'cxflow.cli',
-                'cxflow.datasets',
-                'cxflow.hooks',
-                'cxflow.models',
-                'cxflow.utils',
-                'cxflow.tests'
+      packages=['emloop',
+                'emloop.cli',
+                'emloop.datasets',
+                'emloop.hooks',
+                'emloop.models',
+                'emloop.utils',
+                'emloop.tests'
                 ],
       include_package_data=True,
       zip_safe=False,
@@ -38,6 +38,6 @@ setup(name='cxflow',
       install_requires=[line for line in open('requirements.txt', 'r').readlines() if not line.startswith('#')],
       entry_points={
           'console_scripts': [
-              'cxflow=cxflow.entry_point:entry_point'
+              'emloop=emloop.entry_point:entry_point'
           ]
       })

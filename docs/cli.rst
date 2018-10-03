@@ -1,19 +1,19 @@
 CLI Reference
 =============
-Although the whole **cxflow** API can be accessed programmatically, the intended way of using it is through the
+Although the whole **emloop** API can be accessed programmatically, the intended way of using it is through the
 command line instruments. The design goal is to focus on defining the actual models, datasets etc.
 instead of the burdensome code, which just puts all the components together.
 
-With proper installation, the |cxflow| command should become available. The command comes with four basic sub-commands
+With proper installation, the |emloop| command should become available. The command comes with four basic sub-commands
 explained below.
 
-.. |cxflow| raw:: html
+.. |emloop| raw:: html
 
-   <kbd>cxflow</kbd>
+   <kbd>emloop</kbd>
 
 .. code-block:: yaml
 
-   usage: cxflow (train | resume | predict | dataset) [-v] [-o] ...
+   usage: emloop (train | resume | predict | dataset) [-v] [-o] ...
 
 All the sub-commands share the following arguments:
 
@@ -32,45 +32,45 @@ All the sub-commands share the following arguments:
    </tbody>
    </table>
 
-cxflow train
+emloop train
 ------------
 .. argparse::
-   :ref: cxflow.cli.get_cxflow_arg_parser
-   :prog: cxflow
+   :ref: emloop.cli.get_emloop_arg_parser
+   :prog: emloop
    :path: train
 
-cxflow resume
+emloop resume
 -------------
 .. argparse::
-   :ref: cxflow.cli.get_cxflow_arg_parser
-   :prog: cxflow
+   :ref: emloop.cli.get_emloop_arg_parser
+   :prog: emloop
    :path: resume
 
-cxflow predict
+emloop predict
 --------------
 .. argparse::
-   :ref: cxflow.cli.get_cxflow_arg_parser
-   :prog: cxflow
+   :ref: emloop.cli.get_emloop_arg_parser
+   :prog: emloop
    :path: predict
 
-cxflow dataset
+emloop dataset
 --------------
 .. argparse::
-   :ref: cxflow.cli.get_cxflow_arg_parser
-   :prog: cxflow
+   :ref: emloop.cli.get_emloop_arg_parser
+   :prog: emloop
    :path: dataset
 
-cxflow ls
+emloop ls
 --------------
 .. argparse::
-   :ref: cxflow.cli.get_cxflow_arg_parser
-   :prog: cxflow
+   :ref: emloop.cli.get_emloop_arg_parser
+   :prog: emloop
    :path: ls
 
 
-cxflow prune
+emloop prune
 --------------
 .. argparse::
-   :ref: cxflow.cli.get_cxflow_arg_parser
-   :prog: cxflow
+   :ref: emloop.cli.get_emloop_arg_parser
+   :prog: emloop
    :path: prune

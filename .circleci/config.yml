@@ -34,7 +34,7 @@ references:
       name: PyPI deploy
       command: |
         pip3 install wheel setuptools --upgrade
-        bash <(curl -fsSL https://raw.githubusercontent.com/Cognexa/ci-utils/master/pypi_deploy.sh)
+        bash <(curl -fsSL https://raw.githubusercontent.com/iterait/ci-utils/master/pypi_deploy.sh)
 
   add_rw_key: &add_rw_key
     add_ssh_keys:
@@ -45,7 +45,7 @@ references:
     run:
       name: Generate documentation
       command: |
-        bash <(curl -fsSL https://raw.githubusercontent.com/Cognexa/ci-utils/master/doc_deploy.sh)
+        bash <(curl -fsSL https://raw.githubusercontent.com/iterait/ci-utils/master/doc_deploy.sh)
 
   coverage: &coverage
     run:
@@ -60,7 +60,7 @@ jobs:
   test_ubuntu_latest:
     docker:
       - image: ubuntu:latest
-    working_directory: ~/cxflow
+    working_directory: ~/emloop
     steps:
       - *ubuntu_deps
       - checkout
@@ -70,7 +70,7 @@ jobs:
   test_ubuntu_rolling:
     docker:
       - image: ubuntu:rolling
-    working_directory: ~/cxflow
+    working_directory: ~/emloop
     steps:
       - *ubuntu_deps
       - checkout
@@ -80,7 +80,7 @@ jobs:
   test_archlinux:
     docker:
       - image: pritunl/archlinux:2018-01-13
-    working_directory: ~/cxflow
+    working_directory: ~/emloop
     steps:
       - *arch_deps
       - checkout
@@ -90,7 +90,7 @@ jobs:
   coverage:
     docker:
       - image: pritunl/archlinux:2018-01-13
-    working_directory: ~/cxflow
+    working_directory: ~/emloop
     steps:
       - *arch_deps
       - checkout
@@ -100,7 +100,7 @@ jobs:
   generate_documentation:
     docker:
       - image: ubuntu:rolling
-    working_directory: ~/cxflow
+    working_directory: ~/emloop
     steps:
       - *ubuntu_deps
       - checkout
@@ -111,7 +111,7 @@ jobs:
   deploy:
     docker:
       - image: pritunl/archlinux:2018-01-13
-    working_directory: ~/cxflow
+    working_directory: ~/emloop
     steps:
       - *arch_deps
       - checkout
