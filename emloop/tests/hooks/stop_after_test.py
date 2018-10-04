@@ -6,11 +6,11 @@ import time
 from emloop.main_loop import MainLoop
 from emloop.hooks.stop_after import StopAfter
 from emloop.hooks.abstract_hook import TrainingTerminated
-from emloop.constants import EL_TRAIN_STREAM
+from emloop.constants import EL_DEFAULT_TRAIN_STREAM
 import pytest
 
 NOTRAIN_STREAM_NAME = 'valid'
-assert EL_TRAIN_STREAM is not NOTRAIN_STREAM_NAME
+assert EL_DEFAULT_TRAIN_STREAM != NOTRAIN_STREAM_NAME
 
 
 def test_no_conditions_raise():
@@ -41,13 +41,13 @@ def test_stop_after_iters():
         hook.after_batch(stream_name=NOTRAIN_STREAM_NAME, batch_data=None)
 
     for i in range(9):
-        hook.after_batch(stream_name=EL_TRAIN_STREAM, batch_data=None)
+        hook.after_batch(stream_name=EL_DEFAULT_TRAIN_STREAM, batch_data=None)
 
     hook.after_batch(stream_name=NOTRAIN_STREAM_NAME, batch_data=None)
 
     # Test hook does terminate the training correctly
     with pytest.raises(TrainingTerminated):
-        hook.after_batch(stream_name=EL_TRAIN_STREAM, batch_data=None)
+        hook.after_batch(stream_name=EL_DEFAULT_TRAIN_STREAM, batch_data=None)
 
 
 def test_stop_after_minutes():
