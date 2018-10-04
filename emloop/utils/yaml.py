@@ -52,7 +52,7 @@ def make_simple(data: Any) -> Any:
     :param data: data to be made simple (dict instead of CommentedMap etc.)
     :return: simplified data
     """
-    return yaml.load(yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper), ruamel.yaml.Loader)
+    return yaml.load(yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper), ruamel.yaml.RoundTripLoader)
 
 
 __all__ = []
