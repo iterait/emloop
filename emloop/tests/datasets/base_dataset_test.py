@@ -5,6 +5,7 @@ import logging
 import numpy as np
 import tabulate
 
+import emloop.datasets.base_dataset
 from emloop.datasets.base_dataset import BaseDataset
 from emloop.types import Stream
 
@@ -87,7 +88,7 @@ def test_check_dataset(caplog):
         + (('root', logging.WARNING, 'Exception was raised during checking stream '
             '`undefined_stream`, (stack trace is displayed only with --verbose flag)'),)
         + (('root', logging.DEBUG, 'Traceback (most recent call last):\n'
-            '  File "/root/emloop/emloop/datasets/base_dataset.py", line 61, in '
+           f'  File "{emloop.datasets.base_dataset.__file__}", line 61, in '
             'stream_info\n'
             '    batch = next(iter(stream_fn()))\n'
             "TypeError: 'NoneType' object is not iterable\n"),)
