@@ -53,7 +53,7 @@ references:
       command: |
         coverage run setup.py test
         coverage report
-        COVERALLS_REPO_TOKEN=IcZuMtRg3p15AtsuOoGQSDaSQxjpVF1tP coveralls
+        COVERALLS_REPO_TOKEN=5fdgMuuCkpjBJBJBEm3VueXvxSMN4eS12 coveralls
 
 jobs:
 
@@ -89,7 +89,7 @@ jobs:
 
   coverage:
     docker:
-      - image: pritunl/archlinux:2018-01-13
+      - image: archimg/base-devel
     working_directory: ~/emloop
     steps:
       - *arch_deps
@@ -110,7 +110,7 @@ jobs:
 
   deploy:
     docker:
-      - image: pritunl/archlinux:2018-01-13
+      - image: archimg/base-devel
     working_directory: ~/emloop
     steps:
       - *arch_deps
