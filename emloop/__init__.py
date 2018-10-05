@@ -15,4 +15,4 @@ from . import utils
 
 __all__ = ['MainLoop']
 
-__version__ = '0.12.0'
+__version__ = '0.1.0'
