@@ -79,7 +79,7 @@ jobs:
 
   test_archlinux:
     docker:
-      - image: pritunl/archlinux:2018-01-13
+      - image: archimg/base-devel
     working_directory: ~/emloop
     steps:
       - *arch_deps
