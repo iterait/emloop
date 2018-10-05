@@ -14,7 +14,7 @@ references:
     run:
       name: Install dependencies on Arch Linux.
       command: |
-        pacman -S --noconfirm python python-pip git base-devel curl
+        pacman -Syu --noconfirm python python-pip git base-devel curl
         pip install coveralls coverage
 
   install: &install
