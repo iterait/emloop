@@ -33,7 +33,7 @@ def test_download_and_unpack_successful(url, tmpdir, caplog):
 
     assert caplog.record_tuples == [('root', logging.INFO, '\tdownloading ' + os.path.join(tmpdir, _URL_ZIP_BASE))]
     assert os.path.exists(os.path.join(tmpdir, _URL_ZIP_BASE))
-    assert os.path.exists(os.path.join(tmpdir, 'emloop-0.12.0/setup.py'))
+    assert os.path.exists(os.path.join(tmpdir, 'emloop-0.1.0/setup.py'))
 
 
 @pytest.mark.parametrize('url, url_base, path', UNPACK_FAILURE)
