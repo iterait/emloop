@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='emloop',
-      version='0.12.0',
+      version='0.1.0',
       description='Smart machine learning trainer',
       long_description='Trainer of machine learning models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
