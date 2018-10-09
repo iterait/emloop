@@ -1,0 +1,64 @@
+=================
+``emloop.models``
+=================
+
+.. automodule:: emloop.models
+
+
+.. currentmodule:: emloop.models
+
+
+Classes
+=======
+
+- :py:class:`AbstractModel`:
+  Abstract machine learning model which exposes input and output names, run and save methods.
+
+- :py:class:`Ensemble`:
+  Ensemble model facilitates assembling multiple models into one for more accurate predictions.
+
+- :py:class:`Sequence`:
+  Model sequence provides simple abstraction for sequential application of multiple models to input batches.
+
+
+
+.. autoclass:: AbstractModel
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: AbstractModel
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Ensemble
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Ensemble
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Sequence
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Sequence
+      :parts: 1
+
+   |
+

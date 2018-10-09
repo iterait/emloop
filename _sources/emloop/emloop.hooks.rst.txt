@@ -1,0 +1,333 @@
+================
+``emloop.hooks``
+================
+
+.. automodule:: emloop.hooks
+
+
+.. currentmodule:: emloop.hooks
+
+
+Classes
+=======
+
+- :py:class:`AbstractHook`:
+  **emloop** hook interface.
+
+- :py:class:`AccumulateVariables`:
+  Accumulate the specified variables allowing their aggregation after each epoch.
+
+- :py:class:`WriteCSV`:
+  Log ``epoch_data`` variables to a CSV file after each epoch.
+
+- :py:class:`StopAfter`:
+  Stop the training after any of the specified conditions is met.
+
+- :py:class:`LogVariables`:
+  Log the training results to stderr via standard :py:mod:`logging` module.
+
+- :py:class:`LogProfile`:
+  Summarize and log epoch profile via standard :py:mod:`logging`.
+
+- :py:class:`LogDir`:
+  Log the output dir before training, after each epoch and after training.
+
+- :py:class:`SaveEvery`:
+  Save the model every ``n_epochs`` epoch.
+
+- :py:class:`SaveBest`:
+  Maintain the best performing model given the specified criteria.
+
+- :py:class:`SaveLatest`:
+  Save the latest model.
+
+- :py:class:`ComputeStats`:
+  Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data.
+
+- :py:class:`Check`:
+  Terminate training if the given stream variable exceeds the threshold in at most specified number of epochs.
+
+- :py:class:`ShowProgress`:
+  Show stream progresses and ETA in the current epoch.
+
+- :py:class:`EveryNEpoch`:
+  This hook should be used as base hook in the case when some action need to be processed every n epoch.
+
+- :py:class:`OnPlateau`:
+  Base hook for hooks taking actions when certain variable reaches its plateau.
+
+- :py:class:`StopOnPlateau`:
+  Terminate the training when the observed variable reaches its plateau.
+
+- :py:class:`StopOnNaN`:
+  Stop the training when any of the specified variables contain NaN.
+
+- :py:class:`SaveConfusionMatrix`:
+  After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels.
+
+
+
+.. autoclass:: AbstractHook
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: AbstractHook
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: AccumulateVariables
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: AccumulateVariables
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: WriteCSV
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: WriteCSV
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: StopAfter
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: StopAfter
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: LogVariables
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: LogVariables
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: LogProfile
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: LogProfile
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: LogDir
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: LogDir
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SaveEvery
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SaveEvery
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SaveBest
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SaveBest
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SaveLatest
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SaveLatest
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: ComputeStats
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: ComputeStats
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Check
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Check
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: ShowProgress
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: ShowProgress
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: EveryNEpoch
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: EveryNEpoch
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: OnPlateau
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: OnPlateau
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: StopOnPlateau
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: StopOnPlateau
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: StopOnNaN
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: StopOnNaN
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SaveConfusionMatrix
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SaveConfusionMatrix
+      :parts: 1
+
+   |
+
+
+
+Exceptions
+==========
+
+- :py:exc:`TrainingTerminated`:
+  Exception that is raised when a hook terminates the training.
+
+
+.. autoexception:: TrainingTerminated
+
+   .. rubric:: Inheritance
+   .. inheritance-diagram:: TrainingTerminated
+      :parts: 1

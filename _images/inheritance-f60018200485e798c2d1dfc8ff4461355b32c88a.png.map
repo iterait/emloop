@@ -1,4 +1,0 @@
-<map id="inheritance02e0bda668" name="inheritance02e0bda668">
-<area shape="rect" id="node1" title="Catch SIGINT and SIGTERM interrupt signals allowing to stop the training with grace in between" alt="" coords="5,5,136,31"/>
-<area shape="rect" id="node2" title="**cxflow** main loop for training and model inference." alt="" coords="184,5,268,31"/>
-</map>

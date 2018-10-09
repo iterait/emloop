@@ -1,0 +1,109 @@
+====================
+``emloop.constants``
+====================
+
+.. automodule:: emloop.constants
+
+
+.. currentmodule:: emloop.constants
+
+
+Variables
+=========
+
+- :py:data:`EL_LOG_FORMAT`
+- :py:data:`EL_LOG_DATE_FORMAT`
+- :py:data:`EL_FULL_DATE_FORMAT`
+- :py:data:`EL_HOOKS_MODULE`
+- :py:data:`EL_CONFIG_FILE`
+- :py:data:`EL_LOG_FILE`
+- :py:data:`EL_TRACE_FILE`
+- :py:data:`EL_DEFAULT_TRAIN_STREAM`
+- :py:data:`EL_PREDICT_STREAM`
+- :py:data:`EL_DEFAULT_LOG_DIR`
+- :py:data:`EL_NA_STR`
+- :py:data:`EL_BUFFER_SLEEP`
+
+.. autodata:: EL_LOG_FORMAT
+   :annotation:
+
+   .. code-block:: guess
+
+      '%(asctime)s.%(msecs)03d: %(levelname)-8s@%(module)-12s: %(message)s'
+
+.. autodata:: EL_LOG_DATE_FORMAT
+   :annotation:
+
+   .. code-block:: guess
+
+      '%Y-%m-%d %H:%M:%S'
+
+.. autodata:: EL_FULL_DATE_FORMAT
+   :annotation:
+
+   .. code-block:: guess
+
+      '%Y-%m-%d %H:%M:%S.%f'
+
+.. autodata:: EL_HOOKS_MODULE
+   :annotation:
+
+   .. code-block:: guess
+
+      'emloop.hooks'
+
+.. autodata:: EL_CONFIG_FILE
+   :annotation:
+
+   .. code-block:: guess
+
+      'config.yaml'
+
+.. autodata:: EL_LOG_FILE
+   :annotation:
+
+   .. code-block:: guess
+
+      'train.log'
+
+.. autodata:: EL_TRACE_FILE
+   :annotation:
+
+   .. code-block:: guess
+
+      'trace.yaml'
+
+.. autodata:: EL_DEFAULT_TRAIN_STREAM
+   :annotation:
+
+   .. code-block:: guess
+
+      'train'
+
+.. autodata:: EL_PREDICT_STREAM
+   :annotation:
+
+   .. code-block:: guess
+
+      'predict'
+
+.. autodata:: EL_DEFAULT_LOG_DIR
+   :annotation:
+
+   .. code-block:: guess
+
+      './log'
+
+.. autodata:: EL_NA_STR
+   :annotation:
+
+   .. code-block:: guess
+
+      'N/A'
+
+.. autodata:: EL_BUFFER_SLEEP
+   :annotation:
+
+   .. code-block:: guess
+
+      0.02

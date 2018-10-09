@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Overview: module code &#8212; cxflow 0.12.0 documentation</title>
-    
+    <title>Overview: module code &#8212; emloop 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +20,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -37,7 +33,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -49,8 +45,8 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../index.html">
-          cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -60,7 +56,7 @@
                 <li><a href="../tutorial.html">Tutorial</a></li>
                 <li><a href="../advanced/index.html">Advanced</a></li>
                 <li><a href="../cli.html">CLI Reference</a></li>
-                <li><a href="../cxflow/index.html">API Reference</a></li>
+                <li><a href="../emloop/index.html">API Reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -100,7 +96,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
-	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -110,31 +106,31 @@
 <ul><li><a href="/datasets.html">.datasets</a></li>
 <li><a href="/hooks.html">.hooks</a></li>
 <li><a href="/models.html">.models</a></li>
-<li><a href="cxflow/datasets/abstract_dataset.html">cxflow.datasets.abstract_dataset</a></li>
-<li><a href="cxflow/datasets/base_dataset.html">cxflow.datasets.base_dataset</a></li>
-<li><a href="cxflow/datasets/downloadable_dataset.html">cxflow.datasets.downloadable_dataset</a></li>
-<li><a href="cxflow/datasets/stream_wrapper.html">cxflow.datasets.stream_wrapper</a></li>
-<li><a href="cxflow/hooks/abstract_hook.html">cxflow.hooks.abstract_hook</a></li>
-<li><a href="cxflow/hooks/accumulate_variables.html">cxflow.hooks.accumulate_variables</a></li>
-<li><a href="cxflow/hooks/check.html">cxflow.hooks.check</a></li>
-<li><a href="cxflow/hooks/compute_stats.html">cxflow.hooks.compute_stats</a></li>
-<li><a href="cxflow/hooks/every_n_epoch.html">cxflow.hooks.every_n_epoch</a></li>
-<li><a href="cxflow/hooks/log_dir.html">cxflow.hooks.log_dir</a></li>
-<li><a href="cxflow/hooks/log_profile.html">cxflow.hooks.log_profile</a></li>
-<li><a href="cxflow/hooks/log_variables.html">cxflow.hooks.log_variables</a></li>
-<li><a href="cxflow/hooks/on_plateau.html">cxflow.hooks.on_plateau</a></li>
-<li><a href="cxflow/hooks/save.html">cxflow.hooks.save</a></li>
-<li><a href="cxflow/hooks/save_cm.html">cxflow.hooks.save_cm</a></li>
-<li><a href="cxflow/hooks/show_progress.html">cxflow.hooks.show_progress</a></li>
-<li><a href="cxflow/hooks/stop_after.html">cxflow.hooks.stop_after</a></li>
-<li><a href="cxflow/hooks/stop_on_nan.html">cxflow.hooks.stop_on_nan</a></li>
-<li><a href="cxflow/hooks/stop_on_plateau.html">cxflow.hooks.stop_on_plateau</a></li>
-<li><a href="cxflow/hooks/write_csv.html">cxflow.hooks.write_csv</a></li>
-<li><a href="cxflow/main_loop.html">cxflow.main_loop</a></li>
-<li><a href="cxflow/models/abstract_model.html">cxflow.models.abstract_model</a></li>
-<li><a href="cxflow/models/ensemble.html">cxflow.models.ensemble</a></li>
-<li><a href="cxflow/models/sequence.html">cxflow.models.sequence</a></li>
-<li><a href="cxflow/types.html">cxflow.types</a></li>
+<li><a href="emloop/datasets/abstract_dataset.html">emloop.datasets.abstract_dataset</a></li>
+<li><a href="emloop/datasets/base_dataset.html">emloop.datasets.base_dataset</a></li>
+<li><a href="emloop/datasets/downloadable_dataset.html">emloop.datasets.downloadable_dataset</a></li>
+<li><a href="emloop/datasets/stream_wrapper.html">emloop.datasets.stream_wrapper</a></li>
+<li><a href="emloop/hooks/abstract_hook.html">emloop.hooks.abstract_hook</a></li>
+<li><a href="emloop/hooks/accumulate_variables.html">emloop.hooks.accumulate_variables</a></li>
+<li><a href="emloop/hooks/check.html">emloop.hooks.check</a></li>
+<li><a href="emloop/hooks/compute_stats.html">emloop.hooks.compute_stats</a></li>
+<li><a href="emloop/hooks/every_n_epoch.html">emloop.hooks.every_n_epoch</a></li>
+<li><a href="emloop/hooks/log_dir.html">emloop.hooks.log_dir</a></li>
+<li><a href="emloop/hooks/log_profile.html">emloop.hooks.log_profile</a></li>
+<li><a href="emloop/hooks/log_variables.html">emloop.hooks.log_variables</a></li>
+<li><a href="emloop/hooks/on_plateau.html">emloop.hooks.on_plateau</a></li>
+<li><a href="emloop/hooks/save.html">emloop.hooks.save</a></li>
+<li><a href="emloop/hooks/save_cm.html">emloop.hooks.save_cm</a></li>
+<li><a href="emloop/hooks/show_progress.html">emloop.hooks.show_progress</a></li>
+<li><a href="emloop/hooks/stop_after.html">emloop.hooks.stop_after</a></li>
+<li><a href="emloop/hooks/stop_on_nan.html">emloop.hooks.stop_on_nan</a></li>
+<li><a href="emloop/hooks/stop_on_plateau.html">emloop.hooks.stop_on_plateau</a></li>
+<li><a href="emloop/hooks/write_csv.html">emloop.hooks.write_csv</a></li>
+<li><a href="emloop/main_loop.html">emloop.main_loop</a></li>
+<li><a href="emloop/models/abstract_model.html">emloop.models.abstract_model</a></li>
+<li><a href="emloop/models/ensemble.html">emloop.models.ensemble</a></li>
+<li><a href="emloop/models/sequence.html">emloop.models.sequence</a></li>
+<li><a href="emloop/types.html">emloop.types</a></li>
 </ul>
 
     </div>
@@ -149,8 +145,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
     </p>
   </div>
 </footer>

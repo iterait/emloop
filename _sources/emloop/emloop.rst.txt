@@ -1,0 +1,42 @@
+==========
+``emloop``
+==========
+
+.. automodule:: emloop
+
+
+
+Submodules
+==========
+
+.. toctree::
+   :titlesonly:
+
+   emloop.constants
+   emloop.datasets
+   emloop.hooks
+   emloop.models
+
+.. currentmodule:: emloop
+
+
+Classes
+=======
+
+- :py:class:`MainLoop`:
+  **emloop** main loop for training and model inference.
+
+
+
+.. autoclass:: MainLoop
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: MainLoop
+      :parts: 1
+
+   |
+

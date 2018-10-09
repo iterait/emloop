@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Main Loop &#8212; cxflow 0.12.0 documentation</title>
-    
+    <title>Main Loop &#8212; emloop 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +20,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -39,7 +35,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -51,8 +47,8 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../index.html">
-          cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -62,7 +58,7 @@
                 <li><a href="../tutorial.html">Tutorial</a></li>
                 <li><a href="index.html">Advanced</a></li>
                 <li><a href="../cli.html">CLI Reference</a></li>
-                <li><a href="../cxflow/index.html">API Reference</a></li>
+                <li><a href="../emloop/index.html">API Reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -119,7 +115,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
-	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -127,33 +123,33 @@
       
   <div class="section" id="main-loop">
 <h1>Main Loop<a class="headerlink" href="#main-loop" title="Permalink to this headline">¶</a></h1>
-<p>Main loop is the core of <strong>cxflow</strong> responsible for
+<p>Main loop is the core of <strong>emloop</strong> responsible for
 the main lifecycle of model training.</p>
 <div class="section" id="dataset-model-integration">
 <h2>Dataset/Model Integration<a class="headerlink" href="#dataset-model-integration" title="Permalink to this headline">¶</a></h2>
-<p>No matter what command has been executed, <strong>cxflow</strong> always starts by creating
+<p>No matter what command has been executed, <strong>emloop</strong> always starts by creating
 the dataset and passing the <code class="docutils literal"><span class="pre">dataset</span></code> section from the <a class="reference external" href="config.html">config</a>
-to its constructor. Consequently, <strong>cxflow</strong> continues with creating the model and passing the
+to its constructor. Consequently, <strong>emloop</strong> continues with creating the model and passing the
 <code class="docutils literal"><span class="pre">model</span></code> section from the <a class="reference external" href="config.html">config</a> to its constructor.
 One of the arguments of the model is also the dataset itself, so the model can query
 it for information such as the number of outputs, data size, etc.</p>
-<p>After the dataset and the model are created, <strong>cxflow</strong> calls one of the dataset stream functions
+<p>After the dataset and the model are created, <strong>emloop</strong> calls one of the dataset stream functions
 based on whether it is training, testing or evaluation (more on this is described in the following
 sections).
 The selected stream method (e.g., <code class="docutils literal"><span class="pre">train_stream</span></code>) returns an iterable where each
 item corresponds to a single batch of data.</p>
-<p>Finally, the stream is iterated through and each batch is fed to the model&#8217;s <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a>
+<p>Finally, the stream is iterated through and each batch is fed to the model’s <a class="reference internal" href="../emloop/emloop.models.html#emloop.models.AbstractModel.run" title="emloop.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">emloop.models.AbstractModel.run()</span></code></a>
 method along with a boolean value indicating whether the model should update or not.
 By default, updates only happen when iterating the training stream.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The implementation of <a class="reference internal" href="../cxflow/cxflow.models.html#cxflow.models.AbstractModel.run" title="cxflow.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.models.AbstractModel.run()</span></code></a> method is backend specific.</p>
+<p class="last">The implementation of <a class="reference internal" href="../emloop/emloop.models.html#emloop.models.AbstractModel.run" title="emloop.models.AbstractModel.run"><code class="xref py py-meth docutils literal"><span class="pre">emloop.models.AbstractModel.run()</span></code></a> method is backend specific.</p>
 </div>
 </div>
 <div class="section" id="training-lifecycle">
 <h2>Training Lifecycle<a class="headerlink" href="#training-lifecycle" title="Permalink to this headline">¶</a></h2>
 <p>The lifecycle of the training is very simple. Here are the steps performed by
-<strong>cxflow</strong>.</p>
+<strong>emloop</strong>.</p>
 <ol class="arabic simple">
 <li>Create the dataset and pass the <code class="docutils literal"><span class="pre">dataset</span></code> section from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
 <li>Create the model an pass the <code class="docutils literal"><span class="pre">model</span></code> section from the <a class="reference external" href="config.html">config</a> to its constructor.</li>
@@ -177,7 +173,7 @@ and evaluate the extra streams.</li>
 </div>
 <div class="section" id="evaluation-lifecycle">
 <h2>Evaluation Lifecycle<a class="headerlink" href="#evaluation-lifecycle" title="Permalink to this headline">¶</a></h2>
-<p>Any stream may be evaluated leaving the model intact. There is only a single pass through the stream before cxflow
+<p>Any stream may be evaluated leaving the model intact. There is only a single pass through the stream before emloop
 terminates.</p>
 <p>The whole process can be described by the following pseudocode.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="m">1</span>. create dataset
@@ -217,8 +213,8 @@ profiling information.</li>
       
     </p>
     <p>
-        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
     </p>
   </div>
 </footer>

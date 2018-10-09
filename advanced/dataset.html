@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Dataset &#8212; cxflow 0.12.0 documentation</title>
-    
+    <title>Dataset &#8212; emloop 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +20,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -39,7 +35,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -51,8 +47,8 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../index.html">
-          cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -62,7 +58,7 @@
                 <li><a href="../tutorial.html">Tutorial</a></li>
                 <li><a href="index.html">Advanced</a></li>
                 <li><a href="../cli.html">CLI Reference</a></li>
-                <li><a href="../cxflow/index.html">API Reference</a></li>
+                <li><a href="../emloop/index.html">API Reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -119,7 +115,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
-	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -130,29 +126,29 @@
 <p>Dataset is the essential component of every machine learning problem. In fact, the dataset is often the problem itself.
 Regardless of sizes, complexities and formats, all datasets are beautiful. At some point, though, we need to
 iterate through the data points or <em>examples</em> if you wish.</p>
-<p>As a matter of fact, the ability of providing example iterators is the only requirement from <strong>cxflow</strong> on datasets.
+<p>As a matter of fact, the ability of providing example iterators is the only requirement from <strong>emloop</strong> on datasets.
 A dataset used for training has to implement a <code class="docutils literal"><span class="pre">train_stream</span></code>, in addition to that, any <code class="docutils literal"><span class="pre">&lt;stream_name&gt;_stream</span></code>
 may be used for evaluation.</p>
-<p>To make a dataset compatible with <strong>cxflow</strong> one must implement a class which complies
-to the <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a> concept.
-With that, <strong>cxflow</strong> can create and manage the dataset for you.</p>
-<p>To use the dataset in training, specify its fully-qualified name in <code class="docutils literal"><span class="pre">dataset</span></code> section of <strong>cxflow</strong> configuration
+<p>To make a dataset compatible with <strong>emloop</strong> one must implement a class which complies
+to the <a class="reference internal" href="../emloop/emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">emloop.datasets.AbstractDataset</span></code></a> concept.
+With that, <strong>emloop</strong> can create and manage the dataset for you.</p>
+<p>To use the dataset in training, specify its fully-qualified name in <code class="docutils literal"><span class="pre">dataset</span></code> section of <strong>emloop</strong> configuration
 file. See the <a class="reference external" href="config.html">configuration section</a> for more information.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last"><strong>cxflow</strong> datasets are configured from <strong>cxflow</strong> configuration files. When creating a dataset,
-<strong>cxflow</strong> encodes the parameters as YAML string in order to ease interoperability in the case the dataset is
+<p class="last"><strong>emloop</strong> datasets are configured from <strong>emloop</strong> configuration files. When creating a dataset,
+<strong>emloop</strong> encodes the parameters as YAML string in order to ease interoperability in the case the dataset is
 implemented in a different language such as in c++.</p>
 </div>
 <div class="section" id="basedataset">
 <h2>BaseDataset<a class="headerlink" href="#basedataset" title="Permalink to this headline">¶</a></h2>
-<p>To write your very first dataset in python, we recommend to inherit from <a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>
+<p>To write your very first dataset in python, we recommend to inherit from <a class="reference internal" href="../emloop/emloop.datasets.html#emloop.datasets.BaseDataset" title="emloop.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">emloop.datasets.BaseDataset</span></code></a>
 as it parses the YAML string automatically. Parsed arguments are passed to the
-<a class="reference internal" href="../cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset._configure_dataset" title="cxflow.datasets.BaseDataset._configure_dataset"><code class="xref py py-meth docutils literal"><span class="pre">cxflow.datasets.BaseDataset._configure_dataset()</span></code></a> which is required from you implementation.</p>
+<a class="reference internal" href="../emloop/emloop.datasets.html#emloop.datasets.BaseDataset._configure_dataset" title="emloop.datasets.BaseDataset._configure_dataset"><code class="xref py py-meth docutils literal"><span class="pre">emloop.datasets.BaseDataset._configure_dataset()</span></code></a> which is required from you implementation.</p>
 <p>To give an example, we ll write a skeleton of <code class="docutils literal"><span class="pre">MyDataset</span></code> in <code class="docutils literal"><span class="pre">datasets.my_dataset.py</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text"><code class="docutils literal"><span class="pre">datasets.my_dataset.py</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
-<div class="highlight-python"><div class="highlight"><pre><span></span> <span class="kn">from</span> <span class="nn">cxflow</span> <span class="kn">import</span> <span class="n">BaseDataset</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span> <span class="kn">from</span> <span class="nn">emloop</span> <span class="kn">import</span> <span class="n">BaseDataset</span>
 
  <span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">BaseDataset</span><span class="p">):</span>
      <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">augment</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -164,7 +160,7 @@ as it parses the YAML string automatically. Parsed arguments are passed to the
 is ignored and hidden in the <code class="docutils literal"><span class="pre">**kwargs</span></code>.</p>
 <p>Next, we define the <code class="docutils literal"><span class="pre">dataset</span></code> section in the config file:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">example usage of <code class="docutils literal"><span class="pre">MyDataset</span></code> in <strong>cxflow</strong> configuration</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-text">example usage of <code class="docutils literal"><span class="pre">MyDataset</span></code> in <strong>emloop</strong> configuration</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">dataset</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">datasets.MyDataset</span>
   <span class="l l-Scalar l-Scalar-Plain">batch_size</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">16</span>
@@ -174,16 +170,16 @@ is ignored and hidden in the <code class="docutils literal"><span class="pre">**
 </pre></div>
 </div>
 </div>
-<p>Now given this configuration, <strong>cxflow</strong> can find, create and configure new <code class="docutils literal"><span class="pre">MyDataset</span></code> instance seamlessly.</p>
+<p>Now given this configuration, <strong>emloop</strong> can find, create and configure new <code class="docutils literal"><span class="pre">MyDataset</span></code> instance seamlessly.</p>
 </div>
 <div class="section" id="data-streams">
 <h2>Data Streams<a class="headerlink" href="#data-streams" title="Permalink to this headline">¶</a></h2>
-<p>In most cases, datasets are quite large and can not be fed to the model as whole. For this reason, <strong>cxflow</strong> operates
+<p>In most cases, datasets are quite large and can not be fed to the model as whole. For this reason, <strong>emloop</strong> operates
 with streams of so called <em>mini-batches</em>, i.e. small portions of the dataset.
-In particular, <strong>cxflow</strong> works with data on the following levels:</p>
+In particular, <strong>emloop</strong> works with data on the following levels:</p>
 <ul class="simple">
-<li><strong>stream</strong> in an iterable of <em>batches</em> (<code class="xref py py-attr docutils literal"><span class="pre">cxflow.Stream</span></code>)</li>
-<li><strong>batch</strong> is a dictionary of <em>stream sources</em> (<code class="xref py py-attr docutils literal"><span class="pre">cxflow.BatchData</span></code>)</li>
+<li><strong>stream</strong> in an iterable of <em>batches</em> (<code class="xref py py-attr docutils literal"><span class="pre">emloop.Stream</span></code>)</li>
+<li><strong>batch</strong> is a dictionary of <em>stream sources</em> (<code class="xref py py-attr docutils literal"><span class="pre">emloop.BatchData</span></code>)</li>
 <li><strong>stream source</strong> is a list of example <em>fields</em></li>
 </ul>
 <p>For instance, imagine you are classifying images of animals.
@@ -198,8 +194,8 @@ An <em>example</em> in this case would be a tuple of two fields, <em>image</em> 
 </pre></div>
 </div>
 </div>
-<p>Implementing a <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> method which returns <em>stream</em> iterator allows <strong>cxflow</strong> to use the respective <em>stream</em>.</p>
-<p>When training, <strong>cxflow</strong> requires the train <em>stream</em> to be provided by <code class="docutils literal"><span class="pre">train_stream</span></code> method similar to the following one:</p>
+<p>Implementing a <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> method which returns <em>stream</em> iterator allows <strong>emloop</strong> to use the respective <em>stream</em>.</p>
+<p>When training, <strong>emloop</strong> requires the train <em>stream</em> to be provided by <code class="docutils literal"><span class="pre">train_stream</span></code> method similar to the following one:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text"><code class="docutils literal"><span class="pre">train_stream</span></code> method example</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -219,7 +215,7 @@ along with the train stream. The configuration may look as follows:</p>
 </div>
 </div>
 <p>The extra streams, however, <em>are not</em> used for training, that is, the model is won`t be updated when it iterates through them.</p>
-<p>Finally, <strong>cxflow</strong> allows evaluation of any additional <em>stream</em> with  <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">eval</span> <span class="pre">&lt;stream_name&gt;</span> <span class="pre">..</span></code> command.</p>
+<p>Finally, <strong>emloop</strong> allows evaluation of any additional <em>stream</em> with  <code class="docutils literal"><span class="pre">emloop</span> <span class="pre">eval</span> <span class="pre">&lt;stream_name&gt;</span> <span class="pre">..</span></code> command.</p>
 </div>
 <div class="section" id="additional-methods">
 <h2>Additional Methods<a class="headerlink" href="#additional-methods" title="Permalink to this headline">¶</a></h2>
@@ -227,7 +223,7 @@ along with the train stream. The configuration may look as follows:</p>
 downloading, validating or visualizing the data.</p>
 <p>For example, is can contain a <code class="docutils literal"><span class="pre">download</span></code> method, which checks whether the dataset has all the data it requires.
 If not, it downloads them from the internet/database/drive. These methods may be easily invoked with</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow dataset &lt;method-name&gt; &lt;config&gt;
+<div class="highlight-bash"><div class="highlight"><pre><span></span>emloop dataset &lt;method-name&gt; &lt;config&gt;
 </pre></div>
 </div>
 <p>Additional useful method could be <code class="docutils literal"><span class="pre">statistics</span></code>, which would print various statistics of provided data,
@@ -235,17 +231,17 @@ plot some figures etc.
 Sometimes, we need to split the whole dataset into training, validation and testing sets.
 For this purpose, we would implement a <code class="docutils literal"><span class="pre">split</span></code> function.</p>
 <p>The suggested methods are completely arbitrary. The key concept is to keep data-related functions
-bundled together in the dataset object, so that one doesn&#8217;t need to implement
+bundled together in the dataset object, so that one doesn’t need to implement
 several separate scripts for fetching/visualization/statistics etc.</p>
 <p>A typical pipeline contains the following commands.
 We leave them without further comments as they are self-describing.</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">download</span> <span class="pre">config/my-data.yaml</span></code></li>
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">validate</span> <span class="pre">config/my-data.yaml</span></code></li>
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">print_statistics</span> <span class="pre">config/my-data.yaml</span></code></li>
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">plot_histogram</span> <span class="pre">config/my-data.yaml</span></code></li>
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">train</span> <span class="pre">config/my-data.yaml</span></code></li>
-<li><code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">eval</span> <span class="pre">test</span> <span class="pre">log/my-model</span></code></li>
+<li><code class="docutils literal"><span class="pre">emloop</span> <span class="pre">dataset</span> <span class="pre">download</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">emloop</span> <span class="pre">dataset</span> <span class="pre">validate</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">emloop</span> <span class="pre">dataset</span> <span class="pre">print_statistics</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">emloop</span> <span class="pre">dataset</span> <span class="pre">plot_histogram</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">emloop</span> <span class="pre">train</span> <span class="pre">config/my-data.yaml</span></code></li>
+<li><code class="docutils literal"><span class="pre">emloop</span> <span class="pre">eval</span> <span class="pre">test</span> <span class="pre">log/my-model</span></code></li>
 </ul>
 </div>
 <div class="section" id="the-philosophy-of-laziness">
@@ -255,7 +251,7 @@ This technique is sometimes called <em>lazy initialization</em>.
 That is, the constructor should not perform any time-consuming operation such as loading and decoding the data.
 Instead, the data should be loaded and decoded in the first moment they are truly necessary (e.g.,
 in the <code class="docutils literal"><span class="pre">train_stream</span></code> method).</p>
-<p>The main reason for laziness is that the dataset doesn&#8217;t know for which purpose it was constructed.
+<p>The main reason for laziness is that the dataset doesn’t know for which purpose it was constructed.
 It might be queried to provide the training data or only to print some simple checksums.
 In the cases of extremely big datasets, it is useless and annoying to waste the time by loading the data
 without their actual use.</p>
@@ -275,8 +271,8 @@ without their actual use.</p>
       
     </p>
     <p>
-        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
     </p>
   </div>
 </footer>

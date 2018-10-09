@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emloop.main_loop &#8212; emloop 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/highlight.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../cli.html">CLI Reference</a></li>
+                <li><a href="../../emloop/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../search.html" method="get" class="searchbox">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://cxflow.org">cxflow</a></li>
+	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
+</ul>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for emloop.main_loop</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">**emloop** main loop for training models.</span>
+
+<span class="sd">The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks.</span>
+<span class="sd">Having all that, it manages iterating through streams, training and hooks execution.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">.datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
+<span class="kn">from</span> <span class="nn">.models.abstract_model</span> <span class="k">import</span> <span class="n">AbstractModel</span>
+<span class="kn">from</span> <span class="nn">.hooks.abstract_hook</span> <span class="k">import</span> <span class="n">AbstractHook</span><span class="p">,</span> <span class="n">TrainingTerminated</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">Timer</span><span class="p">,</span> <span class="n">TrainingTrace</span><span class="p">,</span> <span class="n">TrainingTraceKeys</span>
+<span class="kn">from</span> <span class="nn">.utils.misc</span> <span class="k">import</span> <span class="n">CaughtInterrupts</span>
+<span class="kn">from</span> <span class="nn">.datasets.stream_wrapper</span> <span class="k">import</span> <span class="n">StreamWrapper</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="k">import</span> <span class="n">EL_DEFAULT_TRAIN_STREAM</span><span class="p">,</span> <span class="n">EL_PREDICT_STREAM</span>
+<span class="kn">from</span> <span class="nn">.types</span> <span class="k">import</span> <span class="n">EpochData</span>
+
+
+<div class="viewcode-block" id="MainLoop"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop">[docs]</a><span class="k">class</span> <span class="nc">MainLoop</span><span class="p">(</span><span class="n">CaughtInterrupts</span><span class="p">):</span>   <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+    <span class="sd">&quot;&quot;&quot;**emloop** main loop for training and model inference.&quot;&quot;&quot;</span>
+
+    <span class="n">EMPTY_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Possible actions to be taken when a batch/stream is empty.&quot;&quot;&quot;</span>
+    <span class="n">UNUSED_SOURCE_ACTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Possible actions to be taken when a stream source is unused by the trained model.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MainLoop.__init__"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>   <span class="c1"># pylint: disable=too-many-arguments</span>
+                 <span class="n">model</span><span class="p">:</span> <span class="n">AbstractModel</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">AbstractDataset</span><span class="p">,</span>
+                 <span class="n">hooks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AbstractHook</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>
+                 <span class="n">train_stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="n">EL_DEFAULT_TRAIN_STREAM</span><span class="p">,</span>
+                 <span class="n">extra_streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">(),</span>  <span class="c1"># pylint: disable=invalid-sequence-index</span>
+                 <span class="n">buffer</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">on_empty_batch</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+                 <span class="n">on_empty_stream</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+                 <span class="n">on_unused_sources</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span>
+                 <span class="n">fixed_batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">fixed_epoch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">skip_zeroth_epoch</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param model: trained model</span>
+<span class="sd">        :param dataset: loaded dataset</span>
+<span class="sd">        :param hooks: training hooks</span>
+<span class="sd">        :param train_stream_name: name of the training stream</span>
+<span class="sd">        :param extra_streams: additional stream names to be evaluated between epochs</span>
+<span class="sd">        :param buffer: size of the batch buffer, 0 means no buffer</span>
+<span class="sd">        :param on_empty_batch: action to take when batch is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`</span>
+<span class="sd">        :param on_empty_stream: action to take when stream is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`</span>
+<span class="sd">        :param on_unused_sources: action to take when stream provides an unused sources; one of</span>
+<span class="sd">            :py:attr:`UNUSED_SOURCE_ACTIONS`</span>
+<span class="sd">        :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size</span>
+<span class="sd">        :param fixed_epoch_size: if specified, cut the train stream to epochs of at most ``fixed_epoch_size`` batches</span>
+<span class="sd">        :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch</span>
+<span class="sd">        :raise AssertionError: in case of unsupported value of ``on_empty_batch``, ``on_empty_stream`` or \</span>
+<span class="sd">        ``on_unused_sources``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">on_empty_batch</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">EMPTY_ACTIONS</span>
+        <span class="k">assert</span> <span class="n">on_empty_stream</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">EMPTY_ACTIONS</span>
+        <span class="k">assert</span> <span class="n">on_unused_sources</span> <span class="ow">in</span> <span class="n">MainLoop</span><span class="o">.</span><span class="n">UNUSED_SOURCE_ACTIONS</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span> <span class="o">=</span> <span class="n">hooks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="n">buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_batch</span> <span class="o">=</span> <span class="n">on_empty_batch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_stream</span> <span class="o">=</span> <span class="n">on_empty_stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_unused_sources</span> <span class="o">=</span> <span class="n">on_unused_sources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span> <span class="o">=</span> <span class="n">fixed_batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span> <span class="o">=</span> <span class="n">fixed_epoch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_sources_warned</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span> <span class="o">=</span> <span class="n">train_stream_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_streams</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skip_zeroth_epoch</span> <span class="o">=</span> <span class="n">skip_zeroth_epoch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">epochs_done</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Number of training epochs done in the last call of :py:meth:`self._run_training`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fixed_epoch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Fixed epoch size parameter as specified in :py:meth:`self.__init__`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">extra_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;List of extra stream names as specified in :py:meth:`self.__init__`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span>
+
+<div class="viewcode-block" id="MainLoop._create_epoch_data"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop._create_epoch_data">[docs]</a>    <span class="k">def</span> <span class="nf">_create_epoch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EpochData</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create empty epoch data double dict.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">streams</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">())</span> <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="MainLoop._check_sources"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop._check_sources">[docs]</a>    <span class="k">def</span> <span class="nf">_check_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check for unused and missing sources.</span>
+
+<span class="sd">        :param batch: batch to be checked</span>
+<span class="sd">        :raise ValueError: if a source is missing or unused and ``self._on_unused_sources`` is set to ``error``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unused_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">input_names</span><span class="p">]</span>
+        <span class="n">missing_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">source</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">input_names</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="c1"># check stream sources</span>
+        <span class="k">if</span> <span class="n">unused_sources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_unused_sources</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_sources_warned</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Some sources provided by the stream do not match model placeholders. Set &#39;</span>
+                                <span class="s1">&#39;`main_loop.on_unused_sources` to `ignore` in order to suppress this warning. &#39;</span>
+                                <span class="s1">&#39;Extra sources: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">unused_sources</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_extra_sources_warned</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_unused_sources</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Some sources provided by the stream do not match model placeholders. Set&#39;</span>
+                                 <span class="s1">&#39;`main_loop.on_unused_sources` to `warn` in order to suppress this error.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                 <span class="s1">&#39;Extra sources: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unused_sources</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">missing_sources</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Stream does not provide all required sources. Missing sources: </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">missing_sources</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MainLoop._run_epoch"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop._run_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">_run_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">StreamWrapper</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterate through the given stream and evaluate/train the model with the received batches.</span>
+
+<span class="sd">        Calls :py:meth:`emloop.hooks.AbstractHook.after_batch` events.</span>
+
+<span class="sd">        :param stream: stream to iterate</span>
+<span class="sd">        :param train: if set to ``True``, the model will be trained</span>
+<span class="sd">        :raise ValueError: in case of empty batch when ``on_empty_batch`` is set to ``error``</span>
+<span class="sd">        :raise ValueError: in case of empty stream when ``on_empty_stream`` is set to ``error``</span>
+<span class="sd">        :raise ValueError: in case of two batch variables having different lengths</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nonempty_batch_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">batch_input</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">raise_check_interrupt</span><span class="p">()</span>
+
+            <span class="n">batch_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">batch_input</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_sizes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">batch_sizes</span> <span class="o">==</span> <span class="p">{</span><span class="mi">0</span><span class="p">}:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_batch</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">-th batch in stream `</span><span class="si">%s</span><span class="s1">` appears to be empty (</span><span class="si">%i</span><span class="s1">-th empty batch in total). Set &#39;</span>
+                                    <span class="s1">&#39;`main_loop.on_empty_batch` to `ignore` in order to suppress this warning.&#39;</span><span class="p">,</span>
+                                    <span class="n">i</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">nonempty_batch_count</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_batch</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-th batch in stream `</span><span class="si">{}</span><span class="s1">` appears to be empty (</span><span class="si">{}</span><span class="s1">-th empty batch in total). Set &#39;</span>
+                                     <span class="s1">&#39;`main_loop.on_empty_batch` to `warn` in order to change this error into warning; &#39;</span>
+                                     <span class="s1">&#39;set to `ignore` to remove it.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">nonempty_batch_count</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">batch_sizes</span> <span class="o">!=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">}:</span>
+                    <span class="n">var</span><span class="p">,</span> <span class="n">len_</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">batch_input</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%i</span><span class="s1">-th batch in stream `</span><span class="si">%s</span><span class="s1">` has variable `</span><span class="si">%s</span><span class="s1">` of length </span><span class="si">%i</span><span class="s1"> inconsistent with &#39;</span>
+                                  <span class="s1">&#39;`main_loop.fixed_size` = </span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">len_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_batch_size</span><span class="p">)</span>
+                    <span class="k">continue</span>
+            <span class="n">nonempty_batch_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_sources</span><span class="p">(</span><span class="n">batch_input</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;eval_batch_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">):</span>
+                <span class="n">batch_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">batch</span><span class="o">=</span><span class="n">batch_input</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">batch_input</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">batch_output</span><span class="p">)),</span> <span class="s1">&#39;Batch inputs and outputs must not overlap.&#39;</span>
+
+            <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;after_batch_hooks_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">):</span>
+                <span class="n">batch_data</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">batch_input</span><span class="p">,</span> <span class="o">**</span><span class="n">batch_output</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">after_batch</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">batch_data</span><span class="o">=</span><span class="n">batch_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nonempty_batch_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_stream</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Stream `</span><span class="si">%s</span><span class="s1">` appears to be empty. Set `main_loop.on_empty_stream` to `ignore` in order &#39;</span>
+                                <span class="s1">&#39;to suppress this warning.&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_empty_stream</span> <span class="o">==</span> <span class="s1">&#39;error&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Stream `</span><span class="si">{}</span><span class="s1">` appears to be empty. Set &#39;</span>
+                                 <span class="s1">&#39;`main_loop.on_empty_stream` to `warn` in order to change this error into warning; &#39;</span>
+                                 <span class="s1">&#39;set to `ignore` to remove it.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="MainLoop.train_by_stream"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop.train_by_stream">[docs]</a>    <span class="k">def</span> <span class="nf">train_by_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">StreamWrapper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train the model with the given stream.</span>
+
+<span class="sd">        :param stream: stream to train with</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_epoch</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainLoop.evaluate_stream"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop.evaluate_stream">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="n">StreamWrapper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the given stream.</span>
+
+<span class="sd">        :param stream: stream to be evaluated</span>
+<span class="sd">        :param stream_name: stream name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_epoch</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainLoop.get_stream"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop.get_stream">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StreamWrapper</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a :py:class:`StreamWrapper` with the given name.</span>
+
+<span class="sd">        :param stream_name: stream name</span>
+<span class="sd">        :return: dataset function name providing the respective stream</span>
+<span class="sd">        :raise AttributeError: if the dataset does not provide the function creating the stream</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">stream_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">:</span>
+            <span class="n">stream_fn_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_stream&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stream_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">,</span> <span class="n">stream_fn_name</span><span class="p">)</span>
+                <span class="n">stream_epoch_limit</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stream_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span><span class="p">:</span>
+                    <span class="n">stream_epoch_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_epoch_size</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">StreamWrapper</span><span class="p">(</span><span class="n">stream_fn</span><span class="p">,</span> <span class="n">buffer_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">,</span>
+                                                           <span class="n">epoch_size</span><span class="o">=</span><span class="n">stream_epoch_limit</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">stream_name</span><span class="p">,</span>
+                                                           <span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;The dataset does not have a function for creating a stream named `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                                     <span class="s1">&#39;The function has to be named `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span> <span class="n">stream_fn_name</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">ex</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">[</span><span class="n">stream_name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MainLoop._run_zeroth_epoch"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop._run_zeroth_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">_run_zeroth_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run zeroth epoch on the specified streams.</span>
+
+<span class="sd">        Calls</span>
+<span class="sd">            - :py:meth:`emloop.hooks.AbstractHook.after_epoch`</span>
+
+<span class="sd">        :param streams: stream names to be evaluated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+        <span class="n">epoch_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_epoch_data</span><span class="p">(</span><span class="n">streams</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">epoch_data</span><span class="o">=</span><span class="n">epoch_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainLoop._try_run"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop._try_run">[docs]</a>    <span class="k">def</span> <span class="nf">_try_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Try running the given function (training/prediction).</span>
+
+<span class="sd">        Calls</span>
+<span class="sd">            - :py:meth:`emloop.hooks.AbstractHook.before_training`</span>
+<span class="sd">            - :py:meth:`emloop.hooks.AbstractHook.after_training`</span>
+
+<span class="sd">        :param run_func: function to be run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialization: before_training</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">before_training</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">run_func</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">TrainingTerminated</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Training terminated: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ex</span><span class="p">)</span>
+
+        <span class="c1"># After training: after_training</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">after_training</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainLoop.run_training"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop.run_training">[docs]</a>    <span class="k">def</span> <span class="nf">run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrainingTrace</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the main loop in the training mode.</span>
+
+<span class="sd">        Calls</span>
+<span class="sd">            - :py:meth:`emloop.hooks.AbstractHook.after_epoch`</span>
+<span class="sd">            - :py:meth:`emloop.hooks.AbstractHook.after_epoch_profile`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">training</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Training started&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># Zeroth epoch: after_epoch</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip_zeroth_epoch</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Evaluating 0th epoch&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_run_zeroth_epoch</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;0th epoch done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Training loop: after_epoch, after_epoch_profile</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">epoch_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Training epoch </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="n">epoch_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_epoch_data</span><span class="p">()</span>
+
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">train_by_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s1">&#39;after_epoch_hooks&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
+                        <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="n">epoch_id</span><span class="p">,</span> <span class="n">epoch_data</span><span class="o">=</span><span class="n">epoch_data</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hooks</span><span class="p">:</span>
+                    <span class="n">hook</span><span class="o">.</span><span class="n">after_epoch_profile</span><span class="p">(</span><span class="n">epoch_id</span><span class="o">=</span><span class="n">epoch_id</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch_profile</span><span class="p">,</span>
+                                             <span class="n">train_stream_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_stream_name</span><span class="p">,</span>
+                                             <span class="n">extra_streams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_extra_streams</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span> <span class="o">=</span> <span class="n">epoch_id</span>
+                <span class="k">if</span> <span class="n">trace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">trace</span><span class="p">[</span><span class="n">TrainingTraceKeys</span><span class="o">.</span><span class="n">EPOCHS_DONE</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epochs_done</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Epoch </span><span class="si">%s</span><span class="s1"> done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_try_run</span><span class="p">(</span><span class="n">training</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainLoop.run_evaluation"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.MainLoop.run_evaluation">[docs]</a>    <span class="k">def</span> <span class="nf">run_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the main loop with the given stream in the prediction mode.</span>
+
+<span class="sd">        :param stream_name: name of the stream to be evaluated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">prediction</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running prediction&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_zeroth_epoch</span><span class="p">([</span><span class="n">stream_name</span><span class="p">])</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Prediction done</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_try_run</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
+    </p>
+  </div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
+  </body>
+</html>

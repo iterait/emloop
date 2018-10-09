@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Tutorial &#8212; cxflow 0.12.0 documentation</title>
-    
+    <title>Tutorial &#8212; emloop 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/highlight.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.0',
+        VERSION:     '0.1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
@@ -39,7 +35,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
-  <body role="document">
+  <body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -51,8 +47,8 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="index.html">
-          cxflow</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.12</b></span>
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -62,7 +58,7 @@
                 <li><a href="#">Tutorial</a></li>
                 <li><a href="advanced/index.html">Advanced</a></li>
                 <li><a href="cli.html">CLI Reference</a></li>
-                <li><a href="cxflow/index.html">API Reference</a></li>
+                <li><a href="emloop/index.html">API Reference</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -108,7 +104,7 @@
 <li><a class="reference internal" href="#id3">Model</a></li>
 <li><a class="reference internal" href="#main-loop">Main Loop</a></li>
 <li><a class="reference internal" href="#hooks">Hooks</a></li>
-<li><a class="reference internal" href="#using-cxflow">Using cxflow</a></li>
+<li><a class="reference internal" href="#using-emloop">Using emloop</a></li>
 </ul>
 </li>
 </ul>
@@ -127,7 +123,7 @@
 <ul class="nav nav-list">
 	<li><a href="https://cxflow.org">cxflow</a></li>
 	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
-	<li><a href="https://cxtream.org">cxtream (c++)</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
 </ul>
         </div>
       </div>
@@ -135,24 +131,24 @@
       
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we are using an example task to demonstrate&nbsp;cxflow’s&nbsp;basic
+<p>In this tutorial, we are using an example task to demonstrate&nbsp;emloop’s&nbsp;basic
 principles.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p><strong>cxflow</strong> is a lightweight framework for machine learning which focuses on:</p>
+<p><strong>emloop</strong> is a lightweight framework for machine learning which focuses on:</p>
 <ul class="simple">
 <li>modularization and re-usability of ML components (datasets, models etc.)</li>
 <li>rapid experimenting with different configurations</li>
 <li>providing convenient instruments to manage and run your experiments</li>
 </ul>
-<p><strong>cxflow</strong> does not implement any building blocks, NN layers etc. Instead, you can use
+<p><strong>emloop</strong> does not implement any building blocks, NN layers etc. Instead, you can use
 your favorite machine learning framework, such as <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a>,
 <a class="reference external" href="https://cntk.ai/">CNTK</a>, or <a class="reference external" href="https://caffe2.ai/">Caffe2</a>. In other words,
-<strong>cxflow</strong> is back-end agnostic.
-Therefore, you don&#8217;t have to learn a new framework, if you already know one.
+<strong>emloop</strong> is back-end agnostic.
+Therefore, you don’t have to learn a new framework, if you already know one.
 In addition, you can easily convert the models you already have by making only
 minimal changes.</p>
-<p><strong>cxflow</strong> allows (and encourages) you to build modular projects, where the
+<p><strong>emloop</strong> allows (and encourages) you to build modular projects, where the
 dataset, the model, and the configuration are separated and reusable. In the following sections,
 we will describe how those reusable modules should look like on a simple
 example.</p>
@@ -200,21 +196,21 @@ Given a vector of N bits, which bit is in majority?</p>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
 <p class="last">Full example may be found in our
-<a class="reference external" href="https://github.com/Cognexa/cxflow-examples/tree/master/majority">cxflow examples repository &#64;GitHub</a>.</p>
+<a class="reference external" href="https://github.com/iterait/emloop-examples/tree/master/majority">emloop examples repository &#64;GitHub</a>.</p>
 </div>
 </div>
 <div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p>The very first step in any machine learning task is to load and process the data.
-Every <strong>cxflow</strong> dataset is expected to implement the interface defined by <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.AbstractDataset" title="cxflow.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.AbstractDataset</span></code></a>.
+Every <strong>emloop</strong> dataset is expected to implement the interface defined by <a class="reference internal" href="emloop/emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal"><span class="pre">emloop.datasets.AbstractDataset</span></code></a>.
 At the moment, the interfaces defines only the constructor API which accepts a string-encoded YAML.
-For regular projects, we recommend extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a> which decodes the YAML
+For regular projects, we recommend extending <a class="reference internal" href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset" title="emloop.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">emloop.datasets.BaseDataset</span></code></a> which decodes the YAML
 configuration string for you.</p>
 <p>The dataset is meant to wrap all data-related operations.
 It is responsible for correct data loading, verification and other useful operations.
 The main purpose of the dataset is providing various data streams that will be consequently used for training,
 validation and prediction in the production environment.</p>
-<p>A typical <strong>cxflow</strong> dataset will implement the following:</p>
+<p>A typical <strong>emloop</strong> dataset will implement the following:</p>
 <ol class="arabic simple">
 <li><strong>Training stream:</strong> an iteration of training data batches (<code class="docutils literal"><span class="pre">train_stream</span></code> method)</li>
 <li><strong>Eval streams:</strong> iterations of additional streams not used for training.
@@ -222,18 +218,18 @@ To provide a stream named &lt;name&gt;, method <code class="docutils literal"><s
 In our example, we will use <em>test</em> stream provided by <code class="docutils literal"><span class="pre">test_stream</span></code> method.</li>
 <li><strong>The constructor:</strong> accepts a YAML configuration in the form of a string
 (more on this later). We avoid the need to implement a constructor by
-extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>.</li>
+extending <a class="reference internal" href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset" title="emloop.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">emloop.datasets.BaseDataset</span></code></a>.</li>
 <li><strong>Additional methods:</strong> such as <code class="docutils literal"><span class="pre">fetch</span></code>, <code class="docutils literal"><span class="pre">split</span></code>, or anything else you may need.
-<strong>cxflow</strong> is able to call arbitrary dataset methods by invoking <code class="docutils literal"><span class="pre">cxflow</span> <span class="pre">dataset</span> <span class="pre">&lt;method-name&gt;</span></code> command.</li>
+<strong>emloop</strong> is able to call arbitrary dataset methods by invoking <code class="docutils literal"><span class="pre">emloop</span> <span class="pre">dataset</span> <span class="pre">&lt;method-name&gt;</span></code> command.</li>
 </ol>
 <p>To generate the <em>majority</em> data and provide the data streams we will implement a <code class="docutils literal"><span class="pre">MajorityDataset</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">majority_dataset.py</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cxflow</span> <span class="kn">as</span> <span class="nn">cx</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">emloop</span> <span class="kn">as</span> <span class="nn">el</span>
 <span class="kn">import</span> <span class="nn">numpy.random</span> <span class="kn">as</span> <span class="nn">npr</span>
 
 
-<span class="k">class</span> <span class="nc">MajorityDataset</span><span class="p">(</span><span class="n">cx</span><span class="o">.</span><span class="n">BaseDataset</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MajorityDataset</span><span class="p">(</span><span class="n">el</span><span class="o">.</span><span class="n">BaseDataset</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">_configure_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_examples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -245,12 +241,12 @@ extending <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_y</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">)],</span> <span class="n">y</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_y</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">):],</span> <span class="n">y</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span> <span class="o">*</span> <span class="n">n_examples</span><span class="p">):]</span>
 
-    <span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">train_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">el</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">],</span>
                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]}</span>
 
-    <span class="k">def</span> <span class="nf">test_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cx</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">test_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">el</span><span class="o">.</span><span class="n">Stream</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
             <span class="k">yield</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_x</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">],</span>
                    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_y</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]}</span>
@@ -271,7 +267,7 @@ Finally, it splits the dataset into training and testing data in the ratio of 8:
 Note that you have the option to rename them as desired.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">In real-world cases, we usually don&#8217;t want to generate our data randomly.
+<p class="last">In real-world cases, we usually don’t want to generate our data randomly.
 Instead, we can simply load them from a file (e.g. <code class="docutils literal"><span class="pre">.csv</span></code>) or from a database.</p>
 </div>
 <p>The train_stream&nbsp;function iterates over the training data.
@@ -306,29 +302,29 @@ The test stream is used only to estimate the performance of the model.</p>
 <p class="last">In this example, the training and testing streams are generated randomly and thus,
 they may slightly overlap and bias the performace estimation.</p>
 </div>
-<p>A detailed description of <strong>cxflow</strong> datasets might be found in the
+<p>A detailed description of <strong>emloop</strong> datasets might be found in the
 <a class="reference internal" href="advanced/dataset.html"><span class="doc">advanced section</span></a>.</p>
 </div>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
 <p>With the dataset ready, we now must define the model that is to be trained.
 A simple <a class="reference external" href="https://www.tensorflow.org/">TensorFlow</a> graph can solve our task.
-We will use the official <a class="reference external" href="https://github.com/Cognexa/cxflow-tensorflow">cxflow-tensorflow</a> package that provides
-convenient TensorFlow integration with <strong>cxflow</strong>. Please install this package before you proceed
+We will use the official <a class="reference external" href="https://github.com/iterait/emloop-tensorflow">emloop-tensorflow</a> package that provides
+convenient TensorFlow integration with <strong>emloop</strong>. Please install this package before you proceed
 with this tutorial.</p>
-<p>In <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#module-cxflow_tensorflow" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-mod docutils literal"><span class="pre">cxflow_tensorflow</span></code></a>, every model is a python class that is expected to
-extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-class docutils literal"><span class="pre">cxflow_tensorflow.BaseModel</span></code></a>.</p>
+<p>In <code class="xref py py-mod docutils literal"><span class="pre">emloop_tensorflow</span></code>, every model is a python class that is expected to
+extend the <code class="xref py py-class docutils literal"><span class="pre">emloop_tensorflow.BaseModel</span></code>.</p>
 <p>Let us define a class called <code class="docutils literal"><span class="pre">MajorityNet</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">majority_net.py</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">import</span> <span class="nn">cxflow_tensorflow</span> <span class="kn">as</span> <span class="nn">cxtf</span>
+<span class="kn">import</span> <span class="nn">emloop_tensorflow</span> <span class="kn">as</span> <span class="nn">eltf</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
 <span class="kn">import</span> <span class="nn">tensorflow.contrib.keras</span> <span class="kn">as</span> <span class="nn">K</span>
 
 
-<span class="k">class</span> <span class="nc">MajorityNet</span><span class="p">(</span><span class="n">cxtf</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MajorityNet</span><span class="p">(</span><span class="n">eltf</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Simple 2-layered MLP for majority task.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_create_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
@@ -347,7 +343,7 @@ extend the <a class="reference external" href="https://tensorflow.cxflow.org/cxf
 </pre></div>
 </div>
 </div>
-<p>The only method that is necessary to implement is <a class="reference external" href="https://tensorflow.cxflow.org/cxflow_tensorflow/cxflow_tensorflow.html#cxflow_tensorflow.BaseModel._create_model" title="(in cxflow-tensorflow v0.4)"><code class="xref py py-meth docutils literal"><span class="pre">cxflow_tensorflow.BaseModel._create_model()</span></code></a>.
+<p>The only method that is necessary to implement is <code class="xref py py-meth docutils literal"><span class="pre">emloop_tensorflow.BaseModel._create_model()</span></code>.
 In our case, the <code class="docutils literal"><span class="pre">_create_model</span></code> method creates a simple MLP.
 If you know the fundamentals of TensorFlow, it should be easy to understand what is going on.</p>
 <p>To be precise, the model registered the following computational graph nodes:</p>
@@ -362,12 +358,12 @@ predicted to be in majority.</li>
 <p class="first admonition-title">Caution</p>
 <p class="last">For each of input/output variables listed in the configuration, there has to
 exist a computational graph node with the corresponding name.
-<strong>cxflow-tensorflow</strong> is not able to find the nodes if they are not properly
+<strong>emloop-tensorflow</strong> is not able to find the nodes if they are not properly
 named.</p>
 </div>
 <p>The <code class="docutils literal"><span class="pre">_create_model</span></code> method can accept arbitrary arguments - in our case, we allow to configure the number of hidden units.
 We will describe the configuration file from which the parameters are taken in the next section.</p>
-<p>You can find detailed descriptions of&nbsp;cxflow&nbsp;models in the&nbsp;<a class="reference internal" href="advanced/model.html"><span class="doc">advanced section</span></a>.</p>
+<p>You can find detailed descriptions of&nbsp;emloop&nbsp;models in the&nbsp;<a class="reference internal" href="advanced/model.html"><span class="doc">advanced section</span></a>.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
@@ -377,7 +373,7 @@ and which model will be employed for training.</p>
 <p>The configuration file is in the form of a YAML document.
 Feel free to use JSON instead, however, YAML makes a lot of things easier.</p>
 <p>The YAML document consists of four fundamental sections.
-A detailed description of cxflow configuration can be found in the <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a>.</p>
+A detailed description of emloop configuration can be found in the <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a>.</p>
 <ol class="arabic simple">
 <li>dataset</li>
 <li>model</li>
@@ -387,7 +383,7 @@ A detailed description of cxflow configuration can be found in the <a class="ref
 <p>Let us describe the sections one by one.</p>
 <div class="section" id="id2">
 <h3>Dataset<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>In our case, we only need to tell <strong>cxflow</strong> which dataset to use.
+<p>In our case, we only need to tell <strong>emloop</strong> which dataset to use.
 This is done by specifying the <code class="docutils literal"><span class="pre">class</span></code> of the dataset.
 In addition, we will specify the parameters of the dataset (those
 are passed to the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method of the dataset).</p>
@@ -403,7 +399,7 @@ are passed to the <code class="docutils literal"><span class="pre">_configure_da
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The whole <code class="docutils literal"><span class="pre">dataset</span></code> section will be passed as a string-encoded YAML to the dataset constructor.
-In the case of using <a class="reference internal" href="cxflow/cxflow.datasets.html#cxflow.datasets.BaseDataset" title="cxflow.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">cxflow.datasets.BaseDataset</span></code></a>, the YAML is automatically decoded and the individual
+In the case of using <a class="reference internal" href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset" title="emloop.datasets.BaseDataset"><code class="xref py py-class docutils literal"><span class="pre">emloop.datasets.BaseDataset</span></code></a>, the YAML is automatically decoded and the individual
 variables are passed to the <code class="docutils literal"><span class="pre">_configure_dataset</span></code> method.</p>
 </div>
 </div>
@@ -435,10 +431,10 @@ This can be done by listing their names in the <code class="docutils literal"><s
 <div class="section" id="main-loop">
 <h3>Main Loop<a class="headerlink" href="#main-loop" title="Permalink to this headline">¶</a></h3>
 <p>As the model training is executed in epochs, it is naturally implemented as a loop.
-This loop (<a class="reference internal" href="cxflow/cxflow.html#cxflow.MainLoop" title="cxflow.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">cxflow.MainLoop</span></code></a>) can be extended, for example by adding more
+This loop (<a class="reference internal" href="emloop/emloop.html#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal"><span class="pre">emloop.MainLoop</span></code></a>) can be extended, for example by adding more
 streams to the <code class="docutils literal"><span class="pre">train</span></code> stream.
 In our case, we also want to evaluate the <code class="docutils literal"><span class="pre">test</span></code> stream, so we will add it to the
-<code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> section of the config. <strong>cxflow</strong> will then invoke
+<code class="docutils literal"><span class="pre">main_loop.extra_streams</span></code> section of the config. <strong>emloop</strong> will then invoke
 the <code class="docutils literal"><span class="pre">&lt;name&gt;_stream</span></code> method of the dataset to create the stream. In our case,
 the <code class="docutils literal"><span class="pre">test_stream</span></code> method will be invoked.</p>
 <div class="literal-block-wrapper docutils container" id="id6">
@@ -453,7 +449,7 @@ the <code class="docutils literal"><span class="pre">test_stream</span></code> m
 <h3>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h3>
 <p>Hooks can observe, modify and control the training process. In particular, hook actions are triggered after certain events,
 such as after a batch or an epoch is completed (more info in <a class="reference internal" href="advanced/hook.html"><span class="doc">advanced section</span></a>).</p>
-<p>The hooks to be used are specified in <strong>cxflow</strong> configuration similar to the following one:</p>
+<p>The hooks to be used are specified in <strong>emloop</strong> configuration similar to the following one:</p>
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">hook configuration section</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
@@ -465,18 +461,18 @@ such as after a batch or an epoch is completed (more info in <a class="reference
 </pre></div>
 </div>
 </div>
-<p>This section can be read quite naturally. <strong>cxflow</strong> will now compute <code class="docutils literal"><span class="pre">loss</span></code> and <code class="docutils literal"><span class="pre">accuracy</span></code>
+<p>This section can be read quite naturally. <strong>emloop</strong> will now compute <code class="docutils literal"><span class="pre">loss</span></code> and <code class="docutils literal"><span class="pre">accuracy</span></code>
 means for each epoch and log the respective values. The training will be stopped after 10 epochs.</p>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">See <a class="reference external" href="cxflow/cxflow.hooks.html">API reference</a> for full list of <strong>cxflow</strong> hooks.</p>
+<p class="last">See <a class="reference external" href="emloop/emloop.hooks.html">API reference</a> for full list of <strong>emloop</strong> hooks.</p>
 </div>
 </div>
-<div class="section" id="using-cxflow">
-<h3>Using cxflow<a class="headerlink" href="#using-cxflow" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="using-emloop">
+<h3>Using emloop<a class="headerlink" href="#using-emloop" title="Permalink to this headline">¶</a></h3>
 <p>Once the classes and config are implemented, the training can begin.
-Let&#8217;s try it with</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow train majority/config.yaml
+Let’s try it with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>emloop train majority/config.yaml
 </pre></div>
 </div>
 <p>The command produces a lot of output.
@@ -485,25 +481,25 @@ The second part presents the output of the hooks.
 Finally, our logging hook is the one that produces the information after each epoch.
 Now we can easily watch the progress of the training.</p>
 <p>After the training is finished, note that there is a new directory <code class="docutils literal"><span class="pre">log/MajorityExample_*</span></code>.
-This is the logging directory where everything <strong>cxflow</strong> produces is stored, including
+This is the logging directory where everything <strong>emloop</strong> produces is stored, including
 saved models, the configuration file and various other artifacts.</p>
-<p>Let&#8217;s register one more hook which saves the best model according to the test stream:</p>
+<p>Let’s register one more hook which saves the best model according to the test stream:</p>
 <div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">SaveBest</span><span class="p p-Indicator">:</span>
     <span class="l l-Scalar l-Scalar-Plain">stream</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">test</span>
 </pre></div>
 </div>
 <p>When we run the training again, we see that the newly created output directory contains
 the saved model as well.</p>
-<p>Let&#8217;s resume the training from this model.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow resume log/MajorityExample_&lt;some-suffix&gt;
+<p>Let’s resume the training from this model.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>emloop resume log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
-<p>It&#8217;s simple as that.</p>
+<p>It’s simple as that.</p>
 <p>In case the model is good enough to be used in the production, it is extremely
-easy to use cxflow for this purpose.
+easy to use emloop for this purpose.
 See the configuration <a class="reference internal" href="advanced/config.html"><span class="doc">advanced section</span></a> for more details.
 Then, you can just run the following command:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>cxflow <span class="nb">eval</span> predict log/MajorityExample_&lt;some-suffix&gt;
+<div class="highlight-bash"><div class="highlight"><pre><span></span>emloop <span class="nb">eval</span> predict log/MajorityExample_&lt;some-suffix&gt;
 </pre></div>
 </div>
 </div>
@@ -523,8 +519,8 @@ Then, you can just run the following command:</p>
       
     </p>
     <p>
-        &copy; Copyright 2017, Cognexa Solutions s.r.o..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
     </p>
   </div>
 </footer>
