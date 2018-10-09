@@ -148,6 +148,7 @@ workflows:
             - test_ubuntu_rolling
             - test_archlinux
             - generate_documentation
+            - coverage
 
   nightly-build:
     triggers:
