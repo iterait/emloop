@@ -38,40 +38,35 @@ def _get_epoch_data():
 
 
 @pytest.fixture
-def get_tmp_filename():
-    file = tempfile.NamedTemporaryFile()
-    file.close()
-    return file.name
+def tmpfile(tmpdir):
+    return os.path.join(tmpdir, 'filename')
 
 
-def test_init_hook():
+def test_init_hook(tmpfile):
     """Test correct hook initialization."""
-    output_file = get_tmp_filename()
-
-    hook = WriteCSV(output_dir="", output_file=output_file,
+    hook = WriteCSV(output_dir="", output_file=tmpfile,
                     variables=_VARIABLES)
 
     assert hook._variables == _VARIABLES
 
     with pytest.raises(AssertionError):
-        WriteCSV(output_dir="", output_file=output_file,
+        WriteCSV(output_dir="", output_file=tmpfile,
                  on_unknown_type='raise')
 
     with pytest.raises(AssertionError):
-        WriteCSV(output_dir="", output_file=output_file,
+        WriteCSV(output_dir="", output_file=tmpfile,
                  on_missing_variable='raise')
 
 
-def test_write_header():
+def test_write_header(tmpfile):
     """Test writing a correct header to csv file."""
-    output_file = get_tmp_filename()
     delimiter = ';'
-    hook = WriteCSV(output_dir="", output_file=output_file,
+    hook = WriteCSV(output_dir="", output_file=tmpfile,
                     variables=_VARIABLES, delimiter=delimiter)
     epoch_data = _get_epoch_data()
     hook._write_header(epoch_data)
 
-    with open(output_file, 'r') as file:
+    with open(tmpfile, 'r') as file:
         header = file.read()
 
     # header must ends with a newline symbol
@@ -95,12 +90,11 @@ def test_write_header():
                      tested_header_columns
 
 
-def test_write_row():
+def test_write_row(tmpfile):
     """Test writing one row to csv file."""
-    output_file = get_tmp_filename()
     delimiter = ';'
     default_value = '?'
-    hook = WriteCSV(output_dir="", output_file=output_file,
+    hook = WriteCSV(output_dir="", output_file=tmpfile,
                     variables=_VARIABLES, delimiter=delimiter,
                     default_value=default_value)
     epoch_data = _get_epoch_data()
@@ -109,7 +103,7 @@ def test_write_row():
     epoch_id = 6
     hook._write_row(epoch_id, epoch_data)
 
-    with open(output_file, 'r') as file:
+    with open(tmpfile, 'r') as file:
         content = file.readlines()
     row = content[1]
 
@@ -121,15 +115,14 @@ def test_write_row():
     assert valid_row == row.split(delimiter)
 
 
-def test_raise_missing_variable():
+def test_raise_missing_variable(tmpfile):
     """
     Test raising error when selected variable is missing and
     on_missing_variable option is set to 'error'.
     """
 
     variables = _VARIABLES + ['missing']
-    output_file = get_tmp_filename()
-    hook = WriteCSV(output_dir="", output_file=output_file,
+    hook = WriteCSV(output_dir="", output_file=tmpfile,
                     variables=variables, on_missing_variable='error')
     epoch_data = _get_epoch_data()
     hook._write_header(epoch_data)
@@ -138,13 +131,12 @@ def test_raise_missing_variable():
         hook._write_row(epoch_id, epoch_data)
 
 
-def test_raise_unknown_type():
+def test_raise_unknown_type(tmpfile):
     """
     Test raising error when on_unknown_type option is set to 'error' and
     value of selected variable is not scalar.
     """
-    output_file = get_tmp_filename()
-    hook = WriteCSV(output_dir="", output_file=output_file,
+    hook = WriteCSV(output_dir="", output_file=tmpfile,
                     on_unknown_type='error')
     epoch_data = _get_epoch_data()
     hook._write_header(epoch_data)
@@ -153,21 +145,20 @@ def test_raise_unknown_type():
         hook._write_row(epoch_id, epoch_data)
 
 
-def test_after_epoch_one_header():
+def test_after_epoch_one_header(tmpfile):
     """
     Tests result of after_epoch method and whether it writes
     only one header at the beginning of csv file.
     """
-    output_file = get_tmp_filename()
     delimiter = '|'
-    hook = WriteCSV(output_dir="", output_file=output_file,
+    hook = WriteCSV(output_dir="", output_file=tmpfile,
                     delimiter=delimiter, variables=_VARIABLES)
     epoch_data = _get_epoch_data()
 
     hook.after_epoch(6, epoch_data)
     hook.after_epoch(7, epoch_data)
 
-    with open(output_file) as file:
+    with open(tmpfile) as file:
         content = file.readlines()
 
     assert len(content) == 3
@@ -182,20 +173,18 @@ def test_after_epoch_one_header():
         assert valid_row == row.split(delimiter)
 
 
-def test_variable_deduction():
+def test_variable_deduction(tmpfile):
     """
     Test that the variable names are automatically deduced from the
     first available stream.
     """
-    output_file = get_tmp_filename()
-
-    hook_train = WriteCSV(output_dir="", output_file=output_file)
+    hook_train = WriteCSV(output_dir="", output_file=tmpfile)
     epoch_data = _get_epoch_data()
     hook_train._write_header(collections.OrderedDict([('train', epoch_data['train']),
                                                       ('valid', epoch_data['valid'])]))
     assert hook_train._variables == ['accuracy', 'precision', 'loss', 'omitted']
 
-    hook_valid = WriteCSV(output_dir="", output_file=output_file)
+    hook_valid = WriteCSV(output_dir="", output_file=tmpfile)
     epoch_data = _get_epoch_data()
     hook_valid._write_header({'valid': epoch_data['valid']})
     assert hook_valid._variables == ['accuracy', 'precision', 'loss', 'omitted', 'specific']
