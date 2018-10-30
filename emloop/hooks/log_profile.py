@@ -24,7 +24,7 @@ class LogProfile(AbstractHook):
 
     """
 
-    def after_epoch_profile(self, epoch_id, profile: TimeProfile, train_stream_name: str, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id, profile: TimeProfile) -> None:
         """
         Summarize and log the given epoch profile.
 
@@ -37,18 +37,21 @@ class LogProfile(AbstractHook):
         :param extra_streams: enumeration of additional stream names
         """
 
+        streams = []
+        for key_name in profile.keys():
+            if key_name.startswith("eval_batch_"):
+                streams.append(key_name[len("eval_batch_"):])
+
         read_data_total = 0
         eval_total = 0
-        train_total = sum(profile.get('eval_batch_{}'.format(train_stream_name), []))
         hooks_total = sum(profile.get('after_epoch_hooks', []))
 
-        for stream_name in chain(extra_streams, [train_stream_name]):
+        for stream_name in streams:
             read_data_total += sum(profile.get('read_batch_' + stream_name, []))
             hooks_total += sum(profile.get('after_batch_hooks_' + stream_name, []))
-            if stream_name != train_stream_name:
-                eval_total += sum(profile.get('eval_batch_' + stream_name, []))
+
+        for stream_name in streams:
+            logging.info('\tT %s:\t%f', stream_name, sum(profile.get('eval_batch_{}'.format(stream_name), [])))
 
         logging.info('\tT read data:\t%f', read_data_total)
-        logging.info('\tT train:\t%f', train_total)
-        logging.info('\tT eval:\t%f', eval_total)
         logging.info('\tT hooks:\t%f', hooks_total)
