@@ -1,12 +1,12 @@
 """
-Test module for saving masks to the filesystem hook (cxflow.hooks.save_masks_hook).
+Test module for saving masks to the filesystem hook (emloop.hooks.save_masks_hook).
 """
 
 import numpy as np
 import pytest
 import os
 
-from cxflow.hooks.save_masks import SaveMasks
+from emloop.hooks.save_masks import SaveMasks
 
 
 _ITERS = 2
