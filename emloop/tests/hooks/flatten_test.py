@@ -1,12 +1,12 @@
 """
-Test module for flattening variables hook (cxflow.hooks.flatten_hook).
+Test module for flattening variables hook (emloop.hooks.flatten_hook).
 """
 
 import numpy as np
 from collections import OrderedDict
 import pytest
 
-from cxflow.hooks.flatten import Flatten
+from emloop.hooks.flatten import Flatten
 
 
 _ITERS = 5

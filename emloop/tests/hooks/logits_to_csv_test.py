@@ -1,5 +1,5 @@
 """
-Test module for saving class probabilities to a csv file hook (cxflow.hooks.logits_to_csv_hook).
+Test module for saving class probabilities to a csv file hook (emloop.hooks.logits_to_csv_hook).
 """
 
 import numpy as np
@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 import os
 
-from cxflow.hooks.logits_to_csv import LogitsToCsv
+from emloop.hooks.logits_to_csv import LogitsToCsv
 
 
 _ITERS = 2

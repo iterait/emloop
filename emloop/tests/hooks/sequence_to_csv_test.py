@@ -1,5 +1,5 @@
 """
-Test module for saving a stream of sequences to a csv file hook (cxflow.hooks.sequence_to_csv_hook).
+Test module for saving a stream of sequences to a csv file hook (emloop.hooks.sequence_to_csv_hook).
 """
 
 import numpy as np
@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 import os
 
-from cxflow.hooks.sequence_to_csv import SequenceToCsv
+from emloop.hooks.sequence_to_csv import SequenceToCsv
 
 
 _ITERS = 2

@@ -1,12 +1,12 @@
 """
-Test module for drawing line plots hook (cxflow.hooks.plot_lines_hook).
+Test module for drawing line plots hook (emloop.hooks.plot_lines_hook).
 """
 
 import numpy as np
 import pytest
 import os
 
-from cxflow.hooks.plot_lines import PlotLines
+from emloop.hooks.plot_lines import PlotLines
 
 
 _ITERS = 3
