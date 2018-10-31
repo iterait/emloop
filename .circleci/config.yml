@@ -6,15 +6,19 @@ references:
     run:
       name: Install dependencies on Ubuntu.
       command: |
+        export DEBIAN_FRONTEND=noninteractive
         apt-get update -qy
         apt-get install -y git python3-dev python3-pip curl
+        apt update
+        apt-get install -y --force-yes opencv-data libopencv-dev python3-opencv
+        ldconfig
         pip3 install coveralls coverage
 
   arch_deps: &arch_deps
     run:
       name: Install dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm python python-pip git base-devel curl
+        pacman -Syu --noconfirm python python-pip git base-devel curl opencv opencv-samples hdf5 gtk3
         pip install coveralls coverage
 
   install: &install
