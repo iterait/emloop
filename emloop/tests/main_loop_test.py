@@ -159,8 +159,7 @@ class EventRecordingHook(el.AbstractHook):
         self.after_epoch_events.append(self._event_id)
         self._event_id += 1
 
-    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, train_stream_name: str,
-                            extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
         self.after_epoch_profile_events.append(self._event_id)
         self._event_id += 1
 
@@ -201,8 +200,7 @@ class SaveProfileHook(el.AbstractHook):
         super().__init__()
         self.profile = None
 
-    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, train_stream_name: str,
-                            extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
         """Save the profile to self.profile."""
         self.profile = profile
 
@@ -293,7 +291,7 @@ class RecordingModel(TrainableModel):
 def create_main_loop(tmpdir):
 
     def _create_main_loop(epochs=1, extra_hooks=(), dataset=None, model_class=None, skip_zeroth_epoch=True,
-                         train_stream_name=EL_DEFAULT_TRAIN_STREAM, **main_loop_kwargs):
+                          train_stream_name=EL_DEFAULT_TRAIN_STREAM, **main_loop_kwargs):
         """
         Create and return a model, dataset and mainloop.
 
@@ -352,7 +350,7 @@ def test_event_data(create_main_loop):
     """Test after_epoch and after_batch event args match the expectation."""
     recording_hook = DataRecordingHook()
     model, dataset, mainloop = create_main_loop(epochs=3, model_class=RecordingModel,
-                                                     extra_hooks=[recording_hook], extra_streams=['valid'])
+                                                extra_hooks=[recording_hook], extra_streams=['valid'])
     mainloop.run_training()
 
     # check the epoch ids
