@@ -241,10 +241,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
 
         for hook in self._hooks:
-            hook.after_epoch_profile(epoch_id=0, profile=self._epoch_profile)
-
-        self._epoch_profile.clear()
-
+            hook.after_epoch_profile(epoch_id=0, profile=self._epoch_profile,
+                                     streams=[self._train_stream_name] + self._extra_streams)
 
     def _try_run(self, run_func: Callable[[], None]) -> None:
         """
@@ -309,7 +307,9 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                         hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
 
                 for hook in self._hooks:
-                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile)
+                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
+                                             streams=[self._train_stream_name] + self._extra_streams)
+
                 self._epochs_done = epoch_id
                 if trace is not None:
                     trace[TrainingTraceKeys.EPOCHS_DONE] = self._epochs_done

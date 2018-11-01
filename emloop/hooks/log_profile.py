@@ -3,7 +3,7 @@ Module with a hook which reports the time profile data in the stanard logging.
 """
 import logging
 from itertools import chain
-from typing import Iterable
+from typing import Iterable, List
 
 from . import AbstractHook
 from ..types import TimeProfile
@@ -24,7 +24,7 @@ class LogProfile(AbstractHook):
 
     """
 
-    def after_epoch_profile(self, epoch_id, profile: TimeProfile) -> None:
+    def after_epoch_profile(self, epoch_id, profile: TimeProfile, streams: List[str]) -> None:
         """
         Summarize and log the given epoch profile.
 
@@ -34,13 +34,8 @@ class LogProfile(AbstractHook):
             - ``after_epoch_hooks`` entry
 
         :param profile: epoch timings profile
-        :param extra_streams: enumeration of additional stream names
+        :param streams: streams for which profiling times will be printed
         """
-
-        streams = []
-        for key_name in profile.keys():
-            if key_name.startswith("eval_batch_"):
-                streams.append(key_name[len("eval_batch_"):])
 
         read_data_total = 0
         eval_total = 0
