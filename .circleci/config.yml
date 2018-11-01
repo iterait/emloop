@@ -6,20 +6,32 @@ references:
     run:
       name: Install dependencies on Ubuntu.
       command: |
-        export DEBIAN_FRONTEND=noninteractive
         apt-get update -qy
         apt-get install -y git python3-dev python3-pip curl
-        apt update
-        apt-get install -y --force-yes opencv-data libopencv-dev python3-opencv
-        ldconfig
         pip3 install coveralls coverage
 
   arch_deps: &arch_deps
     run:
       name: Install dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm python python-pip git base-devel curl opencv opencv-samples hdf5 gtk3
+        pacman -Syu --noconfirm python python-pip git base-devel curl
         pip install coveralls coverage
+
+  ubuntu_deps_opencv: &ubuntu_deps_opencv
+    run:
+      name: Install opencv dependencies on Ubuntu.
+      command: |
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get install -y --force-yes opencv-data libopencv-dev python3-opencv
+        ldconfig
+        echo 'export OPENCV=true' >> $BASH_ENV
+
+  arch_deps_opencv: &arch_deps_opencv
+    run:
+      name: Install opencv dependencies on Arch Linux.
+      command: |
+        pacman -Syu --noconfirm opencv opencv-samples hdf5 gtk3
+        echo 'export OPENCV=true' >> $BASH_ENV
 
   install: &install
     run:
@@ -92,6 +104,39 @@ jobs:
       - *install
       - *test
 
+  test_ubuntu_latest_opencv:
+    docker:
+    - image: ubuntu:latest
+    working_directory: ~/emloop
+    steps:
+    - *ubuntu_deps
+    - *ubuntu_deps_opencv
+    - checkout
+    - *install
+    - *test
+
+  test_ubuntu_rolling_opencv:
+    docker:
+    - image: ubuntu:rolling
+    working_directory: ~/emloop
+    steps:
+    - *ubuntu_deps
+    - *ubuntu_deps_opencv
+    - checkout
+    - *install
+    - *test
+
+  test_archlinux_opencv:
+    docker:
+    - image: archimg/base-devel
+    working_directory: ~/emloop
+    steps:
+    - *arch_deps
+    - *arch_deps_opencv
+    - checkout
+    - *install
+    - *test
+
   coverage:
     docker:
       - image: archimg/base-devel
@@ -130,6 +175,9 @@ workflows:
       - test_ubuntu_latest
       - test_ubuntu_rolling
       - test_archlinux
+      - test_ubuntu_latest_opencv
+      - test_ubuntu_rolling_opencv
+      - test_archlinux_opencv
       - coverage:
           requires:
             - test_ubuntu_latest

@@ -3,14 +3,17 @@ Hook for saving masks to the filesystem.
 """
 
 import os
-import collections
 import logging
 
-import cv2
 import numpy as np
 
 from . import AbstractHook
 from ..types import Batch
+
+try:
+    import cv2
+except ImportError:
+    logging.info('This hook requires OpenCV.')
 
 
 class SaveMasks(AbstractHook):
