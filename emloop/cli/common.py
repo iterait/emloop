@@ -3,6 +3,7 @@ import errno
 import logging
 import os.path as path
 from datetime import datetime
+from copy import deepcopy
 
 from typing import Optional, Iterable
 
@@ -248,18 +249,20 @@ def run(config: dict, output_root: str, restore_from: str=None, eval: Optional[s
 
     output_dir = dataset = model = hooks = main_loop = None
 
+    config_copy = deepcopy(config)
+
     try:
-        output_dir = create_output_dir(config=config, output_root=output_root)
+        output_dir = create_output_dir(config=config_copy, output_root=output_root)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Failed to create output dir', ex)
 
     try:
-        dataset = create_dataset(config=config, output_dir=output_dir)
+        dataset = create_dataset(config=config_copy, output_dir=output_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating dataset failed', ex)
 
     try:
-        model = create_model(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
+        model = create_model(config=config_copy, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating model failed', ex)
 
@@ -271,7 +274,7 @@ def run(config: dict, output_root: str, restore_from: str=None, eval: Optional[s
         fallback('Saving config failed', ex)
 
     try:
-        hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)
+        hooks = create_hooks(config=config_copy, model=model, dataset=dataset, output_dir=output_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Creating hooks failed', ex)
 

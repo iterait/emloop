@@ -11,9 +11,11 @@ import yaml
 import pytest
 
 from emloop import AbstractModel
-from emloop.cli.common import create_output_dir, create_dataset, create_hooks, create_model
+from emloop.cli.common import create_output_dir, create_dataset, create_hooks, create_model, run
 from emloop.hooks.abstract_hook import AbstractHook
 from emloop.hooks.log_profile import LogProfile
+from emloop.hooks import StopAfter
+from emloop.datasets import AbstractDataset, StreamWrapper
 
 
 class DummyDataset:
@@ -22,9 +24,24 @@ class DummyDataset:
         self.config = yaml.load(config_str)
 
 
+class DummyConfigDataset(AbstractDataset):
+    """Dummy dataset which changes config."""
+    def __init__(self, config_str: str):
+        super().__init__(config_str)
+        config = yaml.load(config_str)
+        self.train = {'a': 'b'}
+        self._configure_dataset(**config)
+
+    def _configure_dataset(self, dataset_config: List[str], **kwargs):
+        dataset_config[0], dataset_config[1], dataset_config[2] = \
+            dataset_config[1], dataset_config[0], dataset_config[2]
+
+    def train_stream(self):
+        yield self.train
+
+
 class DummyHook(AbstractHook):
     """Dummy hook which save its ``**kwargs`` to ``self.kwargs``."""
-
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__(**kwargs)
@@ -35,6 +52,17 @@ class SecondDummyHook(AbstractHook):
     pass
 
 
+class DummyConfigHook(AbstractHook):
+    """Dummy hook which changes config."""
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        super().__init__(**kwargs)
+        self.change_config(**kwargs)
+
+    def change_config(self, variables: List[str], **kwargs):
+        variables[0], variables[1] = variables[1], variables[0]
+
+
 class DummyModel(AbstractModel):
     """Dummy model which serves as a placeholder instead of regular model implementation."""
     def __init__(self, io: dict, **kwargs):  # pylint: disable=unused-argument
@@ -42,7 +70,7 @@ class DummyModel(AbstractModel):
         self._output_names = io['out']
         super().__init__(**kwargs)
 
-    def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
+    def run(self, batch: Mapping[str, object], train: bool, stream: StreamWrapper) -> Mapping[str, object]:
         return {o: i for i, o in enumerate(self._output_names)}
 
     def save(self, name_suffix: str) -> str:
@@ -77,6 +105,18 @@ class DummyModelWithKwargs2(DummyModelWithKwargs):
 
     For restoring purposes only."""
     pass
+
+
+class DummyConfigModel(DummyModel):
+    """Dummy model which changes config."""
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        self._create_model(**kwargs)
+        super().__init__(**kwargs)
+
+    def _create_model(self, architecture: Mapping, **kwargs):
+        config = architecture['model_config']
+        config[0], config[1], config[2], config[3] = config[1], config[0], config[3], config[2]
 
 
 def test_create_output_dir(tmpdir):
@@ -208,7 +248,6 @@ def test_create_hooks(tmpdir, caplog):
     ]
 
 
-
 def test_create_model(tmpdir):
     """Test if model is created correctly."""
 
@@ -239,3 +278,23 @@ def test_create_model(tmpdir):
     restored_model = create_model(config=new_config, output_dir=tmpdir + '_restored', dataset=dataset,
                                   restore_from=tmpdir)
     assert isinstance(restored_model, DummyModelWithKwargs2)
+
+
+def test_config_file_is_unchanged(tmpdir):
+    """Test that config file is not changed during training."""
+
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyConfigDataset', 'batch_size': 10,
+                                   'dataset_config': ['a', 'b', 'c']},
+              'stream': {'train': {'rotate': 20}},
+              'hooks': [{'emloop.tests.cli.common_test.DummyConfigHook': {'additional_arg': 10,
+                                                                          'variables': ['a', 'b']}},
+                        {'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyConfigModel',
+                                 'architecture': {'model_config': ['a', 'b', 'c', 'd']},
+                                 'io': {'in': [], 'out': ['dummy']}}}
+
+    run(config=config, output_root=tmpdir)
+
+    assert config['dataset']['dataset_config'] == ['a', 'b', 'c']
+    assert config['hooks'][0]['emloop.tests.cli.common_test.DummyConfigHook']['variables'] == ['a', 'b']
+    assert config['model']['architecture']['model_config'] == ['a', 'b', 'c', 'd']
