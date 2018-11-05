@@ -54,7 +54,7 @@ _ERRORS = [KeyError, KeyError, AssertionError, AssertionError]
 
 @pytest.mark.parametrize('var, id_var, error', zip(_VARS, _ID_VARS, _ERRORS))
 def test_saving_logits_to_csv_raises_error(tmpdir, var, id_var, error):
-    """Test raising an assertion error if variable is not present in a batch/variable lengths are not same."""
+    """Test raising an error if variable is not present in a batch/variable lengths are not same."""
 
     filename = os.path.join(tmpdir, 'colors.csv')
     logits_to_csv = LogitsToCsv(variable=var, class_names=_CLASSES, id_variable=id_var, output_file=filename)
@@ -63,6 +63,14 @@ def test_saving_logits_to_csv_raises_error(tmpdir, var, id_var, error):
 
     with pytest.raises(error):
         logits_to_csv.after_batch(_STREAM_NAME, batch)
+
+
+def test_saving_logits_to_csv_raises_assertion_error(tmpdir):
+    """Test raising an assertion error if class names are not supplied."""
+
+    filename = os.path.join(tmpdir, 'colors.csv')
+    with pytest.raises(AssertionError):
+        LogitsToCsv(variable='color', class_names=[], id_variable='pic_id', output_file=filename)
 
 
 def test_saving_logits_to_csv_stream_not_in_specified(tmpdir):

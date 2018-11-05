@@ -2,8 +2,7 @@
 Hook for flattening variables.
 """
 from typing import Iterable, Mapping, Optional
-
-import numpy as np
+import more_itertools
 
 from . import AbstractHook
 from ..types import Batch
@@ -35,6 +34,8 @@ class Flatten(AbstractHook):
         :param streams: list of stream names to be considered;
                         if None, the hook will be applied to all the available streams
         """
+        assert len(variables) > 0, 'You have to specify at least one variable.'
+
         super().__init__(**kwargs)
         self._variables = variables
         self._streams = streams
@@ -48,6 +49,4 @@ class Flatten(AbstractHook):
             if variable not in batch_data:
                 raise KeyError('Variable `{}` to be flattened was not found in the batch data for stream `{}`. '
                                'Available variables are `{}`.'.format(variable, stream_name, batch_data.keys()))
-
-        for src, dst in self._variables.items():
-            batch_data[dst] = np.array(batch_data[src]).flatten()
+            batch_data[self._variables[variable]] = list(more_itertools.collapse(batch_data[variable]))

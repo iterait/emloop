@@ -69,10 +69,10 @@ def test_saving_sequence_to_csv_with_optional_arguments(tmpdir):
     assert os.path.exists(filename)
 
 
-_VARS = [['not-there'], ['color'], ['area'], ['area', 'incorrect_0'], ['area', 'incorrect_1'], [], ['color'], ['color']]
-_ID_VAR = ['pic_id', 'not-there', 'pic_id', 'pic_id', 'pic_id', 'pic_id', 'pic_id', 'pic_id']
-_MASK = ['mask', 'mask', 'not-there', 'mask', 'mask', 'mask', 'incorrect_0', 'incorrect_1']
-_ERRORS = [KeyError, KeyError, KeyError, AssertionError, AssertionError, AssertionError, AssertionError, AssertionError]
+_VARS = [['not-there'], ['color'], ['area'], ['area', 'incorrect_0'], ['area', 'incorrect_1'], ['color'], ['color']]
+_ID_VAR = ['pic_id', 'not-there', 'pic_id', 'pic_id', 'pic_id', 'pic_id', 'pic_id']
+_MASK = ['mask', 'mask', 'not-there', 'mask', 'mask', 'incorrect_0', 'incorrect_1']
+_ERRORS = [KeyError, KeyError, KeyError, AssertionError, AssertionError, AssertionError, AssertionError]
 
 
 @pytest.mark.parametrize('var, id_var, mask, error', zip(_VARS, _ID_VAR, _MASK, _ERRORS))
@@ -86,6 +86,14 @@ def test_saving_sequence_to_csv_raises_error(tmpdir, var, id_var, mask, error):
 
     with pytest.raises(error):
         sequence_to_csv.after_batch(_STREAM_NAME, batch)
+
+
+def test_saving_sequence_to_csv_raises_assertion_error(tmpdir):
+    """Test raising an assertion error if variable is not supplied."""
+
+    filename = os.path.join(tmpdir, 'colors.csv')
+    with pytest.raises(AssertionError):
+        SequenceToCsv(variables=[], id_variable='pic_id', output_file=filename, pad_mask_variable='mask')
 
 
 def test_saving_sequence_to_csv_stream_not_in_specified(tmpdir):

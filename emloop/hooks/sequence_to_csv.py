@@ -21,13 +21,13 @@ class SequenceToCsv(AbstractHook):
 
     .. code-block:: yaml
         :caption: Save a csv with columns `video_id`, `index`,
-                  `area` and `color` to `/var/areas.csv`.
+                  `area` and `color` to `/tmp/areas.csv`.
 
         hooks:
           - SequenceToCsv:
               variables: [area, color]
               id_variable: video_id
-              output_file: /var/areas.csv
+              output_file: /tmp/areas.csv
     """
 
     def __init__(self, variables: Iterable[str], id_variable: str, output_file: str,
@@ -40,6 +40,8 @@ class SequenceToCsv(AbstractHook):
         :param pad_mask_variable: name of the source which represents the padding mask
         :param streams: names of the streams to be considered; leave None to consider all streams
         """
+        assert len(variables) > 0, 'You have to specify at least one variable.'
+
         super().__init__(**kwargs)
 
         self._variables = variables
@@ -53,8 +55,6 @@ class SequenceToCsv(AbstractHook):
         """Accumulate the given sequences."""
         if self._streams is not None and stream_name not in self._streams:
             return
-
-        assert len(self._variables) > 0, 'You have to specify at least one variable.'
 
         # Assert variables in batch data.
         if self._id_variable not in batch_data:

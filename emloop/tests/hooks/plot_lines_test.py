@@ -90,13 +90,20 @@ _MASK_VARS = ['accuracy', 'accuracy', 'not-there']
 
 
 @pytest.mark.parametrize('vars, id_var, mask_var', zip(_VARS, _ID_VARS, _MASK_VARS))
-def test_plotting_lines_raises_error(vars, id_var, mask_var, tmpdir):
-    """Test raising an assertion error if variable is not present in a batch."""
+def test_plotting_lines_raises_key_error(vars, id_var, mask_var, tmpdir):
+    """Test raising a key error if variable is not present in a batch."""
 
     plot_lines = PlotLines(output_dir=tmpdir, variables=vars, id_variable=id_var, pad_mask_variable=mask_var)
     batch = get_batch()
     with pytest.raises(KeyError):
         plot_lines.after_batch(_STREAM_NAME, batch)
+
+
+def test_plotting_lines_raises_assertion_error(tmpdir):
+    """Test raising an assertion error if variables are not supplied."""
+
+    with pytest.raises(AssertionError):
+        PlotLines(output_dir=tmpdir, variables=[], id_variable='a_ids', pad_mask_variable='accuracy')
 
 
 def test_plotting_lines_stream_not_in_specified(tmpdir):

@@ -21,7 +21,7 @@ class LogitsToCsv(AbstractHook):
     is named by the corresponding stream source.
 
     .. code-block:: yaml
-        :caption: Save a csv with columns `red`, `green`, and `blue` to `/var/colors.csv`.
+        :caption: Save a csv with columns `red`, `green`, and `blue` to `/tmp/colors.csv`.
                   The stream variable `color` is expected to be a sequence of three numbers.
 
         hooks:
@@ -29,7 +29,7 @@ class LogitsToCsv(AbstractHook):
               variable: color
               class_names: [red, green, blue]
               id_variable: picture_id
-              output_file: /var/colors.csv
+              output_file: /tmp/colors.csv
     """
 
     def __init__(self, variable: str, class_names: Iterable[str], id_variable: str,
@@ -42,6 +42,8 @@ class LogitsToCsv(AbstractHook):
         :param output_file: the desired name of the output csv file
         :param streams: names of the streams to be considered; leave None to consider all streams
         """
+        assert len(class_names) > 0, 'You have to specify at least one class name.'
+
         super().__init__(**kwargs)
 
         self._variable = variable
@@ -66,7 +68,7 @@ class LogitsToCsv(AbstractHook):
 
         # Assert equal batch sizes.
         assert len(batch_data[self._id_variable]) == len(batch_data[self._variable]), 'Batch sizes of variable ' \
-            'to save `{}` and variable_id `{}` are not equal.'.format(self._variable, self._id_variable)
+            'to be saved `{}` and variable_id `{}` are not equal.'.format(self._variable, self._id_variable)
 
         # Iterate through examples.
         for example_idx, example_id in enumerate(batch_data[self._id_variable]):

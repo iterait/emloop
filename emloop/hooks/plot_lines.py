@@ -10,6 +10,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
 
 from . import AbstractHook
 from ..types import Batch
@@ -60,6 +61,8 @@ class PlotLines(AbstractHook):
                             (first ``batch_count`` will be processed)
         :param root_dir: default directory where the plots will be saved
         """
+        assert len(variables) > 0, 'You have to specify at least one variable.'
+
         super().__init__(**kwargs)
 
         self._output_dir = output_dir
