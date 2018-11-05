@@ -2,7 +2,6 @@
 Module with csv logging hook.
 """
 import logging
-import os
 from os import path
 from typing import Iterable, Optional
 
