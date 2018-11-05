@@ -22,7 +22,7 @@ references:
       name: Install opencv dependencies on Ubuntu.
       command: |
         export DEBIAN_FRONTEND=noninteractive
-        apt-get install -y --force-yes opencv-data libopencv-dev python3-opencv
+        apt-get install -y --force-yes libopencv-dev python3-opencv
         ldconfig
         echo 'export OPENCV=true' >> $BASH_ENV
 
@@ -30,7 +30,7 @@ references:
     run:
       name: Install opencv dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm opencv opencv-samples hdf5 gtk3
+        pacman -Syu --noconfirm opencv hdf5 gtk3
         echo 'export OPENCV=true' >> $BASH_ENV
 
   install: &install
@@ -83,6 +83,8 @@ jobs:
       - checkout
       - *install
       - *test
+      - *ubuntu_deps_opencv
+      - *test
 
   test_ubuntu_rolling:
     docker:
@@ -92,6 +94,8 @@ jobs:
       - *ubuntu_deps
       - checkout
       - *install
+      - *test
+      - *ubuntu_deps_opencv
       - *test
 
   test_archlinux:
@@ -103,39 +107,8 @@ jobs:
       - checkout
       - *install
       - *test
-
-  test_ubuntu_latest_opencv:
-    docker:
-    - image: ubuntu:latest
-    working_directory: ~/emloop
-    steps:
-    - *ubuntu_deps
-    - *ubuntu_deps_opencv
-    - checkout
-    - *install
-    - *test
-
-  test_ubuntu_rolling_opencv:
-    docker:
-    - image: ubuntu:rolling
-    working_directory: ~/emloop
-    steps:
-    - *ubuntu_deps
-    - *ubuntu_deps_opencv
-    - checkout
-    - *install
-    - *test
-
-  test_archlinux_opencv:
-    docker:
-    - image: archimg/base-devel
-    working_directory: ~/emloop
-    steps:
-    - *arch_deps
-    - *arch_deps_opencv
-    - checkout
-    - *install
-    - *test
+      - *arch_deps_opencv
+      - *test
 
   coverage:
     docker:
@@ -175,9 +148,6 @@ workflows:
       - test_ubuntu_latest
       - test_ubuntu_rolling
       - test_archlinux
-      - test_ubuntu_latest_opencv
-      - test_ubuntu_rolling_opencv
-      - test_archlinux_opencv
       - coverage:
           requires:
             - test_ubuntu_latest
