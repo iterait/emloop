@@ -5,7 +5,7 @@ Furthermore, TrainingTerminated exception is defined.
 """
 import logging
 import inspect
-from typing import Iterable
+from typing import Iterable, List
 from ..types import EpochData, Batch, TimeProfile, TrainingTerminated
 
 
@@ -81,15 +81,14 @@ class AbstractHook:
         """
         pass
 
-    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, train_stream_name: str, extra_streams: Iterable[str]) -> None:
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
         """
         After epoch profile event.
 
         This event provides opportunity to process time profile of the finished epoch.
 
         :param epoch_id: finished epoch id
-        :param profile: dictionary of lists of event timings that were measured during the epoch
-        :param extra_streams: enumeration of additional stream names
+        :param streams: streams which are in profile
         """
         pass
 
