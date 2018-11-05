@@ -22,7 +22,7 @@ references:
       name: Install opencv dependencies on Ubuntu.
       command: |
         export DEBIAN_FRONTEND=noninteractive
-        apt-get install -y --force-yes libopencv-dev python3-opencv
+        apt-get install -y libopencv-dev python3-opencv
         ldconfig
         echo 'export OPENCV=true' >> $BASH_ENV
 
