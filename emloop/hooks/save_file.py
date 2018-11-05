@@ -17,6 +17,7 @@ class SaveFile(AbstractHook):
 
         hooks:
           - SaveFile
+              files: [path]
     """
 
     def __init__(self, files: Iterable[str], output_dir: str, **kwargs):
@@ -31,5 +32,5 @@ class SaveFile(AbstractHook):
 
     def before_training(self):
         for path in self._files:
-            assert os.path.exists(path), f'file {path} does not exist'
+            assert os.path.exists(path), f'file `{path}` does not exist'
             shutil.copy(path, self._output_dir)
