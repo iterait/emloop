@@ -228,13 +228,21 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         :param streams: stream names to be evaluated
         """
+
+        self._epoch_profile.clear()
         for stream_name in streams:
             with self.get_stream(stream_name) as stream:
                 self.evaluate_stream(stream)
 
         epoch_data = self._create_epoch_data(streams)
+
+        with Timer('after_epoch_hooks', self._epoch_profile):
+            for hook in self._hooks:
+                hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
+
         for hook in self._hooks:
-            hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
+            hook.after_epoch_profile(epoch_id=0, profile=self._epoch_profile,
+                                     streams=[self._train_stream_name] + self._extra_streams)
 
     def _try_run(self, run_func: Callable[[], None]) -> None:
         """
@@ -300,8 +308,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
                 for hook in self._hooks:
                     hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
-                                             train_stream_name=self._train_stream_name,
-                                             extra_streams=self._extra_streams)
+                                             streams=[self._train_stream_name] + self._extra_streams)
+
                 self._epochs_done = epoch_id
                 if trace is not None:
                     trace[TrainingTraceKeys.EPOCHS_DONE] = self._epochs_done
