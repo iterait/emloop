@@ -28,16 +28,11 @@ class DummyConfigDataset(AbstractDataset):
     """Dummy dataset which changes config."""
     def __init__(self, config_str: str):
         super().__init__(config_str)
-        config = yaml.load(config_str)
-        self.train = {'a': 'b'}
-        self._configure_dataset(**config)
-
-    def _configure_dataset(self, dataset_config: List[str], **kwargs):
-        dataset_config[0], dataset_config[1], dataset_config[2] = \
-            dataset_config[1], dataset_config[0], dataset_config[2]
+        config = yaml.load(config_str)['dataset_config']
+        config[0], config[1], config[2] = config[1], config[0], config[2]
 
     def train_stream(self):
-        yield self.train
+        yield {'a': ['b']}
 
 
 class DummyHook(AbstractHook):
@@ -54,12 +49,8 @@ class SecondDummyHook(AbstractHook):
 
 class DummyConfigHook(AbstractHook):
     """Dummy hook which changes config."""
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
+    def __init__(self, variables: List[str], **kwargs):
         super().__init__(**kwargs)
-        self.change_config(**kwargs)
-
-    def change_config(self, variables: List[str], **kwargs):
         variables[0], variables[1] = variables[1], variables[0]
 
 
@@ -109,12 +100,8 @@ class DummyModelWithKwargs2(DummyModelWithKwargs):
 
 class DummyConfigModel(DummyModel):
     """Dummy model which changes config."""
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
-        self._create_model(**kwargs)
+    def __init__(self, architecture: Mapping, **kwargs):
         super().__init__(**kwargs)
-
-    def _create_model(self, architecture: Mapping, **kwargs):
         config = architecture['model_config']
         config[0], config[1], config[2], config[3] = config[1], config[0], config[3], config[2]
 
@@ -281,20 +268,24 @@ def test_create_model(tmpdir):
 
 
 def test_config_file_is_unchanged(tmpdir):
-    """Test that config file is not changed during training."""
+    """
+    Test that config file is not changed during training.
+    Regarding issue #31: Config YAML in log dir differs https://github.com/iterait/emloop/issues/31
+    """
 
-    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyConfigDataset', 'batch_size': 10,
-                                   'dataset_config': ['a', 'b', 'c']},
-              'stream': {'train': {'rotate': 20}},
-              'hooks': [{'emloop.tests.cli.common_test.DummyConfigHook': {'additional_arg': 10,
-                                                                          'variables': ['a', 'b']}},
-                        {'StopAfter': {'epochs': 1}}],
-              'model': {'class': 'emloop.tests.cli.common_test.DummyConfigModel',
-                                 'architecture': {'model_config': ['a', 'b', 'c', 'd']},
-                                 'io': {'in': [], 'out': ['dummy']}}}
+    orig_config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyConfigDataset', 'batch_size': 10,
+                               'dataset_config': ['a', 'b', 'c']},
+                   'stream': {'train': {'rotate': 20}},
+                   'hooks': [{'emloop.tests.cli.common_test.DummyConfigHook': {'additional_arg': 10,
+                                                                               'variables': ['a', 'b']}},
+                             {'StopAfter': {'epochs': 1}}],
+                   'model': {'class': 'emloop.tests.cli.common_test.DummyConfigModel',
+                                      'architecture': {'model_config': ['a', 'b', 'c', 'd']},
+                                      'io': {'in': [], 'out': ['dummy']}}}
+    config = deepcopy(orig_config)
 
     run(config=config, output_root=tmpdir)
 
-    assert config['dataset']['dataset_config'] == ['a', 'b', 'c']
-    assert config['hooks'][0]['emloop.tests.cli.common_test.DummyConfigHook']['variables'] == ['a', 'b']
-    assert config['model']['architecture']['model_config'] == ['a', 'b', 'c', 'd']
+    orig_config['model']['restore_fallback'] = ''
+
+    assert orig_config == config
