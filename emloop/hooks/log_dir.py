@@ -3,7 +3,6 @@ Module with simple hook logging the output dir at various occasions just for con
 """
 import logging
 
-
 from . import AbstractHook
 
 

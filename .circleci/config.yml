@@ -17,6 +17,22 @@ references:
         pacman -Syu --noconfirm python python-pip git base-devel curl
         pip install coveralls coverage
 
+  ubuntu_deps_opencv: &ubuntu_deps_opencv
+    run:
+      name: Install opencv dependencies on Ubuntu.
+      command: |
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get install -y libopencv-dev python3-opencv
+        ldconfig
+        echo 'export OPENCV=true' >> $BASH_ENV
+
+  arch_deps_opencv: &arch_deps_opencv
+    run:
+      name: Install opencv dependencies on Arch Linux.
+      command: |
+        pacman -Syu --noconfirm opencv hdf5 gtk3
+        echo 'export OPENCV=true' >> $BASH_ENV
+
   install: &install
     run:
       name: Install.
@@ -67,6 +83,8 @@ jobs:
       - checkout
       - *install
       - *test
+      - *ubuntu_deps_opencv
+      - *test
 
   test_ubuntu_rolling:
     docker:
@@ -77,6 +95,8 @@ jobs:
       - checkout
       - *install
       - *test
+      - *ubuntu_deps_opencv
+      - *test
 
   test_archlinux:
     docker:
@@ -86,6 +106,8 @@ jobs:
       - *arch_deps
       - checkout
       - *install
+      - *test
+      - *arch_deps_opencv
       - *test
 
   coverage:
