@@ -25,6 +25,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
     """Possible actions to be taken when a batch/stream is empty."""
     UNUSED_SOURCE_ACTIONS = ['ignore', 'warn', 'error']
     """Possible actions to be taken when a stream source is unused by the trained model."""
+    INCORRECT_CONFIG_ACTIONS = ['ignore', 'warn', 'error']
+    """Possible actions to be taken when a mainloop config contains some unexpected arguments."""
 
     def __init__(self,   # pylint: disable=too-many-arguments
                  model: AbstractModel, dataset: AbstractDataset,
@@ -35,9 +37,11 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                  on_empty_batch: str='error',
                  on_empty_stream: str='error',
                  on_unused_sources: str='warn',
+                 on_incorrect_config: str= 'error',
                  fixed_batch_size: Optional[int]=None,
                  fixed_epoch_size: Optional[int]=None,
-                 skip_zeroth_epoch: bool=False):
+                 skip_zeroth_epoch: bool=False,
+                 **kwargs):
         """
         :param model: trained model
         :param dataset: loaded dataset
@@ -49,6 +53,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         :param on_empty_stream: action to take when stream is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
         :param on_unused_sources: action to take when stream provides an unused sources; one of
             :py:attr:`UNUSED_SOURCE_ACTIONS`
+        :param on_incorrect_config: action to take when mainloop config contains unexpected arguments; one of
+            :py:attr:`MainLoop.INCORRECT_CONFIG_ACTIONS`
         :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
         :param fixed_epoch_size: if specified, cut the train stream to epochs of at most ``fixed_epoch_size`` batches
         :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch
@@ -58,6 +64,17 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         assert on_empty_batch in MainLoop.EMPTY_ACTIONS
         assert on_empty_stream in MainLoop.EMPTY_ACTIONS
         assert on_unused_sources in MainLoop.UNUSED_SOURCE_ACTIONS
+        assert on_incorrect_config in MainLoop.INCORRECT_CONFIG_ACTIONS
+
+        if kwargs:
+            if on_incorrect_config == 'error':
+                raise ValueError('Config yaml contains some unexpected arguments in mainloop section. '
+                                 'Set `main_loop.on_incorrect_config` to `warn` in order to suppress this error.\n'
+                                 'Extra arguments: {}'.format(kwargs))
+            elif on_incorrect_config == 'warn':
+                logging.warning('Config yaml contains some unexpected arguments in mainloop section. '
+                                'Set `main_loop.on_incorrect_config` to `ignore` in order to suppress this warning. '
+                                'Extra arguments: %s', kwargs)
 
         self._model = model
         self._dataset = dataset
@@ -177,7 +194,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 raise ValueError('Stream `{}` appears to be empty. Set '
                                  '`main_loop.on_empty_stream` to `warn` in order to change this error into warning; '
                                  'set to `ignore` to remove it.'.format(stream.name))
-
 
     def train_by_stream(self, stream: StreamWrapper) -> None:
         """

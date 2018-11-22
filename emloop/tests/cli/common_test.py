@@ -23,6 +23,9 @@ class DummyDataset:
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
 
+    def train_stream(self):
+        yield {'a': ['b']}
+
 
 class DummyConfigDataset(AbstractDataset):
     """Dummy dataset which changes config."""
@@ -289,3 +292,54 @@ def test_config_file_is_unchanged(tmpdir):
     orig_config['model']['restore_fallback'] = ''
 
     assert orig_config == config
+
+
+def test_config_file_is_incorrect(tmpdir, caplog):
+    """Test that incorrect config file raises error and subsequent system exit."""
+
+    # incorrect dataset arguments
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset', 'output_dir': '/tmp'},
+              'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'additional_arg': 10}, 'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect hooks arguments
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset'},
+              'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'additional_arg': 10}, 'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect model arguments
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset'},
+              'hooks': [{'StopAfter': {'epochs': 1}}],
+              'model': {'io': {'in': [], 'out': ['dummy']}}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect main_loop arguments - raises error by default
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset'},
+              'hooks': [{'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}},
+              'main_loop': {'non-existent': 'none', 'extra_streams': ['train']}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect main_loop arguments - logs warning
+    caplog.clear()
+    caplog.set_level(logging.WARNING)
+    config['main_loop']['on_incorrect_config'] = 'warn'
+    run(config=config, output_root=tmpdir)
+    assert 'Extra arguments: {\'non-existent\': \'none\'}' in caplog.text
+
+    # incorrect main_loop arguments - ignored
+    caplog.clear()
+    caplog.set_level(logging.WARNING)
+    config['main_loop']['on_incorrect_config'] = 'ignore'
+    run(config=config, output_root=tmpdir)
+    assert 'Extra arguments: {\'non-existent\': \'none\'}' not in caplog.text
