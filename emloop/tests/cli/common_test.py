@@ -16,6 +16,7 @@ from emloop.hooks.abstract_hook import AbstractHook
 from emloop.hooks import StopAfter, LogProfile
 from emloop.datasets import AbstractDataset, StreamWrapper
 from emloop.constants import EL_DEFAULT_TRAIN_STREAM
+from emloop.types import TimeProfile
 
 
 class DummyDataset:
@@ -67,6 +68,16 @@ class DummyConfigHook(AbstractHook):
     def __init__(self, variables: List[str], **kwargs):
         super().__init__(**kwargs)
         variables[0], variables[1] = variables[1], variables[0]
+
+
+class DummyEvalHook(AbstractHook):
+    """Dummy hook which save its ``**kwargs`` to ``self.kwargs``."""
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
+        """Checks passed in streams parameter is correct."""
+        assert streams == ['valid']
 
 
 class DummyModel(AbstractModel):
@@ -362,13 +373,10 @@ def test_run_with_eval_stream(tmpdir, caplog):
     caplog.set_level(logging.INFO)
 
     config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyEvalDataset'},
-              'stream': {'train': {'rotate': 20}},
-              'hooks': [{'LogProfile': {'epochs': 1}}, {'StopAfter': {'epochs': 1}}],
+              'hooks': [{'emloop.tests.cli.common_test.DummyEvalHook': {'epochs': 1}}, {'StopAfter': {'epochs': 1}}],
               'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
 
     run(config=config, output_root=tmpdir, eval='valid')
     
     assert f'Running the evaluation of stream `{EL_DEFAULT_TRAIN_STREAM}`' not in caplog.text
-    assert f'T {EL_DEFAULT_TRAIN_STREAM}:' not in caplog.text
     assert 'Running the evaluation of stream `valid`' in caplog.text
-    assert 'T valid:' in caplog.text
