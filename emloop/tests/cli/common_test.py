@@ -13,9 +13,9 @@ import pytest
 from emloop import AbstractModel
 from emloop.cli.common import create_output_dir, create_dataset, create_hooks, create_model, run
 from emloop.hooks.abstract_hook import AbstractHook
-from emloop.hooks.log_profile import LogProfile
-from emloop.hooks import StopAfter
+from emloop.hooks import StopAfter, LogProfile
 from emloop.datasets import AbstractDataset, StreamWrapper
+from emloop.constants import EL_DEFAULT_TRAIN_STREAM
 
 
 class DummyDataset:
@@ -35,6 +35,18 @@ class DummyConfigDataset(AbstractDataset):
         config[0], config[1], config[2] = config[1], config[0], config[2]
 
     def train_stream(self):
+        yield {'a': ['b']}
+
+
+class DummyEvalDataset(AbstractDataset):
+    """Dummy dataset with valid_stream method."""
+    def __init__(self, config_str: str):
+        super().__init__(config_str)
+
+    def train_stream(self):
+        pass
+
+    def valid_stream(self):
         yield {'a': ['b']}
 
 
@@ -299,7 +311,7 @@ def test_config_file_is_incorrect(tmpdir, caplog):
 
     # incorrect dataset arguments
     config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset', 'output_dir': '/tmp'},
-              'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'additional_arg': 10}, 'StopAfter': {'epochs': 1}}],
+              'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'additional_arg': 1}}, {'StopAfter': {'epochs': 1}}],
               'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
 
     with pytest.raises(SystemExit):
@@ -343,3 +355,20 @@ def test_config_file_is_incorrect(tmpdir, caplog):
     config['main_loop']['on_incorrect_config'] = 'ignore'
     run(config=config, output_root=tmpdir)
     assert 'Extra arguments: {\'non-existent\': \'none\'}' not in caplog.text
+
+
+def test_run_with_eval_stream(tmpdir, caplog):
+    """Test that eval is called with given stream and not with EL_DEFAULT_TRAIN_STREAM."""
+    caplog.set_level(logging.INFO)
+
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyEvalDataset'},
+              'stream': {'train': {'rotate': 20}},
+              'hooks': [{'LogProfile': {'epochs': 1}}, {'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
+
+    run(config=config, output_root=tmpdir, eval='valid')
+    
+    assert f'Running the evaluation of stream `{EL_DEFAULT_TRAIN_STREAM}`' not in caplog.text
+    assert f'T {EL_DEFAULT_TRAIN_STREAM}:' not in caplog.text
+    assert 'Running the evaluation of stream `valid`' in caplog.text
+    assert 'T valid:' in caplog.text
