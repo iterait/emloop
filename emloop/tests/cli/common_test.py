@@ -72,9 +72,6 @@ class DummyConfigHook(AbstractHook):
 
 class DummyEvalHook(AbstractHook):
     """Dummy hook which save its ``**kwargs`` to ``self.kwargs``."""
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
         """Checks passed in streams parameter is correct."""
         assert streams == ['valid']
