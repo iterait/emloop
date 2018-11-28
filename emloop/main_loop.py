@@ -258,7 +258,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
         for hook in self._hooks:
             hook.after_epoch_profile(epoch_id=0, profile=self._epoch_profile,
-                                     streams=[self._train_stream_name] + self._extra_streams)
+                                     streams=streams)
 
     def _try_run(self, run_func: Callable[[], None]) -> None:
         """
