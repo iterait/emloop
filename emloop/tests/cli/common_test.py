@@ -11,9 +11,12 @@ import yaml
 import pytest
 
 from emloop import AbstractModel
-from emloop.cli.common import create_output_dir, create_dataset, create_hooks, create_model
+from emloop.cli.common import create_output_dir, create_dataset, create_hooks, create_model, run
 from emloop.hooks.abstract_hook import AbstractHook
-from emloop.hooks.log_profile import LogProfile
+from emloop.hooks import StopAfter, LogProfile
+from emloop.datasets import AbstractDataset, StreamWrapper
+from emloop.constants import EL_DEFAULT_TRAIN_STREAM
+from emloop.types import TimeProfile
 
 
 class DummyDataset:
@@ -21,10 +24,35 @@ class DummyDataset:
     def __init__(self, config_str):
         self.config = yaml.load(config_str)
 
+    def train_stream(self):
+        yield {'a': ['b']}
+
+
+class DummyConfigDataset(AbstractDataset):
+    """Dummy dataset which changes config."""
+    def __init__(self, config_str: str):
+        super().__init__(config_str)
+        config = yaml.load(config_str)['dataset_config']
+        config[0], config[1], config[2] = config[1], config[0], config[2]
+
+    def train_stream(self):
+        yield {'a': ['b']}
+
+
+class DummyEvalDataset(AbstractDataset):
+    """Dummy dataset with valid_stream method."""
+    def __init__(self, config_str: str):
+        super().__init__(config_str)
+
+    def train_stream(self):
+        pass
+
+    def valid_stream(self):
+        yield {'a': ['b']}
+
 
 class DummyHook(AbstractHook):
     """Dummy hook which save its ``**kwargs`` to ``self.kwargs``."""
-
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__(**kwargs)
@@ -35,6 +63,20 @@ class SecondDummyHook(AbstractHook):
     pass
 
 
+class DummyConfigHook(AbstractHook):
+    """Dummy hook which changes config."""
+    def __init__(self, variables: List[str], **kwargs):
+        super().__init__(**kwargs)
+        variables[0], variables[1] = variables[1], variables[0]
+
+
+class DummyEvalHook(AbstractHook):
+    """Dummy hook that checks the `after_epoch_profile` is evaluated on `valid` stream."""
+    def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
+        """Checks passed in streams parameter is correct."""
+        assert streams == ['valid']
+
+
 class DummyModel(AbstractModel):
     """Dummy model which serves as a placeholder instead of regular model implementation."""
     def __init__(self, io: dict, **kwargs):  # pylint: disable=unused-argument
@@ -42,7 +84,7 @@ class DummyModel(AbstractModel):
         self._output_names = io['out']
         super().__init__(**kwargs)
 
-    def run(self, batch: Mapping[str, object], train: bool) -> Mapping[str, object]:
+    def run(self, batch: Mapping[str, object], train: bool, stream: StreamWrapper) -> Mapping[str, object]:
         return {o: i for i, o in enumerate(self._output_names)}
 
     def save(self, name_suffix: str) -> str:
@@ -77,6 +119,14 @@ class DummyModelWithKwargs2(DummyModelWithKwargs):
 
     For restoring purposes only."""
     pass
+
+
+class DummyConfigModel(DummyModel):
+    """Dummy model which changes config."""
+    def __init__(self, architecture: Mapping, **kwargs):
+        super().__init__(**kwargs)
+        config = architecture['model_config']
+        config[0], config[1], config[2], config[3] = config[1], config[0], config[3], config[2]
 
 
 def test_create_output_dir(tmpdir):
@@ -208,7 +258,6 @@ def test_create_hooks(tmpdir, caplog):
     ]
 
 
-
 def test_create_model(tmpdir):
     """Test if model is created correctly."""
 
@@ -239,3 +288,92 @@ def test_create_model(tmpdir):
     restored_model = create_model(config=new_config, output_dir=tmpdir + '_restored', dataset=dataset,
                                   restore_from=tmpdir)
     assert isinstance(restored_model, DummyModelWithKwargs2)
+
+
+def test_config_file_is_unchanged(tmpdir):
+    """
+    Test that config file is not changed during training.
+    Regarding issue #31: Config YAML in log dir differs https://github.com/iterait/emloop/issues/31
+    """
+
+    orig_config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyConfigDataset', 'batch_size': 10,
+                               'dataset_config': ['a', 'b', 'c']},
+                   'stream': {'train': {'rotate': 20}},
+                   'hooks': [{'emloop.tests.cli.common_test.DummyConfigHook': {'additional_arg': 10,
+                                                                               'variables': ['a', 'b']}},
+                             {'StopAfter': {'epochs': 1}}],
+                   'model': {'class': 'emloop.tests.cli.common_test.DummyConfigModel',
+                                      'architecture': {'model_config': ['a', 'b', 'c', 'd']},
+                                      'io': {'in': [], 'out': ['dummy']}}}
+    config = deepcopy(orig_config)
+
+    run(config=config, output_root=tmpdir)
+
+    orig_config['model']['restore_fallback'] = ''
+
+    assert orig_config == config
+
+
+def test_config_file_is_incorrect(tmpdir, caplog):
+    """Test that incorrect config file raises error and subsequent system exit."""
+
+    # incorrect dataset arguments
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset', 'output_dir': '/tmp'},
+              'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'additional_arg': 1}}, {'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect hooks arguments
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset'},
+              'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'additional_arg': 10}, 'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect model arguments
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset'},
+              'hooks': [{'StopAfter': {'epochs': 1}}],
+              'model': {'io': {'in': [], 'out': ['dummy']}}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect main_loop arguments - raises error by default
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyDataset'},
+              'hooks': [{'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}},
+              'main_loop': {'non-existent': 'none', 'extra_streams': ['train']}}
+
+    with pytest.raises(SystemExit):
+        run(config=config, output_root=tmpdir)
+
+    # incorrect main_loop arguments - logs warning
+    caplog.clear()
+    caplog.set_level(logging.WARNING)
+    config['main_loop']['on_incorrect_config'] = 'warn'
+    run(config=config, output_root=tmpdir)
+    assert 'Extra arguments: {\'non-existent\': \'none\'}' in caplog.text
+
+    # incorrect main_loop arguments - ignored
+    caplog.clear()
+    caplog.set_level(logging.WARNING)
+    config['main_loop']['on_incorrect_config'] = 'ignore'
+    run(config=config, output_root=tmpdir)
+    assert 'Extra arguments: {\'non-existent\': \'none\'}' not in caplog.text
+
+
+def test_run_with_eval_stream(tmpdir, caplog):
+    """Test that eval is called with given stream and not with EL_DEFAULT_TRAIN_STREAM."""
+    caplog.set_level(logging.INFO)
+
+    config = {'dataset': {'class': 'emloop.tests.cli.common_test.DummyEvalDataset'},
+              'hooks': [{'emloop.tests.cli.common_test.DummyEvalHook': {'epochs': 1}}, {'StopAfter': {'epochs': 1}}],
+              'model': {'class': 'emloop.tests.cli.common_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
+
+    run(config=config, output_root=tmpdir, eval='valid')
+    
+    assert f'Running the evaluation of stream `{EL_DEFAULT_TRAIN_STREAM}`' not in caplog.text
+    assert 'Running the evaluation of stream `valid`' in caplog.text

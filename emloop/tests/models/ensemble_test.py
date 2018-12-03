@@ -38,18 +38,15 @@ class DummyModel:
         return {'outputs': list(np.array(batch['inputs'])*int(self.restore_from[-1]))}
 
 
-class TestMajorVoteTest:
-    """major_vote function test case."""
+def test_major_vote():
+    """Test if major_vote works properly."""
+    vote1 = (1, 3, (5, 5), 12)
+    vote2 = [1, 2, 2, 2]
+    vote3 = [1, 2, (5, 5), 1]
 
-    def test_major_vote(self):
-        """Test if major_vote works properly."""
-        vote1 = (1, 3, (5, 5), 12)
-        vote2 = [1, 2, 2, 2]
-        vote3 = [1, 2, (5, 5), 1]
-
-        result = major_vote([vote1, vote2, vote3])
-        assert [1, 2, (5, 5)] == list(result)[:3]
-        assert result[-1] in {1, 2, 12}
+    result = major_vote([vote1, vote2, vote3])
+    assert [1, 2, (5, 5)] == list(result)[:3]
+    assert result[-1] in {1, 2, 12}
 
 
 @pytest.fixture
