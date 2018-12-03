@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emloop.hooks.logits_to_csv &#8212; emloop 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../../cli.html">CLI Reference</a></li>
+                <li><a href="../../../emloop/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../../search.html" method="get" class="searchbox">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://emloop.org">emloop</a></li>
+	<li><a href="https://tensorflow.emloop.org">emloop-tensorflow</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
+</ul>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for emloop.hooks.logits_to_csv</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Hook for saving class probabilities to a csv file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">Batch</span>
+
+
+<div class="viewcode-block" id="LogitsToCsv"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.LogitsToCsv">[docs]</a><span class="k">class</span> <span class="nc">LogitsToCsv</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save a stream of logits to a csv file.</span>
+
+<span class="sd">    In the generated file, there are |class_names| + 1 columns for each</span>
+<span class="sd">    example.  The one extra column is for the id of the example.  The class</span>
+<span class="sd">    names are used as headers for the corresponding columns and the id column</span>
+<span class="sd">    is named by the corresponding stream source.</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: Save a csv with columns `red`, `green`, and `blue` to `/tmp/colors.csv`.</span>
+<span class="sd">                  The stream variable `color` is expected to be a sequence of three numbers.</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - LogitsToCsv:</span>
+<span class="sd">              variable: color</span>
+<span class="sd">              class_names: [red, green, blue]</span>
+<span class="sd">              id_variable: picture_id</span>
+<span class="sd">              output_file: /tmp/colors.csv</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LogitsToCsv.__init__"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.LogitsToCsv.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">class_names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">id_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param variable: name of the source with a sequence for each example</span>
+<span class="sd">        :param class_names: the names of the individual classes; should correspond</span>
+<span class="sd">                            to the size of the `variable` source</span>
+<span class="sd">        :param id_variable: name of the source which represents a unique example id</span>
+<span class="sd">        :param output_file: the desired name of the output csv file</span>
+<span class="sd">        :param streams: names of the streams to be considered; leave None to consider all streams</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;You have to specify at least one class name.&#39;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="o">=</span> <span class="n">variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_class_names</span> <span class="o">=</span> <span class="n">class_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span> <span class="o">=</span> <span class="n">id_variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_file</span> <span class="o">=</span> <span class="n">output_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span> <span class="o">=</span> <span class="n">streams</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accumulator</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="LogitsToCsv.after_batch"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.LogitsToCsv.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Accumulate the given logits.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">stream_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streams</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Assert variables in batch data.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` to be used as unique id was not found in the batch data for stream `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                           <span class="s1">&#39;Available variables are `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">batch_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Variable `</span><span class="si">{}</span><span class="s1">` to be saved to csv was not found in the batch data for stream `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                           <span class="s1">&#39;Available variables are `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="n">batch_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="c1"># Assert equal batch sizes.</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">]),</span> <span class="s1">&#39;Batch sizes of variable &#39;</span> \
+            <span class="s1">&#39;to be saved `</span><span class="si">{}</span><span class="s1">` and variable_id `</span><span class="si">{}</span><span class="s1">` are not equal.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span><span class="p">)</span>
+
+        <span class="c1"># Iterate through examples.</span>
+        <span class="k">for</span> <span class="n">example_idx</span><span class="p">,</span> <span class="n">example_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batch_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span><span class="p">]):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">][</span><span class="n">example_idx</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_class_names</span><span class="p">),</span> <span class="s1">&#39;Size of variable to save &#39;</span> \
+                <span class="s1">&#39;`</span><span class="si">{}</span><span class="s1">` does not correspond to number of class names `</span><span class="si">{}</span><span class="s1">`.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_names</span><span class="p">)</span>
+            <span class="c1"># Build the csv record.</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">record</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_id_variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">example_id</span>
+            <span class="k">for</span> <span class="n">class_idx</span><span class="p">,</span> <span class="n">class_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_class_names</span><span class="p">):</span>
+                <span class="n">record</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">][</span><span class="n">example_idx</span><span class="p">][</span><span class="n">class_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_accumulator</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogitsToCsv.after_epoch"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.LogitsToCsv.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Save all the accumulated data to csv.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_accumulator</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saving logits from </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">.&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_file</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_accumulator</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
+    </p>
+  </div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
+  </body>
+</html>

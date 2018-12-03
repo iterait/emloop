@@ -2,21 +2,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Getting Started &#8212; emloop 0.1.0 documentation</title>
+    <title>Getting Started &#8212; emloop 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/highlight.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -34,8 +26,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -112,8 +103,8 @@
 	<h4>Related projects</h4>
 </div>
 <ul class="nav nav-list">
-	<li><a href="https://cxflow.org">cxflow</a></li>
-	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://emloop.org">emloop</a></li>
+	<li><a href="https://tensorflow.emloop.org">emloop-tensorflow</a></li>
 	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
 </ul>
         </div>
@@ -128,40 +119,40 @@
 <p>In order to run and install emloop, the following utilities must be installed:</p>
 <ul class="simple">
 <li>Python 3.5+</li>
-<li><code class="docutils literal"><span class="pre">pip</span></code> 9.0+</li>
+<li><code class="docutils literal notranslate"><span class="pre">pip</span></code> 9.0+</li>
 </ul>
-<p>emloop depends on additional dependencies which are listed in the <code class="docutils literal"><span class="pre">requirements.txt</span></code> file.
-Nevertheless, these dependencies are automatically installed by <code class="docutils literal"><span class="pre">pip</span></code> (see below).</p>
+<p>emloop depends on additional dependencies which are listed in the <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file.
+Nevertheless, these dependencies are automatically installed by <code class="docutils literal notranslate"><span class="pre">pip</span></code> (see below).</p>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>The simplest way of installing emloop is using pip.
 This is the recommended option for majority of users.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install emloop
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install emloop
 </pre></div>
 </div>
-<p>Optionally, install additional plugins by installing <code class="docutils literal"><span class="pre">emloop-&lt;plugin-name&gt;</span></code>.
+<p>Optionally, install additional plugins by installing <code class="docutils literal notranslate"><span class="pre">emloop-&lt;plugin-name&gt;</span></code>.
 TensorFlow backend for emloop can be installed by:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install emloop-tensorflow
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install emloop-tensorflow
 </pre></div>
 </div>
 <p>In order to use emloop nightly builds, install it directly from the source code
-repository (<code class="docutils literal"><span class="pre">dev</span></code> branch).</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install -U git+https://github.com/iterait/emloop.git@dev
+repository (<code class="docutils literal notranslate"><span class="pre">dev</span></code> branch).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -U git+https://github.com/iterait/emloop.git@dev
 </pre></div>
 </div>
 </div>
 <div class="section" id="developer-installation">
 <h2>Developer Installation<a class="headerlink" href="#developer-installation" title="Permalink to this headline">¶</a></h2>
 <p>Finally, emloop might be installed directly for development purposes.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone git@github.com:iterait/emloop.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:iterait/emloop.git
 <span class="nb">cd</span> emloop
 pip install -e .
 </pre></div>
 </div>
 <p>The emloop test suite can be executed by running the following command in the
 cloned repository:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>python setup.py <span class="nb">test</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py <span class="nb">test</span>
 </pre></div>
 </div>
 </div>
@@ -181,7 +172,7 @@ cloned repository:</p>
     </p>
     <p>
         &copy; Copyright 2018, Iterait a.s..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>

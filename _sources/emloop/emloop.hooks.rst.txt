@@ -65,6 +65,21 @@ Classes
 - :py:class:`SaveConfusionMatrix`:
   After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels.
 
+- :py:class:`Flatten`:
+  Flatten a stream variable.
+
+- :py:class:`PlotLines`:
+  Plot sequences of numbers using matplotlib.
+
+- :py:class:`LogitsToCsv`:
+  Save a stream of logits to a csv file.
+
+- :py:class:`SequenceToCsv`:
+  Save a stream of sequences to a csv file.
+
+- :py:class:`SaveFile`:
+  Save files to the output dir before training.
+
 
 
 .. autoclass:: AbstractHook
@@ -313,6 +328,76 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: SaveConfusionMatrix
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Flatten
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Flatten
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: PlotLines
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: PlotLines
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: LogitsToCsv
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: LogitsToCsv
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SequenceToCsv
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SequenceToCsv
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: SaveFile
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: SaveFile
       :parts: 1
 
    |

@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop.hooks.stop_on_plateau &#8212; emloop 0.1.1 documentation</title>
+    <title>emloop.hooks.save_file &#8212; emloop 0.1.1 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
@@ -93,46 +93,43 @@
       </div>
     <div class="col-md-9 content">
       
-  <h1>Source code for emloop.hooks.stop_on_plateau</h1><div class="highlight"><pre>
+  <h1>Source code for emloop.hooks.save_file</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Module with StopOnPlateau hook which terminates the training when the observed variable reaches its plateau.</span>
+<span class="sd">Module with simple hook saving files to the output dir.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">TrainingTerminated</span><span class="p">,</span> <span class="n">OnPlateau</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
 
 
-<div class="viewcode-block" id="StopOnPlateau"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.StopOnPlateau">[docs]</a><span class="k">class</span> <span class="nc">StopOnPlateau</span><span class="p">(</span><span class="n">OnPlateau</span><span class="p">):</span>
+<div class="viewcode-block" id="SaveFile"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.SaveFile">[docs]</a><span class="k">class</span> <span class="nc">SaveFile</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Terminate the training when the observed variable reaches its plateau.</span>
+<span class="sd">    Save files to the output dir before training.</span>
 
 <span class="sd">    .. code-block:: yaml</span>
-<span class="sd">        :caption: stop the training when the mean of last 100 valid ``loss`` values is</span>
-<span class="sd">                  smaller than the mean of last 30 ``loss`` values.</span>
+<span class="sd">        :caption: save files to output dir</span>
 
 <span class="sd">        hooks:</span>
-<span class="sd">          - StopOnPlateau:</span>
-<span class="sd">              long_term: 100</span>
-<span class="sd">              short_term: 30</span>
-
-
-<span class="sd">    .. code-block:: yaml</span>
-<span class="sd">        :caption: stop the training when accuracy stops improving (raising)</span>
-
-<span class="sd">        hooks:</span>
-<span class="sd">          - StopOnPlateau:</span>
-<span class="sd">              variable: accuracy</span>
-<span class="sd">              objective: max</span>
-
+<span class="sd">          - SaveFile</span>
+<span class="sd">              files: [path]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StopOnPlateau._on_plateau_action"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.StopOnPlateau._on_plateau_action">[docs]</a>    <span class="k">def</span> <span class="nf">_on_plateau_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SaveFile.__init__"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.SaveFile.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Terminate the training when the observed variable reaches its plateau.</span>
-
-<span class="sd">        :raise TrainingTerminated: if the model stops improving</span>
+<span class="sd">        :param files: files to be saved</span>
+<span class="sd">        :param output_dir: directory to save the files</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="n">TrainingTerminated</span><span class="p">(</span><span class="s1">&#39;Detected plateau of variable `</span><span class="si">{}</span><span class="s1">` in stream `</span><span class="si">{}</span><span class="s1">`&#39;</span><span class="o">.</span>
-                                 <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">))</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="n">files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span> <span class="o">=</span> <span class="n">output_dir</span></div>
+
+<div class="viewcode-block" id="SaveFile.before_training"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.SaveFile.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">f</span><span class="s1">&#39;file `</span><span class="si">{path}</span><span class="s1">` does not exist&#39;</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">)</span></div></div>
 </pre></div>
 
     </div>

@@ -2,21 +2,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>CLI Reference &#8212; emloop 0.1.0 documentation</title>
+    <title>CLI Reference &#8212; emloop 0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/highlight.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -34,8 +26,7 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-  </head>
-  <body>
+  </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
     <div class="container">
@@ -135,8 +126,8 @@
 	<h4>Related projects</h4>
 </div>
 <ul class="nav nav-list">
-	<li><a href="https://cxflow.org">cxflow</a></li>
-	<li><a href="https://tensorflow.cxflow.org">cxflow-tensorflow</a></li>
+	<li><a href="https://emloop.org">emloop</a></li>
+	<li><a href="https://tensorflow.emloop.org">emloop-tensorflow</a></li>
 	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
 </ul>
         </div>
@@ -150,7 +141,7 @@ command line instruments. The design goal is to focus on defining the actual mod
 instead of the burdensome code, which just puts all the components together.</p>
 <p>With proper installation, the <kbd>emloop</kbd> command should become available. The command comes with four basic sub-commands
 explained below.</p>
-<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">usage</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">emloop (train | resume | predict | dataset) [-v] [-o] ...</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">usage</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">emloop (train | resume | predict | dataset) [-v] [-o] ...</span>
 </pre></div>
 </div>
 <p>All the sub-commands share the following arguments:</p>
@@ -167,8 +158,8 @@ explained below.</p>
 </tbody>
 </table><div class="section" id="emloop-train">
 <h2>emloop train<a class="headerlink" href="#emloop-train" title="Permalink to this headline">¶</a></h2>
-<p>Start emloop training from the <code class="docutils literal"><span class="pre">config_file</span></code>.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">train</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_file</span>
+<p>Start emloop training from the <code class="docutils literal notranslate"><span class="pre">config_file</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">train</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_file</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -186,8 +177,8 @@ explained below.</p>
 </div>
 <div class="section" id="emloop-resume">
 <h2>emloop resume<a class="headerlink" href="#emloop-resume" title="Permalink to this headline">¶</a></h2>
-<p>Resume emloop training from the <code class="docutils literal"><span class="pre">config_path</span></code>.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">resume</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_path</span> <span class="p">[</span><span class="n">restore_from</span><span class="p">]</span>
+<p>Resume emloop training from the <code class="docutils literal notranslate"><span class="pre">config_path</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">resume</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_path</span> <span class="p">[</span><span class="n">restore_from</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -208,8 +199,8 @@ explained below.</p>
 </div>
 <div class="section" id="emloop-predict">
 <h2>emloop predict<a class="headerlink" href="#emloop-predict" title="Permalink to this headline">¶</a></h2>
-<p>Run prediction with the given <code class="docutils literal"><span class="pre">config_path</span></code>.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">predict</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_path</span> <span class="p">[</span><span class="n">restore_from</span><span class="p">]</span>
+<p>Run prediction with the given <code class="docutils literal notranslate"><span class="pre">config_path</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">predict</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">config_path</span> <span class="p">[</span><span class="n">restore_from</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -231,7 +222,7 @@ explained below.</p>
 <div class="section" id="emloop-dataset">
 <h2>emloop dataset<a class="headerlink" href="#emloop-dataset" title="Permalink to this headline">¶</a></h2>
 <p>Invoke arbitrary dataset method.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">dataset</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">method</span> <span class="n">config_file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">dataset</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">method</span> <span class="n">config_file</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -253,7 +244,7 @@ explained below.</p>
 <div class="section" id="emloop-ls">
 <h2>emloop ls<a class="headerlink" href="#emloop-ls" title="Permalink to this headline">¶</a></h2>
 <p>List training log dirs in the given path.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">ls</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="nb">dir</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">ls</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="nb">dir</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -304,7 +295,7 @@ explained below.</p>
 <div class="section" id="emloop-prune">
 <h2>emloop prune<a class="headerlink" href="#emloop-prune" title="Permalink to this headline">¶</a></h2>
 <p>Prune training log dirs in the given path without finished epochs.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">prune</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">EPOCHS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">]</span> <span class="p">[</span><span class="nb">dir</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">emloop</span> <span class="n">prune</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">EPOCHS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">]</span> <span class="p">[</span><span class="nb">dir</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -357,7 +348,7 @@ explained below.</p>
     </p>
     <p>
         &copy; Copyright 2018, Iterait a.s..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
     </p>
   </div>
 </footer>
