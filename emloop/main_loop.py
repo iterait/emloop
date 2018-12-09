@@ -93,6 +93,9 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         self._streams = {}
         self._epochs_done = None
 
+        for hook in self._hooks:
+            hook.register_mainloop(self)
+
         super().__init__()
 
     @property

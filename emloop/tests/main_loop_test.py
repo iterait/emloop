@@ -225,6 +225,7 @@ class EpochDataChecker(el.AbstractHook):
     """Simple hook asserts that the specified streams match the epoch_data keys."""
 
     def __init__(self, streams):
+        super().__init__()
         self._streams = streams
 
     def after_epoch(self, epoch_id: int, epoch_data: EpochData) -> None:

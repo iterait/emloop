@@ -46,6 +46,8 @@ class AbstractHook:
                 logging.warning('Argument `%s` was not recognized by `%s`. Recognized arguments are `%s`.',
                                 key, type(self).__name__, list(inspect.signature(type(self)).parameters.keys()))
 
+        self._main_loop = None
+
     def before_training(self) -> None:
         """
         Before training event.
@@ -102,3 +104,15 @@ class AbstractHook:
             This method is called exactly once during the training.
         """
         pass
+
+    def register_mainloop(self, main_loop: 'emloop.MainLoop') -> None:
+        """
+        Pass :py:class:`emloop.MainLoop` to hook. Raise :py:class:`ValueError` if MainLoop was already passed before.
+
+        :param main_loop: **emloop** main loop for training
+        :raise ValueError: if MainLoop was already passed before
+        """
+        if self._main_loop is not None:
+            raise ValueError('A MainLoop was already registered with this hook.')
+
+        self._main_loop = main_loop
