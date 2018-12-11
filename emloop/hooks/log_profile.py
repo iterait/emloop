@@ -1,5 +1,5 @@
 """
-Module with a hook which reports the time profile data in the stanard logging.
+Module with a hook which reports the time profile data in the standard logging.
 """
 import logging
 from itertools import chain
