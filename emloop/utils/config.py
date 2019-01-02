@@ -45,6 +45,14 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> d
             conf = conf[key_part]
         conf[key] = value
 
+        if 'eval' in config:
+            eval_conf = config['eval']
+            for stream in eval_conf:
+                stream_conf = eval_conf[stream]
+                for key_part in key_prefix:
+                    stream_conf = stream_conf[key_part]
+                stream_conf[key] = value
+
     return reload(config)
 
 
