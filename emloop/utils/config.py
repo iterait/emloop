@@ -33,6 +33,11 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> d
     :return: configuration as dict
     """
 
+    def override_value(config_dict, dict_key, dict_key_prefix, arg_value):
+        for key_part in dict_key_prefix:
+            config_dict = config_dict[key_part]
+        config_dict[dict_key] = arg_value
+
     config = load_yaml(config_file)
 
     for key_full, value in [parse_arg(arg) for arg in additional_args]:
@@ -41,17 +46,13 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> d
         key = key_split[-1]
 
         conf = config
-        for key_part in key_prefix:
-            conf = conf[key_part]
-        conf[key] = value
+        override_value(conf, key, key_prefix, value)
 
         if 'eval' in config:
             eval_conf = config['eval']
             for stream in eval_conf:
                 stream_conf = eval_conf[stream]
-                for key_part in key_prefix:
-                    stream_conf = stream_conf[key_part]
-                stream_conf[key] = value
+                override_value(stream_conf, key, key_prefix, value)
 
     return reload(config)
 
