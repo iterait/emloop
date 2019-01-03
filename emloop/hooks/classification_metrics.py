@@ -2,7 +2,7 @@
 Hook computing epoch statistics for classification tasks.
 """
 
-from typing import Any, Mapping
+from typing import Mapping, List, Union
 import logging
 
 try:
@@ -17,8 +17,8 @@ from ..types import EpochData
 class ClassificationMetrics(AccumulateVariables):
     """
     Accumulate the specified prediction and gt variables and compute their classification statistics after each epoch.
-    In particular, accuracy, precisions, recalls and f1s are computed and saved to epoch data.
-
+    In particular, accuracy, precisions, recalls, f1s and sometimes specificity (if f1_average is set to 'binary') are
+    computed and saved to epoch data.
 
     .. code-block:: yaml
         :caption: Compute and save classification statistics between model output
@@ -40,13 +40,16 @@ class ClassificationMetrics(AccumulateVariables):
         """
         super().__init__(variables=[predicted_variable, gt_variable], **kwargs)
 
+        if f1_average != 'binary':
+            logging.warning('Specificity won\'t be computed as f1_average was not set to `binary`.')
+
         self._predicted_variable = predicted_variable
         self._gt_variable = gt_variable
         self._f1_average = f1_average
         self._var_prefix = var_prefix
 
-    def _get_metrics(self, gt: list, predicted: list) -> Mapping[str, Any]:
-        """Compute accuracy, precision, recall and f1."""
+    def _get_metrics(self, gt: List[float], predicted: List[float]) -> Mapping[str, Union[float, List[float]]]:
+        """Compute accuracy, precision, recall, f1 and sometimes specificity (if f1_average is set to 'binary')."""
         metrics = {}
         metrics[self._var_prefix+'precision'], metrics[self._var_prefix+'recall'], metrics[self._var_prefix+'f1'], _ = \
             sk.precision_recall_fscore_support(gt, predicted, average=self._f1_average)
@@ -59,8 +62,8 @@ class ClassificationMetrics(AccumulateVariables):
     def _save_metrics(self, epoch_data: EpochData) -> None:
         """
         Compute the classification statistics from the accumulator and save the results to the given epoch data.
-
-        Set up 'accuracy', 'precision', 'recall' and 'f1' epoch data variables prefixed with self._var_prefix.
+        Set up 'accuracy', 'precision', 'recall', 'f1' and sometimes 'specificity' (if f1_average is set to 'binary')
+        epoch data variables prefixed with self._var_prefix.
 
         :param epoch_data: epoch data to save the results to
         :raise ValueError: if the output variables are already set
