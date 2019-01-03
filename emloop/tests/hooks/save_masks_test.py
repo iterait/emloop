@@ -20,7 +20,7 @@ def get_batch():
     return batch
 
 
-@pytest.mark.skipif(os.environ.get('OPENCV', None) is None, reason='This test requires OpenCV.')
+@pytest.mark.skipif(os.environ.get('EXTRA_PKGS', None) is None, reason='This test requires OpenCV.')
 def test_saving_mask(tmpdir):
     """Test masks are correctly saved to file."""
 
@@ -42,7 +42,7 @@ _MASK = ['not-there', 'mask', 'incorrect', 'mask']
 _PATH = ['path', 'not-there', 'path', 'incorrect']
 
 
-@pytest.mark.skipif(os.environ.get('OPENCV', None) is None, reason='This test requires OpenCV.')
+@pytest.mark.skipif(os.environ.get('EXTRA_PKGS', None) is None, reason='This test requires OpenCV.')
 @pytest.mark.parametrize('mask, path', zip(_MASK, _PATH))
 def test_saving_mask_raises_error(tmpdir, mask, path):
     """Test raising an assertion error if variable is not present in a batch/variable lengths are not same."""

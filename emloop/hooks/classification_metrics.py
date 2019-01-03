@@ -34,7 +34,7 @@ class ClassificationMetrics(AccumulateVariables):
         """
         :param predicted_variable: name of the predicted variable.
         :param gt_variable: name of the gt variable
-        :param f1_average: averaging type {micro, macro, weighted, samples} defined by
+        :param f1_average: averaging type {binary, micro, macro, weighted, samples} defined by
                            `sklearn.metrics.precision_recall_fscore_support`
         :param var_prefix: prefix for the output variables
         """
@@ -65,7 +65,6 @@ class ClassificationMetrics(AccumulateVariables):
         :param epoch_data: epoch data to save the results to
         :raise ValueError: if the output variables are already set
         """
-
         for stream_name, stream_data in epoch_data.items():
             # variables are already checked in the AccumulatingHook; hence, we do not check them here
             metrics = self._get_metrics(self._accumulator[stream_name][self._gt_variable],
