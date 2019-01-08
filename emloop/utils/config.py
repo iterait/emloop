@@ -2,6 +2,8 @@
 Config module providing util functions for handling YAML configurations.
 """
 import typing
+import logging
+from copy import deepcopy
 
 import yaml
 
@@ -24,21 +26,35 @@ def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     return key, value
 
 
-def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> dict:
+def load_config(config_file: str, additional_args: typing.Iterable[str]=(), override_stream: str=None) -> dict:
     """
-    Load config from YAML ``config_file`` and extend/override it with the given ``additional_args``.
+    Load config from YAML ``config_file``.
 
-    :param config_file: path the YAML config file to be loaded
-    :param additional_args: additional args which may extend or override the config loaded from the file.
+    If ``override_stream`` is specified, update config by the respective eval.override_stream section, in particular:
+        - hooks section is entirely replaced
+        - model and dataset sections are updated
+
+    Extend/override it with the given ``additional_args``.
+
+    :param config_file: path to the YAML config file to be loaded
+    :param additional_args: additional args which may extend or override the config loaded from the file
+    :param override_stream: stream name whose config section will be updated
     :return: configuration as dict
     """
 
-    def override_value(config_dict, dict_key, dict_key_prefix, arg_value):
-        for key_part in dict_key_prefix:
-            config_dict = config_dict[key_part]
-        config_dict[dict_key] = arg_value
-
     config = load_yaml(config_file)
+
+    if override_stream is not None and 'eval' in config and override_stream in config['eval']:
+        update_section = config['eval'][override_stream]
+        for subsection in ['dataset', 'model', 'main_loop']:
+            if subsection in update_section:
+                config[subsection].update(deepcopy(update_section[subsection]))
+        if 'hooks' in update_section:
+            config['hooks'] = update_section['hooks']
+        else:
+            logging.warning('Config does not contain `eval.%s.hooks` section. '
+                            'No hook will be employed during the evaluation.', override_stream)
+            config['hooks'] = []
 
     for key_full, value in [parse_arg(arg) for arg in additional_args]:
         key_split = key_full.split('.')
@@ -46,13 +62,9 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=()) -> d
         key = key_split[-1]
 
         conf = config
-        override_value(conf, key, key_prefix, value)
-
-        if 'eval' in config:
-            eval_conf = config['eval']
-            for stream in eval_conf:
-                stream_conf = eval_conf[stream]
-                override_value(stream_conf, key, key_prefix, value)
+        for key_part in key_prefix:
+            conf = conf[key_part]
+        conf[key] = value
 
     return reload(config)
 

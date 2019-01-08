@@ -65,3 +65,96 @@ def test_load_anchored_config(tmpdir, anchored_yaml, params, a_key, e_key):
 
     assert load_config(f_name, *params)['a'] == a_key
     assert OrderedDict(load_config(f_name, *params)['e']) == OrderedDict(e_key)
+
+
+@pytest.fixture
+def yaml():
+    yield """
+          model:
+            class: Model
+
+            io: 
+              in: [a]
+              out: [b]
+
+            outputs: [c]
+
+          dataset:
+            class: Dataset
+            
+            batch_size: 10
+
+          hooks:
+          - Hook_1:
+              epochs: 1
+
+          - Hook_2:
+              epochs: 1
+
+          eval:
+            train:      
+              model:
+                class: EvalModel
+
+                io: 
+                  in: [x]
+                  out: [y]
+                  
+                inputs: [z]
+
+              dataset:
+                class: EvalDataset
+
+              hooks:
+              - Hook_2:
+                  epochs: 2
+          """
+
+
+def test_override(tmpdir, yaml):
+    """Test configuration is first overridden by eval section and CLI arguments then override everything."""
+    orig_config = path.join(tmpdir, 'test.yaml')
+
+    with open(orig_config, 'w') as file:
+        file.write(yaml)
+
+    cl_arguments = ['dataset.class=CliDataset', 'model.io.in=[m]']
+
+    # no cl_arguments nor override_stream specified - no override
+    config_0 = {'model': {'class': 'Model', 'io': {'in': ['a'], 'out': ['b']}, 'outputs': ['c']},
+                'dataset': {'class': 'Dataset', 'batch_size': 10},
+                'hooks': [{'Hook_1': {'epochs': 1}}, {'Hook_2': {'epochs': 1}}],
+                'eval': {'train': {'model': {'class': 'EvalModel', 'io': {'in': ['x'], 'out': ['y']}, 'inputs': ['z']},
+                                   'dataset': {'class': 'EvalDataset'},
+                                   'hooks': [{'Hook_2': {'epochs': 2}}]}}}
+    assert OrderedDict(load_config(orig_config)) == OrderedDict(config_0)
+
+    # no cl_arguments specified, override_stream not in eval - no override
+    assert OrderedDict(load_config(config_file=orig_config, override_stream='valid')) == OrderedDict(config_0)
+
+    # no cl_arguments specified, override_stream in eval - override
+    config_1 = {'model': {'class': 'EvalModel', 'io': {'in': ['x'], 'out': ['y']}, 'outputs': ['c'], 'inputs': ['z']},
+                'dataset': {'class': 'EvalDataset', 'batch_size': 10},
+                'hooks': [{'Hook_2': {'epochs': 2}}],
+                'eval': {'train': {'model': {'class': 'EvalModel', 'io': {'in': ['x'], 'out': ['y']}, 'inputs': ['z']},
+                                   'dataset': {'class': 'EvalDataset'},
+                                   'hooks': [{'Hook_2': {'epochs': 2}}]}}}
+    assert OrderedDict(load_config(config_file=orig_config, override_stream='train')) == OrderedDict(config_1)
+
+    # cl_arguments specified, override_stream not in eval - override
+    config_2 = {'model': {'class': 'Model', 'io': {'in': ['m'], 'out': ['b']}, 'outputs': ['c']},
+                'dataset': {'class': 'CliDataset', 'batch_size': 10},
+                'hooks': [{'Hook_1': {'epochs': 1}}, {'Hook_2': {'epochs': 1}}],
+                'eval': {'train': {'model': {'class': 'EvalModel', 'io': {'in': ['x'], 'out': ['y']}, 'inputs': ['z']},
+                                   'dataset': {'class': 'EvalDataset'},
+                                   'hooks': [{'Hook_2': {'epochs': 2}}]}}}
+    assert OrderedDict(load_config(orig_config, cl_arguments, 'valid')) == OrderedDict(config_2)
+
+    # cl_arguments specified, override_stream in eval - override
+    config_3 = {'model': {'class': 'EvalModel', 'io': {'in': ['m'], 'out': ['y']}, 'outputs': ['c'], 'inputs': ['z']},
+                'dataset': {'class': 'CliDataset', 'batch_size': 10},
+                'hooks': [{'Hook_2': {'epochs': 2}}],
+                'eval': {'train': {'model': {'class': 'EvalModel', 'io': {'in': ['x'], 'out': ['y']}, 'inputs': ['z']},
+                                   'dataset': {'class': 'EvalDataset'},
+                                   'hooks': [{'Hook_2': {'epochs': 2}}]}}}
+    assert OrderedDict(load_config(orig_config, cl_arguments, 'train')) == OrderedDict(config_3)
