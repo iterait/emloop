@@ -112,7 +112,7 @@ def yaml():
 
 
 def test_override(tmpdir, yaml):
-    """Test configuration is first overridden by eval section and CLI arguments then override everything."""
+    """Test configuration is overridden by the eval section and subsequently by the CLI arguments."""
     orig_config = path.join(tmpdir, 'test.yaml')
 
     with open(orig_config, 'w') as file:
