@@ -1,7 +1,6 @@
 """
 Test module for computing epoch statistics for classification tasks hook (emloop.hooks.classification_metrics).
 """
-import collections
 import os
 
 import numpy as np
@@ -10,18 +9,19 @@ import pytest
 from emloop.hooks.classification_metrics import ClassificationMetrics
 
 
+TRAIN_BATCH_1 = {'gt': np.array([0, 0, 0]),
+                 'prediction': np.array([0, 0, 0])}
+
+TRAIN_BATCH_2 = {'gt': np.array([0, 1]),
+                 'prediction': np.array([1, 1])}
+
+TEST_BATCH_1 = {'gt': np.array([1, 1, 1, 1, 0]),
+                'prediction': np.array([1, 1, 1, 0, 0])}
+
+
 def get_epoch_data():
-    epoch_data = collections.OrderedDict([
-        ('train', collections.OrderedDict([
-            ('gt', np.array([0, 0, 0, 0, 1])),
-            ('prediction', np.array([0, 0, 0, 1, 1])),
-            ('accuracy', 1),
-        ])),
-        ('test', collections.OrderedDict([
-            ('gt', np.array([1, 1, 1, 1, 0])),
-            ('prediction', np.array([1, 1, 1, 0, 0])),
-        ]))
-    ])
+    epoch_data = {'train': {'accuracy': 1},
+                  'test': {}}
     return epoch_data
 
 
@@ -33,8 +33,9 @@ def test_computing_metrics():
     hook = ClassificationMetrics('prediction', 'gt', 'binary', prefix)
     epoch_data = get_epoch_data()
 
-    hook.after_batch(stream_name='train', batch_data=epoch_data['train'])
-    hook.after_batch(stream_name='test', batch_data=epoch_data['test'])
+    hook.after_batch(stream_name='train', batch_data=TRAIN_BATCH_1)
+    hook.after_batch(stream_name='test', batch_data=TEST_BATCH_1)
+    hook.after_batch(stream_name='train', batch_data=TRAIN_BATCH_2)
     hook.after_epoch(epoch_data)
 
     assert epoch_data['train'][prefix+'precision'] == 0.5
@@ -57,6 +58,7 @@ def test_computing_metrics_raises_error():
     hook = ClassificationMetrics('prediction', 'gt')
     epoch_data = get_epoch_data()
 
-    hook.after_batch(stream_name='train', batch_data=epoch_data['train'])
+    hook.after_batch(stream_name='train', batch_data=TRAIN_BATCH_1)
+    hook.after_batch(stream_name='train', batch_data=TRAIN_BATCH_2)
     with pytest.raises(ValueError):
         hook.after_epoch(epoch_data)
