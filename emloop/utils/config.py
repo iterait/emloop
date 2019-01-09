@@ -48,6 +48,7 @@ def load_config(config_file: str, additional_args: typing.Iterable[str]=(), over
         update_section = config['eval'][override_stream]
         for subsection in ['dataset', 'model', 'main_loop']:
             if subsection in update_section:
+                # deepcopy has to be made, otherwise responding eval section is overridden as well
                 config[subsection].update(deepcopy(update_section[subsection]))
         if 'hooks' in update_section:
             config['hooks'] = update_section['hooks']
