@@ -33,7 +33,7 @@ class ClassificationMetrics(AccumulateVariables):
     def __init__(self, predicted_variable: str, gt_variable: str, f1_average: str=None, var_prefix: str='', **kwargs):
         """
         :param predicted_variable: name of the predicted variable.
-        :param gt_variable: name of the gt variable
+        :param gt_variable: name of the ground truth variable
         :param f1_average: averaging type {binary, micro, macro, weighted, samples} defined by
                            `sklearn.metrics.precision_recall_fscore_support`
         :param var_prefix: prefix for the output variables to avoid name conflicts; e.g. `classification_`
