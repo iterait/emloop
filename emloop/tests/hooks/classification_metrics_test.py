@@ -53,7 +53,7 @@ def test_computing_metrics():
 
 @pytest.mark.skipif(os.environ.get('EXTRA_PKGS', None) is None, reason='This test requires SciKit.')
 def test_computing_metrics_raises_error():
-    """Test raises value error if variables should be repeated."""
+    """Test the hook raises value error if output variables are already present in the stream sources."""
 
     hook = ClassificationMetrics('prediction', 'gt')
     epoch_data = get_epoch_data()
