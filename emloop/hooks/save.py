@@ -93,18 +93,17 @@ class SaveBest(AbstractHook):
 
     """
 
-    _OUTPUT_NAME = 'best'
-
     OBJECTIVES = {'min', 'max'}
     """Possible objectives for the monitor variable."""
 
     def __init__(self,  # pylint: disable=too-many-arguments
-                 model: AbstractModel, variable: str='loss', condition: str='min', stream: str='valid',
-                 aggregation: str='mean', on_save_failure: str='error', **kwargs):
+                 model: AbstractModel, model_name: str='best', variable: str='loss', condition: str='min',
+                 stream: str='valid', aggregation: str='mean', on_save_failure: str='error', **kwargs):
         """
         Example: metric=loss, condition=min -> saved the model when the loss is best so far (on `stream`).
 
         :param model: trained model
+        :param model_name: name under which model will be saved
         :param variable: variable name to be monitored
         :param condition: performance objective; one of :py:attr:`OBJECTIVES`
         :param stream: stream name to be monitored
@@ -118,6 +117,7 @@ class SaveBest(AbstractHook):
 
         super().__init__(**kwargs)
         self._model = model
+        self._model_name = model_name
         self._variable = variable
         self._condition = condition
         self._stream_name = stream
@@ -182,7 +182,7 @@ class SaveBest(AbstractHook):
 
         if self._is_value_better(new_value):
             self._best_value = new_value
-            SaveEvery.save_model(model=self._model, name_suffix=self._OUTPUT_NAME, on_failure=self._on_save_failure)
+            SaveEvery.save_model(model=self._model, name_suffix=self._model_name, on_failure=self._on_save_failure)
 
 
 class SaveLatest(AbstractHook):
