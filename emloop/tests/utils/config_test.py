@@ -112,7 +112,7 @@ def yaml():
 
 
 def test_override(tmpdir, yaml):
-    """Test configuration is first overridden by eval section and CLI arguments then override everything."""
+    """Test configuration is overridden by the eval section and subsequently by the CLI arguments."""
     orig_config = path.join(tmpdir, 'test.yaml')
 
     with open(orig_config, 'w') as file:
@@ -120,7 +120,7 @@ def test_override(tmpdir, yaml):
 
     cl_arguments = ['dataset.class=CliDataset', 'model.io.in=[m]']
 
-    # no cl_arguments nor override_stream specified - no override
+    # neither cl_arguments nor override_stream specified - no override
     config_0 = {'model': {'class': 'Model', 'io': {'in': ['a'], 'out': ['b']}, 'outputs': ['c']},
                 'dataset': {'class': 'Dataset', 'batch_size': 10},
                 'hooks': [{'Hook_1': {'epochs': 1}}, {'Hook_2': {'epochs': 1}}],
