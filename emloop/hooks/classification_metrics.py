@@ -2,7 +2,7 @@
 Hook computing epoch statistics for classification tasks.
 """
 
-from typing import Mapping, List, Union
+from typing import Mapping, List, Union, Optional
 import logging
 
 try:
@@ -20,6 +20,9 @@ class ClassificationMetrics(AccumulateVariables):
     In particular, accuracy, precisions, recalls, f1s and sometimes specificity (if f1_average is set to 'binary') are
     computed and saved to epoch data.
 
+    .. warning::
+        Specificity will be computed only if `f1_average` is set to `binary`.
+
     .. code-block:: yaml
         :caption: Compute and save classification statistics between model output
                   `prediction` and stream source `labels`.
@@ -30,18 +33,17 @@ class ClassificationMetrics(AccumulateVariables):
               gt_variable: labels
     """
 
-    def __init__(self, predicted_variable: str, gt_variable: str, f1_average: str=None, var_prefix: str='', **kwargs):
+    def __init__(self, predicted_variable: str, gt_variable: str, f1_average: Optional[str]=None,
+                 var_prefix: str='', **kwargs):
         """
         :param predicted_variable: name of the predicted variable.
         :param gt_variable: name of the ground truth variable
         :param f1_average: averaging type {binary, micro, macro, weighted, samples} defined by
                            `sklearn.metrics.precision_recall_fscore_support`
+               https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html
         :param var_prefix: prefix for the output variables to avoid name conflicts; e.g. `classification_`
         """
         super().__init__(variables=[predicted_variable, gt_variable], **kwargs)
-
-        if f1_average != 'binary':
-            logging.warning('Specificity won\'t be computed as f1_average was not set to `binary`.')
 
         self._predicted_variable = predicted_variable
         self._gt_variable = gt_variable
