@@ -27,7 +27,7 @@ def get_epoch_data():
 
 @pytest.mark.skipif(os.environ.get('EXTRA_PKGS', None) is None, reason='This test requires SciKit.')
 def test_computing_metrics():
-    """Test metrics is correctly computed."""
+    """Test that the metrics are correctly computed."""
 
     prefix = 'metrics_'
     hook = ClassificationMetrics('prediction', 'gt', 'binary', prefix)
