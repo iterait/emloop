@@ -39,8 +39,8 @@ class ClassificationMetrics(AccumulateVariables):
         :param predicted_variable: name of the predicted variable.
         :param gt_variable: name of the ground truth variable
         :param f1_average: averaging type {binary, micro, macro, weighted, samples} defined by
-                           `sklearn.metrics.precision_recall_fscore_support`
-               https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html
+                           `sklearn.metrics.precision_recall_fscore_support
+            <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html>`_
         :param var_prefix: prefix for the output variables to avoid name conflicts; e.g. `classification_`
         """
         super().__init__(variables=[predicted_variable, gt_variable], **kwargs)
