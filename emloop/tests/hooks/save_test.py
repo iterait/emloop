@@ -56,6 +56,12 @@ class EmptyModel(AbstractModel):
         return ''
 
 
+class SaveModel(EmptyModel):
+    """The model which checks that correct `name_suffix` was passed."""
+    def save(self, name_suffix: str) -> str:
+        assert name_suffix == 'best_valid_loss'
+
+
 ##############
 # Save After #
 ##############
@@ -153,6 +159,12 @@ def test_save_value_better():
 
     test_max_min_cond('max', 3, 5, 2)
     test_max_min_cond('min', 5, 3, 3)
+
+
+def test_save_under_configurable_name():
+    """Test a model saving under given configurable name."""
+    hook = SaveBest(model=SaveModel(), model_name='best_valid_loss')
+    hook.after_epoch(_get_epoch_data())
 
 
 ###############
