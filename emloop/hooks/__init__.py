@@ -16,6 +16,7 @@ from .abstract_hook import AbstractHook, TrainingTerminated
 from .accumulate_variables import AccumulateVariables
 from .benchmark import Benchmark
 from .check import Check
+from .classification_metrics import ClassificationMetrics
 from .compute_stats import ComputeStats
 from .every_n_epoch import EveryNEpoch
 from .flatten import Flatten
@@ -40,5 +41,5 @@ AbstractHook.__module__ = '.hooks'
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
            'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'SaveLatest', 'ComputeStats', 'Check', 'ShowProgress',
            'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'StopOnNaN', 'SaveConfusionMatrix', 'Flatten', 'PlotLines',
-           'LogitsToCsv', 'SequenceToCsv', 'SaveFile', 'Benchmark']
+           'LogitsToCsv', 'SequenceToCsv', 'SaveFile', 'Benchmark', 'ClassificationMetrics']
 
