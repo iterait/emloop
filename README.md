@@ -32,7 +32,6 @@ For that reason the whole functionality is divided into various extensions with 
 At the moment we support the following extensions:
 
 - [emloop-tensorflow](https://github.com/iterait/emloop-tensorflow) - TensorFlow support
-- [emloop-scikit](https://github.com/iterait/emloop-scikit) - scientific computations and statistics
 - [emloop-rethinkdb](https://github.com/iterait/emloop-rethinkdb) - RethinkDB hook for training management with NoSQL (experimental)
 
 ## Contributions
