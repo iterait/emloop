@@ -113,10 +113,10 @@ class Sequence(AbstractModel):
         # run all the models in-order
         current_batch = dict(copy.deepcopy(batch))
         for model in self._models:
-            input_names = set(model.input_names)
             batch_inputs = set(list(current_batch.keys()))
-            if input_names-batch_inputs != set():
-                raise ValueError(f'Model `{model.__class__.__name__}` expects inputs `{input_names}` which is '
+            missing_inputs = set(model.input_names)-batch_inputs
+            if missing_inputs != set():
+                raise ValueError(f'Model `{model.__class__.__name__}` expects inputs `{missing_inputs}` which are '
                                  f'missing among currently passed in inputs `{batch_inputs}`.')
             current_batch.update(model.run(current_batch, False, None))
 
