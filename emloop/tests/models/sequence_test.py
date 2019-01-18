@@ -32,6 +32,18 @@ model:
 """
 
 
+_STEP3_CONFIG = """
+model:
+  name: step3
+  class: emloop.tests.models.sequence_test.Step3
+  inputs: [masks, classes]
+  outputs: [results]
+
+"""
+
+_IMAGES = [[2.], [2.], [2.]]
+
+
 class Step1:
     def __init__(self, dataset, **_):
         self.dataset = dataset
@@ -66,12 +78,28 @@ class Step2:
         return {'classes': np.ones(np.array(batch['images']).shape[0])}
 
 
+class Step3:
+    def __init__(self, **_):
+        pass
+
+    @property
+    def input_names(self):
+        return ['masks', 'classes']
+
+    @property
+    def output_names(self):
+        return ['results']
+
+    def run(self, batch: el.Batch, train: bool, stream: StreamWrapper) -> el.Batch:
+        return {'results': np.ones(np.array(batch['masks']).shape[0])}
+
+
 @pytest.fixture
 def create_models(tmpdir):
 
     def _create_models():
         """Create two step models in the tmp dir."""
-        for name, config in zip(['step1', 'step2'], [_STEP1_CONFIG, _STEP2_CONFIG]):
+        for name, config in zip(['step1', 'step2', 'step3'], [_STEP1_CONFIG, _STEP2_CONFIG, _STEP3_CONFIG]):
             model_dir = path.join(tmpdir, name)
             os.mkdir(model_dir)
             with open(path.join(model_dir, EL_CONFIG_FILE), 'w') as config_file:
@@ -97,15 +125,16 @@ def test_init(create_models, tmpdir):
 def test_run(create_models, tmpdir):
     """Test if Sequence model accumulates the outputs properly."""
     create_models()
-    sequence = Sequence(models_root=tmpdir, model_paths=['step1', 'step2'], dataset='my_dataset')
+    sequence = Sequence(models_root=tmpdir, model_paths=['step1', 'step2', 'step3'], dataset='my_dataset')
 
     # outputs accumulating
-    images = [[2.], [2.], [2.]]
-    output = sequence.run({'images': images}, False, None)
+    output = sequence.run({'images': _IMAGES}, False, None)
     assert 'masks' in output
     assert 'classes' in output
-    np.testing.assert_array_equal(np.zeros_like(images), output['masks'])
+    assert 'results' in output
+    np.testing.assert_array_equal(np.zeros_like(_IMAGES), output['masks'])
     np.testing.assert_array_equal(np.ones((3,)), output['classes'])
+    np.testing.assert_array_equal(np.ones((3,)), output['results'])
 
     # test dataset is propagated
     assert 'my_dataset' == sequence._models[0].dataset
@@ -121,3 +150,8 @@ def test_raising(create_models, tmpdir):
     with pytest.raises(NotImplementedError):
         sequence.save()
     assert sequence.restore_fallback is None
+
+    # test ValueError raised if models don't follow up correctly
+    sequence2 = Sequence(models_root=tmpdir, model_paths=['step1', 'step3'])
+    with pytest.raises(ValueError):
+        sequence2.run({'images': _IMAGES}, False, None)
