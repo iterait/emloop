@@ -8,7 +8,7 @@ from typing import Optional
 from collections import namedtuple
 import traceback
 
-import yaml
+import ruamel.yaml
 import tabulate
 import numpy as np
 
@@ -36,7 +36,7 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
         """
         super().__init__(config_str)
 
-        config = yaml.load(config_str)
+        config = ruamel.yaml.load(config_str, ruamel.yaml.RoundTripLoader)
         self._configure_dataset(**config)
 
     @abstractmethod
