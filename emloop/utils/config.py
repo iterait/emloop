@@ -1,7 +1,7 @@
 """
 Config module providing util functions for handling YAML configurations.
 """
-import typing
+from typing import Tuple, Any, Iterable, Optional
 import logging
 from copy import deepcopy
 
@@ -10,7 +10,7 @@ import yaml
 from .yaml import load_yaml, reload
 
 
-def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
+def parse_arg(arg: str) -> Tuple[str, Any]:
     """
     Parse CLI argument in format ``key=value`` to ``(key, value)``
 
@@ -26,7 +26,7 @@ def parse_arg(arg: str) -> typing.Tuple[str, typing.Any]:
     return key, value
 
 
-def load_config(config_file: str, additional_args: typing.Iterable[str]=(), override_stream: str=None) -> dict:
+def load_config(config_file: str, additional_args: Iterable[str]=(), override_stream: Optional[str]=None) -> dict:
     """
     Load config from YAML ``config_file``.
 

@@ -14,6 +14,10 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
     """
     Evaluate the given model on the specified data stream.
 
+    Configuration is updated by the respective predict.stream_name section, in particular:
+        - hooks section is entirely replaced
+        - model and dataset sections are updated
+
     :param model_path: path to the model to be evaluated
     :param stream_name: data stream name to be evaluated
     :param config_path: path to the config to be used, if not specified infer the path from ``model_path``
