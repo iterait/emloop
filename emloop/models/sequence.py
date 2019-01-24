@@ -16,7 +16,7 @@ from ..constants import EL_CONFIG_FILE
 class Sequence(AbstractModel):
     """
     Model sequence provides simple abstraction for sequential application of multiple models to input batches.
-    All the models are fed with the original inputs as well as the outputs of the preceeding models.
+    All the models are fed with the original inputs as well as the outputs of the preceding models.
     Ultimately, all the model outputs are returned.
 
     .. warning::
@@ -113,6 +113,11 @@ class Sequence(AbstractModel):
         # run all the models in-order
         current_batch = dict(copy.deepcopy(batch))
         for model in self._models:
+            batch_inputs = set(list(current_batch.keys()))
+            missing_inputs = set(model.input_names)-batch_inputs
+            if missing_inputs != set():
+                raise ValueError(f'Model `{model.__class__.__name__}` expects inputs `{missing_inputs}` which are '
+                                 f'missing among currently passed in inputs `{batch_inputs}`.')
             current_batch.update(model.run(current_batch, False, None))
 
         return {key: current_batch[key] for key in self.output_names}
