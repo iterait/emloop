@@ -7,7 +7,7 @@ from collections import OrderedDict
 import ruamel.yaml
 import yaml
 
-from emloop.utils.yaml import yaml_to_file, yaml_to_str, load_yaml, make_simple
+from emloop.utils.yaml import yaml_to_file, yaml_to_str, load_yaml
 from emloop.constants import EL_CONFIG_FILE
 
 
@@ -52,10 +52,3 @@ def test_dump_yaml(tmpdir):
     # test dump to string (effectively, test pyaml)
     yaml_str = yaml_to_str(config)
     assert yaml.load(yaml_str) == config
-
-
-def test_make_simple(anchored_yaml):
-    """Test yaml make_simple utility function."""
-    anchored = ruamel.yaml.load(anchored_yaml, Loader=ruamel.yaml.RoundTripLoader)
-    full_part = yaml.load(yaml_to_str(make_simple(anchored)['e']))
-    assert full_part['b'] == 'c'
