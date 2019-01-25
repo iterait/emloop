@@ -44,17 +44,6 @@ def yaml_to_str(data: Mapping) -> str:
     return yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper)
 
 
-def make_simple(data: Any) -> Any:
-    """
-    Substitute all the references in the given data (typically a mapping or sequence) with the actual values.
-    This is useful, if you loaded a yaml with RoundTripLoader and you need to dump part of it safely.
-
-    :param data: data to be made simple (dict instead of CommentedMap etc.)
-    :return: simplified data
-    """
-    return yaml.load(yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper), Loader=ruamel.yaml.Loader)
-
-
 def reload(data: Any) -> Any:
     """
     Dump and load yaml data.
