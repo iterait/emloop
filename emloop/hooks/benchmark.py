@@ -17,7 +17,7 @@ class Benchmark(AbstractHook):
         :caption: log mean and median example times after each epoch
 
         hooks:
-          - Benchmarking
+          - Benchmark
 
     """
 
