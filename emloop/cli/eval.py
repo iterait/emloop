@@ -29,24 +29,12 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
     try:
         model_dir = path.dirname(model_path) if not path.isdir(model_path) else model_path
         config_path = find_config(model_dir if config_path is None else config_path)
-        config = load_config(config_file=config_path, additional_args=cl_arguments)
+        config = load_config(config_file=config_path, additional_args=cl_arguments, override_stream=stream_name)
 
         if stream_name == EL_PREDICT_STREAM and stream_name in config:  # old style ``emloop predict ...``
             logging.warning('Old style ``predict`` configuration section is deprecated and will not be supported, '
                             'use ``eval.predict`` section instead.')
             config['eval'] = {'predict': config['predict']}
-
-        if 'eval' in config and stream_name in config['eval']:
-            update_section = config['eval'][stream_name]
-            for subsection in ['dataset', 'model', 'main_loop']:
-                if subsection in update_section:
-                    config[subsection].update(update_section[subsection])
-            if 'hooks' in update_section:
-                config['hooks'] = update_section['hooks']
-            else:
-                logging.warning('Config does not contain `eval.%s.hooks` section. '
-                                'No hook will be employed during the evaluation.', stream_name)
-                config['hooks'] = []
 
         validate_config(config)
 

@@ -26,7 +26,7 @@ class SaveMasks(AbstractHook):
                   `image_paths` suffixed by `_mask.png`.
 
         hooks:
-          - SaveImagesToPath:
+          - SaveMasks:
               mask_variable: predictions
               path_variable: image_paths
     """

@@ -10,7 +10,7 @@ import logging
 import yaml
 import pytest
 
-from emloop import AbstractModel
+from emloop import AbstractModel, MainLoop
 from emloop.cli.common import create_output_dir, create_dataset, create_hooks, create_model, run
 from emloop.hooks.abstract_hook import AbstractHook
 from emloop.hooks import StopAfter, LogProfile
@@ -377,3 +377,24 @@ def test_run_with_eval_stream(tmpdir, caplog):
     
     assert f'Running the evaluation of stream `{EL_DEFAULT_TRAIN_STREAM}`' not in caplog.text
     assert 'Running the evaluation of stream `valid`' in caplog.text
+
+
+def test_pass_mainloop_to_hooks(tmpdir):
+    """Test that mainloop is passed to all hooks."""
+    config = {'hooks': [{'emloop.tests.cli.common_test.DummyHook': {'epochs': 1}},
+                        {'emloop.tests.cli.common_test.DummyEvalHook': {'epochs': 1}}]}
+
+    dataset = 'dataset_placeholder'
+    model = 'model_placeholder'
+    hooks = create_hooks(config=config, dataset=dataset, model=model, output_dir=tmpdir)
+
+    for hook in hooks:
+        assert hook._main_loop == None
+
+    main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks)
+
+    for hook in hooks:
+        assert hook._main_loop == main_loop
+
+    with pytest.raises(ValueError):
+        MainLoop(model=model, dataset=dataset, hooks=hooks)

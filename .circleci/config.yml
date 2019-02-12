@@ -7,31 +7,32 @@ references:
       name: Install dependencies on Ubuntu.
       command: |
         apt-get update -qy
-        apt-get install -y git python3-dev python3-pip curl
+        apt-get install -y git python3-dev python3-numpy python3-pip curl
         pip3 install coveralls coverage
 
   arch_deps: &arch_deps
     run:
       name: Install dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm python python-pip git base-devel curl
+        pacman -Syu --noconfirm python python-numpy python-pip git curl
         pip install coveralls coverage
 
-  ubuntu_deps_opencv: &ubuntu_deps_opencv
+  ubuntu_deps_extra_pkgs: &ubuntu_deps_extra_pkgs
     run:
-      name: Install opencv dependencies on Ubuntu.
+      name: Install opencv & scikit dependencies on Ubuntu.
       command: |
         export DEBIAN_FRONTEND=noninteractive
         apt-get install -y libopencv-dev python3-opencv
         ldconfig
-        echo 'export OPENCV=true' >> $BASH_ENV
+        pip3 install scikit-learn
+        echo 'export EXTRA_PKGS=true' >> $BASH_ENV
 
-  arch_deps_opencv: &arch_deps_opencv
+  arch_deps_extra_pkgs: &arch_deps_extra_pkgs
     run:
-      name: Install opencv dependencies on Arch Linux.
+      name: Install opencv & scikit dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm opencv hdf5 gtk3
-        echo 'export OPENCV=true' >> $BASH_ENV
+        pacman -Syu --noconfirm opencv hdf5 gtk3 python-scikit-learn
+        echo 'export EXTRA_PKGS=true' >> $BASH_ENV
 
   install: &install
     run:
@@ -83,7 +84,7 @@ jobs:
       - checkout
       - *install
       - *test
-      - *ubuntu_deps_opencv
+      - *ubuntu_deps_extra_pkgs
       - *test
 
   test_ubuntu_rolling:
@@ -95,24 +96,24 @@ jobs:
       - checkout
       - *install
       - *test
-      - *ubuntu_deps_opencv
+      - *ubuntu_deps_extra_pkgs
       - *test
 
   test_archlinux:
     docker:
-      - image: archimg/base-devel
+      - image: archlinux/base
     working_directory: ~/emloop
     steps:
       - *arch_deps
       - checkout
       - *install
       - *test
-      - *arch_deps_opencv
+      - *arch_deps_extra_pkgs
       - *test
 
   coverage:
     docker:
-      - image: archimg/base-devel
+      - image: archlinux/base
     working_directory: ~/emloop
     steps:
       - *arch_deps
@@ -133,7 +134,7 @@ jobs:
 
   deploy:
     docker:
-      - image: archimg/base-devel
+      - image: archlinux/base
     working_directory: ~/emloop
     steps:
       - *arch_deps

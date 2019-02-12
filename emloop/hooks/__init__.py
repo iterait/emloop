@@ -13,31 +13,33 @@ Module with official **emloop** hooks.
 
 """
 from .abstract_hook import AbstractHook, TrainingTerminated
-from .every_n_epoch import EveryNEpoch
 from .accumulate_variables import AccumulateVariables
-from .write_csv import WriteCSV
-from .stop_after import StopAfter
-from .log_variables import LogVariables
-from .log_profile import LogProfile
-from .log_dir import LogDir
-from .save import SaveEvery, SaveBest, SaveLatest
-from .compute_stats import ComputeStats
+from .benchmark import Benchmark
 from .check import Check
-from .show_progress import ShowProgress
-from .on_plateau import OnPlateau
-from .stop_on_plateau import StopOnPlateau
-from .stop_on_nan import StopOnNaN
-from .save_cm import SaveConfusionMatrix
+from .classification_metrics import ClassificationMetrics
+from .compute_stats import ComputeStats
+from .every_n_epoch import EveryNEpoch
 from .flatten import Flatten
-from .plot_lines import PlotLines
+from .log_dir import LogDir
+from .log_profile import LogProfile
+from .log_variables import LogVariables
 from .logits_to_csv import LogitsToCsv
-from .sequence_to_csv import SequenceToCsv
+from .on_plateau import OnPlateau
+from .plot_lines import PlotLines
+from .save import SaveEvery, SaveBest, SaveLatest
+from .save_cm import SaveConfusionMatrix
 from .save_file import SaveFile
+from .sequence_to_csv import SequenceToCsv
+from .show_progress import ShowProgress
+from .stop_after import StopAfter
+from .stop_on_nan import StopOnNaN
+from .stop_on_plateau import StopOnPlateau
+from .write_csv import WriteCSV
 
 AbstractHook.__module__ = '.hooks'
 
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
            'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'SaveLatest', 'ComputeStats', 'Check', 'ShowProgress',
            'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'StopOnNaN', 'SaveConfusionMatrix', 'Flatten', 'PlotLines',
-           'LogitsToCsv', 'SequenceToCsv', 'SaveFile']
+           'LogitsToCsv', 'SequenceToCsv', 'SaveFile', 'Benchmark', 'ClassificationMetrics']
 
