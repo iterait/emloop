@@ -80,6 +80,12 @@ Classes
 - :py:class:`SaveFile`:
   Save files to the output dir before training.
 
+- :py:class:`Benchmark`:
+  Log mean and median example times via standard :py:mod:`logging`.
+
+- :py:class:`ClassificationMetrics`:
+  Accumulate the specified prediction and gt variables and compute their classification statistics after each epoch.
+
 
 
 .. autoclass:: AbstractHook
@@ -398,6 +404,34 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: SaveFile
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Benchmark
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Benchmark
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: ClassificationMetrics
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: ClassificationMetrics
       :parts: 1
 
    |

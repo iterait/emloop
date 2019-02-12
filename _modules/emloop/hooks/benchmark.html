@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop.hooks.log_profile &#8212; emloop 0.1.2 documentation</title>
+    <title>emloop.hooks.benchmark &#8212; emloop 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
@@ -93,59 +93,51 @@
       </div>
     <div class="col-md-9 content">
       
-  <h1>Source code for emloop.hooks.log_profile</h1><div class="highlight"><pre>
+  <h1>Source code for emloop.hooks.benchmark</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Module with a hook which reports the time profile data in the standard logging.</span>
+<span class="sd">Hook for benchmarking models and logging average example times.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">AbstractHook</span>
 <span class="kn">from</span> <span class="nn">..types</span> <span class="k">import</span> <span class="n">TimeProfile</span>
 
 
-<div class="viewcode-block" id="LogProfile"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.LogProfile">[docs]</a><span class="k">class</span> <span class="nc">LogProfile</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
+<div class="viewcode-block" id="Benchmark"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.Benchmark">[docs]</a><span class="k">class</span> <span class="nc">Benchmark</span><span class="p">(</span><span class="n">AbstractHook</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Summarize and log epoch profile via standard :py:mod:`logging`.</span>
-
-<span class="sd">    Epoch profile contains info about time spent training, reading data etc. For full reference, see</span>
-<span class="sd">    :py:class:`emloop.MainLoop`.</span>
+<span class="sd">    Log mean and median example times via standard :py:mod:`logging`.</span>
 
 <span class="sd">    .. code-block:: yaml</span>
-<span class="sd">        :caption: log the time profile after each epoch</span>
+<span class="sd">        :caption: log mean and median example times after each epoch</span>
 
 <span class="sd">        hooks:</span>
-<span class="sd">          - LogProfile</span>
+<span class="sd">          - Benchmark</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LogProfile.after_epoch_profile"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.LogProfile.after_epoch_profile">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">TimeProfile</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Benchmark.__init__"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.Benchmark.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span> <span class="o">=</span> <span class="n">batch_size</span></div>
+
+<div class="viewcode-block" id="Benchmark.after_epoch_profile"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.Benchmark.after_epoch_profile">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">TimeProfile</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Summarize and log the given epoch profile.</span>
+<span class="sd">        Log average example times after each epoch.</span>
 
-<span class="sd">        The profile is expected to contain at least:</span>
-<span class="sd">            - ``read_data_train``, ``eval_batch_train`` and ``after_batch_hooks_train`` entries produced by the train</span>
-<span class="sd">              stream (if train stream name is `train`)</span>
-<span class="sd">            - ``after_epoch_hooks`` entry</span>
+<span class="sd">        The profile is expected to contain at least `eval_batch_{stream}` entry for each logged stream.</span>
 
+<span class="sd">        :param epoch_id: number of the processed epoch</span>
 <span class="sd">        :param profile: epoch timings profile</span>
-<span class="sd">        :param streams: streams for which profiling times will be printed</span>
+<span class="sd">        :param streams: streams for which example times will be logged</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">read_data_total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">eval_total</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">hooks_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;after_epoch_hooks&#39;</span><span class="p">,</span> <span class="p">[]))</span>
-
         <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">:</span>
-            <span class="n">read_data_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;read_batch_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">,</span> <span class="p">[]))</span>
-            <span class="n">hooks_total</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;after_batch_hooks_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">,</span> <span class="p">[]))</span>
-
-        <span class="k">for</span> <span class="n">stream_name</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">T </span><span class="si">%s</span><span class="s1">:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eval_batch_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">),</span> <span class="p">[])))</span>
-
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">T read data:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">read_data_total</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">T hooks:</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">hooks_total</span><span class="p">)</span></div></div>
+            <span class="n">batch_times</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eval_batch_&#39;</span> <span class="o">+</span> <span class="n">stream_name</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="c1"># last batch may be smaller than the other ones, so we drop it to not skew the measurement</span>
+            <span class="n">example_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span><span class="p">),</span> <span class="n">batch_times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> - time per example: mean=</span><span class="si">{:.5f}</span><span class="s1">s, median=</span><span class="si">{:.5f}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">,</span>
+                                                                                      <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">example_times</span><span class="p">),</span>
+                                                                                      <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">example_times</span><span class="p">)))</span></div></div>
 </pre></div>
 
     </div>

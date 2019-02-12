@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Index &#8212; emloop 0.1.1 documentation</title>
+    <title>Index &#8212; emloop 0.1.2 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/highlight.css" type="text/css" />
@@ -139,7 +139,11 @@
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.AccumulateVariables.__init__">(emloop.hooks.AccumulateVariables method)</a>
 </li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.Benchmark.__init__">(emloop.hooks.Benchmark method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.Check.__init__">(emloop.hooks.Check method)</a>
+</li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics.__init__">(emloop.hooks.ClassificationMetrics method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats.__init__">(emloop.hooks.ComputeStats method)</a>
 </li>
@@ -220,6 +224,8 @@
 </li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._epoch_limit_reached">_epoch_limit_reached() (emloop.datasets.StreamWrapper method)</a>
 </li>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics._get_metrics">_get_metrics() (emloop.hooks.ClassificationMetrics method)</a>
+</li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._get_stream">_get_stream() (emloop.datasets.StreamWrapper method)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.SaveBest._get_value">_get_value() (emloop.hooks.SaveBest method)</a>
@@ -253,6 +259,8 @@
       <li><a href="emloop/emloop.html#emloop.MainLoop._run_epoch">_run_epoch() (emloop.MainLoop method)</a>
 </li>
       <li><a href="emloop/emloop.html#emloop.MainLoop._run_zeroth_epoch">_run_zeroth_epoch() (emloop.MainLoop method)</a>
+</li>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics._save_metrics">_save_metrics() (emloop.hooks.ClassificationMetrics method)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats._save_stats">_save_stats() (emloop.hooks.ComputeStats method)</a>
 </li>
@@ -307,6 +315,8 @@
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.Check.after_epoch">(emloop.hooks.Check method)</a>
 </li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics.after_epoch">(emloop.hooks.ClassificationMetrics method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats.after_epoch">(emloop.hooks.ComputeStats method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.EveryNEpoch.after_epoch">(emloop.hooks.EveryNEpoch method)</a>
@@ -343,6 +353,8 @@
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch_profile">after_epoch_profile() (emloop.hooks.AbstractHook method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.Benchmark.after_epoch_profile">(emloop.hooks.Benchmark method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.LogProfile.after_epoch_profile">(emloop.hooks.LogProfile method)</a>
 </li>
       </ul></li>
@@ -375,6 +387,10 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.Benchmark">Benchmark (class in emloop.hooks)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
@@ -384,6 +400,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics">ClassificationMetrics (class in emloop.hooks)</a>
+</li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats">ComputeStats (class in emloop.hooks)</a>
 </li>
   </ul></td>
@@ -578,6 +596,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.register_mainloop">register_mainloop() (emloop.hooks.AbstractHook method)</a>
+</li>
       <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.restore_fallback">restore_fallback (emloop.models.AbstractModel attribute)</a>
 
       <ul>
@@ -586,6 +606,8 @@
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.restore_fallback">(emloop.models.Sequence attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.run">run() (emloop.models.AbstractModel method)</a>
 
       <ul>
@@ -594,8 +616,6 @@
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.run">(emloop.models.Sequence method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.html#emloop.MainLoop.run_evaluation">run_evaluation() (emloop.MainLoop method)</a>
 </li>
       <li><a href="emloop/emloop.html#emloop.MainLoop.run_training">run_training() (emloop.MainLoop method)</a>

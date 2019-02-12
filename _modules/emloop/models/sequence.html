@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop.models.sequence &#8212; emloop 0.1.1 documentation</title>
+    <title>emloop.models.sequence &#8212; emloop 0.1.2 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
@@ -112,7 +112,7 @@
 <div class="viewcode-block" id="Sequence"><a class="viewcode-back" href="../../../emloop/emloop.models.html#emloop.models.Sequence">[docs]</a><span class="k">class</span> <span class="nc">Sequence</span><span class="p">(</span><span class="n">AbstractModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Model sequence provides simple abstraction for sequential application of multiple models to input batches.</span>
-<span class="sd">    All the models are fed with the original inputs as well as the outputs of the preceeding models.</span>
+<span class="sd">    All the models are fed with the original inputs as well as the outputs of the preceding models.</span>
 <span class="sd">    Ultimately, all the model outputs are returned.</span>
 
 <span class="sd">    .. warning::</span>
@@ -209,6 +209,11 @@
         <span class="c1"># run all the models in-order</span>
         <span class="n">current_batch</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_models</span><span class="p">:</span>
+            <span class="n">batch_inputs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">current_batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">missing_inputs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">input_names</span><span class="p">)</span><span class="o">-</span><span class="n">batch_inputs</span>
+            <span class="k">if</span> <span class="n">missing_inputs</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Model `</span><span class="si">{model.__class__.__name__}</span><span class="s1">` expects inputs `</span><span class="si">{missing_inputs}</span><span class="s1">` which are &#39;</span>
+                                 <span class="n">f</span><span class="s1">&#39;missing among currently passed in inputs `</span><span class="si">{batch_inputs}</span><span class="s1">`.&#39;</span><span class="p">)</span>
             <span class="n">current_batch</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">current_batch</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">current_batch</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_names</span><span class="p">}</span></div>
