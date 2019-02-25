@@ -16,7 +16,7 @@ import logging
 import os
 import sys
 
-from emloop.cli import train, resume, predict, evaluate, grid_search, get_emloop_arg_parser, invoke_dataset_method, \
+from emloop.cli import train, resume, evaluate, grid_search, get_emloop_arg_parser, invoke_dataset_method, \
     list_train_dirs
 from emloop.cli.prune import prune_train_dirs
 
@@ -55,11 +55,6 @@ def entry_point() -> None:
     elif known_args.subcommand == 'resume':
         resume(config_path=known_args.config_path, restore_from=known_args.restore_from, cl_arguments=unknown_args,
                output_root=known_args.output_root)
-
-    elif known_args.subcommand == 'predict':
-        logging.warning('Predict command is deprecated and will be removed, use ``emloop eval predict ...`` instead')
-        predict(config_path=known_args.config_path, restore_from=known_args.restore_from, cl_arguments=unknown_args,
-                output_root=known_args.output_root)
 
     elif known_args.subcommand == 'eval':
         evaluate(model_path=known_args.model_path, stream_name=known_args.stream_name,

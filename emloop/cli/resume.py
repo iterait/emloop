@@ -3,8 +3,8 @@ import os.path as path
 
 from typing import Optional, Iterable
 
+from ..api import create_main_loop
 from .util import fallback, validate_config, find_config
-from .common import run
 from ..utils.config import load_config
 
 
@@ -29,7 +29,10 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)
+        
+        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=restore_from)
+        main_loop.run_training()
     except Exception as ex:  # pylint: disable=broad-except
-        fallback('Loading config failed', ex)
+        fallback('Resume failed', ex)
 
-    run(config=config, output_root=output_root, restore_from=restore_from)
+

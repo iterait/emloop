@@ -46,12 +46,12 @@ emloop resume
    :prog: emloop
    :path: resume
 
-emloop predict
+emloop eval
 --------------
 .. argparse::
    :ref: emloop.cli.get_emloop_arg_parser
    :prog: emloop
-   :path: predict
+   :path: eval
 
 emloop dataset
 --------------

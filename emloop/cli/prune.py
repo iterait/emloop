@@ -7,7 +7,8 @@ from shutil import rmtree
 
 from ..constants import EL_DEFAULT_LOG_DIR, EL_TRACE_FILE
 from .ls import is_train_dir
-from ..utils.training_trace import TrainingTrace, TrainingTraceKeys
+from ..hooks.training_trace import TrainingTraceKeys
+from ..utils import load_config
 
 
 def _safe_rmtree(dir_: str):
@@ -45,7 +46,7 @@ def _prune(dir_: str, epochs: int) -> None:
         else:
             trace_path = path.join(logdir, EL_TRACE_FILE)
             try:
-                epochs_done = TrainingTrace.from_file(trace_path)[TrainingTraceKeys.EPOCHS_DONE]
+                epochs_done = load_config(trace_path)[TrainingTraceKeys.EPOCHS_DONE]
             except (KeyError, TypeError):
                 epochs_done = 0
             if not epochs_done or epochs_done < epochs:

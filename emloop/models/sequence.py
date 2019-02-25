@@ -5,9 +5,10 @@ import os.path as path
 from itertools import chain
 from typing import Iterable, Optional
 
+import emloop.api   # avoids circular dependency
+
 from .abstract_model import AbstractModel
 from ..utils import load_config
-from ..cli.common import create_model
 from ..datasets import AbstractDataset, StreamWrapper
 from ..types import Batch
 from ..constants import EL_CONFIG_FILE
@@ -74,8 +75,8 @@ class Sequence(AbstractModel):
                 logging.debug('\tloading %s', model_path)
                 if path.isdir(model_path):
                     model_path = path.join(model_path, EL_CONFIG_FILE)
-                return create_model(load_config(model_path), output_dir=None, dataset=self._dataset,
-                                    restore_from=path.dirname(model_path))
+                return emloop.api.create_model(load_config(model_path), output_dir=None, dataset=self._dataset,
+                                               restore_from=path.dirname(model_path))
 
             self._models = list(map(load_model, self._model_paths))
 
@@ -129,8 +130,3 @@ class Sequence(AbstractModel):
         :raise NotImplementedError: when called
         """
         raise NotImplementedError('Ensemble model cannot be saved.')
-
-    @property
-    def restore_fallback(self) -> None:
-        """Sequence model does not provide restore_fallback."""
-        pass

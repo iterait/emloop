@@ -4,7 +4,7 @@ import os.path as path
 from typing import Iterable
 
 from .util import fallback, validate_config, find_config
-from .common import create_dataset, create_output_dir
+from ..api import create_dataset, create_output_dir
 from ..utils.config import load_config
 
 

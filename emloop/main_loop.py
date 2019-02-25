@@ -5,13 +5,14 @@ The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks
 Having all that, it manages iterating through streams, training and hooks execution.
 """
 import logging
-from typing import Iterable, Callable, List, Dict, Optional
+from typing import Iterable, Callable, List, Dict, Optional, Union
 from collections import OrderedDict
 
 from .datasets import AbstractDataset
 from .models.abstract_model import AbstractModel
 from .hooks.abstract_hook import AbstractHook, TrainingTerminated
-from .utils import Timer, TrainingTrace, TrainingTraceKeys
+from .hooks.training_trace import TrainingTrace
+from .utils import Timer
 from .utils.misc import CaughtInterrupts
 from .datasets.stream_wrapper import StreamWrapper
 from .constants import EL_DEFAULT_TRAIN_STREAM, EL_PREDICT_STREAM
@@ -32,7 +33,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                  model: AbstractModel, dataset: AbstractDataset,
                  hooks: Iterable[AbstractHook]=(),
                  train_stream_name: str=EL_DEFAULT_TRAIN_STREAM,
-                 extra_streams: List[str]=(),  # pylint: disable=invalid-sequence-index
+                 extra_streams: Iterable[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
                  on_empty_batch: str='error',
                  on_empty_stream: str='error',
@@ -91,17 +92,30 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         self._extra_streams = list(extra_streams)
         self._skip_zeroth_epoch = skip_zeroth_epoch
         self._streams = {}
-        self._epochs_done = None
+        self._training_epochs_done = 0
 
         for hook in self._hooks:
             hook.register_mainloop(self)
 
         super().__init__()
 
+    def __enter__(self):
+        """Calls before_training() for all hooks."""
+        CaughtInterrupts.__enter__(self)
+        for hook in self._hooks:
+            hook.before_training()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Calls after_training() for all hooks."""
+        CaughtInterrupts.__exit__(self)
+        for hook in self._hooks:
+            success = exc_type == None
+            hook.after_training(success)
+
     @property
-    def epochs_done(self) -> Optional[int]:
-        """Number of training epochs done in the last call of :py:meth:`self._run_training`."""
-        return self._epochs_done
+    def training_epochs_done(self) -> Optional[int]:
+        """Number of training epochs done."""
+        return self._training_epochs_done
 
     @property
     def fixed_epoch_size(self) -> Optional[int]:
@@ -112,12 +126,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
     def extra_streams(self) -> List[str]:
         """List of extra stream names as specified in :py:meth:`self.__init__`."""
         return self._extra_streams
-
-    def _create_epoch_data(self, streams: Optional[Iterable[str]]=None) -> EpochData:
-        """Create empty epoch data double dict."""
-        if streams is None:
-            streams = [self._train_stream_name] + self._extra_streams
-        return OrderedDict([(stream_name, OrderedDict()) for stream_name in streams])
 
     def _check_sources(self, batch: Dict[str, object]) -> None:
         """
@@ -198,23 +206,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                                  '`main_loop.on_empty_stream` to `warn` in order to change this error into warning; '
                                  'set to `ignore` to remove it.'.format(stream.name))
 
-    def train_by_stream(self, stream: StreamWrapper) -> None:
-        """
-        Train the model with the given stream.
-
-        :param stream: stream to train with
-        """
-        self._run_epoch(stream=stream, train=True)
-
-    def evaluate_stream(self, stream: StreamWrapper) -> None:
-        """
-        Evaluate the given stream.
-
-        :param stream: stream to be evaluated
-        :param stream_name: stream name
-        """
-        self._run_epoch(stream=stream, train=False)
-
     def get_stream(self, stream_name: str) -> StreamWrapper:
         """
         Get a :py:class:`StreamWrapper` with the given name.
@@ -237,113 +228,129 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
                                      'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
         return self._streams[stream_name]
-
-    def _run_zeroth_epoch(self, streams: Iterable[str]) -> None:
+    
+    def prepare_streams(self, stream_list: Iterable[Union[Iterable, StreamWrapper, str]],
+                        base_name: str) -> Iterable[str]:
         """
-        Run zeroth epoch on the specified streams.
+        Converts streams to StreamWrappers, saves them to `self._streams` and returns their names as strings.
 
-        Calls
-            - :py:meth:`emloop.hooks.AbstractHook.after_epoch`
-
-        :param streams: stream names to be evaluated
+        :param stream_list: list of training streams, each either string (e.g. 'train'), StreamWrapper or iterator
+        :param base_name: default base name for unnamed streams
         """
+        stream_names = []
+        unnamed_count = 0
+        for stream_object in stream_list:
+            stream_name = None
+            if isinstance(stream_object, str):
+                stream_name = stream_object
+                streamwrapper = self.get_stream(stream_object)
+            
+            elif isinstance(stream_object, StreamWrapper):
+                stream_name = stream_object.name
+                streamwrapper = stream_object
 
+            else:
+                streamwrapper = StreamWrapper(lambda stream_object=stream_object: stream_object,
+                                              buffer_size=self._buffer, profile=self._epoch_profile)
+
+            if stream_name is None:
+                stream_name = f"unnamed_{base_name}_{unnamed_count}"
+                unnamed_count += 1
+
+            if stream_name in self._streams:
+                ValueError(f"Multiple streams with name `{stream_name}`")
+
+            self._streams[stream_name] = streamwrapper
+            stream_names.append(stream_name)
+        
+        return stream_names
+    
+    def epoch(self, train_streams: Iterable[Union[Iterable, StreamWrapper, str]],
+              eval_streams: Iterable[Union[Iterable, StreamWrapper, str]]) -> None:
+        """
+        Runs single epoch with given streams.
+
+        :param train_streams: list of training streams, each either string (e.g. 'train'), StreamWrapper or iterator
+        :param eval_streams: list of eval streams, each either string (e.g. 'valid'), StreamWrapper or iterator
+        """
+        self._streams = {}
+        train_streams = self.prepare_streams(train_streams, "train")
+        eval_streams = self.prepare_streams(eval_streams, "eval")
+
+        self._epoch_impl(train_streams, eval_streams)
+        self._streams = {}
+
+    def _epoch_impl(self, train_streams: Iterable[str], eval_streams: Iterable[str]) -> None:
+        """
+        Runs single epoch with given streams.
+
+        :param train_streams: list of training streams
+        :param eval_streams: list of eval streams
+        """
         self._epoch_profile.clear()
-        for stream_name in streams:
+        for stream_name in train_streams:
             with self.get_stream(stream_name) as stream:
-                self.evaluate_stream(stream)
+                self._run_epoch(stream=stream, train=True)
 
-        epoch_data = self._create_epoch_data(streams)
+        for stream_name in eval_streams:
+            with self.get_stream(stream_name) as stream:
+                self._run_epoch(stream=stream, train=False)
 
+        if len(train_streams) > 0:
+            self._training_epochs_done += 1
+
+        epoch_data = OrderedDict([(stream_name, OrderedDict()) for stream_name in train_streams + eval_streams])
+
+        end_training_exception = None
         with Timer('after_epoch_hooks', self._epoch_profile):
             for hook in self._hooks:
-                hook.after_epoch(epoch_id=0, epoch_data=epoch_data)
+                try:
+                    hook.after_epoch(epoch_id=self._training_epochs_done, epoch_data=epoch_data)
+                except TrainingTerminated as ex:
+                    end_training_exception = ex
 
         for hook in self._hooks:
-            hook.after_epoch_profile(epoch_id=0, profile=self._epoch_profile,
-                                     streams=streams)
+            hook.after_epoch_profile(epoch_id=self._training_epochs_done, profile=self._epoch_profile,
+                                     streams=train_streams + eval_streams)
 
-    def _try_run(self, run_func: Callable[[], None]) -> None:
+        if end_training_exception:
+            raise end_training_exception
+
+    def run_training(self) -> None:
         """
-        Try running the given function (training/prediction).
-
-        Calls
-            - :py:meth:`emloop.hooks.AbstractHook.before_training`
-            - :py:meth:`emloop.hooks.AbstractHook.after_training`
-
-        :param run_func: function to be run
+        Trains until TrainingTerminated exception is raised.
         """
-        # Initialization: before_training
-        for hook in self._hooks:
-            hook.before_training()
+        if len(list(filter(lambda x: isinstance(x, TrainingTrace), self._hooks))) == 0:
+            logging.warning("TrainingTrace hook missing - trace.yaml will not be generated")
 
-        try:
-            run_func()
-        except TrainingTerminated as ex:
-            logging.info('Training terminated: %s', ex)
+        with self:
+            try:
+                logging.debug('Training started')
 
-        # After training: after_training
-        for hook in self._hooks:
-            hook.after_training()
+                # Zeroth epoch
+                if not self._skip_zeroth_epoch:
+                    logging.info('Evaluating 0th epoch')
+                    self._epoch_impl([], [self._train_stream_name] + self._extra_streams)
+                    logging.info('0th epoch done\n\n')
 
-    def run_training(self, trace: Optional[TrainingTrace]=None) -> None:
+                while True:
+                    logging.info('Training epoch %s', self._training_epochs_done + 1)
+                    self._epoch_impl([self._train_stream_name], self._extra_streams)
+                    logging.info('Epoch %s done\n\n', self._training_epochs_done)
+
+            except TrainingTerminated as ex:
+                logging.info('Training terminated: %s', ex)
+
+    def run_evaluation(self, stream_name) -> None:
         """
-        Run the main loop in the training mode.
+        Evaluates given stream.
 
-        Calls
-            - :py:meth:`emloop.hooks.AbstractHook.after_epoch`
-            - :py:meth:`emloop.hooks.AbstractHook.after_epoch_profile`
+        :param stream_name: Name of stream to evaluate (e.g. `valid`).
         """
-        for stream_name in [self._train_stream_name] + self._extra_streams:
-            self.get_stream(stream_name)
-
-        def training():
-            logging.debug('Training started')
-            self._epochs_done = 0
-
-            # Zeroth epoch: after_epoch
-            if not self._skip_zeroth_epoch:
-                logging.info('Evaluating 0th epoch')
-                self._run_zeroth_epoch([self._train_stream_name] + self._extra_streams)
-                logging.info('0th epoch done\n\n')
-
-            # Training loop: after_epoch, after_epoch_profile
-            while True:
-                epoch_id = self._epochs_done + 1
-                logging.info('Training epoch %s', epoch_id)
-                self._epoch_profile.clear()
-                epoch_data = self._create_epoch_data()
-
-                with self.get_stream(self._train_stream_name) as stream:
-                    self.train_by_stream(stream)
-
-                for stream_name in self._extra_streams:
-                    with self.get_stream(stream_name) as stream:
-                        self.evaluate_stream(stream)
-
-                with Timer('after_epoch_hooks', self._epoch_profile):
-                    for hook in self._hooks:
-                        hook.after_epoch(epoch_id=epoch_id, epoch_data=epoch_data)
-
-                for hook in self._hooks:
-                    hook.after_epoch_profile(epoch_id=epoch_id, profile=self._epoch_profile,
-                                             streams=[self._train_stream_name] + self._extra_streams)
-
-                self._epochs_done = epoch_id
-                if trace is not None:
-                    trace[TrainingTraceKeys.EPOCHS_DONE] = self._epochs_done
-                logging.info('Epoch %s done\n\n', epoch_id)
-
-        self._try_run(training)
-
-    def run_evaluation(self, stream_name: str) -> None:
-        """
-        Run the main loop with the given stream in the prediction mode.
-
-        :param stream_name: name of the stream to be evaluated
-        """
-        def prediction():
-            logging.info('Running prediction')
-            self._run_zeroth_epoch([stream_name])
-            logging.info('Prediction done\n\n')
-        self._try_run(prediction)
+        with self:
+            try:
+                logging.info('Running the evaluation of stream `%s`', stream_name)
+                self._epoch_impl(train_streams=[], eval_streams=[stream_name])
+                logging.info('Evaluation done\n\n')
+            except TrainingTerminated as ex:
+                logging.info('Evaluation terminated: %s', ex)

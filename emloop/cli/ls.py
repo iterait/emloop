@@ -13,7 +13,8 @@ from babel.dates import format_timedelta
 
 from ..utils import load_config, yaml_to_str
 from ..constants import EL_DEFAULT_LOG_DIR, EL_CONFIG_FILE, EL_TRACE_FILE, EL_NA_STR, EL_LOG_FILE
-from ..utils import TrainingTrace, TrainingTraceKeys
+
+from ..hooks.training_trace import TrainingTraceKeys
 
 
 def print_boxed(str_: str) -> None:
@@ -86,7 +87,7 @@ def get_model_name(config: dict) -> str:
     return config['model']['name'] if 'model' in config and 'name' in config['model'] else 'Unnamed'
 
 
-def _print_trainings_long(trainings: Iterable[Tuple[str, dict, TrainingTrace]]) -> None:
+def _print_trainings_long(trainings: Iterable[Tuple[str, dict, dict]]) -> None:
     """
     Print a plain table with the details of the given trainings.
 
@@ -114,7 +115,7 @@ def _print_trainings_long(trainings: Iterable[Tuple[str, dict, TrainingTrace]]) 
     print(tabulate(long_table, tablefmt='plain'))
 
 
-def _ls_print_listing(dir_: str, recursive: bool, all_: bool, long: bool) -> List[Tuple[str, dict, TrainingTrace]]:
+def _ls_print_listing(dir_: str, recursive: bool, all_: bool, long: bool) -> List[Tuple[str, dict, dict]]:
     """
     Print names of the train dirs contained in the given dir.
 
@@ -132,7 +133,7 @@ def _ls_print_listing(dir_: str, recursive: bool, all_: bool, long: bool) -> Lis
                 print(root_dir + ':')
             trainings = [(train_dir,
                           load_config(path.join(train_dir, EL_CONFIG_FILE), []),
-                          TrainingTrace.from_file(path.join(train_dir, EL_TRACE_FILE)))
+                          load_config(path.join(train_dir, EL_TRACE_FILE)))
                          for train_dir
                          in [os.path.join(root_dir, train_dir) for train_dir in train_dirs]]
             if not all_:
@@ -152,7 +153,7 @@ def _ls_print_listing(dir_: str, recursive: bool, all_: bool, long: bool) -> Lis
     return all_trainings
 
 
-def _ls_print_summary(all_trainings: List[Tuple[str, dict, TrainingTrace]]) -> None:
+def _ls_print_summary(all_trainings: List[Tuple[str, dict, dict]]) -> None:
     """
     Print trainings summary.
     In particular print tables summarizing the number of trainings with

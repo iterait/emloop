@@ -34,6 +34,7 @@ from .show_progress import ShowProgress
 from .stop_after import StopAfter
 from .stop_on_nan import StopOnNaN
 from .stop_on_plateau import StopOnPlateau
+from .training_trace import TrainingTrace
 from .write_csv import WriteCSV
 
 AbstractHook.__module__ = '.hooks'
@@ -41,5 +42,5 @@ AbstractHook.__module__ = '.hooks'
 __all__ = ['AbstractHook', 'TrainingTerminated', 'AccumulateVariables', 'WriteCSV', 'StopAfter', 'LogVariables',
            'LogProfile', 'LogDir', 'SaveEvery', 'SaveBest', 'SaveLatest', 'ComputeStats', 'Check', 'ShowProgress',
            'EveryNEpoch', 'OnPlateau', 'StopOnPlateau', 'StopOnNaN', 'SaveConfusionMatrix', 'Flatten', 'PlotLines',
-           'LogitsToCsv', 'SequenceToCsv', 'SaveFile', 'Benchmark', 'ClassificationMetrics']
+           'LogitsToCsv', 'SequenceToCsv', 'SaveFile', 'Benchmark', 'ClassificationMetrics', 'TrainingTrace']
 

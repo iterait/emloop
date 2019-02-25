@@ -5,7 +5,7 @@ from os import listdir, mkdir, path
 from pathlib import Path
 
 from emloop.cli.prune import prune_train_dirs
-from emloop.utils.training_trace import TrainingTrace, TrainingTraceKeys
+from emloop.hooks.training_trace import TrainingTraceKeys
 from emloop.constants import EL_CONFIG_FILE, EL_LOG_FILE, EL_TRACE_FILE
 
 
@@ -24,9 +24,8 @@ def test_prune(tmpdir):
         mkdir(logdir)
     # set trace files
     for logdir, epochs in zip(logdirs[:3], [0, 1, 8]):
-        trace = TrainingTrace(logdir)
-        trace[TrainingTraceKeys.EPOCHS_DONE] = epochs
-        trace.save()
+        with open(path.join(logdir, 'trace.yaml'), "w") as trace:
+            trace.write(f'{TrainingTraceKeys.EPOCHS_DONE}: {epochs}')
     Path(path.join(logdirs[3], EL_TRACE_FILE)).touch()
     # create rest of the files from is_train_dir condition
     for logdir in logdirs[:-1]:

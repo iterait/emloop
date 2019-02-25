@@ -12,7 +12,7 @@ import numpy as np
 import emloop as el
 from emloop.constants import EL_BUFFER_SLEEP, EL_PREDICT_STREAM, EL_DEFAULT_TRAIN_STREAM
 from emloop.datasets import StreamWrapper
-from emloop.hooks import StopAfter
+from emloop.hooks import StopAfter, TrainingTrace
 from emloop.types import EpochData, Batch, Stream, TimeProfile
 
 
@@ -163,7 +163,7 @@ class EventRecordingHook(el.AbstractHook):
         self.after_epoch_profile_events.append(self._event_id)
         self._event_id += 1
 
-    def after_training(self) -> None:
+    def after_training(self, success: bool) -> None:
         self.after_training_events.append(self._event_id)
         self._event_id += 1
 
@@ -295,7 +295,6 @@ def create_main_loop(tmpdir):
                           train_stream_name=EL_DEFAULT_TRAIN_STREAM, **main_loop_kwargs):
         """
         Create and return a model, dataset and mainloop.
-
         :param tmpdir: creates pytest tmpdir
         :param epochs: the number of epochs to be run in the main_loop
         :param extra_hooks: additional hooks to be passed to the main loop
@@ -306,7 +305,7 @@ def create_main_loop(tmpdir):
         :param train_stream_name: name of the training stream
         :return: a tuple of the created model, dataset and mainloop
         """
-        hooks = list(extra_hooks) + [StopAfter(epochs=epochs)]
+        hooks = list(extra_hooks) + [StopAfter(epochs=epochs), TrainingTrace(tmpdir)]
         if dataset is None:
             dataset = SimpleDataset()
         if model_class is None:
@@ -335,10 +334,8 @@ def test_events(create_main_loop):
     second_epoch_profile = [5+2*_DATASET_ITERS]
     third_epoch_batches = list(range(6+2*_DATASET_ITERS, 6+3*_DATASET_ITERS))
     third_epoch = [6+3*_DATASET_ITERS]
-    # at this point, the training is interrupted by the EpochStopperHook,
-    # hence the last after_epoch_profile event is not recorded
-    third_epoch_profile = []
-    after_training = [7+3*_DATASET_ITERS]
+    third_epoch_profile = [7+3*_DATASET_ITERS]
+    after_training = [8+3*_DATASET_ITERS]
 
     assert recording_hook.before_training_events == before_training
     assert recording_hook.after_batch_events == first_epoch_batches + second_epoch_batches + third_epoch_batches
@@ -586,10 +583,10 @@ def test_stream_check(create_main_loop, caplog):
     mainloop.run_evaluation(EL_PREDICT_STREAM)
 
     assert caplog.record_tuples == [
-            ('root', logging.INFO, 'Running prediction'),
+            ('root', logging.INFO, 'Running the evaluation of stream `predict`'),
             ('root', logging.DEBUG, '0-th batch in stream `predict` has variable `input` of length 11 inconsistent '
                                     'with `main_loop.fixed_size` = 47'),
-            ('root', logging.INFO, 'Prediction done\n\n')
+            ('root', logging.INFO, 'Evaluation done\n\n')
     ]
 
 
@@ -619,3 +616,40 @@ def test_configurable_train_stream(create_main_loop, caplog):
         ('root', logging.INFO, 'EpochStopperHook triggered'),
         ('root', logging.INFO, 'Training terminated: Training terminated after epoch 1')
     ]
+
+
+def test_mainloop_epoch_with_strings(create_main_loop):
+    recording_hook = EventRecordingHook()
+    _, _, mainloop = create_main_loop(epochs=2, extra_hooks=[recording_hook])
+    mainloop.epoch(["train", "test"], ["valid", "predict"])
+
+    assert recording_hook.after_batch_events == list(range(1, 1 + _DATASET_ITERS*4))
+    assert recording_hook.after_epoch_events == [1 + _DATASET_ITERS*4]
+    assert recording_hook.after_epoch_profile_events == [2 + _DATASET_ITERS*4]
+
+
+def test_mainloop_epoch_with_iterables(create_main_loop):
+    recording_hook = EventRecordingHook()
+    _, _, mainloop = create_main_loop(epochs=2, extra_hooks=[recording_hook])
+    mainloop.epoch([[{"input": [1, 2], "target": [10, 1]}, {"input": [1, 2], "target": [2, 10]}],
+                    [{"input": [5, 15], "target": [5, 10]}]], [[{"input": [1, 2], "target": [10, 3]}]])
+
+    assert recording_hook.after_batch_events == list(range(1, 1 + 4))
+    assert recording_hook.after_epoch_events == [1 + 4]
+    assert recording_hook.after_epoch_profile_events == [2 + 4]
+
+
+def test_mainloop_epoch_with_streamwrappers(create_main_loop):
+    recording_hook = EventRecordingHook()
+    _, _, mainloop = create_main_loop(epochs=2, extra_hooks=[recording_hook])
+    streamwrapper_1 = StreamWrapper(lambda: [{"input": [1, 2], "target": [10, 3]}, {"input": [1, 2], "target": [5, 1]}],
+                                    buffer_size=mainloop._buffer, profile=mainloop._epoch_profile)
+    streamwrapper_2 = StreamWrapper(lambda: [{"input": [5, 15], "target": [1, 5]}],
+                                    buffer_size=mainloop._buffer, profile=mainloop._epoch_profile)
+    streamwrapper_3 = StreamWrapper(lambda: [{"input": [5, 15], "target": [8, 10]}],
+                                    buffer_size=mainloop._buffer, profile=mainloop._epoch_profile)
+    mainloop.epoch([streamwrapper_1], [streamwrapper_2, streamwrapper_3])
+
+    assert recording_hook.after_batch_events == list(range(1, 1 + 4))
+    assert recording_hook.after_epoch_events == [1 + 4]
+    assert recording_hook.after_epoch_profile_events == [2 + 4]

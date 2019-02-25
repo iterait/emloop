@@ -33,14 +33,6 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
                                help='information passed to the model constructor (backend-specific); '
                                     'usually a directory in which the trained model is stored')
 
-    # create predict sub-parser (deprecated)
-    predict_parser = subparsers.add_parser('predict', description='Run prediction with the given ``config_path``.')
-    predict_parser.set_defaults(subcommand='predict')
-    predict_parser.add_argument('config_path', help='path to the config file or the directory in which it is stored')
-    predict_parser.add_argument('restore_from', nargs='?', default=None,
-                                help='information passed to the model constructor (backend-specific); usually a '
-                                     'directory in which the trained model is stored')
-
     # create eval sub-parser
     eval_parser = subparsers.add_parser('eval', description='Evaluate the given model on the specified data stream.')
     eval_parser.set_defaults(subcommand='eval')
@@ -87,7 +79,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
 
     # add common arguments
     if add_common_arguments:
-        for parser in [main_parser, train_parser, resume_parser, predict_parser, dataset_parser, eval_parser]:
+        for parser in [main_parser, train_parser, resume_parser, dataset_parser, eval_parser]:
             parser.add_argument('--output_root', '-o', default='./log', help='output directory')
             parser.add_argument('--verbose', '-v', action='store_true', help='increase verbosity to level DEBUG')
 
