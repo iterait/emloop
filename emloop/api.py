@@ -1,21 +1,17 @@
 import os
-import errno
 import logging
 import os.path as path
 from datetime import datetime
 import copy
-from collections import namedtuple
-from typing import Optional, Iterable, List
+from typing import Optional, Iterable
 
 from .datasets import AbstractDataset
 from .models import AbstractModel
 from .hooks import AbstractHook
 from .hooks.training_trace import TrainingTrace
-from .cli.util import fallback
-from .constants import EL_LOG_FILE
 from .constants import EL_LOG_FILE, EL_HOOKS_MODULE, EL_CONFIG_FILE, EL_LOG_DATE_FORMAT, EL_LOG_FORMAT
 from .utils.reflection import get_class_module, parse_fully_qualified_name, create_object
-from .utils.yaml import yaml_to_str, yaml_to_file, load_yaml
+from .utils.yaml import yaml_to_str, yaml_to_file
 from .utils import get_random_name
 from .main_loop import MainLoop
 

@@ -5,7 +5,6 @@ from os import path
 from collections import OrderedDict
 
 import ruamel.yaml
-import yaml
 
 from emloop.utils.yaml import yaml_to_file, yaml_to_str, load_yaml
 from emloop.constants import EL_CONFIG_FILE
@@ -51,4 +50,4 @@ def test_dump_yaml(tmpdir):
 
     # test dump to string (effectively, test pyaml)
     yaml_str = yaml_to_str(config)
-    assert yaml.load(yaml_str) == config
+    assert ruamel.yaml.load(yaml_str) == config
