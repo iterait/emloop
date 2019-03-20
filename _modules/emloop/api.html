@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emloop.api &#8212; emloop 0.2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/highlight.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          emloop</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../getting_started.html">Getting Started</a></li>
+                <li><a href="../../tutorial.html">Tutorial</a></li>
+                <li><a href="../../advanced/index.html">Advanced</a></li>
+                <li><a href="../../cli.html">CLI Reference</a></li>
+                <li><a href="../../emloop/index.html">API Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Pages <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary">
+<form action="../../search.html" method="get" class="searchbox">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form><div class="side_nav">
+	<h4>Related projects</h4>
+</div>
+<ul class="nav nav-list">
+	<li><a href="https://emloop.org">emloop</a></li>
+	<li><a href="https://tensorflow.emloop.org">emloop-tensorflow</a></li>
+	<li><a href="https://hipipe.org">hipipe (c++)</a></li>
+</ul>
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <h1>Source code for emloop.api</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">path</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">from</span> <span class="nn">.datasets</span> <span class="k">import</span> <span class="n">AbstractDataset</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="k">import</span> <span class="n">AbstractModel</span>
+<span class="kn">from</span> <span class="nn">.hooks</span> <span class="k">import</span> <span class="n">AbstractHook</span>
+<span class="kn">from</span> <span class="nn">.hooks.training_trace</span> <span class="k">import</span> <span class="n">TrainingTrace</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="k">import</span> <span class="n">EL_LOG_FILE</span><span class="p">,</span> <span class="n">EL_HOOKS_MODULE</span><span class="p">,</span> <span class="n">EL_CONFIG_FILE</span><span class="p">,</span> <span class="n">EL_LOG_DATE_FORMAT</span><span class="p">,</span> <span class="n">EL_LOG_FORMAT</span>
+<span class="kn">from</span> <span class="nn">.utils.reflection</span> <span class="k">import</span> <span class="n">get_class_module</span><span class="p">,</span> <span class="n">parse_fully_qualified_name</span><span class="p">,</span> <span class="n">create_object</span>
+<span class="kn">from</span> <span class="nn">.utils.yaml</span> <span class="k">import</span> <span class="n">yaml_to_str</span><span class="p">,</span> <span class="n">yaml_to_file</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">get_random_name</span>
+<span class="kn">from</span> <span class="nn">.main_loop</span> <span class="k">import</span> <span class="n">MainLoop</span>
+
+
+<div class="viewcode-block" id="create_output_dir"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.create_output_dir">[docs]</a><span class="k">def</span> <span class="nf">create_output_dir</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">output_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Unnamed&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create output_dir under the given ``output_root`` and</span>
+<span class="sd">        - dump the given config to YAML file under this dir</span>
+<span class="sd">        - register a file logger logging to a file under this dir</span>
+
+<span class="sd">    :param config: config to be dumped</span>
+<span class="sd">    :param output_root: dir wherein output_dir shall be created</span>
+<span class="sd">    :param default_model_name: name to be used when `model.name` is not found in the config</span>
+<span class="sd">    :return: path to the created output_dir</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating output dir&#39;</span><span class="p">)</span>
+
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">default_model_name</span>
+    <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">model.name not found in config, defaulting to: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_root</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Output root folder &quot;</span><span class="si">%s</span><span class="s1">&quot; does not exist and will be created&#39;</span><span class="p">,</span> <span class="n">output_root</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_root</span><span class="p">)</span>
+
+    <span class="n">output_dir_format</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;EMLOOP_OUTPUT_DIR_FORMAT&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{model_name}</span><span class="s1">_</span><span class="si">{random_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">-%H-%M-%S&#39;</span><span class="p">)</span>
+    <span class="n">random_name</span> <span class="o">=</span> <span class="n">get_random_name</span><span class="p">()</span>
+    <span class="n">output_dir_name</span> <span class="o">=</span> <span class="n">output_dir_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">random_name</span><span class="o">=</span><span class="n">random_name</span><span class="p">)</span>
+
+    <span class="n">suffix</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">suffix</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output_dir_name</span> <span class="o">=</span> <span class="n">output_dir_name</span> <span class="o">+</span> <span class="n">f</span><span class="s1">&#39;_</span><span class="si">{suffix}</span><span class="s1">&#39;</span>
+
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_root</span><span class="p">,</span> <span class="n">output_dir_name</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Created output directory with name </span><span class="si">{output_dir}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Output dir: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">yaml_to_file</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">EL_CONFIG_FILE</span><span class="p">)</span>
+
+    <span class="c1"># create file logger</span>
+    <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">EL_LOG_FILE</span><span class="p">))</span>
+    <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">EL_LOG_FORMAT</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="n">EL_LOG_DATE_FORMAT</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output_dir</span></div>
+
+
+<div class="viewcode-block" id="create_dataset"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.create_dataset">[docs]</a><span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractDataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a dataset object according to the given config.</span>
+
+<span class="sd">    Dataset config section and the `output_dir` are passed to the constructor in a single YAML-encoded string.</span>
+
+<span class="sd">    :param config: config dict with dataset config</span>
+<span class="sd">    :param output_dir: path to the training output dir or None</span>
+<span class="sd">    :return: dataset object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating dataset&#39;</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+ 
+    <span class="n">dataset_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="p">)[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s1">&#39;class&#39;</span> <span class="ow">in</span> <span class="n">dataset_config</span><span class="p">,</span> <span class="s1">&#39;`dataset.class` not present in the config&#39;</span>
+    <span class="n">dataset_module</span><span class="p">,</span> <span class="n">dataset_class</span> <span class="o">=</span> <span class="n">parse_fully_qualified_name</span><span class="p">(</span><span class="n">dataset_config</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="s1">&#39;output_dir&#39;</span> <span class="ow">in</span> <span class="n">dataset_config</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The `output_dir` key is reserved and can not be used in dataset configuration.&#39;</span><span class="p">)</span>
+
+    <span class="n">dataset_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;output_dir&#39;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]}</span>
+    <span class="k">del</span> <span class="n">dataset_config</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">create_object</span><span class="p">(</span><span class="n">dataset_module</span><span class="p">,</span> <span class="n">dataset_class</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">yaml_to_str</span><span class="p">(</span><span class="n">dataset_config</span><span class="p">),))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="s1"> created&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+
+<div class="viewcode-block" id="create_model"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.create_model">[docs]</a><span class="k">def</span> <span class="nf">create_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AbstractDataset</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">restore_from</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AbstractModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a model object either from scratch or from the checkpoint specified by ``restore_from``.</span>
+
+<span class="sd">    Emloop allows the following scenarios</span>
+
+<span class="sd">    1. Create model: leave ``restore_from=None`` and specify ``class``;</span>
+<span class="sd">    2. Restore model: specify ``restore_from`` which is a backend-specific path to (a directory with) the saved model.</span>
+
+<span class="sd">    :param config: config dict with model config</span>
+<span class="sd">    :param output_dir: path to the training output dir</span>
+<span class="sd">    :param dataset: dataset object implementing the :py:class:`emloop.datasets.AbstractDataset` concept</span>
+<span class="sd">    :param restore_from: from whence the model should be restored (backend-specific information)</span>
+<span class="sd">    :return: model object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating a model&#39;</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="s1">&#39;class&#39;</span> <span class="ow">in</span> <span class="n">model_config</span><span class="p">,</span> <span class="s1">&#39;`model.class` not present in the config&#39;</span>
+    <span class="n">model_module</span><span class="p">,</span> <span class="n">model_class</span> <span class="o">=</span> <span class="n">parse_fully_qualified_name</span><span class="p">(</span><span class="n">model_config</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">])</span>
+
+    <span class="c1"># create model kwargs (without `class` and `name`)</span>
+    <span class="n">model_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dataset&#39;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;log_dir&#39;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;restore_from&#39;</span><span class="p">:</span> <span class="n">restore_from</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">}</span>
+    <span class="k">del</span> <span class="n">model_kwargs</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">model_kwargs</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">model_kwargs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">create_object</span><span class="p">(</span><span class="n">model_module</span><span class="p">,</span> <span class="n">model_class</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">model_kwargs</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="s1"> created&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="create_hooks"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.create_hooks">[docs]</a><span class="k">def</span> <span class="nf">create_hooks</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AbstractModel</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AbstractDataset</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AbstractHook</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create hooks specified in ``config[&#39;hooks&#39;]`` list.</span>
+
+<span class="sd">    Hook config entries may be one of the following types:</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: A hook with default args specified only by its name as a string; e.g.</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - LogVariables</span>
+<span class="sd">          - emloop_tensorflow.WriteTensorBoard</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">        :caption: A hook with custom args as a dict name -&gt; args; e.g.</span>
+
+<span class="sd">        hooks:</span>
+<span class="sd">          - StopAfter:</span>
+<span class="sd">              n_epochs: 10</span>
+
+<span class="sd">    :param config: config dict</span>
+<span class="sd">    :param model: model object to be passed to the hooks</span>
+<span class="sd">    :param dataset: dataset object to be passed to hooks</span>
+<span class="sd">    :param output_dir: training output dir available to the hooks</span>
+<span class="sd">    :return: list of hook objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating hooks&#39;</span><span class="p">)</span>
+    <span class="n">hooks_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hooks&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">hooks</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">training_trace_created</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">hook_config</span> <span class="ow">in</span> <span class="n">hooks_config</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hook_config</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">hook_config</span> <span class="o">=</span> <span class="p">{</span><span class="n">hook_config</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">hook_config</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Hook configuration must have exactly one key (fully qualified name).&#39;</span>
+
+        <span class="n">hook_path</span><span class="p">,</span> <span class="n">hook_params</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">hook_config</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">hook_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1"> Empty config of `</span><span class="si">%s</span><span class="s1">` hook&#39;</span><span class="p">,</span> <span class="n">hook_path</span><span class="p">)</span>
+            <span class="n">hook_params</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">hook_module</span><span class="p">,</span> <span class="n">hook_class</span> <span class="o">=</span> <span class="n">parse_fully_qualified_name</span><span class="p">(</span><span class="n">hook_path</span><span class="p">)</span>
+
+        <span class="c1"># find the hook module if not specified</span>
+        <span class="k">if</span> <span class="n">hook_module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hook_module</span> <span class="o">=</span> <span class="n">get_class_module</span><span class="p">(</span><span class="n">EL_HOOKS_MODULE</span><span class="p">,</span> <span class="n">hook_class</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Found hook module `</span><span class="si">%s</span><span class="s1">` for class `</span><span class="si">%s</span><span class="s1">`&#39;</span><span class="p">,</span> <span class="n">hook_module</span><span class="p">,</span> <span class="n">hook_class</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hook_module</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ModuleNotFoundError</span><span class="p">(</span><span class="s1">&#39;Can`t find hook module for hook class `</span><span class="si">{}</span><span class="s1">`. &#39;</span>
+                                          <span class="s1">&#39;Make sure it is defined under `</span><span class="si">{}</span><span class="s1">` sub-modules.&#39;</span>
+                                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hook_class</span><span class="p">,</span> <span class="n">EL_HOOKS_MODULE</span><span class="p">))</span>
+        <span class="c1"># create hook kwargs</span>
+        <span class="n">hook_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dataset&#39;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span> <span class="s1">&#39;output_dir&#39;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">hook_params</span><span class="p">}</span>
+
+        <span class="c1"># create new hook</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hook</span> <span class="o">=</span> <span class="n">create_object</span><span class="p">(</span><span class="n">hook_module</span><span class="p">,</span> <span class="n">hook_class</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">hook_kwargs</span><span class="p">)</span>
+            <span class="n">hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hook</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hook</span><span class="p">,</span> <span class="n">TrainingTrace</span><span class="p">):</span>
+                <span class="n">training_trace_created</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="s1"> created&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">hooks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NameError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Failed to create a hook from config `</span><span class="si">%s</span><span class="s1">`&#39;</span><span class="p">,</span> <span class="n">hook_config</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ex</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">training_trace_created</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;TrainingTrace hook added between hooks. Add it to your config.yaml to suppress this warning.&#39;</span><span class="p">)</span>
+        <span class="n">hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TrainingTrace</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">hooks</span></div>
+
+
+<div class="viewcode-block" id="create_main_loop"><a class="viewcode-back" href="../../emloop/emloop.html#emloop.create_main_loop">[docs]</a><span class="k">def</span> <span class="nf">create_main_loop</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">output_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">restore_from</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MainLoop</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates :py:class:`MainLoop` with model, dataset and hooks according to config.</span>
+
+<span class="sd">    :param config: config dict </span>
+<span class="sd">    :param output_root: dir where output_dir shall be created</span>
+<span class="sd">    :param restore_from: if not None, from whence the model should be restored (backend-specific information)</span>
+
+<span class="sd">    :return: main loop object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">dataset</span> <span class="o">=</span> <span class="n">model</span> <span class="o">=</span> <span class="n">hooks</span> <span class="o">=</span> <span class="n">main_loop</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">create_output_dir</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">output_root</span><span class="o">=</span><span class="n">output_root</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">restore_from</span><span class="o">=</span><span class="n">restore_from</span><span class="p">)</span>
+    <span class="n">hooks</span> <span class="o">=</span> <span class="n">create_hooks</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating main loop&#39;</span><span class="p">)</span>
+    <span class="n">main_loop_kwargs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;main_loop&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">main_loop</span> <span class="o">=</span> <span class="n">MainLoop</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">hooks</span><span class="o">=</span><span class="n">hooks</span><span class="p">,</span> <span class="o">**</span><span class="n">main_loop_kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">main_loop</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, Iterait a.s..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
+    </p>
+  </div>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-108491604-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-108491604-2');
+</script>
+
+
+
+  </body>
+</html>

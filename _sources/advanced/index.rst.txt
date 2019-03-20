@@ -12,6 +12,7 @@ See the following sections for more information.
    model
    hook
    config
+   python
 
 .. Architecture
    ------------

@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Model &#8212; emloop 0.1.2 documentation</title>
+    <title>Model &#8212; emloop 0.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           emloop</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -166,10 +166,10 @@ The class is inferred from the dumped configuration file in the output directory
 <code class="docutils literal notranslate"><span class="pre">model.class</span></code> entry.
 However, there are cases in which the original class cannot be constructed (somebody deleted source codes
 with the model object implementations etc.).
-For these cases, each model should implement a <a class="reference internal" href="../emloop/emloop.models.html#emloop.models.AbstractModel.restore_fallback" title="emloop.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.models.AbstractModel.restore_fallback()</span></code></a> method, which usually points
+For these cases, each model should implement a <code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.models.AbstractModel.restore_fallback()</span></code> method, which usually points
 to a backend-specific base class, which is able to restore the saved files of all its subclasses.
-For instance, in the <code class="docutils literal notranslate"><span class="pre">emloop-tensorflow</span></code> backend, the <a class="reference internal" href="../emloop/emloop.models.html#emloop.models.AbstractModel.restore_fallback" title="emloop.models.AbstractModel.restore_fallback"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.models.AbstractModel.restore_fallback()</span></code></a> class returns
-<a class="reference external" href="https://tensorflow.emloop.org/emloop_tensorflow/emloop_tensorflow.html#emloop_tensorflow.BaseModel" title="(in emloop-tensorflow v0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">emloop_tensorflow.BaseModel</span></code></a>, which it is able to load any checkpoint
+For instance, in the <code class="docutils literal notranslate"><span class="pre">emloop-tensorflow</span></code> backend, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.models.AbstractModel.restore_fallback()</span></code> class returns
+<a class="reference external" href="https://tensorflow.emloop.org/emloop_tensorflow/emloop_tensorflow.html#emloop_tensorflow.BaseModel" title="(in emloop-tensorflow v0.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">emloop_tensorflow.BaseModel</span></code></a>, which it is able to load any checkpoint
 without the need for the original model source codes.</p>
 </div>
 </div>

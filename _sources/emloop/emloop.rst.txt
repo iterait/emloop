@@ -20,11 +20,68 @@ Submodules
 .. currentmodule:: emloop
 
 
+Functions
+=========
+
+- :py:func:`create_output_dir`:
+  Create output_dir under the given ``output_root`` and
+
+- :py:func:`create_dataset`:
+  Create a dataset object according to the given config.
+
+- :py:func:`create_model`:
+  Create a model object either from scratch or from the checkpoint specified by ``restore_from``.
+
+- :py:func:`create_hooks`:
+  Create hooks specified in ``config['hooks']`` list.
+
+- :py:func:`create_main_loop`:
+  Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
+
+
+.. autofunction:: create_output_dir
+
+.. autofunction:: create_dataset
+
+.. autofunction:: create_model
+
+.. autofunction:: create_hooks
+
+.. autofunction:: create_main_loop
+
+
 Classes
 =======
 
 - :py:class:`MainLoop`:
   **emloop** main loop for training and model inference.
+
+- :py:class:`AbstractDataset`:
+  This concept prescribes the API that is required from every **emloop** dataset.
+
+- :py:class:`BaseDataset`:
+  Base class for datasets written in python.
+
+- :py:class:`DownloadableDataset`:
+  DownloadableDataset is dataset base class implementing routines for downloading and extracting data via
+
+- :py:class:`AbstractHook`:
+  **emloop** hook interface.
+
+- :py:class:`AbstractModel`:
+  Abstract machine learning model which exposes input and output names, run and save methods.
+
+- :py:class:`Batch`:
+  Abstract base class for generic types.
+
+- :py:class:`Stream`:
+  Abstract base class for generic types.
+
+- :py:class:`EpochData`:
+  Abstract base class for generic types.
+
+- :py:class:`TimeProfile`:
+  Abstract base class for generic types.
 
 
 
@@ -36,6 +93,132 @@ Classes
    :exclude-members: __weakref__
 
    .. inheritance-diagram:: MainLoop
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: AbstractDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: AbstractDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: BaseDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: BaseDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: DownloadableDataset
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: DownloadableDataset
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: AbstractHook
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: AbstractHook
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: AbstractModel
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: AbstractModel
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Batch
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Batch
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: Stream
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: Stream
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: EpochData
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: EpochData
+      :parts: 1
+
+   |
+
+
+
+.. autoclass:: TimeProfile
+   :show-inheritance:
+   :members:
+   :private-members:
+   :special-members:
+   :exclude-members: __weakref__
+
+   .. inheritance-diagram:: TimeProfile
       :parts: 1
 
    |

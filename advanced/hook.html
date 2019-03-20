@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Hooks &#8212; emloop 0.1.2 documentation</title>
+    <title>Hooks &#8212; emloop 0.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           emloop</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -122,7 +122,7 @@ Hook actions are triggered by the following events invoked by the <strong>emloop
 <li><strong>after_batch</strong> invoked after each batch regardless of the stream, <code class="docutils literal notranslate"><span class="pre">(stream_name,</span> <span class="pre">batch_data)</span></code></li>
 <li><strong>after_epoch</strong> invoked after each epoch, <code class="docutils literal notranslate"><span class="pre">(epoch_id,</span> <span class="pre">epoch_data)</span></code></li>
 <li><strong>after_epoch_profile</strong> special event with training profiling data, invoked after each epoch, <code class="docutils literal notranslate"><span class="pre">(epoch_id,</span> <span class="pre">epoch_profile)</span></code></li>
-<li><strong>after_training</strong> invoked once after the trainig finishes, <code class="docutils literal notranslate"><span class="pre">no</span> <span class="pre">args</span></code></li>
+<li><strong>after_training</strong> invoked once after the trainig finishes, <code class="docutils literal notranslate"><span class="pre">(success)</span></code></li>
 </ul>
 <p>Before we dig into the details, we peek on how to use some of the standard hooks
 available in <strong>emloop</strong> framework.</p>

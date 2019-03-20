@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop.hooks.save_cm &#8212; emloop 0.1.2 documentation</title>
+    <title>emloop.hooks.save_cm &#8212; emloop 0.2.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           emloop</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -221,8 +221,9 @@
             <span class="c1"># Calculate confusion matrix (cm) with absolute values</span>
             <span class="n">cm_abs</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">expected</span><span class="p">,</span> <span class="n">predicted</span><span class="o">=</span><span class="n">predicted</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">)</span>
             <span class="c1"># Calculate cm with relative values</span>
-            <span class="n">cm_norm</span> <span class="o">=</span> <span class="n">cm_abs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cm_abs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
-            <span class="n">cm_norm</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">cm_norm</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Is `np.nan`s appeared, replace them by zero</span>
+            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+                <span class="n">cm_norm</span> <span class="o">=</span> <span class="n">cm_abs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cm_abs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">cm_norm</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">cm_norm</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># If `np.nan`s appeared, replace them by zero</span>
             <span class="c1"># Choose cm type</span>
             <span class="n">cm</span> <span class="o">=</span> <span class="n">cm_norm</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span> <span class="k">else</span> <span class="n">cm_abs</span>
 

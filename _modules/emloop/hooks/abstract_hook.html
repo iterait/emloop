@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop.hooks.abstract_hook &#8212; emloop 0.1.2 documentation</title>
+    <title>emloop.hooks.abstract_hook &#8212; emloop 0.2.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/highlight.css" type="text/css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html">
           emloop</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -130,7 +130,7 @@
     <span class="sd">&quot;&quot;&quot;Arguments which **emloop** pass, in addition to the config args, to ``__init__``</span>
 <span class="sd">    methods of every hook being created.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AbstractHook.__init__"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractHook.__init__"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check and warn if there is any argument created by the user yet not recognized in the child hook ``__init__``</span>
 <span class="sd">        method.</span>
@@ -144,7 +144,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_main_loop</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="AbstractHook.before_training"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractHook.before_training"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.before_training">[docs]</a>    <span class="k">def</span> <span class="nf">before_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Before training event.</span>
 
@@ -155,7 +155,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="AbstractHook.after_batch"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractHook.after_batch"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.after_batch">[docs]</a>    <span class="k">def</span> <span class="nf">after_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">:</span> <span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After batch event.</span>
 
@@ -167,7 +167,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="AbstractHook.after_epoch"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractHook.after_epoch"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.after_epoch">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch_data</span><span class="p">:</span> <span class="n">EpochData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After epoch event.</span>
 
@@ -179,7 +179,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="AbstractHook.after_epoch_profile"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch_profile">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">TimeProfile</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractHook.after_epoch_profile"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.after_epoch_profile">[docs]</a>    <span class="k">def</span> <span class="nf">after_epoch_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">TimeProfile</span><span class="p">,</span> <span class="n">streams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After epoch profile event.</span>
 
@@ -190,7 +190,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="AbstractHook.after_training"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_training">[docs]</a>    <span class="k">def</span> <span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractHook.after_training"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.after_training">[docs]</a>    <span class="k">def</span> <span class="nf">after_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        After training event.</span>
 
@@ -198,10 +198,12 @@
 
 <span class="sd">        .. note::</span>
 <span class="sd">            This method is called exactly once during the training.</span>
+
+<span class="sd">        :param success: whether the training ended with successfully or with exception</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="AbstractHook.register_mainloop"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.hooks.AbstractHook.register_mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">register_mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_loop</span><span class="p">:</span> <span class="s1">&#39;emloop.MainLoop&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="AbstractHook.register_mainloop"><a class="viewcode-back" href="../../../emloop/emloop.hooks.html#emloop.AbstractHook.register_mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">register_mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_loop</span><span class="p">:</span> <span class="s1">&#39;emloop.MainLoop&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pass :py:class:`emloop.MainLoop` to hook. Raise :py:class:`ValueError` if MainLoop was already passed before.</span>
 

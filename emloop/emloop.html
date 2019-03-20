@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop &#8212; emloop 0.1.2 documentation</title>
+    <title>emloop &#8212; emloop 0.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html">
           emloop</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -87,6 +87,7 @@
     </div><ul>
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">emloop</span></code></a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 </ul>
 </li>
@@ -124,11 +125,200 @@
 </ul>
 </div>
 </div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="#emloop.create_output_dir" title="emloop.create_output_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_output_dir()</span></code></a>:
+Create output_dir under the given <code class="docutils literal notranslate"><span class="pre">output_root</span></code> and</li>
+<li><a class="reference internal" href="#emloop.create_dataset" title="emloop.create_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_dataset()</span></code></a>:
+Create a dataset object according to the given config.</li>
+<li><a class="reference internal" href="#emloop.create_model" title="emloop.create_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_model()</span></code></a>:
+Create a model object either from scratch or from the checkpoint specified by <code class="docutils literal notranslate"><span class="pre">restore_from</span></code>.</li>
+<li><a class="reference internal" href="#emloop.create_hooks" title="emloop.create_hooks"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_hooks()</span></code></a>:
+Create hooks specified in <code class="docutils literal notranslate"><span class="pre">config['hooks']</span></code> list.</li>
+<li><a class="reference internal" href="#emloop.create_main_loop" title="emloop.create_main_loop"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_main_loop()</span></code></a>:
+Creates <a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">MainLoop</span></code></a> with model, dataset and hooks according to config.</li>
+</ul>
+<dl class="function">
+<dt id="emloop.create_output_dir">
+<code class="descclassname">emloop.</code><code class="descname">create_output_dir</code><span class="sig-paren">(</span><em>config</em>, <em>output_root</em>, <em>default_model_name='Unnamed'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/api.html#create_output_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.create_output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Create output_dir under the given <code class="docutils literal notranslate"><span class="pre">output_root</span></code> and</dt>
+<dd><ul class="first last simple">
+<li>dump the given config to YAML file under this dir</li>
+<li>register a file logger logging to a file under this dir</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – config to be dumped</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – dir wherein output_dir shall be created</li>
+<li><strong>default_model_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name to be used when <cite>model.name</cite> is not found in the config</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">path to the created output_dir</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emloop.create_dataset">
+<code class="descclassname">emloop.</code><code class="descname">create_dataset</code><span class="sig-paren">(</span><em>config</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/api.html#create_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.create_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a dataset object according to the given config.</p>
+<p>Dataset config section and the <cite>output_dir</cite> are passed to the constructor in a single YAML-encoded string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – config dict with dataset config</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – path to the training output dir or None</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataset</span></code></a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dataset object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emloop.create_model">
+<code class="descclassname">emloop.</code><code class="descname">create_model</code><span class="sig-paren">(</span><em>config</em>, <em>output_dir=None</em>, <em>dataset=None</em>, <em>restore_from=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/api.html#create_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.create_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a model object either from scratch or from the checkpoint specified by <code class="docutils literal notranslate"><span class="pre">restore_from</span></code>.</p>
+<p>Emloop allows the following scenarios</p>
+<ol class="arabic simple">
+<li>Create model: leave <code class="docutils literal notranslate"><span class="pre">restore_from=None</span></code> and specify <code class="docutils literal notranslate"><span class="pre">class</span></code>;</li>
+<li>Restore model: specify <code class="docutils literal notranslate"><span class="pre">restore_from</span></code> which is a backend-specific path to (a directory with) the saved model.</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – config dict with model config</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – path to the training output dir</li>
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataset</span></code></a>]) – dataset object implementing the <a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">emloop.datasets.AbstractDataset</span></code></a> concept</li>
+<li><strong>restore_from</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – from whence the model should be restored (backend-specific information)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="emloop.models.html#emloop.models.AbstractModel" title="emloop.models.AbstractModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractModel</span></code></a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">model object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emloop.create_hooks">
+<code class="descclassname">emloop.</code><code class="descname">create_hooks</code><span class="sig-paren">(</span><em>config</em>, <em>model=None</em>, <em>dataset=None</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/api.html#create_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.create_hooks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create hooks specified in <code class="docutils literal notranslate"><span class="pre">config['hooks']</span></code> list.</p>
+<p>Hook config entries may be one of the following types:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">A hook with default args specified only by its name as a string; e.g.</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">LogVariables</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">emloop_tensorflow.WriteTensorBoard</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">A hook with custom args as a dict name -&gt; args; e.g.</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hooks</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StopAfter</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">n_epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – config dict</li>
+<li><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="emloop.models.html#emloop.models.AbstractModel" title="emloop.models.AbstractModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractModel</span></code></a>]) – model object to be passed to the hooks</li>
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataset</span></code></a>]) – dataset object to be passed to hooks</li>
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – training output dir available to the hooks</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook" title="emloop.hooks.AbstractHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHook</span></code></a>]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of hook objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emloop.create_main_loop">
+<code class="descclassname">emloop.</code><code class="descname">create_main_loop</code><span class="sig-paren">(</span><em>config</em>, <em>output_root</em>, <em>restore_from=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/api.html#create_main_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.create_main_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates <a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">MainLoop</span></code></a> with model, dataset and hooks according to config.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – config dict</li>
+<li><strong>output_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – dir where output_dir shall be created</li>
+<li><strong>restore_from</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – if not None, from whence the model should be restored (backend-specific information)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal notranslate"><span class="pre">MainLoop</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">main loop object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">MainLoop</span></code></a>:
 <strong>emloop</strong> main loop for training and model inference.</li>
+<li><a class="reference internal" href="#emloop.AbstractDataset" title="emloop.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataset</span></code></a>:
+This concept prescribes the API that is required from every <strong>emloop</strong> dataset.</li>
+<li><a class="reference internal" href="#emloop.BaseDataset" title="emloop.BaseDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseDataset</span></code></a>:
+Base class for datasets written in python.</li>
+<li><a class="reference internal" href="#emloop.DownloadableDataset" title="emloop.DownloadableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">DownloadableDataset</span></code></a>:
+DownloadableDataset is dataset base class implementing routines for downloading and extracting data via</li>
+<li><a class="reference internal" href="#emloop.AbstractHook" title="emloop.AbstractHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHook</span></code></a>:
+<strong>emloop</strong> hook interface.</li>
+<li><a class="reference internal" href="#emloop.AbstractModel" title="emloop.AbstractModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractModel</span></code></a>:
+Abstract machine learning model which exposes input and output names, run and save methods.</li>
+<li><a class="reference internal" href="#emloop.Batch" title="emloop.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>:
+Abstract base class for generic types.</li>
+<li><a class="reference internal" href="#emloop.Stream" title="emloop.Stream"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a>:
+Abstract base class for generic types.</li>
+<li><a class="reference internal" href="#emloop.EpochData" title="emloop.EpochData"><code class="xref py py-class docutils literal notranslate"><span class="pre">EpochData</span></code></a>:
+Abstract base class for generic types.</li>
+<li><a class="reference internal" href="#emloop.TimeProfile" title="emloop.TimeProfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeProfile</span></code></a>:
+Abstract base class for generic types.</li>
 </ul>
 <dl class="class">
 <dt id="emloop.MainLoop">
@@ -158,6 +348,18 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="emloop.MainLoop.__enter__">
+<code class="descname">__enter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.__enter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.__enter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls before_training() for all hooks.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.MainLoop.__exit__">
+<code class="descname">__exit__</code><span class="sig-paren">(</span><em>exc_type</em>, <em>exc_value</em>, <em>traceback</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.__exit__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.__exit__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls after_training() for all hooks.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="emloop.MainLoop.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>dataset</em>, <em>hooks=()</em>, <em>train_stream_name='train'</em>, <em>extra_streams=()</em>, <em>buffer=0</em>, <em>on_empty_batch='error'</em>, <em>on_empty_stream='error'</em>, <em>on_unused_sources='warn'</em>, <em>on_incorrect_config='error'</em>, <em>fixed_batch_size=None</em>, <em>fixed_epoch_size=None</em>, <em>skip_zeroth_epoch=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -169,7 +371,7 @@
 <li><strong>dataset</strong> (<a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataset</span></code></a>) – loaded dataset</li>
 <li><strong>hooks</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook" title="emloop.hooks.AbstractHook"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHook</span></code></a>]) – training hooks</li>
 <li><strong>train_stream_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the training stream</li>
-<li><strong>extra_streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – additional stream names to be evaluated between epochs</li>
+<li><strong>extra_streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – additional stream names to be evaluated between epochs</li>
 <li><strong>buffer</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – size of the batch buffer, 0 means no buffer</li>
 <li><strong>on_empty_batch</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – action to take when batch is empty; one of <a class="reference internal" href="#emloop.MainLoop.EMPTY_ACTIONS" title="emloop.MainLoop.EMPTY_ACTIONS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MainLoop.EMPTY_ACTIONS</span></code></a></li>
 <li><strong>on_empty_stream</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – action to take when stream is empty; one of <a class="reference internal" href="#emloop.MainLoop.EMPTY_ACTIONS" title="emloop.MainLoop.EMPTY_ACTIONS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MainLoop.EMPTY_ACTIONS</span></code></a></li>
@@ -209,14 +411,21 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="emloop.MainLoop._create_epoch_data">
-<code class="descname">_create_epoch_data</code><span class="sig-paren">(</span><em>streams=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop._create_epoch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop._create_epoch_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create empty epoch data double dict.</p>
+<dt id="emloop.MainLoop._epoch_impl">
+<code class="descname">_epoch_impl</code><span class="sig-paren">(</span><em>train_streams</em>, <em>eval_streams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop._epoch_impl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop._epoch_impl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs single epoch with given streams.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>]</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>train_streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – list of training streams</li>
+<li><strong>eval_streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – list of eval streams</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -252,77 +461,16 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="emloop.MainLoop._run_zeroth_epoch">
-<code class="descname">_run_zeroth_epoch</code><span class="sig-paren">(</span><em>streams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop._run_zeroth_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop._run_zeroth_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run zeroth epoch on the specified streams.</p>
-<dl class="docutils">
-<dt>Calls</dt>
-<dd><ul class="first last simple">
-<li><a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch" title="emloop.hooks.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.hooks.AbstractHook.after_epoch()</span></code></a></li>
-</ul>
-</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – stream names to be evaluated</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="emloop.MainLoop._try_run">
-<code class="descname">_try_run</code><span class="sig-paren">(</span><em>run_func</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop._try_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop._try_run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Try running the given function (training/prediction).</p>
-<dl class="docutils">
-<dt>Calls</dt>
-<dd><ul class="first last simple">
-<li><a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook.before_training" title="emloop.hooks.AbstractHook.before_training"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.hooks.AbstractHook.before_training()</span></code></a></li>
-<li><a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook.after_training" title="emloop.hooks.AbstractHook.after_training"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.hooks.AbstractHook.after_training()</span></code></a></li>
-</ul>
-</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>run_func</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[], <code class="docutils literal notranslate"><span class="pre">None</span></code>]) – function to be run</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="emloop.MainLoop.epochs_done">
-<code class="descname">epochs_done</code><a class="headerlink" href="#emloop.MainLoop.epochs_done" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of training epochs done in the last call of <code class="xref py py-meth docutils literal notranslate"><span class="pre">self._run_training()</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="emloop.MainLoop.evaluate_stream">
-<code class="descname">evaluate_stream</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.evaluate_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.evaluate_stream" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate the given stream.</p>
+<dt id="emloop.MainLoop.epoch">
+<code class="descname">epoch</code><span class="sig-paren">(</span><em>train_streams</em>, <em>eval_streams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs single epoch with given streams.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>stream</strong> (<a class="reference internal" href="emloop.datasets.html#emloop.datasets.StreamWrapper" title="emloop.datasets.StreamWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWrapper</span></code></a>) – stream to be evaluated</li>
-<li><strong>stream_name</strong> – stream name</li>
+<li><strong>train_streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[+T_co]]) – list of training streams, each either string (e.g. ‘train’), StreamWrapper or iterator</li>
+<li><strong>eval_streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[+T_co]]) – list of eval streams, each either string (e.g. ‘valid’), StreamWrapper or iterator</li>
 </ul>
 </td>
 </tr>
@@ -382,14 +530,35 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="emloop.MainLoop.run_evaluation">
-<code class="descname">run_evaluation</code><span class="sig-paren">(</span><em>stream_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.run_evaluation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.run_evaluation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the main loop with the given stream in the prediction mode.</p>
+<dt id="emloop.MainLoop.prepare_streams">
+<code class="descname">prepare_streams</code><span class="sig-paren">(</span><em>stream_list</em>, <em>base_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.prepare_streams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.prepare_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts streams to StreamWrappers, saves them to <cite>self._streams</cite> and returns their names as strings.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the stream to be evaluated</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[+T_co]]) – list of training streams, each either string (e.g. ‘train’), StreamWrapper or iterator</li>
+<li><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – default base name for unnamed streams</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.MainLoop.run_evaluation">
+<code class="descname">run_evaluation</code><span class="sig-paren">(</span><em>stream_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.run_evaluation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.run_evaluation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates given stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream_name</strong> – Name of stream to evaluate (e.g. <cite>valid</cite>).</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
 </tr>
@@ -399,16 +568,365 @@
 
 <dl class="method">
 <dt id="emloop.MainLoop.run_training">
-<code class="descname">run_training</code><span class="sig-paren">(</span><em>trace=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.run_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.run_training" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the main loop in the training mode.</p>
+<code class="descname">run_training</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.run_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.run_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains until TrainingTerminated exception is raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.MainLoop.training_epochs_done">
+<code class="descname">training_epochs_done</code><a class="headerlink" href="#emloop.MainLoop.training_epochs_done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of training epochs done.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emloop.AbstractDataset">
+<em class="property">class </em><code class="descclassname">emloop.</code><code class="descname">AbstractDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="headerlink" href="#emloop.AbstractDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This concept prescribes the API that is required from every <strong>emloop</strong> dataset.</p>
+<p>Every <strong>emloop</strong> dataset has to have a constructor which takes YAML string config.
+Additionally, one may implement any <code class="docutils literal notranslate"><span class="pre">&lt;stream_name&gt;_stream</span></code> method
+in order to make <code class="docutils literal notranslate"><span class="pre">stream_name</span></code> stream available in the <strong>emloop</strong> <a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">emloop.MainLoop</span></code></a>.</p>
+<p>All the defined stream methods should return a <a class="reference internal" href="#emloop.Stream" title="emloop.Stream"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Stream</span></code></a>.</p>
+<img src="../_images/inheritance-6ec089364fb36a13876f14038680743d046988ef.png" alt="Inheritance diagram of AbstractDataset" class="inheritance"/>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="emloop.AbstractDataset.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/datasets/abstract_dataset.html#AbstractDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new dataset configured with the given YAML string (obligatory).</p>
+<p>The configuration must contain <code class="docutils literal notranslate"><span class="pre">dataset</span></code> entry and may contain <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – YAML string config</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emloop.BaseDataset">
+<em class="property">class </em><code class="descclassname">emloop.</code><code class="descname">BaseDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="headerlink" href="#emloop.BaseDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">datasets.AbstractDataset</span></code></a></p>
+<p>Base class for datasets written in python.</p>
 <dl class="docutils">
-<dt>Calls</dt>
+<dt>In the inherited class, one should:</dt>
 <dd><ul class="first last simple">
-<li><a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch" title="emloop.hooks.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.hooks.AbstractHook.after_epoch()</span></code></a></li>
-<li><a class="reference internal" href="emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch_profile" title="emloop.hooks.AbstractHook.after_epoch_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">emloop.hooks.AbstractHook.after_epoch_profile()</span></code></a></li>
+<li>override the <code class="docutils literal notranslate"><span class="pre">_configure_dataset</span></code></li>
+<li>(optional) implement <code class="docutils literal notranslate"><span class="pre">train_stream</span></code> method if intended to be used with <code class="docutils literal notranslate"><span class="pre">emloop</span> <span class="pre">train</span> <span class="pre">...</span></code></li>
+<li>(optional) implement <code class="docutils literal notranslate"><span class="pre">&lt;stream_name&gt;_stream</span></code> method in order to make <code class="docutils literal notranslate"><span class="pre">&lt;stream_name&gt;</span></code> stream available</li>
 </ul>
 </dd>
 </dl>
+<img src="../_images/inheritance-546cf1f3479497ddc573004189bdf9a97826a087.png" alt="Inheritance diagram of BaseDataset" class="inheritance"/>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="emloop.BaseDataset.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/datasets/base_dataset.html#BaseDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.BaseDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new dataset.</p>
+<p>Decode the given YAML config string and pass the obtained <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> to <a class="reference internal" href="#emloop.BaseDataset._configure_dataset" title="emloop.BaseDataset._configure_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_configure_dataset()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – dataset configuration as YAML string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.BaseDataset._configure_dataset">
+<code class="descname">_configure_dataset</code><span class="sig-paren">(</span><em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/datasets/base_dataset.html#BaseDataset._configure_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.BaseDataset._configure_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the dataset with <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> decoded from YAML configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – output directory for logging and any additional outputs (None if no output dir is available)</li>
+<li><strong>kwargs</strong> – dataset configuration as <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> parsed from <code class="docutils literal notranslate"><span class="pre">config['dataset']</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.7)"><strong>NotImplementedError</strong></a> – if not overridden</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.BaseDataset.stream_info">
+<code class="descname">stream_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/datasets/base_dataset.html#BaseDataset.stream_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.BaseDataset.stream_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check and report source names, dtypes and shapes of all the streams available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emloop.DownloadableDataset">
+<em class="property">class </em><code class="descclassname">emloop.</code><code class="descname">DownloadableDataset</code><span class="sig-paren">(</span><em>config_str</em><span class="sig-paren">)</span><a class="headerlink" href="#emloop.DownloadableDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emloop.datasets.html#emloop.datasets.BaseDataset" title="emloop.datasets.BaseDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">datasets.BaseDataset</span></code></a></p>
+<p>DownloadableDataset is dataset base class implementing routines for downloading and extracting data via
+<code class="docutils literal notranslate"><span class="pre">emloop</span> <span class="pre">dataset</span> <span class="pre">download</span></code> command.</p>
+<p>The typical use-case is that <code class="docutils literal notranslate"><span class="pre">data_root</span></code>, <code class="docutils literal notranslate"><span class="pre">url_root</span></code> and <code class="docutils literal notranslate"><span class="pre">download_filenames</span></code> variables are passed to the
+dataset constructor.
+Alternatively, these properties might be directly implemented in their corresponding methods.</p>
+<img src="../_images/inheritance-167e7e8c45c52a894fbba7dfbc756fa3b68a8cd3.png" alt="Inheritance diagram of DownloadableDataset" class="inheritance"/>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="emloop.DownloadableDataset._configure_dataset">
+<code class="descname">_configure_dataset</code><span class="sig-paren">(</span><em>data_root=None</em>, <em>download_urls=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/datasets/downloadable_dataset.html#DownloadableDataset._configure_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.DownloadableDataset._configure_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the passed values and use them as a default property implementation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – directory to which the files will be downloaded</li>
+<li><strong>download_urls</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – list of URLs to be downloaded</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.DownloadableDataset.data_root">
+<code class="descname">data_root</code><a class="headerlink" href="#emloop.DownloadableDataset.data_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to the data root directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.DownloadableDataset.download">
+<code class="descname">download</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/datasets/downloadable_dataset.html#DownloadableDataset.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.DownloadableDataset.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maybe download and extract the extra files required.</p>
+<p>If not already downloaded, download all files specified by <a class="reference internal" href="#emloop.DownloadableDataset.download_urls" title="emloop.DownloadableDataset.download_urls"><code class="xref py py-meth docutils literal notranslate"><span class="pre">download_urls()</span></code></a>. Then, extract
+the downloaded files to <a class="reference internal" href="#emloop.DownloadableDataset.data_root" title="emloop.DownloadableDataset.data_root"><code class="xref py py-meth docutils literal notranslate"><span class="pre">data_root()</span></code></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">emloop CLI example</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emloop dataset download &lt;path-to-config&gt;
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.DownloadableDataset.download_urls">
+<code class="descname">download_urls</code><a class="headerlink" href="#emloop.DownloadableDataset.download_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of URLs to be downloaded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emloop.AbstractHook">
+<em class="property">class </em><code class="descclassname">emloop.</code><code class="descname">AbstractHook</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#emloop.AbstractHook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p><strong>emloop</strong> hook interface.</p>
+<p>Hook lifecycle (event -&gt; method invocation):</p>
+<ol class="arabic simple">
+<li><strong>emloop</strong> constructs the hooks -&gt; <a class="reference internal" href="#emloop.AbstractHook.__init__" title="emloop.AbstractHook.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></li>
+<li><dl class="first docutils">
+<dt><strong>emloop</strong> enters the main loop -&gt; <a class="reference internal" href="#emloop.AbstractHook.before_training" title="emloop.AbstractHook.before_training"><code class="xref py py-meth docutils literal notranslate"><span class="pre">before_training()</span></code></a></dt>
+<dd><ol class="first last loweralpha">
+<li><strong>emloop</strong> starts an epoch</li>
+<li><strong>emloop</strong> computes a batch -&gt; <a class="reference internal" href="#emloop.AbstractHook.after_batch" title="emloop.AbstractHook.after_batch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">after_batch()</span></code></a></li>
+<li><strong>emloop</strong> finishes the epoch -&gt; <a class="reference internal" href="#emloop.AbstractHook.after_epoch" title="emloop.AbstractHook.after_epoch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">after_epoch()</span></code></a> and <a class="reference internal" href="#emloop.AbstractHook.after_epoch_profile" title="emloop.AbstractHook.after_epoch_profile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">after_epoch_profile()</span></code></a></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><strong>emloop</strong> terminates the main loop -&gt; <a class="reference internal" href="#emloop.AbstractHook.after_training" title="emloop.AbstractHook.after_training"><code class="xref py py-meth docutils literal notranslate"><span class="pre">after_training()</span></code></a></li>
+</ol>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p>Hook naming conventions:</p>
+<ul class="last simple">
+<li>hook names should describe hook actions with verb stems. E.g.: <code class="docutils literal notranslate"><span class="pre">LogProfile</span></code> or <code class="docutils literal notranslate"><span class="pre">SaveBest</span></code></li>
+<li>hook names should not include <code class="docutils literal notranslate"><span class="pre">Hook</span></code> suffix</li>
+</ul>
+</div>
+<img src="../_images/inheritance-ad6297b61e20ae8fc85a4800f6b55144829b8c6e.png" alt="Inheritance diagram of AbstractHook" class="inheritance"/>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="emloop.AbstractHook.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check and warn if there is any argument created by the user yet not recognized in the child hook <code class="docutils literal notranslate"><span class="pre">__init__</span></code>
+method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> – <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> not recognized in the child hook</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractHook.after_batch">
+<code class="descname">after_batch</code><span class="sig-paren">(</span><em>stream_name</em>, <em>batch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.after_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.after_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>After batch event.</p>
+<p>This event is triggered after every processed batch regardless of stream type.
+Batch results are available in results argument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name of the stream (usually <code class="docutils literal notranslate"><span class="pre">train</span></code>, <code class="docutils literal notranslate"><span class="pre">valid</span></code> or``test``)</li>
+<li><strong>batch_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]) – batch inputs and model outputs</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractHook.after_epoch">
+<code class="descname">after_epoch</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>epoch_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.after_epoch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.after_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>After epoch event.</p>
+<p>This event is triggered after every epoch wherein all the streams were iterated. The <code class="docutils literal notranslate"><span class="pre">epoch_data</span></code> object is
+initially empty and shared among all the hooks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – finished epoch id</li>
+<li><strong>epoch_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>]) – epoch data flowing through all hooks</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractHook.after_epoch_profile">
+<code class="descname">after_epoch_profile</code><span class="sig-paren">(</span><em>epoch_id</em>, <em>profile</em>, <em>streams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.after_epoch_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.after_epoch_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>After epoch profile event.</p>
+<p>This event provides opportunity to process time profile of the finished epoch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epoch_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – finished epoch id</li>
+<li><strong>streams</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – streams which are in profile</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractHook.after_training">
+<code class="descname">after_training</code><span class="sig-paren">(</span><em>success</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.after_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.after_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>After training event.</p>
+<p>This event is called after the training finished either naturally or thanks to an interrupt.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is called exactly once during the training.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>success</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – whether the training ended with successfully or with exception</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractHook.before_training">
+<code class="descname">before_training</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.before_training"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.before_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Before training event.</p>
+<p>No data were processed at this moment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is called exactly once during the training.</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -420,21 +938,154 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="emloop.MainLoop.train_by_stream">
-<code class="descname">train_by_stream</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/main_loop.html#MainLoop.train_by_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.MainLoop.train_by_stream" title="Permalink to this definition">¶</a></dt>
-<dd><p>Train the model with the given stream.</p>
+<dt id="emloop.AbstractHook.register_mainloop">
+<code class="descname">register_mainloop</code><span class="sig-paren">(</span><em>main_loop</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/hooks/abstract_hook.html#AbstractHook.register_mainloop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractHook.register_mainloop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass <a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">emloop.MainLoop</span></code></a> to hook. Raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> if MainLoop was already passed before.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stream</strong> (<a class="reference internal" href="emloop.datasets.html#emloop.datasets.StreamWrapper" title="emloop.datasets.StreamWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWrapper</span></code></a>) – stream to train with</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>main_loop</strong> (<a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><em>emloop.MainLoop</em></a>) – <strong>emloop</strong> main loop for training</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">None</span></code></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – if MainLoop was already passed before</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="emloop.AbstractModel">
+<em class="property">class </em><code class="descclassname">emloop.</code><code class="descname">AbstractModel</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#emloop.AbstractModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Abstract machine learning model which exposes input and output names, run and save methods.
+<cite>AbstractModel</cite> implementations are trainable with <a class="reference internal" href="#emloop.MainLoop" title="emloop.MainLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">emloop.MainLoop</span></code></a>.</p>
+<img src="../_images/inheritance-05c81c4ef143363a245b51c23e804f03e09efa9d.png" alt="Inheritance diagram of AbstractModel" class="inheritance"/>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="method">
+<dt id="emloop.AbstractModel.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>dataset</em>, <em>log_dir</em>, <em>restore_from=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/models/abstract_model.html#AbstractModel.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model constructor interface.</p>
+<p>Additional parameters (currently covered by <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>) are passed
+according to the configuration <code class="docutils literal notranslate"><span class="pre">model</span></code> section.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dataset</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="emloop.datasets.html#emloop.datasets.AbstractDataset" title="emloop.datasets.AbstractDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractDataset</span></code></a>]) – dataset object</li>
+<li><strong>log_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – existing directory in which all output files should be stored</li>
+<li><strong>restore_from</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – information passed to the model constructor (backend-specific);
+usually a directory in which the trained model is stored</li>
+<li><strong>kwargs</strong> – configuration section <code class="docutils literal notranslate"><span class="pre">model</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.AbstractModel.input_names">
+<code class="descname">input_names</code><a class="headerlink" href="#emloop.AbstractModel.input_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of model input names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.AbstractModel.output_names">
+<code class="descname">output_names</code><a class="headerlink" href="#emloop.AbstractModel.output_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of model output names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractModel.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>batch</em>, <em>train</em>, <em>stream</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/models/abstract_model.html#AbstractModel.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractModel.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run feed-forward pass with the given batch and return the results as dict.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">train=True</span></code>, also update parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]) – batch to be processed</li>
+<li><strong>train</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if this batch should be used for model update, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise</li>
+<li><strong>stream</strong> (<a class="reference internal" href="emloop.datasets.html#emloop.datasets.StreamWrapper" title="emloop.datasets.StreamWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamWrapper</span></code></a>) – stream wrapper (useful for precise buffer management)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">results dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emloop.AbstractModel.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>name_suffix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/emloop/models/abstract_model.html#AbstractModel.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emloop.AbstractModel.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the model parameters with the given <code class="docutils literal notranslate"><span class="pre">name_suffix</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – name suffix to be appended to the saved model</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">path to the saved file/dir</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.Batch">
+<code class="descclassname">emloop.</code><code class="descname">Batch</code><a class="headerlink" href="#emloop.Batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Mapping</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.Stream">
+<code class="descclassname">emloop.</code><code class="descname">Stream</code><a class="headerlink" href="#emloop.Stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Iterable</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.EpochData">
+<code class="descclassname">emloop.</code><code class="descname">EpochData</code><a class="headerlink" href="#emloop.EpochData" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Mapping</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emloop.TimeProfile">
+<code class="descclassname">emloop.</code><code class="descname">TimeProfile</code><a class="headerlink" href="#emloop.TimeProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Mapping</span></code></a></p>
 </dd></dl>
 
 </div>

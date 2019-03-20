@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Index &#8212; emloop 0.1.2 documentation</title>
+    <title>Index &#8212; emloop 0.2.0 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/highlight.css" type="text/css" />
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           emloop</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -123,13 +123,29 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper.__enter__">__enter__() (emloop.datasets.StreamWrapper method)</a>
-</li>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper.__exit__">__exit__() (emloop.datasets.StreamWrapper method)</a>
-</li>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.AbstractDataset.__init__">__init__() (emloop.datasets.AbstractDataset method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.html#emloop.MainLoop.__enter__">(emloop.MainLoop method)</a>
+</li>
+      </ul></li>
+      <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper.__exit__">__exit__() (emloop.datasets.StreamWrapper method)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.html#emloop.MainLoop.__exit__">(emloop.MainLoop method)</a>
+</li>
+      </ul></li>
+      <li><a href="emloop/emloop.html#emloop.AbstractDataset.__init__">__init__() (emloop.AbstractDataset method)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.html#emloop.AbstractHook.__init__">(emloop.AbstractHook method)</a>
+</li>
+        <li><a href="emloop/emloop.html#emloop.AbstractModel.__init__">(emloop.AbstractModel method)</a>
+</li>
+        <li><a href="emloop/emloop.html#emloop.BaseDataset.__init__">(emloop.BaseDataset method)</a>
+</li>
         <li><a href="advanced/config.html#emloop.MainLoop.__init__">(emloop.MainLoop method)</a>, <a href="emloop/emloop.html#emloop.MainLoop.__init__">[1]</a>
+</li>
+        <li><a href="emloop/emloop.datasets.html#emloop.datasets.AbstractDataset.__init__">(emloop.datasets.AbstractDataset method)</a>
 </li>
         <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset.__init__">(emloop.datasets.BaseDataset method)</a>
 </li>
@@ -179,6 +195,8 @@
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.StopOnNaN.__init__">(emloop.hooks.StopOnNaN method)</a>
 </li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.TrainingTrace.__init__">(emloop.hooks.TrainingTrace method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.WriteCSV.__init__">(emloop.hooks.WriteCSV method)</a>
 </li>
         <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.__init__">(emloop.models.AbstractModel method)</a>
@@ -188,6 +206,8 @@
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.__init__">(emloop.models.Sequence method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper.__iter__">__iter__() (emloop.datasets.StreamWrapper method)</a>
 </li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper.__next__">__next__() (emloop.datasets.StreamWrapper method)</a>
@@ -198,8 +218,6 @@
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.SaveEvery._after_n_epoch">(emloop.hooks.SaveEvery method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.OnPlateau._AGGREGATION">_AGGREGATION (emloop.hooks.OnPlateau attribute)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.StopOnNaN._check_nan">_check_nan() (emloop.hooks.StopOnNaN method)</a>
@@ -210,17 +228,21 @@
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats._compute_aggregation">_compute_aggregation() (emloop.hooks.ComputeStats static method)</a>
 </li>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset._configure_dataset">_configure_dataset() (emloop.datasets.BaseDataset method)</a>
+      <li><a href="emloop/emloop.html#emloop.BaseDataset._configure_dataset">_configure_dataset() (emloop.BaseDataset method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.html#emloop.DownloadableDataset._configure_dataset">(emloop.DownloadableDataset method)</a>
+</li>
+        <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset._configure_dataset">(emloop.datasets.BaseDataset method)</a>
+</li>
         <li><a href="emloop/emloop.datasets.html#emloop.datasets.DownloadableDataset._configure_dataset">(emloop.datasets.DownloadableDataset method)</a>
 </li>
       </ul></li>
-      <li><a href="emloop/emloop.html#emloop.MainLoop._create_epoch_data">_create_epoch_data() (emloop.MainLoop method)</a>
-</li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._dequeue_batch">_dequeue_batch() (emloop.datasets.StreamWrapper method)</a>
 </li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._enqueue_batches">_enqueue_batches() (emloop.datasets.StreamWrapper method)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.MainLoop._epoch_impl">_epoch_impl() (emloop.MainLoop method)</a>
 </li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._epoch_limit_reached">_epoch_limit_reached() (emloop.datasets.StreamWrapper method)</a>
 </li>
@@ -258,8 +280,6 @@
 </li>
       <li><a href="emloop/emloop.html#emloop.MainLoop._run_epoch">_run_epoch() (emloop.MainLoop method)</a>
 </li>
-      <li><a href="emloop/emloop.html#emloop.MainLoop._run_zeroth_epoch">_run_zeroth_epoch() (emloop.MainLoop method)</a>
-</li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics._save_metrics">_save_metrics() (emloop.hooks.ClassificationMetrics method)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats._save_stats">_save_stats() (emloop.hooks.ComputeStats method)</a>
@@ -267,8 +287,6 @@
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._start_thread">_start_thread() (emloop.datasets.StreamWrapper method)</a>
 </li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper._stop_thread">_stop_thread() (emloop.datasets.StreamWrapper method)</a>
-</li>
-      <li><a href="emloop/emloop.html#emloop.MainLoop._try_run">_try_run() (emloop.MainLoop method)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.WriteCSV._write_header">_write_header() (emloop.hooks.WriteCSV method)</a>
 </li>
@@ -280,17 +298,31 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.AbstractDataset">AbstractDataset (class in emloop.datasets)</a>
-</li>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook">AbstractHook (class in emloop.hooks)</a>
-</li>
-      <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel">AbstractModel (class in emloop.models)</a>
-</li>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AccumulateVariables">AccumulateVariables (class in emloop.hooks)</a>
-</li>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_batch">after_batch() (emloop.hooks.AbstractHook method)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractDataset">AbstractDataset (class in emloop)</a>
 
       <ul>
+        <li><a href="emloop/emloop.datasets.html#emloop.datasets.AbstractDataset">(class in emloop.datasets)</a>
+</li>
+      </ul></li>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook">AbstractHook (class in emloop)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook">(class in emloop.hooks)</a>
+</li>
+      </ul></li>
+      <li><a href="emloop/emloop.html#emloop.AbstractModel">AbstractModel (class in emloop)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel">(class in emloop.models)</a>
+</li>
+      </ul></li>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AccumulateVariables">AccumulateVariables (class in emloop.hooks)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook.after_batch">after_batch() (emloop.AbstractHook method)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_batch">(emloop.hooks.AbstractHook method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.AccumulateVariables.after_batch">(emloop.hooks.AccumulateVariables method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.Flatten.after_batch">(emloop.hooks.Flatten method)</a>
@@ -308,9 +340,11 @@
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.StopOnNaN.after_batch">(emloop.hooks.StopOnNaN method)</a>
 </li>
       </ul></li>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch">after_epoch() (emloop.hooks.AbstractHook method)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook.after_epoch">after_epoch() (emloop.AbstractHook method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch">(emloop.hooks.AbstractHook method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.AccumulateVariables.after_epoch">(emloop.hooks.AccumulateVariables method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.Check.after_epoch">(emloop.hooks.Check method)</a>
@@ -345,23 +379,31 @@
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.StopOnNaN.after_epoch">(emloop.hooks.StopOnNaN method)</a>
 </li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.TrainingTrace.after_epoch">(emloop.hooks.TrainingTrace method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.WriteCSV.after_epoch">(emloop.hooks.WriteCSV method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch_profile">after_epoch_profile() (emloop.hooks.AbstractHook method)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook.after_epoch_profile">after_epoch_profile() (emloop.AbstractHook method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_epoch_profile">(emloop.hooks.AbstractHook method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.Benchmark.after_epoch_profile">(emloop.hooks.Benchmark method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.LogProfile.after_epoch_profile">(emloop.hooks.LogProfile method)</a>
 </li>
       </ul></li>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_training">after_training() (emloop.hooks.AbstractHook method)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook.after_training">after_training() (emloop.AbstractHook method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.after_training">(emloop.hooks.AbstractHook method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.LogDir.after_training">(emloop.hooks.LogDir method)</a>
+</li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.TrainingTrace.after_training">(emloop.hooks.TrainingTrace method)</a>
 </li>
       </ul></li>
       <li><a href="emloop/emloop.models.html#emloop.models.Ensemble.AGGREGATION_METHODS">AGGREGATION_METHODS (emloop.models.Ensemble attribute)</a>
@@ -374,16 +416,26 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset">BaseDataset (class in emloop.datasets)</a>
-</li>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.before_training">before_training() (emloop.hooks.AbstractHook method)</a>
+      <li><a href="emloop/emloop.html#emloop.BaseDataset">BaseDataset (class in emloop)</a>
 
       <ul>
+        <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset">(class in emloop.datasets)</a>
+</li>
+      </ul></li>
+      <li><a href="emloop/emloop.html#emloop.Batch">Batch (in module emloop)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook.before_training">before_training() (emloop.AbstractHook method)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.before_training">(emloop.hooks.AbstractHook method)</a>
+</li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.LogDir.before_training">(emloop.hooks.LogDir method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.SaveFile.before_training">(emloop.hooks.SaveFile method)</a>
 </li>
         <li><a href="emloop/emloop.hooks.html#emloop.hooks.StopAfter.before_training">(emloop.hooks.StopAfter method)</a>
+</li>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.TrainingTrace.before_training">(emloop.hooks.TrainingTrace method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -398,11 +450,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.Check">Check (class in emloop.hooks)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ClassificationMetrics">ClassificationMetrics (class in emloop.hooks)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.ComputeStats">ComputeStats (class in emloop.hooks)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.create_dataset">create_dataset() (in module emloop)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="emloop/emloop.html#emloop.create_hooks">create_hooks() (in module emloop)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.create_main_loop">create_main_loop() (in module emloop)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.create_model">create_model() (in module emloop)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.create_output_dir">create_output_dir() (in module emloop)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -411,15 +473,31 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.DownloadableDataset.data_root">data_root (emloop.datasets.DownloadableDataset attribute)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.html#emloop.DownloadableDataset.data_root">(emloop.DownloadableDataset attribute)</a>
 </li>
+      </ul></li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.DownloadableDataset.download">download() (emloop.datasets.DownloadableDataset method)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.html#emloop.DownloadableDataset.download">(emloop.DownloadableDataset method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.DownloadableDataset.download_urls">download_urls (emloop.datasets.DownloadableDataset attribute)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.html#emloop.DownloadableDataset.download_urls">(emloop.DownloadableDataset attribute)</a>
 </li>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.DownloadableDataset">DownloadableDataset (class in emloop.datasets)</a>
+      </ul></li>
+      <li><a href="emloop/emloop.html#emloop.DownloadableDataset">DownloadableDataset (class in emloop)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.datasets.html#emloop.datasets.DownloadableDataset">(class in emloop.datasets)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -468,9 +546,9 @@
 </li>
       <li><a href="emloop/emloop.models.html#emloop.models.Ensemble">Ensemble (class in emloop.models)</a>
 </li>
-      <li><a href="emloop/emloop.html#emloop.MainLoop.epochs_done">epochs_done (emloop.MainLoop attribute)</a>
+      <li><a href="emloop/emloop.html#emloop.MainLoop.epoch">epoch() (emloop.MainLoop method)</a>
 </li>
-      <li><a href="emloop/emloop.html#emloop.MainLoop.evaluate_stream">evaluate_stream() (emloop.MainLoop method)</a>
+      <li><a href="emloop/emloop.html#emloop.EpochData">EpochData (in module emloop)</a>
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.EveryNEpoch">EveryNEpoch (class in emloop.hooks)</a>
 </li>
@@ -510,9 +588,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.html#emloop.MainLoop.INCORRECT_CONFIG_ACTIONS">INCORRECT_CONFIG_ACTIONS (emloop.MainLoop attribute)</a>
 </li>
-      <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.input_names">input_names (emloop.models.AbstractModel attribute)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractModel.input_names">input_names (emloop.AbstractModel attribute)</a>
 
       <ul>
+        <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.input_names">(emloop.models.AbstractModel attribute)</a>
+</li>
         <li><a href="emloop/emloop.models.html#emloop.models.Ensemble.input_names">(emloop.models.Ensemble attribute)</a>
 </li>
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.input_names">(emloop.models.Sequence attribute)</a>
@@ -570,9 +650,11 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.output_names">output_names (emloop.models.AbstractModel attribute)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractModel.output_names">output_names (emloop.AbstractModel attribute)</a>
 
       <ul>
+        <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.output_names">(emloop.models.AbstractModel attribute)</a>
+</li>
         <li><a href="emloop/emloop.models.html#emloop.models.Ensemble.output_names">(emloop.models.Ensemble attribute)</a>
 </li>
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.output_names">(emloop.models.Sequence attribute)</a>
@@ -590,32 +672,32 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.PlotLines">PlotLines (class in emloop.hooks)</a>
 </li>
+      <li><a href="emloop/emloop.html#emloop.MainLoop.prepare_streams">prepare_streams() (emloop.MainLoop method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.register_mainloop">register_mainloop() (emloop.hooks.AbstractHook method)</a>
-</li>
-      <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.restore_fallback">restore_fallback (emloop.models.AbstractModel attribute)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractHook.register_mainloop">register_mainloop() (emloop.AbstractHook method)</a>
 
       <ul>
-        <li><a href="emloop/emloop.models.html#emloop.models.Ensemble.restore_fallback">(emloop.models.Ensemble attribute)</a>
-</li>
-        <li><a href="emloop/emloop.models.html#emloop.models.Sequence.restore_fallback">(emloop.models.Sequence attribute)</a>
+        <li><a href="emloop/emloop.hooks.html#emloop.hooks.AbstractHook.register_mainloop">(emloop.hooks.AbstractHook method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.run">run() (emloop.models.AbstractModel method)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractModel.run">run() (emloop.AbstractModel method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.run">(emloop.models.AbstractModel method)</a>
+</li>
         <li><a href="emloop/emloop.models.html#emloop.models.Ensemble.run">(emloop.models.Ensemble method)</a>
 </li>
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.run">(emloop.models.Sequence method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.html#emloop.MainLoop.run_evaluation">run_evaluation() (emloop.MainLoop method)</a>
 </li>
       <li><a href="emloop/emloop.html#emloop.MainLoop.run_training">run_training() (emloop.MainLoop method)</a>
@@ -626,9 +708,11 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.save">save() (emloop.models.AbstractModel method)</a>
+      <li><a href="emloop/emloop.html#emloop.AbstractModel.save">save() (emloop.AbstractModel method)</a>
 
       <ul>
+        <li><a href="emloop/emloop.models.html#emloop.models.AbstractModel.save">(emloop.models.AbstractModel method)</a>
+</li>
         <li><a href="emloop/emloop.models.html#emloop.models.Ensemble.save">(emloop.models.Ensemble method)</a>
 </li>
         <li><a href="emloop/emloop.models.html#emloop.models.Sequence.save">(emloop.models.Sequence method)</a>
@@ -662,8 +746,14 @@
 </li>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.StopOnPlateau">StopOnPlateau (class in emloop.hooks)</a>
 </li>
-      <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset.stream_info">stream_info() (emloop.datasets.BaseDataset method)</a>
+      <li><a href="emloop/emloop.html#emloop.Stream">Stream (in module emloop)</a>
 </li>
+      <li><a href="emloop/emloop.html#emloop.BaseDataset.stream_info">stream_info() (emloop.BaseDataset method)</a>
+
+      <ul>
+        <li><a href="emloop/emloop.datasets.html#emloop.datasets.BaseDataset.stream_info">(emloop.datasets.BaseDataset method)</a>
+</li>
+      </ul></li>
       <li><a href="emloop/emloop.datasets.html#emloop.datasets.StreamWrapper">StreamWrapper (class in emloop.datasets)</a>
 </li>
   </ul></td>
@@ -672,11 +762,15 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="emloop/emloop.html#emloop.MainLoop.train_by_stream">train_by_stream() (emloop.MainLoop method)</a>
+      <li><a href="emloop/emloop.html#emloop.TimeProfile">TimeProfile (in module emloop)</a>
+</li>
+      <li><a href="emloop/emloop.html#emloop.MainLoop.training_epochs_done">training_epochs_done (emloop.MainLoop attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="emloop/emloop.hooks.html#emloop.hooks.TrainingTerminated">TrainingTerminated</a>
+</li>
+      <li><a href="emloop/emloop.hooks.html#emloop.hooks.TrainingTrace">TrainingTrace (class in emloop.hooks)</a>
 </li>
   </ul></td>
 </tr></table>
