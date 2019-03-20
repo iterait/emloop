@@ -8,7 +8,7 @@ from typing import Mapping, List
 import logging
 import datetime
 
-import yaml
+import ruamel.yaml
 import pytest
 
 from emloop import AbstractModel, MainLoop
@@ -25,7 +25,7 @@ from emloop.utils.yaml import load_yaml
 class DummyDataset:
     """Dummy dataset which loads the given config to self.config."""
     def __init__(self, config_str):
-        self.config = yaml.load(config_str)
+        self.config = ruamel.yaml.load(config_str)
 
     def train_stream(self):
         yield {'a': ['b']}
@@ -35,7 +35,7 @@ class DummyConfigDataset(AbstractDataset):
     """Dummy dataset which changes config."""
     def __init__(self, config_str: str):
         super().__init__(config_str)
-        config = yaml.load(config_str)['dataset_config']
+        config = ruamel.yaml.load(config_str)['dataset_config']
         config[0], config[1], config[2] = config[1], config[0], config[2]
 
     def train_stream(self):

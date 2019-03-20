@@ -5,7 +5,7 @@ from typing import Tuple, Any, Iterable, Optional
 import logging
 from copy import deepcopy
 
-import yaml
+import ruamel.yaml
 
 from .yaml import load_yaml, reload
 
@@ -21,7 +21,7 @@ def parse_arg(arg: str) -> Tuple[str, Any]:
     assert '=' in arg, 'Unrecognized argument `{}`. [name]=[value] expected.'.format(arg)
 
     key = arg[:arg.index('=')]
-    value = yaml.load(arg[arg.index('=') + 1:])
+    value = ruamel.yaml.load(arg[arg.index('=') + 1:])
 
     return key, value
 
