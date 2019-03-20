@@ -146,9 +146,21 @@ workflows:
   version: 2
   test-doc-deploy:
     jobs:
-      - test_ubuntu_latest
-      - test_ubuntu_rolling
-      - test_archlinux
+      - test_ubuntu_latest:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - test_ubuntu_rolling:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - test_archlinux:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
       - coverage:
           requires:
             - test_ubuntu_latest
