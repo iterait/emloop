@@ -126,4 +126,3 @@ def test_raising(create_models, tmpdir):
         ensemble.run(None, True, None)
     with pytest.raises(NotImplementedError):
         ensemble.save()
-    assert ensemble.restore_fallback is None

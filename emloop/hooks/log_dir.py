@@ -36,6 +36,6 @@ class LogDir(AbstractHook):
         """Log the output directory."""
         logging.info('Output dir: %s', self._output_dir)
 
-    def after_training(self) -> None:
+    def after_training(self, _) -> None:
         """Log the output directory."""
         logging.info('Output dir: %s', self._output_dir)

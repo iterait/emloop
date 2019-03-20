@@ -11,7 +11,7 @@ Hook actions are triggered by the following events invoked by the **emloop** `ma
 - **after_batch** invoked after each batch regardless of the stream, ``(stream_name, batch_data)``
 - **after_epoch** invoked after each epoch, ``(epoch_id, epoch_data)``
 - **after_epoch_profile** special event with training profiling data, invoked after each epoch, ``(epoch_id, epoch_profile)``
-- **after_training** invoked once after the trainig finishes, ``no args``
+- **after_training** invoked once after the trainig finishes, ``(success)``
 
 Before we dig into the details, we peek on how to use some of the standard hooks 
 available in **emloop** framework.

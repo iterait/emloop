@@ -15,7 +15,7 @@ autoapi_modules = {
 # General information about the project.
 project = 'emloop'
 copyright = '2018, Iterait a.s.'
-author = 'Petr Belohlavek, Adam Blazek, Filip Matzner'
+author = 'Petr Belohlavek, Adam Blazek, Filip Matzner, Bedrich Pisl'
 
 # The short X.Y version.
 version = '.'.join(pkg_resources.get_distribution("emloop").version.split('.')[:2])

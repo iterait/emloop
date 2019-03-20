@@ -6,9 +6,10 @@ from collections import Counter
 
 import numpy as np
 
+import emloop.api   # avoids circular dependency
+
 from .abstract_model import AbstractModel
 from ..utils import load_config
-from ..cli.common import create_model
 from ..datasets import AbstractDataset, StreamWrapper
 from ..types import Batch
 from ..constants import EL_CONFIG_FILE
@@ -123,8 +124,8 @@ class Ensemble(AbstractModel):
                 config['model']['inputs'] = self._inputs
                 config['model']['outputs'] = self._outputs
 
-                return create_model(config, output_dir=None, dataset=self._dataset,
-                                    restore_from=path.dirname(model_path))
+                return emloop.api.create_model(config, output_dir=None, dataset=self._dataset,
+                                               restore_from=path.dirname(model_path))
 
             self._models = list(map(load_model, self._model_paths))
 
@@ -178,8 +179,3 @@ class Ensemble(AbstractModel):
         :raise NotImplementedError: when called
         """
         raise NotImplementedError('Ensemble model cannot be saved.')
-
-    @property
-    def restore_fallback(self) -> None:
-        """Ensemble model does not provide restore_fallback."""
-        pass

@@ -125,8 +125,9 @@ class SaveConfusionMatrix(AccumulateVariables):
             # Calculate confusion matrix (cm) with absolute values
             cm_abs = confusion_matrix(expected=expected, predicted=predicted, num_classes=num_classes)
             # Calculate cm with relative values
-            cm_norm = cm_abs.astype(np.float) / np.sum(cm_abs, axis=1)[:, np.newaxis]
-            cm_norm[np.isnan(cm_norm)] = 0  # Is `np.nan`s appeared, replace them by zero
+            with np.errstate(divide='ignore', invalid='ignore'):
+                cm_norm = cm_abs.astype(np.float) / np.sum(cm_abs, axis=1)[:, np.newaxis]
+            cm_norm[np.isnan(cm_norm)] = 0  # If `np.nan`s appeared, replace them by zero
             # Choose cm type
             cm = cm_norm if self._normalize else cm_abs
 

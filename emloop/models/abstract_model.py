@@ -65,16 +65,3 @@ class AbstractModel(metaclass=ABCMeta):
         :return: path to the saved file/dir
         """
         pass
-
-    @property
-    @abstractmethod
-    def restore_fallback(self) -> str:
-        """
-        Return the fully-qualified name of the fallback restore class (e.g. ``module.submodule.BaseClass``).
-
-        When restoring a model, **emloop** tries to use the fallback class if the construction of the model
-        object specified in `model` configuration section fails.
-
-        :return: fully-qualified name of the fallback restore class
-        """
-        pass

@@ -149,7 +149,6 @@ def test_raising(create_models, tmpdir):
         sequence.run(None, True, None)
     with pytest.raises(NotImplementedError):
         sequence.save()
-    assert sequence.restore_fallback is None
 
     # test ValueError raised if models don't follow up correctly
     sequence2 = Sequence(models_root=tmpdir, model_paths=['step1', 'step3'])

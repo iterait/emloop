@@ -94,7 +94,7 @@ class AbstractHook:
         """
         pass
 
-    def after_training(self) -> None:
+    def after_training(self, success: bool) -> None:
         """
         After training event.
 
@@ -102,6 +102,8 @@ class AbstractHook:
 
         .. note::
             This method is called exactly once during the training.
+
+        :param success: whether the training ended with successfully or with exception
         """
         pass
 

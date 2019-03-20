@@ -14,7 +14,7 @@ def test_log_dir(caplog):
     caplog.set_level(logging.INFO)
     hook.before_training()
     hook.after_epoch(batch_data={}, stream_name='Dummy')
-    hook.after_training()
+    hook.after_training(True)
 
     assert caplog.record_tuples == [
         ('root', logging.INFO, 'Output dir: {}'.format(test_dir)),
