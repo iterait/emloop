@@ -21,7 +21,7 @@ def parse_arg(arg: str) -> Tuple[str, Any]:
     assert '=' in arg, 'Unrecognized argument `{}`. [name]=[value] expected.'.format(arg)
 
     key = arg[:arg.index('=')]
-    value = ruamel.yaml.load(arg[arg.index('=') + 1:])
+    value = ruamel.yaml.load(arg[arg.index('=') + 1:], Loader=ruamel.yaml.Loader)
 
     return key, value
 
