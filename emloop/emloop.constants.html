@@ -2,21 +2,17 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>emloop.constants &#8212; emloop 0.2.0 documentation</title>
+    <meta charset="utf-8" />
+    <title>emloop.constants &#8212; emloop 0.2.1 documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/highlight.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/highlight.css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="emloop.datasets" href="emloop.datasets.html" />
@@ -25,6 +21,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
 
@@ -107,7 +107,7 @@
 </ul>
         </div>
       </div>
-    <div class="col-md-9 content">
+    <div class="body col-md-9 content" role="main">
       
   <div class="section" id="module-emloop.constants">
 <span id="emloop-constants"></span><h1><code class="docutils literal notranslate"><span class="pre">emloop.constants</span></code><a class="headerlink" href="#module-emloop.constants" title="Permalink to this headline">¶</a></h1>
@@ -115,18 +115,18 @@
 <div class="section" id="variables">
 <h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="#emloop.constants.EL_LOG_FORMAT" title="emloop.constants.EL_LOG_FORMAT"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_LOG_FORMAT</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_LOG_DATE_FORMAT" title="emloop.constants.EL_LOG_DATE_FORMAT"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_LOG_DATE_FORMAT</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_FULL_DATE_FORMAT" title="emloop.constants.EL_FULL_DATE_FORMAT"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_FULL_DATE_FORMAT</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_HOOKS_MODULE" title="emloop.constants.EL_HOOKS_MODULE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_HOOKS_MODULE</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_CONFIG_FILE" title="emloop.constants.EL_CONFIG_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_CONFIG_FILE</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_LOG_FILE" title="emloop.constants.EL_LOG_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_LOG_FILE</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_TRACE_FILE" title="emloop.constants.EL_TRACE_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_TRACE_FILE</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_DEFAULT_TRAIN_STREAM" title="emloop.constants.EL_DEFAULT_TRAIN_STREAM"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_DEFAULT_TRAIN_STREAM</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_PREDICT_STREAM" title="emloop.constants.EL_PREDICT_STREAM"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_PREDICT_STREAM</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_DEFAULT_LOG_DIR" title="emloop.constants.EL_DEFAULT_LOG_DIR"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_DEFAULT_LOG_DIR</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_NA_STR" title="emloop.constants.EL_NA_STR"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_NA_STR</span></code></a></li>
-<li><a class="reference internal" href="#emloop.constants.EL_BUFFER_SLEEP" title="emloop.constants.EL_BUFFER_SLEEP"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_BUFFER_SLEEP</span></code></a></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_LOG_FORMAT" title="emloop.constants.EL_LOG_FORMAT"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_LOG_FORMAT</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_LOG_DATE_FORMAT" title="emloop.constants.EL_LOG_DATE_FORMAT"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_LOG_DATE_FORMAT</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_FULL_DATE_FORMAT" title="emloop.constants.EL_FULL_DATE_FORMAT"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_FULL_DATE_FORMAT</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_HOOKS_MODULE" title="emloop.constants.EL_HOOKS_MODULE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_HOOKS_MODULE</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_CONFIG_FILE" title="emloop.constants.EL_CONFIG_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_CONFIG_FILE</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_LOG_FILE" title="emloop.constants.EL_LOG_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_LOG_FILE</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_TRACE_FILE" title="emloop.constants.EL_TRACE_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_TRACE_FILE</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_DEFAULT_TRAIN_STREAM" title="emloop.constants.EL_DEFAULT_TRAIN_STREAM"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_DEFAULT_TRAIN_STREAM</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_PREDICT_STREAM" title="emloop.constants.EL_PREDICT_STREAM"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_PREDICT_STREAM</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_DEFAULT_LOG_DIR" title="emloop.constants.EL_DEFAULT_LOG_DIR"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_DEFAULT_LOG_DIR</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_NA_STR" title="emloop.constants.EL_NA_STR"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_NA_STR</span></code></a></p></li>
+<li><p><a class="reference internal" href="#emloop.constants.EL_BUFFER_SLEEP" title="emloop.constants.EL_BUFFER_SLEEP"><code class="xref py py-data docutils literal notranslate"><span class="pre">EL_BUFFER_SLEEP</span></code></a></p></li>
 </ul>
 <dl class="data">
 <dt id="emloop.constants.EL_LOG_FORMAT">
@@ -253,7 +253,7 @@
     </p>
     <p>
         &copy; Copyright 2018, Iterait a.s..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.9.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.<br/>
     </p>
   </div>
 </footer>

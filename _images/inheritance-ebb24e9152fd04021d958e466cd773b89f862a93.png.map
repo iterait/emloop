@@ -1,0 +1,5 @@
+<map id="inheritancee96d9cb954" name="inheritancee96d9cb954">
+<area shape="rect" id="node1" title="**emloop** hook interface." alt="" coords="5,5,116,31"/>
+<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="164,5,323,31"/>
+<area shape="rect" id="node3" title="Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data." alt="" coords="371,5,485,31"/>
+</map>

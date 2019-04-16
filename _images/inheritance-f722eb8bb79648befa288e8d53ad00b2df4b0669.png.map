@@ -1,0 +1,5 @@
+<map id="inheritance0310c48255" name="inheritance0310c48255">
+<area shape="rect" id="node1" title="This concept prescribes the API that is required from every **emloop** dataset." alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node2" title="Base class for datasets written in python." alt="" coords="180,5,285,31"/>
+<area shape="rect" id="node3" title="DownloadableDataset is dataset base class implementing routines for downloading and extracting data via" alt="" coords="333,5,500,31"/>
+</map>

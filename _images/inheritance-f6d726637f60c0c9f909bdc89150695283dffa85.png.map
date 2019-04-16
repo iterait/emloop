@@ -1,0 +1,7 @@
+<map id="inheritancee06f0c9832" name="inheritancee06f0c9832">
+<area shape="rect" id="node1" title="**emloop** hook interface." alt="" coords="5,5,112,30"/>
+<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="158,5,312,30"/>
+<area shape="rect" id="node3" title="Accumulate the specified variables, compute the specified aggregation values and save them to the epoch data." alt="" coords="358,5,469,30"/>
+<area shape="rect" id="node4" title="Base hook for hooks taking actions when certain variable reaches its plateau." alt="" coords="515,5,602,30"/>
+<area shape="rect" id="node5" title="Terminate the training when the observed variable reaches its plateau." alt="" coords="648,5,763,30"/>
+</map>

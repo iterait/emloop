@@ -1,4 +1,0 @@
-<map id="inheritance5ea32bbab7" name="inheritance5ea32bbab7">
-<area shape="rect" id="node2" title="Accumulate the specified variables allowing their aggregation after each epoch." alt="" coords="164,5,323,31"/>
-<area shape="rect" id="node3" title="After each epoch, compute and save/store confusion matrix figure for the predicted and expected labels." alt="" coords="371,5,531,31"/>
-</map>
