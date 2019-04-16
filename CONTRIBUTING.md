@@ -34,7 +34,8 @@ Do not forget to stick to the Python **coding style** ([PEP 8](https://www.pytho
 Once the bug is fixed or the feature is implemented, please do not forget to run the **unit tests**.
 
 ```bash
-python setup.py test
+pip3 install '.[tests]'  # install test dependendencies
+python setup.py test     # run the unit tests
 ```
 
 In the case of fixing a bug, please add the **regression tests** which address this particular bug.

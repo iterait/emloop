@@ -1,8 +1,0 @@
-click>=7.0
-numpy>=1.16
-requests>=2.21
-ruamel.yaml>=0.15
-tabulate>=0.8.3
-babel>=2.6
-matplotlib>=3.0
-pandas>=0.24
