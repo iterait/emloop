@@ -58,9 +58,9 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
             try:
                 stream_fn = getattr(self, stream_name)
                 logging.info(stream_name)
-                batch = next(iter(stream_fn()))
-                rows = []
-                for key, value in batch.items():
+                for batch in stream_fn():
+                    rows = []
+                    for key, value in batch.items():
                         try:
                             value_arr = np.array(value)
                             row = [key, value_arr.dtype, value_arr.shape]
@@ -77,9 +77,10 @@ class BaseDataset(AbstractDataset, metaclass=ABCMeta):
                             logging.warning('*** stream source `%s` appears to be ragged (non-rectangular) ***', key)
 
                         rows.append(row)
-                for line in tabulate.tabulate(rows, headers=['name', 'dtype', 'shape', 'range'],
-                                              tablefmt='grid').split('\n'):
-                    logging.info(line)
+                    for line in tabulate.tabulate(rows, headers=['name', 'dtype', 'shape', 'range'],
+                                                  tablefmt='grid').split('\n'):
+                        logging.info(line)
+                    break
             except Exception:
                 logging.warning('Exception was raised during checking stream `%s`, '
                                 '(stack trace is displayed only with --verbose flag)', stream_name)

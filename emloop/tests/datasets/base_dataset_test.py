@@ -90,7 +90,7 @@ def test_check_dataset(caplog):
         + (('root', logging.DEBUG, 'Traceback (most recent call last):\n'
            f'  File "{emloop.datasets.base_dataset.__file__}", line 61, in '
             'stream_info\n'
-            '    batch = next(iter(stream_fn()))\n'
+            '    for batch in stream_fn():\n'
             "TypeError: 'NoneType' object is not iterable\n"),)
     )
 
