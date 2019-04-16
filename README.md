@@ -36,4 +36,3 @@ At the moment we support the following extensions:
 ## Contributions
 
 All contributions are welcomed. Please read our [contributor's guide](CONTRIBUTING.md).
-

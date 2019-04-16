@@ -10,7 +10,7 @@ In order to run and install emloop, the following utilities must be installed:
 - Python 3.5+
 - ``pip`` 9.0+
 
-emloop depends on additional dependencies which are listed in the ``requirements.txt`` file.
+emloop depends on additional dependencies which are listed in the ``setup.py`` file.
 Nevertheless, these dependencies are automatically installed by ``pip`` (see below).
 
 Installation
@@ -47,6 +47,7 @@ Finally, emloop might be installed directly for development purposes.
     git clone git@github.com:iterait/emloop.git
     cd emloop
     pip install -e .
+    pip install -e '.[tests]'
 
 The emloop test suite can be executed by running the following command in the 
 cloned repository:
