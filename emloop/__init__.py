@@ -18,4 +18,4 @@ __all__ = ['MainLoop', 'create_output_dir', 'create_dataset', 'create_model', 'c
            'load_yaml', 'AbstractDataset', 'BaseDataset', 'DownloadableDataset', 'AbstractHook', 'MainLoop',
            'AbstractModel', 'Batch', 'Stream', 'EpochData', 'TimeProfile']
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'

@@ -5,7 +5,7 @@ tests_require = [
 ]
 
 setup(name='emloop',
-      version='0.2.0',
+      version='0.2.1',
       description='Smart machine learning trainer',
       long_description='Trainer of machine learning models that automatically manages the whole process of training,'
                        'saving and restoring models and much more',
