@@ -39,7 +39,7 @@ references:
       name: Install.
       command: |
         pip3 install .
-        pip3 install -r requirements-tests.txt
+        pip3 install '.[tests]'
 
   test: &test
     run:
@@ -63,6 +63,7 @@ references:
     run:
       name: Generate documentation
       command: |
+        pip3 install '.[docs]'
         bash <(curl -fsSL https://raw.githubusercontent.com/iterait/ci-utils/master/doc_deploy.sh)
 
   coverage: &coverage
