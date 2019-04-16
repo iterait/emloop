@@ -15,7 +15,7 @@ def load_yaml(yaml_file: str) -> Any:
     :return: content of the YAML as dict/list
     """
     with open(yaml_file, 'r') as file:
-        return ruamel.yaml.load(file, ruamel.yaml.RoundTripLoader)
+        return ruamel.yaml.load(file, Loader=ruamel.yaml.RoundTripLoader)
 
 
 def yaml_to_file(data: Mapping, output_dir: str, name: str) -> str:

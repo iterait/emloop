@@ -21,9 +21,8 @@ pip install emloop
 - [Additional examples](https://github.com/iterait/emloop-examples)
 
 ## Requirements
- - **emloop** is supported (and tested) on [Arch Linux](https://www.archlinux.org) and [Ubuntu](http://releases.ubuntu.com) (latest LTS and rolling) with Python 3.6 and 3.5 respectively.
- - **emloop** will most likely work on [Windows with Anaconda](https://www.anaconda.com/download/) and Python 3.6 yet **it is not tested regularly**
-
+ - **emloop** is supported (and tested) on [Arch Linux](https://www.archlinux.org) and [Ubuntu](http://releases.ubuntu.com) (latest LTS and rolling) with Python 3.7 and 3.6, respectively.
+ - **emloop** will most likely work on [Windows with Anaconda](https://www.anaconda.com/download/) and Python 3.6 or 3.7 yet **it is not tested regularly**
 
 ## Extensions
 **emloop** is meant to be extremely lightweight.
@@ -37,4 +36,3 @@ At the moment we support the following extensions:
 ## Contributions
 
 All contributions are welcomed. Please read our [contributor's guide](CONTRIBUTING.md).
-
