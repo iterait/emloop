@@ -50,4 +50,4 @@ def test_dump_yaml(tmpdir):
 
     # test dump to string (effectively, test pyaml)
     yaml_str = yaml_to_str(config)
-    assert ruamel.yaml.load(yaml_str) == config
+    assert ruamel.yaml.safe_load(yaml_str) == config
