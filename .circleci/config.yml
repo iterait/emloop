@@ -14,7 +14,7 @@ references:
     run:
       name: Install dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm python python-numpy python-pip git curl
+        pacman -Syu --noconfirm --needed python python-numpy python-pip git curl base-devel
         pip install coveralls coverage
 
   ubuntu_deps_extra_pkgs: &ubuntu_deps_extra_pkgs
@@ -31,7 +31,7 @@ references:
     run:
       name: Install opencv & scikit dependencies on Arch Linux.
       command: |
-        pacman -Syu --noconfirm opencv hdf5 gtk3 python-scikit-learn
+        pacman -Syu --noconfirm --needed opencv qt5-base hdf5 gtk3 python-scikit-learn
         echo 'export EXTRA_PKGS=true' >> $BASH_ENV
 
   install: &install
