@@ -35,6 +35,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                  train_stream_name: str=EL_DEFAULT_TRAIN_STREAM,
                  extra_streams: Iterable[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
+                 epochs_count: int=1,
                  on_empty_batch: str='error',
                  on_empty_stream: str='error',
                  on_unused_sources: str='warn',
@@ -50,6 +51,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         :param train_stream_name: name of the training stream
         :param extra_streams: additional stream names to be evaluated between epochs
         :param buffer: size of the batch buffer, 0 means no buffer
+        :param epochs_count: terminate the train stream after ``epochs_count`` epochs
         :param on_empty_batch: action to take when batch is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
         :param on_empty_stream: action to take when stream is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
         :param on_unused_sources: action to take when stream provides an unused sources; one of
@@ -81,6 +83,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         self._dataset = dataset
         self._hooks = hooks
         self._buffer = buffer
+        self._epochs_count = epochs_count
         self._on_empty_batch = on_empty_batch
         self._on_empty_stream = on_empty_stream
         self._on_unused_sources = on_unused_sources
@@ -228,7 +231,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 raise AttributeError('The dataset does not have a function for creating a stream named `{}`. '
                                      'The function has to be named `{}`.'.format(stream_name, stream_fn_name)) from ex
         return self._streams[stream_name]
-    
+
     def prepare_streams(self, stream_list: Iterable[Union[Iterable, StreamWrapper, str]],
                         base_name: str) -> Iterable[str]:
         """
@@ -244,7 +247,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
             if isinstance(stream_object, str):
                 stream_name = stream_object
                 streamwrapper = self.get_stream(stream_object)
-            
+
             elif isinstance(stream_object, StreamWrapper):
                 stream_name = stream_object.name
                 streamwrapper = stream_object
@@ -262,9 +265,9 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
             self._streams[stream_name] = streamwrapper
             stream_names.append(stream_name)
-        
+
         return stream_names
-    
+
     def epoch(self, train_streams: Iterable[Union[Iterable, StreamWrapper, str]],
               eval_streams: Iterable[Union[Iterable, StreamWrapper, str]]) -> None:
         """
@@ -337,6 +340,9 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     logging.info('Training epoch %s', self._training_epochs_done + 1)
                     self._epoch_impl([self._train_stream_name], self._extra_streams)
                     logging.info('Epoch %s done\n\n', self._training_epochs_done)
+
+                    if self._training_epochs_done == self._epochs_count:
+                        raise TrainingTerminated
 
             except TrainingTerminated as ex:
                 logging.info('Training terminated: %s', ex)
