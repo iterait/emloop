@@ -35,11 +35,11 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                  train_stream_name: str=EL_DEFAULT_TRAIN_STREAM,
                  extra_streams: Iterable[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
-                 epochs_count: int=1,
                  on_empty_batch: str='error',
                  on_empty_stream: str='error',
                  on_unused_sources: str='warn',
                  on_incorrect_config: str= 'error',
+                 epochs_count: Optional[int]=None,
                  fixed_batch_size: Optional[int]=None,
                  fixed_epoch_size: Optional[int]=None,
                  skip_zeroth_epoch: bool=False,
@@ -51,13 +51,13 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         :param train_stream_name: name of the training stream
         :param extra_streams: additional stream names to be evaluated between epochs
         :param buffer: size of the batch buffer, 0 means no buffer
-        :param epochs_count: terminate the train stream after ``epochs_count`` epochs
         :param on_empty_batch: action to take when batch is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
         :param on_empty_stream: action to take when stream is empty; one of :py:attr:`MainLoop.EMPTY_ACTIONS`
         :param on_unused_sources: action to take when stream provides an unused sources; one of
             :py:attr:`UNUSED_SOURCE_ACTIONS`
         :param on_incorrect_config: action to take when mainloop config contains unexpected arguments; one of
             :py:attr:`MainLoop.INCORRECT_CONFIG_ACTIONS`
+        :param epochs_count: if specified, main_loop will terminate the train stream after ``epochs_count`` epochs
         :param fixed_batch_size: if specified, main_loop removes all batches that do not have the specified size
         :param fixed_epoch_size: if specified, cut the train stream to epochs of at most ``fixed_epoch_size`` batches
         :param skip_zeroth_epoch: if specified, main loop skips the 0th epoch
@@ -341,7 +341,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                     self._epoch_impl([self._train_stream_name], self._extra_streams)
                     logging.info('Epoch %s done\n\n', self._training_epochs_done)
 
-                    if self._training_epochs_done == self._epochs_count:
+                    if self._epochs_count and self._training_epochs_done == self._epochs_count:
                         raise TrainingTerminated
 
             except TrainingTerminated as ex:
