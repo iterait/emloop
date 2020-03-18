@@ -8,7 +8,8 @@ from .util import fallback, validate_config, find_config
 from ..utils.config import load_config
 
 
-def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str) -> None:
+def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str,
+            delete_dir: bool) -> None:
     """
     Load config from the directory specified and start the training.
 
@@ -29,8 +30,9 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)
-        
-        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=restore_from)
+
+        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=restore_from,
+                                     delete_dir=delete_dir)
         main_loop.run_training()
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Resume failed', ex)

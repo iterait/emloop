@@ -9,7 +9,7 @@ from ..utils.config import load_config
 
 
 def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_arguments: Iterable[str],
-             output_root: str) -> None:
+             output_root: str, delete_dir: bool) -> None:
     """
     Evaluate the given model on the specified data stream.
 
@@ -33,8 +33,9 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)
-        
-        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=model_path)
+
+        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=model_path,
+                                     delete_dir=delete_dir)
         main_loop.run_evaluation(stream_name)
 
     except Exception as ex:  # pylint: disable=broad-except

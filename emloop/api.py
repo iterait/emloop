@@ -1,4 +1,5 @@
 import os
+import shutil
 import logging
 import os.path as path
 from datetime import datetime
@@ -80,7 +81,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     """
     logging.info('Creating dataset')
     config = copy.deepcopy(config)
- 
+
     dataset_config = dict(config)['dataset']
     assert 'class' in dataset_config, '`dataset.class` not present in the config'
     dataset_module, dataset_class = parse_fully_qualified_name(dataset_config['class'])
@@ -206,11 +207,11 @@ def create_hooks(config: dict, model: Optional[AbstractModel]=None, dataset: Opt
     return hooks
 
 
-def create_main_loop(config: dict, output_root: str, restore_from: str=None) -> MainLoop:
+def create_main_loop(config: dict, output_root: str, restore_from: str=None, delete_dir: bool=False) -> MainLoop:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
-    :param config: config dict 
+    :param config: config dict
     :param output_root: dir where output_dir shall be created
     :param restore_from: if not None, from whence the model should be restored (backend-specific information)
 
@@ -225,5 +226,9 @@ def create_main_loop(config: dict, output_root: str, restore_from: str=None) -> 
     logging.info('Creating main loop')
     main_loop_kwargs = copy.deepcopy(config.get('main_loop', {}))
     main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **main_loop_kwargs)
+
+    if delete_dir:
+        logging.info(f'Deleting output directory with name {output_dir}')
+        shutil.rmtree(output_dir)
 
     return main_loop
