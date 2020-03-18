@@ -590,6 +590,27 @@ def test_stream_check(create_main_loop, caplog):
     ]
 
 
+def test_mainloop_epochs_count_overrides_stopafter(create_main_loop):
+    _, _, mainloop = create_main_loop(epochs=10, epochs_count=1)
+    mainloop.run_training()
+
+    assert mainloop.training_epochs_done == 1
+
+
+def test_mainloop_stopafter_overrides_epochs_count(create_main_loop):
+    _, _, mainloop = create_main_loop(epochs=1, epochs_count=10)
+    mainloop.run_training()
+
+    assert mainloop.training_epochs_done == 1
+
+
+def test_mainloop_missing_epochs_count(create_main_loop):
+    _, _, mainloop = create_main_loop(epochs=1)
+    mainloop.run_training()
+
+    assert mainloop.training_epochs_done == 1
+
+
 def test_configurable_train_stream(create_main_loop, caplog):
     caplog.set_level(logging.DEBUG)
 
