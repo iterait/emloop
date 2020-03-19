@@ -1,5 +1,4 @@
 import os
-import shutil
 import logging
 import os.path as path
 from datetime import datetime
@@ -207,7 +206,7 @@ def create_hooks(config: dict, model: Optional[AbstractModel]=None, dataset: Opt
     return hooks
 
 
-def create_main_loop(config: dict, output_root: str, restore_from: str=None, delete_dir: bool=False) -> MainLoop:
+def create_main_loop(config: dict, output_root: str, restore_from: str=None) -> MainLoop:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
@@ -225,10 +224,6 @@ def create_main_loop(config: dict, output_root: str, restore_from: str=None, del
     hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)
     logging.info('Creating main loop')
     main_loop_kwargs = copy.deepcopy(config.get('main_loop', {}))
-    main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **main_loop_kwargs)
-
-    if delete_dir:
-        logging.info(f'Deleting output directory with name {output_dir}')
-        shutil.rmtree(output_dir)
+    main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, output_dir=output_dir, **main_loop_kwargs)
 
     return main_loop

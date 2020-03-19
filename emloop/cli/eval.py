@@ -34,9 +34,8 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
 
         logging.debug('\tLoaded config: %s', config)
 
-        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=model_path,
-                                     delete_dir=delete_dir)
+        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=model_path)
         main_loop.run_evaluation(stream_name)
-
+        main_loop.clean_after(delete=delete_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Evaluation failed', ex)

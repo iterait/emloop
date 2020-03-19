@@ -5,6 +5,7 @@ The MainLoop requires AbstractModel, AbstractDataset and a list of AbstractHooks
 Having all that, it manages iterating through streams, training and hooks execution.
 """
 import logging
+import shutil
 from typing import Iterable, Callable, List, Dict, Optional, Union
 from collections import OrderedDict
 
@@ -35,6 +36,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                  train_stream_name: str=EL_DEFAULT_TRAIN_STREAM,
                  extra_streams: Iterable[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
+                 output_dir: str='',
                  on_empty_batch: str='error',
                  on_empty_stream: str='error',
                  on_unused_sources: str='warn',
@@ -89,6 +91,7 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         self._on_unused_sources = on_unused_sources
         self._fixed_batch_size = fixed_batch_size
         self._fixed_epoch_size = fixed_epoch_size
+        self._output_dir = output_dir
         self._extra_sources_warned = False
         self._epoch_profile = {}
         self._train_stream_name = train_stream_name
@@ -360,3 +363,13 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 logging.info('Evaluation done\n\n')
             except TrainingTerminated as ex:
                 logging.info('Evaluation terminated: %s', ex)
+
+    def clean_after(self, delete: bool) -> None:
+        """
+        Clean created output dir
+
+        :param delete: If ``True``, delete self.output_dir
+        """
+        if delete and self._output_dir:
+            logging.info(f'Delete output dir {self._output_dir}')
+            shutil.rmtree(self._output_dir)

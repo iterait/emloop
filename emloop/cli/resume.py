@@ -31,9 +31,9 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
 
         logging.debug('\tLoaded config: %s', config)
 
-        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=restore_from,
-                                     delete_dir=delete_dir)
+        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=restore_from)
         main_loop.run_training()
+        main_loop.clean_after(delete=delete_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Resume failed', ex)
 

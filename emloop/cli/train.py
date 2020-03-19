@@ -22,7 +22,8 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delet
         config = load_config(config_file=config_path, additional_args=cl_arguments)
         validate_config(config)
         logging.debug('\tLoaded config: %s', config)
-        main_loop = create_main_loop(config, output_root, delete_dir)
+        main_loop = create_main_loop(config, output_root)
         main_loop.run_training()
+        main_loop.clean_after(delete=delete_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Training failed', ex)
