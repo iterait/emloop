@@ -62,15 +62,22 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
             suffix += 1
 
     logging.info(f'Created output directory with name {output_dir}')
-    logging.info('\tOutput dir: %s', output_dir)
+    return output_dir
+
+
+def config_log_to_output_dir(config: dict, output_dir: str):
+    logging.info('\tOutput dir is: %s', output_dir)
+
+    if not os.path.exists(output_dir):
+        logging.info('\tOutput dir folder "%s" does not exist and will be created', output_dir)
+        os.makedirs(output_dir)
+
     yaml_to_file(data=config, output_dir=output_dir, name=EL_CONFIG_FILE)
 
     # create file logger
     file_handler = logging.FileHandler(path.join(output_dir, EL_LOG_FILE))
     file_handler.setFormatter(logging.Formatter(EL_LOG_FORMAT, datefmt=EL_LOG_DATE_FORMAT))
     logging.getLogger().addHandler(file_handler)
-
-    return output_dir
 
 
 def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractDataset:
@@ -205,7 +212,8 @@ def create_hooks(config: dict, model: Optional[AbstractModel]=None, dataset: Opt
             raise ex
 
     if not training_trace_created:
-        logging.warning('TrainingTrace hook added between hooks. Add it to your config.yaml to suppress this warning.')
+        logging.warning(
+            'TrainingTrace hook added between hooks. Add it to your config.yaml to suppress this warning.')
         hooks.append(TrainingTrace(output_dir=output_dir))
 
     return hooks
@@ -220,7 +228,7 @@ def delete_output_dir(output_dir: str) -> None:
         shutil.rmtree(output_dir)
 
 
-def create_emloop_training(config: dict, output_root: str, restore_from: str=None) -> EmloopTraining:
+def create_main_loop(config: dict, output_root: str, restore_from: str=None, target_dir: str='') -> EmloopTraining:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
@@ -230,9 +238,12 @@ def create_emloop_training(config: dict, output_root: str, restore_from: str=Non
 
     :return: main loop object
     """
-    output_dir = dataset = model = hooks = main_loop = None
+    dataset = model = hooks = main_loop = None
+    output_dir = target_dir
 
-    output_dir = create_output_dir(config=config, output_root=output_root)
+    if not output_dir:
+        output_dir = create_output_dir(config=config, output_root=output_root)
+    config_log_to_output_dir(config, output_dir)
     dataset = create_dataset(config=config, output_dir=output_dir)
     model = create_model(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
     hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)

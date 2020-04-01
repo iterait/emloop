@@ -52,16 +52,16 @@ def entry_point() -> None:
     exit_code = 0
     if known_args.subcommand == 'train':
         exit_code = train(config_path=known_args.config_file, cl_arguments=unknown_args,
-                          output_root=known_args.output_root, delete_dir=known_args.rm)
+                          output_root=known_args.output_root, delete_dir=known_args.rm, target_dir=known_args.target_dir)
 
     elif known_args.subcommand == 'resume':
         exit_code = resume(config_path=known_args.config_path, restore_from=known_args.restore_from,
-                           cl_arguments=unknown_args, output_root=known_args.output_root, delete_dir=known_args.rm)
+                           cl_arguments=unknown_args, output_root=known_args.output_root, delete_dir=known_args.rm, target_dir=known_args.target_dir)
 
     elif known_args.subcommand == 'eval':
         exit_code = evaluate(model_path=known_args.model_path, stream_name=known_args.stream_name,
                              config_path=known_args.config, cl_arguments=unknown_args,
-                             output_root=known_args.output_root, delete_dir=known_args.rm)
+                             output_root=known_args.output_root, delete_dir=known_args.rm, target_dir=known_args.target_dir)
 
     elif known_args.subcommand == 'dataset':
         invoke_dataset_method(config_path=known_args.config_file, method_name=known_args.method,

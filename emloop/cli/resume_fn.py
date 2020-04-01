@@ -9,7 +9,7 @@ from ..utils.config import load_config
 
 
 def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str,
-           delete_dir: bool) -> int:
+           delete_dir: bool, target_dir: str) -> int:
     """
     Load config from the directory specified and start the training.
 
@@ -35,7 +35,7 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
 
         logging.debug('\tLoaded config: %s', config)
 
-        emloop_training = create_emloop_training(config, output_root, restore_from)
+        emloop_training = create_emloop_training(config, output_root, restore_from, target_dir=target_dir)
         emloop_training.main_loop.run_training()
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Resume failed')
