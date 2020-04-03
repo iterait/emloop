@@ -32,7 +32,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
     def __init__(self,   # pylint: disable=too-many-arguments
                  model: AbstractModel, dataset: AbstractDataset,
                  hooks: Iterable[AbstractHook]=(),
-                 output_dir: str='',
                  train_stream_name: str=EL_DEFAULT_TRAIN_STREAM,
                  extra_streams: Iterable[str]=(),  # pylint: disable=invalid-sequence-index
                  buffer: int=0,
@@ -49,7 +48,6 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         :param model: trained model
         :param dataset: loaded dataset
         :param hooks: training hooks
-        :param output_dir: name of the output directory
         :param train_stream_name: name of the training stream
         :param extra_streams: additional stream names to be evaluated between epochs
         :param buffer: size of the batch buffer, 0 means no buffer

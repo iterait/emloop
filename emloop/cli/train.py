@@ -7,7 +7,7 @@ from .util import fallback, validate_config, find_config
 from ..utils.config import load_config
 
 
-def train(config_path: str, cl_arguments: Iterable[str], output_root: str, target_dir: str) -> None:
+def train(config_path: str, cl_arguments: Iterable[str], output_root: str, output_dir: str) -> None:
     """
     Load config and start the training.
 
@@ -22,8 +22,8 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, targe
         config = load_config(config_file=config_path, additional_args=cl_arguments)
         validate_config(config)
         logging.debug('\tLoaded config: %s', config)
-        print('target_dir', target_dir)
-        main_loop = create_main_loop(config, output_root, target_dir=target_dir)
+        print('output_dir', output_dir)
+        main_loop = create_main_loop(config, output_root, output_dir=output_dir)
         main_loop.run_training()
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Training failed', ex)

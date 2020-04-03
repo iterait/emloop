@@ -20,17 +20,23 @@ from .main_loop import MainLoop
 EmloopTraining = namedtuple("Training", "output_dir dataset model hooks main_loop")
 
 
-def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed') -> str:
+def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed', output_dir: str='') -> str:
     """
     Create output_dir under the given ``output_root`` and
         - dump the given config to YAML file under this dir
         - register a file logger logging to a file under this dir
 
-    :param config: config to be dumped
+    :param config: config with model_name
     :param output_root: dir wherein output_dir shall be created
     :param default_model_name: name to be used when `model.name` is not found in the config
+    :param output_dir: if specified, create directory with output_dir path and return the path
     :return: path to the created output_dir
     """
+    if output_dir:
+        logging.info('\tOutput dir is: %s', output_dir)
+        os.makedirs(output_dir, exist_ok=True)
+        return output_dir
+
     logging.info('Creating output dir')
 
     model_name = default_model_name
@@ -65,13 +71,14 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     return output_dir
 
 
-def config_log_to_output_dir(config: dict, output_dir: str):
-    logging.info('\tOutput dir is: %s', output_dir)
+def create_config_log(config: dict, output_dir: str):
+    """
+    Dump the given config to YAML file under this dir
+    and register a file logger logging to a file under this dir
 
-    if not os.path.exists(output_dir):
-        logging.info('\tOutput dir folder "%s" does not exist and will be created', output_dir)
-        os.makedirs(output_dir)
-
+    :param config: config to be dumped
+    :param output_dir: path to output_dir where shall config be dumped and file logger registered
+    """
     yaml_to_file(data=config, output_dir=output_dir, name=EL_CONFIG_FILE)
 
     # create file logger
@@ -228,22 +235,21 @@ def delete_output_dir(output_dir: str) -> None:
         shutil.rmtree(output_dir)
 
 
-def create_main_loop(config: dict, output_root: str, restore_from: str=None, target_dir: str='') -> EmloopTraining:
+def create_main_loop(config: dict, output_root: str, restore_from: str=None, output_dir: str='') -> EmloopTraining:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
     :param config: config dict
     :param output_root: dir where output_dir shall be created
     :param restore_from: if not None, from whence the model should be restored (backend-specific information)
+    :param output_dir: if not specified new output_dir will be crated in output_root
 
     :return: main loop object
     """
     dataset = model = hooks = main_loop = None
-    output_dir = target_dir
 
-    if not output_dir:
-        output_dir = create_output_dir(config=config, output_root=output_root)
-    config_log_to_output_dir(config, output_dir)
+    output_dir = create_output_dir(config=config, output_root=output_root, output_dir=output_dir)
+    create_config_log(config, output_dir)
     dataset = create_dataset(config=config, output_dir=output_dir)
     model = create_model(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
     hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)
