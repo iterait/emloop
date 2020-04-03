@@ -12,7 +12,7 @@ import ruamel.yaml
 import pytest
 
 from emloop import AbstractModel, MainLoop
-from emloop.api import create_output_dir, create_dataset, create_hooks, create_model, create_main_loop
+from emloop.api import create_output_dir, create_dataset, create_hooks, create_model, create_emloop_training
 from emloop.hooks.abstract_hook import AbstractHook
 from emloop.hooks import StopAfter, LogProfile
 from emloop.hooks.training_trace import TrainingTraceKeys
@@ -298,7 +298,7 @@ def test_config_file_is_unchanged(tmpdir):
                                       'io': {'in': [], 'out': ['dummy']}}}
     config = deepcopy(orig_config)
 
-    create_main_loop(config=config, output_root=tmpdir).run_training()
+    create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
 
     assert orig_config == config
 
@@ -312,7 +312,7 @@ def test_config_file_is_incorrect(tmpdir, caplog):
               'model': {'class': 'emloop.tests.api_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
 
     with pytest.raises(Exception):
-        create_main_loop(config=config, output_root=tmpdir).run_training()
+        create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
 
     # incorrect hooks arguments
     config = {'dataset': {'class': 'emloop.tests.api_test.DummyDataset'},
@@ -320,7 +320,7 @@ def test_config_file_is_incorrect(tmpdir, caplog):
               'model': {'class': 'emloop.tests.api_test.DummyModel', 'io': {'in': [], 'out': ['dummy']}}}
 
     with pytest.raises(Exception):
-        create_main_loop(config=config, output_root=tmpdir).run_training()
+        create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
 
     # incorrect model arguments
     config = {'dataset': {'class': 'emloop.tests.api_test.DummyDataset'},
@@ -328,7 +328,7 @@ def test_config_file_is_incorrect(tmpdir, caplog):
               'model': {'io': {'in': [], 'out': ['dummy']}}}
 
     with pytest.raises(Exception):
-        create_main_loop(config=config, output_root=tmpdir).run_training()
+        create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
 
     # incorrect main_loop arguments - raises error by default
     config = {'dataset': {'class': 'emloop.tests.api_test.DummyDataset'},
@@ -337,20 +337,20 @@ def test_config_file_is_incorrect(tmpdir, caplog):
               'main_loop': {'non-existent': 'none', 'extra_streams': ['train']}}
 
     with pytest.raises(Exception):
-        create_main_loop(config=config, output_root=tmpdir).run_training()
+        create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
 
     # incorrect main_loop arguments - logs warning
     caplog.clear()
     caplog.set_level(logging.WARNING)
     config['main_loop']['on_incorrect_config'] = 'warn'
-    create_main_loop(config=config, output_root=tmpdir).run_training()
+    create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
     assert 'Extra arguments: {\'non-existent\': \'none\'}' in caplog.text
 
     # incorrect main_loop arguments - ignored
     caplog.clear()
     caplog.set_level(logging.WARNING)
     config['main_loop']['on_incorrect_config'] = 'ignore'
-    create_main_loop(config=config, output_root=tmpdir).run_training()
+    create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
     assert 'Extra arguments: {\'non-existent\': \'none\'}' not in caplog.text
 
 
@@ -361,9 +361,9 @@ def test_run_with_eval_stream(tmpdir, caplog):
     config = {'dataset': {'class': 'emloop.tests.api_test.DummyEvalDataset'},
               'hooks': [{'emloop.tests.api_test.DummyEvalHook': {'epochs': 1}}, {'StopAfter': {'epochs': 1}}],
               'model': {'class': 'emloop.tests.api_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
-    
-    create_main_loop(config=config, output_root=tmpdir).run_evaluation(stream_name='valid')
-    
+
+    create_emloop_training(config=config, output_root=tmpdir).run_evaluation(stream_name='valid')
+
     assert f'Running the evaluation of stream `{EL_DEFAULT_TRAIN_STREAM}`' not in caplog.text
     assert 'Running the evaluation of stream `valid`' in caplog.text
 
@@ -394,8 +394,8 @@ def test_training_with_list(tmpdir):
               'hooks': ['TrainingTrace'],
               'model': {'class': 'emloop.tests.api_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
 
-    main_loop = create_main_loop(config, tmpdir)
-    inputs = [{"a" : [i, i+1]} for i in range(0, 10, 2)]
+    main_loop = create_emloop_training(config, tmpdir)
+    inputs = [{"a": [i, i + 1]} for i in range(0, 10, 2)]
     with main_loop:
         main_loop.epoch(train_streams=[inputs], eval_streams=[])
 
@@ -413,7 +413,7 @@ def test_training_trace(tmpdir, caplog):
                                  'architecture': {'model_config': ['a', 'b', 'c', 'd']},
                                  'io': {'in': [], 'out': ['dummy']}}}
     start = datetime.datetime.now()
-    create_main_loop(config=config, output_root=tmpdir).run_training()
+    create_emloop_training(config=config, output_root=tmpdir).main_loop.run_training()
     end = datetime.datetime.now()
 
     assert ('root', logging.WARNING, 'TrainingTrace hook added between hooks. Add it to your config.yaml to suppress '

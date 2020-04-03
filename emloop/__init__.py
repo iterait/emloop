@@ -14,7 +14,7 @@ from . import hooks
 from . import models
 from . import utils
 
-__all__ = ['MainLoop', 'create_output_dir', 'create_dataset', 'create_model', 'create_hooks', 'create_main_loop',
+__all__ = ['MainLoop', 'create_output_dir', 'create_dataset', 'create_model', 'create_hooks', 'create_emloop_training',
            'load_yaml', 'AbstractDataset', 'BaseDataset', 'DownloadableDataset', 'AbstractHook', 'MainLoop',
            'AbstractModel', 'Batch', 'Stream', 'EpochData', 'TimeProfile']
 

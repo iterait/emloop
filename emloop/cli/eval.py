@@ -3,8 +3,8 @@ import os.path as path
 
 from typing import Optional, Iterable
 
-from ..api import create_main_loop
-from .util import fallback, validate_config, find_config
+from ..api import create_emloop_training, delete_output_dir
+from .util import fallback, validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
@@ -34,8 +34,12 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
 
         logging.debug('\tLoaded config: %s', config)
 
-        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=model_path)
-        main_loop.run_evaluation(stream_name)
-        main_loop.clean_after(delete=delete_dir)
+        emloop_training = create_emloop_training(
+            config=config, output_root=output_root, restore_from=model_path)
+        if delete_dir:
+            print_delete_warning()
+        emloop_training.main_loop.run_evaluation(stream_name)
+        if delete_dir:
+            delete_output_dir(emloop_training.output_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Evaluation failed', ex)

@@ -3,13 +3,13 @@ import os.path as path
 
 from typing import Optional, Iterable
 
-from ..api import create_main_loop
-from .util import fallback, validate_config, find_config
+from ..api import create_emloop_training, delete_output_dir
+from .util import fallback, validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
 def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str,
-            delete_dir: bool) -> None:
+           delete_dir: bool) -> None:
     """
     Load config from the directory specified and start the training.
 
@@ -31,10 +31,12 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
 
         logging.debug('\tLoaded config: %s', config)
 
-        main_loop = create_main_loop(config=config, output_root=output_root, restore_from=restore_from)
-        main_loop.run_training()
-        main_loop.clean_after(delete=delete_dir)
+        emloop_training = create_emloop_training(
+            config=config, output_root=output_root, restore_from=restore_from)
+        if delete_dir:
+            print_delete_warning()
+        emloop_training.main_loop.run_training()
+        if delete_dir:
+            delete_output_dir(emloop_training.output_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Resume failed', ex)
-
-
