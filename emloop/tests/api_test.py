@@ -363,7 +363,7 @@ def test_run_with_eval_stream(tmpdir, caplog):
               'hooks': [{'emloop.tests.api_test.DummyEvalHook': {'epochs': 1}}, {'StopAfter': {'epochs': 1}}],
               'model': {'class': 'emloop.tests.api_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
 
-    create_emloop_training(config=config, output_root=tmpdir).run_evaluation(stream_name='valid')
+    create_emloop_training(config=config, output_root=tmpdir).main_loop.run_evaluation(stream_name='valid')
 
     assert f'Running the evaluation of stream `{EL_DEFAULT_TRAIN_STREAM}`' not in caplog.text
     assert 'Running the evaluation of stream `valid`' in caplog.text
@@ -395,7 +395,7 @@ def test_training_with_list(tmpdir):
               'hooks': ['TrainingTrace'],
               'model': {'class': 'emloop.tests.api_test.DummyModel', 'io': {'in': ['a'], 'out': ['dummy']}}}
 
-    main_loop = create_emloop_training(config, tmpdir)
+    main_loop = create_emloop_training(config, tmpdir).main_loop
     inputs = [{"a": [i, i + 1]} for i in range(0, 10, 2)]
     with main_loop:
         main_loop.epoch(train_streams=[inputs], eval_streams=[])
