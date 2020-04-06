@@ -429,6 +429,7 @@ def test_training_trace(tmpdir, caplog):
 
 
 def test_output_dir_deleted_rm_true(tmpdir):
+    """Test that output dir will be deleted if rm set to true."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--rm', action='store_true')
     parsed = parser.parse_args(['--rm'])
@@ -441,6 +442,7 @@ def test_output_dir_deleted_rm_true(tmpdir):
 
 
 def test_output_dir_not_deleted_rm_false(tmpdir):
+    """Test that output dir will not be deleted if rm not set."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--rm', action='store_true')
     parsed = parser.parse_args([])

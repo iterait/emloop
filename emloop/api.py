@@ -213,7 +213,7 @@ def create_hooks(config: dict, model: Optional[AbstractModel]=None, dataset: Opt
 
 def clean_output_dir(output_dir: str, delete_dir: bool) -> None:
     """
-    Delete created output dir
+    Delete created output dir if delete_dir is `True`.
     """
     if delete_dir:
         logging.info(f'Delete output dir {output_dir}')
