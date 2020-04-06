@@ -181,6 +181,22 @@ def test_create_output_dir_noname(tmpdir):
     assert name in output_dir
 
 
+def test_create_output_dir_given_path(tmpdir):
+    """Test create output dir with specified dir_path."""
+    output_dir_path = path.join(tmpdir, 'my_name')
+    output_dir = create_output_dir(config={'a': 'b', 'model': {'other_name'}},
+                                   output_root=tmpdir,
+                                   output_dir=output_dir_path)
+
+    assert output_dir_path == output_dir
+
+    assert len(os.listdir(tmpdir)) == 1
+    created_dir = path.join(tmpdir, os.listdir(tmpdir)[0])
+    assert output_dir == created_dir
+    assert path.exists(created_dir)
+    assert path.isdir(created_dir)
+
+
 def test_different_dirs(tmpdir):
     """Test if two calls of train_create_output_dir yields two different dirs."""
     name = 'my_name'

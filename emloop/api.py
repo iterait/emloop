@@ -35,6 +35,7 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     if output_dir:
         logging.info('\tOutput dir is: %s', output_dir)
         os.makedirs(output_dir, exist_ok=True)
+        create_config_log(config, output_dir)
         return output_dir
 
     logging.info('Creating output dir')
@@ -67,6 +68,7 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
         except FileExistsError:
             suffix += 1
 
+    create_config_log(config, output_dir)
     logging.info(f'Created output directory with name {output_dir}')
     return output_dir
 
@@ -249,7 +251,6 @@ def create_main_loop(config: dict, output_root: str, restore_from: str=None, out
     dataset = model = hooks = main_loop = None
 
     output_dir = create_output_dir(config=config, output_root=output_root, output_dir=output_dir)
-    create_config_log(config, output_dir)
     dataset = create_dataset(config=config, output_dir=output_dir)
     model = create_model(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
     hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)
