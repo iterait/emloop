@@ -3,7 +3,7 @@ import os.path as path
 
 from typing import Optional, Iterable
 
-from ..api import create_emloop_training, delete_output_dir
+from ..api import create_emloop_training, clean_output_dir
 from .util import fallback, validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
@@ -39,7 +39,6 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
         if delete_dir:
             print_delete_warning()
         emloop_training.main_loop.run_evaluation(stream_name)
-        if delete_dir:
-            delete_output_dir(emloop_training.output_dir)
+        clean_output_dir(emloop_training.output_dir, delete_dir)
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Evaluation failed', ex)

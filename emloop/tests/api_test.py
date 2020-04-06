@@ -5,6 +5,7 @@ import os
 from os import path
 from copy import deepcopy
 from typing import Mapping, List
+import argparse
 import logging
 import datetime
 
@@ -12,7 +13,7 @@ import ruamel.yaml
 import pytest
 
 from emloop import AbstractModel, MainLoop
-from emloop.api import create_output_dir, create_dataset, create_hooks, create_model, create_emloop_training
+from emloop.api import create_output_dir, create_dataset, create_hooks, create_model, create_emloop_training, clean_output_dir
 from emloop.hooks.abstract_hook import AbstractHook
 from emloop.hooks import StopAfter, LogProfile
 from emloop.hooks.training_trace import TrainingTraceKeys
@@ -425,3 +426,27 @@ def test_training_trace(tmpdir, caplog):
     assert loaded_yaml[TrainingTraceKeys.EXIT_STATUS] == 0
     assert start - loaded_yaml[TrainingTraceKeys.TRAIN_BEGIN] < datetime.timedelta(seconds=1)
     assert end - loaded_yaml[TrainingTraceKeys.TRAIN_END] < datetime.timedelta(seconds=1)
+
+
+def test_output_dir_deleted_rm_true(tmpdir):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rm', action='store_true')
+    parsed = parser.parse_args(['--rm'])
+
+    output_dir = create_output_dir(config={'model': {'name': "my_name"}}, output_root=tmpdir)
+    assert os.path.exists(output_dir)
+
+    clean_output_dir(output_dir, parsed.rm)
+    assert not os.path.exists(output_dir)
+
+
+def test_output_dir_not_deleted_rm_false(tmpdir):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rm', action='store_true')
+    parsed = parser.parse_args([])
+
+    output_dir = create_output_dir(config={'model': {'name': "my_name"}}, output_root=tmpdir)
+    assert os.path.exists(output_dir)
+
+    clean_output_dir(output_dir, parsed.rm)
+    assert os.path.exists(output_dir)
