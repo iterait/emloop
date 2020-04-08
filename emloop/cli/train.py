@@ -1,8 +1,7 @@
 import logging
-
 from typing import Iterable
 
-from ..api import create_emloop_training, clean_output_dir
+from ..api import create_emloop_training, delete_output_dir
 from .util import fallback, validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
@@ -26,6 +25,10 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delet
         if delete_dir:
             print_delete_warning()
         emloop_training.main_loop.run_training()
-        clean_output_dir(emloop_training.output_dir, delete_dir)
-    except Exception as ex:  # pylint: disable=broad-except
-        fallback('Training failed', ex)
+    except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
+        logging.exception('%s', ex)
+    finally:
+        logging.info(f"Finally {delete_dir}")
+        if delete_dir:
+            delete_output_dir(emloop_training.output_dir)
+        sys.exit()

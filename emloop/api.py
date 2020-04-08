@@ -211,13 +211,12 @@ def create_hooks(config: dict, model: Optional[AbstractModel]=None, dataset: Opt
     return hooks
 
 
-def clean_output_dir(output_dir: str, delete_dir: bool) -> None:
+def delete_output_dir(output_dir: str) -> None:
     """
-    Delete created output dir if delete_dir is `True`.
+    Delete given output dir.
     """
-    if delete_dir:
-        logging.info(f'Delete output dir {output_dir}')
-        shutil.rmtree(output_dir)
+    logging.info(f'Delete output dir {output_dir}')
+    shutil.rmtree(output_dir)
 
 
 def create_emloop_training(config: dict, output_root: str, restore_from: str=None) -> MainLoop:
