@@ -20,7 +20,7 @@ from .main_loop import MainLoop
 EmloopTraining = namedtuple("Training", "output_dir dataset model hooks main_loop")
 
 
-def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed', output_dir: str='') -> str:
+def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed', output_dir: str=None) -> str:
     """
     Create output_dir under the given ``output_root`` and
         - dump the given config to YAML file under this dir
@@ -32,61 +32,50 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     :param output_dir: if specified, create directory with output_dir path and return the path
     :return: path to the created output_dir
     """
-    if output_dir:
+    if output_dir is not None:
         logging.info('\tCreating an output dir with specified name: %s', output_dir)
         os.makedirs(output_dir, exist_ok=True)
-        create_config_log(config, output_dir)
-        return output_dir
 
-    logging.info('Creating output dir')
-
-    model_name = default_model_name
-    if 'name' not in config['model']:
-        logging.warning('\tmodel.name not found in config, defaulting to: %s', model_name)
     else:
-        model_name = config['model']['name']
+        logging.info('Creating output dir')
 
-    if not os.path.exists(output_root):
-        logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
-        os.makedirs(output_root)
+        model_name = default_model_name
+        if 'name' not in config['model']:
+            logging.warning('\tmodel.name not found in config, defaulting to: %s', model_name)
+        else:
+            model_name = config['model']['name']
 
-    output_dir_format = os.environ.get('EMLOOP_OUTPUT_DIR_FORMAT', '{model_name}_{random_name}')
-    timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    random_name = get_random_name()
-    output_dir_name = output_dir_format.format(
-        timestamp=timestamp, model_name=model_name, random_name=random_name)
+        if not os.path.exists(output_root):
+            logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
+            os.makedirs(output_root)
 
-    suffix = 0
-    while True:
-        if suffix > 0:
-            output_dir_name = output_dir_name + f'_{suffix}'
+        output_dir_format = os.environ.get('EMLOOP_OUTPUT_DIR_FORMAT', '{model_name}_{random_name}')
+        timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        random_name = get_random_name()
+        output_dir_name = output_dir_format.format(
+            timestamp=timestamp, model_name=model_name, random_name=random_name)
 
-        output_dir = os.path.join(output_root, output_dir_name)
-        try:
-            os.mkdir(output_dir)
-            break
-        except FileExistsError:
-            suffix += 1
+        suffix = 0
+        while True:
+            if suffix > 0:
+                output_dir_name = output_dir_name + f'_{suffix}'
 
-    create_config_log(config, output_dir)
-    logging.info(f'Created output directory with name {output_dir}')
-    return output_dir
+            output_dir = os.path.join(output_root, output_dir_name)
+            try:
+                os.mkdir(output_dir)
+                break
+            except FileExistsError:
+                suffix += 1
 
-
-def create_config_log(config: dict, output_dir: str):
-    """
-    Dump the given config to YAML file under this dir
-    and register a file logger logging to a file under this dir
-
-    :param config: config to be dumped
-    :param output_dir: path to output_dir where shall config be dumped and file logger registered
-    """
     yaml_to_file(data=config, output_dir=output_dir, name=EL_CONFIG_FILE)
 
     # create file logger
     file_handler = logging.FileHandler(path.join(output_dir, EL_LOG_FILE))
     file_handler.setFormatter(logging.Formatter(EL_LOG_FORMAT, datefmt=EL_LOG_DATE_FORMAT))
     logging.getLogger().addHandler(file_handler)
+
+    logging.info(f'Output directory has name {output_dir}')
+    return output_dir
 
 
 def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractDataset:
