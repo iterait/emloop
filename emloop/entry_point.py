@@ -16,7 +16,8 @@ import logging
 import os
 import sys
 
-from emloop.cli import train, resume, evaluate, grid_search, get_emloop_arg_parser, invoke_dataset_method, \
+from emloop.cli.train import train
+from emloop.cli import resume, evaluate, grid_search, get_emloop_arg_parser, invoke_dataset_method, \
     list_train_dirs
 from emloop.cli.prune import prune_train_dirs
 

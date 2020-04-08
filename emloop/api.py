@@ -230,7 +230,6 @@ def create_emloop_training(config: dict, output_root: str, restore_from: str=Non
 
     :return: main loop object
     """
-    print('I WAS CALLED ********************8')
     output_dir = dataset = model = hooks = main_loop = None
 
     output_dir = create_output_dir(config=config, output_root=output_root)

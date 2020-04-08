@@ -4,7 +4,7 @@ import os.path as path
 from typing import Optional, Iterable
 
 from ..api import create_emloop_training, delete_output_dir
-from .util import fallback, validate_config, find_config, print_delete_warning
+from .util import validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
@@ -20,8 +20,8 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     """
-    config = None
-
+    emloop_training = None
+    exit_code = 0
     try:
         config_path = find_config(config_path)
         restore_from = restore_from or path.dirname(config_path)
@@ -36,8 +36,11 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
         if delete_dir:
             print_delete_warning()
         emloop_training.main_loop.run_training()
-    except Exception as ex:  # pylint: disable=broad-except
-        fallback('Resume failed', ex)
+    except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
+        logging.error('Resume failed')
+        logging.exception('%s', ex)
+        exit_code = 1
     finally:
         if delete_dir:
             delete_output_dir(emloop_training.output_dir)
+        sys.exit(exit_code)
