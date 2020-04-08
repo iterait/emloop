@@ -33,7 +33,7 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     :return: path to the created output_dir
     """
     if output_dir:
-        logging.info('\tOutput dir is: %s', output_dir)
+        logging.info('\tCreating an output dir with specified name: %s', output_dir)
         os.makedirs(output_dir, exist_ok=True)
         create_config_log(config, output_dir)
         return output_dir
