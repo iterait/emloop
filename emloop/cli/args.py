@@ -26,7 +26,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
     train_parser.add_argument('--rm', action='store_true', help='Delete directory after training finishes')
-    train_parser.add_argument('--output_dir', default="",
+    train_parser.add_argument('--output_dir', default=None,
                               help='Specify target directory. If left empty, emloop will create by itself directory in --output_root.')
 
     # create resume sub-parser
@@ -39,7 +39,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
                                help='information passed to the model constructor (backend-specific); '
                                     'usually a directory in which the trained model is stored')
     resume_parser.add_argument('--rm', action='store_true', help='Delete directory after resumed training finishes')
-    resume_parser.add_argument('--output_dir', default="",
+    resume_parser.add_argument('--output_dir', default=None,
                                help='Specify target directory. If left empty, emloop will create by itself directory in --output_root.')
 
     # create eval sub-parser
@@ -50,7 +50,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     eval_parser.add_argument('model_path', help='model path to be evaluated')
     eval_parser.add_argument('--config', '-c', nargs='?', default=None, help='optional config path to be used')
     eval_parser.add_argument('--rm', action='store_true', help='Delete directory after evaluation finishes')
-    eval_parser.add_argument('--output_dir', default="",
+    eval_parser.add_argument('--output_dir', default=None,
                              help='Specify target directory. If left empty, emloop will create by itself directory in --output_root.')
 
     # create dataset sub-parser
