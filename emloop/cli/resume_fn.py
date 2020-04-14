@@ -39,7 +39,7 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
 
         logging.debug('\tLoaded config: %s', config)
 
-        emloop_training = create_emloop_training(config, output_root, restore_from, output_dir=output_dir)
+        emloop_training = create_emloop_training(config, output_root, restore_from, output_dir_name=output_dir)
         emloop_training.main_loop.run_training()
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Resume failed')

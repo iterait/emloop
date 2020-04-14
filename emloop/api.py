@@ -20,7 +20,8 @@ from .main_loop import MainLoop
 EmloopTraining = namedtuple("Training", "output_dir dataset model hooks main_loop")
 
 
-def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed', output_dir: str=None) -> str:
+def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed',
+                      output_dir_name: Optional[str]=None) -> str:
     """
     Create output_dir under the given ``output_root`` and
         - dump the given config to YAML file under this dir
@@ -29,11 +30,16 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     :param config: config with model_name
     :param output_root: dir wherein output_dir shall be created
     :param default_model_name: name to be used when `model.name` is not found in the config
-    :param output_dir: if specified, create directory with output_dir path and return the path
+    :param output_dir_name: if specified, create directory with `output_root`/`output_dir_name` path
     :return: path to the created output_dir
     """
-    if output_dir is not None:
-        logging.info('\tCreating an output dir with specified name: %s', output_dir)
+    if not os.path.exists(output_root):
+        logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
+        os.makedirs(output_root)
+
+    if output_dir_name is not None:
+        logging.info('\tCreating an output dir with specified name: %s', output_dir_name)
+        output_dir = path.join(output_root, output_dir_name)
         os.makedirs(output_dir, exist_ok=True)
 
     else:
@@ -44,10 +50,6 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
             logging.warning('\tmodel.name not found in config, defaulting to: %s', model_name)
         else:
             model_name = config['model']['name']
-
-        if not os.path.exists(output_root):
-            logging.info('\tOutput root folder "%s" does not exist and will be created', output_root)
-            os.makedirs(output_root)
 
         output_dir_format = os.environ.get('EMLOOP_OUTPUT_DIR_FORMAT', '{model_name}_{random_name}')
         timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
@@ -74,7 +76,7 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     file_handler.setFormatter(logging.Formatter(EL_LOG_FORMAT, datefmt=EL_LOG_DATE_FORMAT))
     logging.getLogger().addHandler(file_handler)
 
-    logging.info(f'Output directory has name {output_dir}')
+    logging.info('\tCreated output directory with name %s', output_dir)
     return output_dir
 
 
@@ -226,20 +228,21 @@ def delete_output_dir(output_dir: str) -> None:
         shutil.rmtree(output_dir)
 
 
-def create_main_loop(config: dict, output_root: str, restore_from: str=None, output_dir: str=None) -> EmloopTraining:
+def create_main_loop(config: dict, output_root: str, restore_from: str=None,
+                     output_dir_name: Optional[str]=None) -> EmloopTraining:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
     :param config: config dict
     :param output_root: dir where output_dir shall be created
     :param restore_from: if not None, from whence the model should be restored (backend-specific information)
-    :param output_dir: if not specified new output_dir will be crated in output_root
+    :param output_dir_name: if specified new dir will be created with path `output_root`/`output_dir_name`
 
     :return: main loop object
     """
     dataset = model = hooks = main_loop = None
 
-    output_dir = create_output_dir(config=config, output_root=output_root, output_dir=output_dir)
+    output_dir = create_output_dir(config=config, output_root=output_root, output_dir_name=output_dir_name)
     dataset = create_dataset(config=config, output_dir=output_dir)
     model = create_model(config=config, output_dir=output_dir, dataset=dataset, restore_from=restore_from)
     hooks = create_hooks(config=config, model=model, dataset=dataset, output_dir=output_dir)

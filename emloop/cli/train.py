@@ -22,7 +22,7 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, outpu
         config = load_config(config_file=config_path, additional_args=cl_arguments)
         validate_config(config)
         logging.debug('\tLoaded config: %s', config)
-        main_loop = create_main_loop(config, output_root, output_dir=output_dir)
+        main_loop = create_main_loop(config, output_root, output_dir_name=output_dir)
         main_loop.run_training()
     except Exception as ex:  # pylint: disable=broad-except
         fallback('Training failed', ex)
