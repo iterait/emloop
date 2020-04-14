@@ -1,5 +1,6 @@
 from .ls import list_train_dirs
 
+from .train_fn import train
 from .resume import resume
 from .grid_search import grid_search, _build_grid_search_commands
 from .eval import evaluate

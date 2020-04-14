@@ -67,4 +67,4 @@ def print_delete_warning():
       |||||
 
     """
-    print(s)
+    print(s, flush=True)

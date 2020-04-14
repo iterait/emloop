@@ -28,14 +28,14 @@ def test_delete_dir_option(tmpdir, mocker, simple_yaml):
     with open(orig_config, 'w') as file:
         file.write(simple_yaml)
 
-    import emloop.cli.train
-    mocker.patch.object(emloop.cli.train, 'create_emloop_training', new=lambda _, __:
-                        EmloopTraining(output_dir='adfsgsdfgfds', dataset=None, main_loop=None, model=None, hooks=None))
+    import emloop.cli.train_fn
+    mocker.patch.object(emloop.cli.train_fn, 'create_emloop_training', new=lambda _, __: EmloopTraining(
+        output_dir='adfsgsdfgfds', dataset=None, main_loop=None, model=None, hooks=[]))
 
-    mymocker = mocker.patch('emloop.cli.train.delete_output_dir')
-    emloop.cli.train.train(orig_config, [], "", True)
-    assert mymocker.called
+    mymocker = mocker.patch('emloop.cli.train_fn.delete_output_dir')
 
-    mymocker = mocker.patch('emloop.cli.train.delete_output_dir')
-    emloop.cli.train.train(orig_config, [], "", False)
+    emloop.cli.train_fn.train(orig_config, [], "", False)
     assert not mymocker.called
+
+    emloop.cli.train_fn.train(orig_config, [], "", True)
+    assert mymocker.called

@@ -19,10 +19,13 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
                          it is located in.
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
+    :param delete_dir: if True, delete output directory after resumed training finishes
     """
     emloop_training = None
     exit_code = 0
     try:
+        if delete_dir:
+            print_delete_warning()
         config_path = find_config(config_path)
         restore_from = restore_from or path.dirname(config_path)
         config = load_config(config_file=config_path, additional_args=cl_arguments)
@@ -33,8 +36,6 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
 
         emloop_training = create_emloop_training(
             config=config, output_root=output_root, restore_from=restore_from)
-        if delete_dir:
-            print_delete_warning()
         emloop_training.main_loop.run_training()
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Resume failed')
@@ -43,4 +44,5 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
     finally:
         if delete_dir:
             delete_output_dir(emloop_training.output_dir)
-        sys.exit(exit_code)
+
+    return exit_code

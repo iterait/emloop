@@ -430,20 +430,5 @@ def test_training_trace(tmpdir, caplog):
 
 def test_delete_output_dir(tmpdir):
     """Test that output dir will be deleted if rm set to true."""
-    os.makedirs(tmpdir, exist_ok=True)
-
     delete_output_dir(tmpdir)
     assert not os.path.exists(tmpdir)
-
-
-def test_output_dir_not_deleted_rm_false(tmpdir):
-    """Test that output dir will not be deleted if rm not set."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--rm', action='store_true')
-    parsed = parser.parse_args([])
-
-    output_dir = create_output_dir(config={'model': {'name': "my_name"}}, output_root=tmpdir)
-    assert os.path.exists(output_dir)
-
-    delete_output_dir(output_dir, parsed.rm)
-    assert os.path.exists(output_dir)
