@@ -38,8 +38,7 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
 
         logging.debug('\tLoaded config: %s', config)
 
-        emloop_training = create_emloop_training(
-            config=config, output_root=output_root, restore_from=model_path)
+        emloop_training = create_emloop_training(config, output_root, model_path)
         emloop_training.main_loop.run_evaluation(stream_name)
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Evaluation failed')
