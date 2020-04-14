@@ -25,6 +25,7 @@ from emloop.utils.yaml import load_yaml
 
 class DummyDataset:
     """Dummy dataset which loads the given config to self.config."""
+
     def __init__(self, config_str):
         self.config = ruamel.yaml.safe_load(config_str)
 
@@ -34,6 +35,7 @@ class DummyDataset:
 
 class DummyConfigDataset(AbstractDataset):
     """Dummy dataset which changes config."""
+
     def __init__(self, config_str: str):
         super().__init__(config_str)
         config = ruamel.yaml.safe_load(config_str)['dataset_config']
@@ -45,6 +47,7 @@ class DummyConfigDataset(AbstractDataset):
 
 class DummyEvalDataset(AbstractDataset):
     """Dummy dataset with valid_stream method."""
+
     def __init__(self, config_str: str):
         super().__init__(config_str)
 
@@ -57,6 +60,7 @@ class DummyEvalDataset(AbstractDataset):
 
 class DummyHook(AbstractHook):
     """Dummy hook which save its ``**kwargs`` to ``self.kwargs``."""
+
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__(**kwargs)
@@ -69,6 +73,7 @@ class SecondDummyHook(AbstractHook):
 
 class DummyConfigHook(AbstractHook):
     """Dummy hook which changes config."""
+
     def __init__(self, variables: List[str], **kwargs):
         super().__init__(**kwargs)
         variables[0], variables[1] = variables[1], variables[0]
@@ -76,6 +81,7 @@ class DummyConfigHook(AbstractHook):
 
 class DummyEvalHook(AbstractHook):
     """Dummy hook that checks the `after_epoch_profile` is evaluated on `valid` stream."""
+
     def after_epoch_profile(self, epoch_id: int, profile: TimeProfile, streams: List[str]) -> None:
         """Checks passed in streams parameter is correct."""
         assert streams == ['valid']
@@ -83,6 +89,7 @@ class DummyEvalHook(AbstractHook):
 
 class DummyModel(AbstractModel):
     """Dummy model which serves as a placeholder instead of regular model implementation."""
+
     def __init__(self, io: dict, **kwargs):  # pylint: disable=unused-argument
         self._input_names = io['in']
         self._output_names = io['out']
@@ -109,6 +116,7 @@ class DummyModel(AbstractModel):
 
 class DummyModelWithKwargs(DummyModel):
     """Dummy model which saves kwargs to self.kwargs."""
+
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         super().__init__(**kwargs)
@@ -126,6 +134,7 @@ class DummyModelWithKwargs2(DummyModelWithKwargs):
 
 class DummyConfigModel(DummyModel):
     """Dummy model which changes config."""
+
     def __init__(self, architecture: Mapping, **kwargs):
         super().__init__(**kwargs)
         config = architecture['model_config']
@@ -182,14 +191,16 @@ def test_create_output_dir_noname(tmpdir):
 
 
 def test_create_output_dir_given_path(tmpdir):
-    """Test create output dir with specified dir_path."""
-    output_dir_path = path.join(tmpdir, 'my_name')
+    """Test create output dir with specified dir_name."""
+    output_dir_name = 'my_name'
     output_dir = create_output_dir(config={'a': 'b', 'model': {'other_name'}},
                                    output_root=tmpdir,
-                                   output_dir=output_dir_path)
+                                   output_dir_name=output_dir_name)
 
-    assert output_dir_path == output_dir
+    # test whether the return output_dir has expected name
+    assert output_dir == path.join(tmpdir, output_dir_name)
 
+    # test whether the directory was really created
     assert len(os.listdir(tmpdir)) == 1
     created_dir = path.join(tmpdir, os.listdir(tmpdir)[0])
     assert output_dir == created_dir
@@ -245,7 +256,7 @@ def test_create_hooks(tmpdir, caplog):
 
     # test correct hook order and hook config with no additional args
     two_hooks_config = {'hooks': [{'emloop.tests.api_test.DummyHook': {'additional_arg': 10}},
-                                   'emloop.tests.api_test.SecondDummyHook', 'TrainingTrace']}
+                                  'emloop.tests.api_test.SecondDummyHook', 'TrainingTrace']}
     hooks2 = create_hooks(config=two_hooks_config, dataset=dataset, model=model, output_dir=tmpdir)
 
     assert len(hooks2) == 3
@@ -272,7 +283,7 @@ def test_create_hooks(tmpdir, caplog):
     assert isinstance(hooks4[0], DummyHook)
 
     assert ('root', logging.WARNING, '\t\t Empty config of `emloop.tests.api_test.DummyHook` hook') \
-      in caplog.record_tuples
+        in caplog.record_tuples
 
 
 def test_create_model(tmpdir):
