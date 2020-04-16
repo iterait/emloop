@@ -9,7 +9,7 @@ from ..utils.config import load_config
 
 
 def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_arguments: Iterable[str],
-             output_root: str, output_dir: str, delete_dir: bool) -> int:
+             output_root: str, delete_dir: bool, output_dir: Optional[str]=None) -> int:
     """
     Evaluate the given model on the specified data stream.
 
@@ -23,6 +23,7 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     :param delete_dir: if True, delete output directory after evaluation finishes
+    :param output_dir: if specified new dir will be created with path `output_root`/`output_dir`
     :return: exit code of the run
     """
     emloop_training = None
@@ -39,7 +40,7 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)
-        emloop_training = create_emloop_training(config, output_root, model_path, output_dir_name=output_dir)
+        emloop_training = create_emloop_training(config, output_root, model_path, output_dir)
         emloop_training.main_loop.run_evaluation(stream_name)
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Evaluation failed')

@@ -8,10 +8,6 @@ from .util import validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
-<< << << < HEAD:
-    emloop / cli / resume_fn.py
-
-
 def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str,
            delete_dir: bool, output_dir: str) -> int:
     """
@@ -24,6 +20,7 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     :param delete_dir: if True, delete output directory after resumed training finishes
+    :param output_dir: if specified new dir will be created with path `output_root`/`output_dir`
     :return: exit code of the run
     """
     emloop_training = None
@@ -39,7 +36,7 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
 
         logging.debug('\tLoaded config: %s', config)
 
-        emloop_training = create_emloop_training(config, output_root, restore_from, output_dir_name=output_dir)
+        emloop_training = create_emloop_training(config, output_root, restore_from, output_dir)
         emloop_training.main_loop.run_training()
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Resume failed')

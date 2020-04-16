@@ -228,8 +228,8 @@ def delete_output_dir(output_dir: str) -> None:
         shutil.rmtree(output_dir)
 
 
-def create_main_loop(config: dict, output_root: str, restore_from: str=None,
-                     output_dir_name: Optional[str]=None) -> EmloopTraining:
+def create_emloop_training(config: dict, output_root: str, restore_from: str=None,
+                           output_dir_name: Optional[str]=None) -> EmloopTraining:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
