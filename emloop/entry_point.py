@@ -49,16 +49,19 @@ def entry_point() -> None:
     stderr_handler.setFormatter(logging.Formatter(EL_LOG_FORMAT, datefmt=EL_LOG_DATE_FORMAT))
     logger.addHandler(stderr_handler)
 
+    exit_code = 0
     if known_args.subcommand == 'train':
-        train(config_path=known_args.config_file, cl_arguments=unknown_args, output_root=known_args.output_root)
+        exit_code = train(config_path=known_args.config_file, cl_arguments=unknown_args,
+                          output_root=known_args.output_root, delete_dir=known_args.rm)
 
     elif known_args.subcommand == 'resume':
-        resume(config_path=known_args.config_path, restore_from=known_args.restore_from, cl_arguments=unknown_args,
-               output_root=known_args.output_root)
+        exit_code = resume(config_path=known_args.config_path, restore_from=known_args.restore_from,
+                           cl_arguments=unknown_args, output_root=known_args.output_root, delete_dir=known_args.rm)
 
     elif known_args.subcommand == 'eval':
-        evaluate(model_path=known_args.model_path, stream_name=known_args.stream_name,
-                 config_path=known_args.config, cl_arguments=unknown_args, output_root=known_args.output_root)
+        exit_code = evaluate(model_path=known_args.model_path, stream_name=known_args.stream_name,
+                             config_path=known_args.config, cl_arguments=unknown_args,
+                             output_root=known_args.output_root, delete_dir=known_args.rm)
 
     elif known_args.subcommand == 'dataset':
         invoke_dataset_method(config_path=known_args.config_file, method_name=known_args.method,
@@ -68,10 +71,13 @@ def entry_point() -> None:
         grid_search(script=known_args.script, params=known_args.params, dry_run=known_args.dry_run)
 
     elif known_args.subcommand == 'ls':
-        list_train_dirs(known_args.dir, known_args.recursive, known_args.all, known_args.long, known_args.verbose)
+        list_train_dirs(known_args.dir, known_args.recursive,
+                        known_args.all, known_args.long, known_args.verbose)
 
     elif known_args.subcommand == 'prune':
         prune_train_dirs(known_args.dir, known_args.epochs, known_args.subdirs)
+
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':

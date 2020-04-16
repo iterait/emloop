@@ -1,9 +1,11 @@
 import os
-import logging
 import os.path as path
+import logging
+import shutil
 from datetime import datetime
 import copy
 from typing import Optional, Iterable
+from collections import namedtuple
 
 from .datasets import AbstractDataset
 from .models import AbstractModel
@@ -14,6 +16,8 @@ from .utils.reflection import get_class_module, parse_fully_qualified_name, crea
 from .utils.yaml import yaml_to_str, yaml_to_file
 from .utils import get_random_name
 from .main_loop import MainLoop
+
+EmloopTraining = namedtuple("Training", "output_dir dataset model hooks main_loop")
 
 
 def create_output_dir(config: dict, output_root: str, default_model_name: str='Unnamed') -> str:
@@ -42,7 +46,8 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
     output_dir_format = os.environ.get('EMLOOP_OUTPUT_DIR_FORMAT', '{model_name}_{random_name}')
     timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     random_name = get_random_name()
-    output_dir_name = output_dir_format.format(timestamp=timestamp, model_name=model_name, random_name=random_name)
+    output_dir_name = output_dir_format.format(
+        timestamp=timestamp, model_name=model_name, random_name=random_name)
 
     suffix = 0
     while True:
@@ -80,7 +85,7 @@ def create_dataset(config: dict, output_dir: Optional[str]=None) -> AbstractData
     """
     logging.info('Creating dataset')
     config = copy.deepcopy(config)
- 
+
     dataset_config = dict(config)['dataset']
     assert 'class' in dataset_config, '`dataset.class` not present in the config'
     dataset_module, dataset_class = parse_fully_qualified_name(dataset_config['class'])
@@ -206,11 +211,20 @@ def create_hooks(config: dict, model: Optional[AbstractModel]=None, dataset: Opt
     return hooks
 
 
-def create_main_loop(config: dict, output_root: str, restore_from: str=None) -> MainLoop:
+def delete_output_dir(output_dir: str) -> None:
+    """
+    Delete given output dir.
+    """
+    if path.exists(output_dir):
+        logging.info(f'Delete output dir {output_dir}')
+        shutil.rmtree(output_dir)
+
+
+def create_emloop_training(config: dict, output_root: str, restore_from: str=None) -> EmloopTraining:
     """
     Creates :py:class:`MainLoop` with model, dataset and hooks according to config.
 
-    :param config: config dict 
+    :param config: config dict
     :param output_root: dir where output_dir shall be created
     :param restore_from: if not None, from whence the model should be restored (backend-specific information)
 
@@ -226,4 +240,5 @@ def create_main_loop(config: dict, output_root: str, restore_from: str=None) -> 
     main_loop_kwargs = copy.deepcopy(config.get('main_loop', {}))
     main_loop = MainLoop(model=model, dataset=dataset, hooks=hooks, **main_loop_kwargs)
 
-    return main_loop
+    return EmloopTraining(output_dir=output_dir, dataset=dataset,
+                          model=model, hooks=hooks, main_loop=main_loop)

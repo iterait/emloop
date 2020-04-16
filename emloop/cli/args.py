@@ -24,6 +24,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     train_parser = subparsers.add_parser('train', description='Start emloop training from the ``config_file``.')
     train_parser.set_defaults(subcommand='train')
     train_parser.add_argument('config_file', help='path to the config file')
+    train_parser.add_argument('--rm', action='store_true', help='Delete directory after training finishes')
 
     # create resume sub-parser
     resume_parser = subparsers.add_parser('resume', description='Resume emloop training from the ``config_path``.')
@@ -32,6 +33,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     resume_parser.add_argument('restore_from', nargs='?', default=None,
                                help='information passed to the model constructor (backend-specific); '
                                     'usually a directory in which the trained model is stored')
+    resume_parser.add_argument('--rm', action='store_true', help='Delete directory after resumed training finishes')
 
     # create eval sub-parser
     eval_parser = subparsers.add_parser('eval', description='Evaluate the given model on the specified data stream.')
@@ -39,6 +41,7 @@ def get_emloop_arg_parser(add_common_arguments: bool=False) -> ArgumentParser:
     eval_parser.add_argument('stream_name', help='stream name to be evaluated')
     eval_parser.add_argument('model_path', help='model path to be evaluated')
     eval_parser.add_argument('--config', '-c', nargs='?', default=None, help='optional config path to be used')
+    eval_parser.add_argument('--rm', action='store_true', help='Delete directory after evaluation finishes')
 
     # create dataset sub-parser
     dataset_parser = subparsers.add_parser('dataset', description='Invoke arbitrary dataset method.')

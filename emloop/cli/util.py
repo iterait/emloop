@@ -47,3 +47,24 @@ def fallback(message: str, ex: Exception) -> None:
     logging.error('%s', message)
     logging.exception('%s', ex)
     sys.exit(1)
+
+
+def print_delete_warning():
+    s = """
+      _____
+     /     \\
+    | () () |
+     \\  ^  /
+      |||||
+      |||||
+
+    WARNING: the log directory will be removed as soon as the training is finished
+      _____
+     /     \\
+    | () () |
+     \\  ^  /
+      |||||
+      |||||
+
+    """
+    print(s, flush=True)
