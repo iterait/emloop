@@ -7,7 +7,7 @@ from .util import validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
-def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delete_dir: bool) -> None:
+def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delete_dir: bool) -> int:
     """
     Load config and start the training.
 
@@ -15,6 +15,7 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delet
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     :param delete_dir: if True, delete output directory after training finishes
+    :return: exit code of the run
     """
     emloop_training = None
     exit_code = 0

@@ -9,7 +9,7 @@ from ..utils.config import load_config
 
 
 def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable[str], output_root: str,
-           delete_dir: bool) -> None:
+           delete_dir: bool) -> int:
     """
     Load config from the directory specified and start the training.
 
@@ -20,6 +20,7 @@ def resume(config_path: str, restore_from: Optional[str], cl_arguments: Iterable
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     :param delete_dir: if True, delete output directory after resumed training finishes
+    :return: exit code of the run
     """
     emloop_training = None
     exit_code = 0

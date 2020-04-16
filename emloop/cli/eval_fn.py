@@ -9,7 +9,7 @@ from ..utils.config import load_config
 
 
 def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_arguments: Iterable[str],
-             output_root: str, delete_dir: bool) -> None:
+             output_root: str, delete_dir: bool) -> int:
     """
     Evaluate the given model on the specified data stream.
 
@@ -23,6 +23,7 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     :param delete_dir: if True, delete output directory after evaluation finishes
+    :return: exit code of the run
     """
     emloop_training = None
     exit_code = 0
