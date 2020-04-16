@@ -43,7 +43,7 @@ def create_output_dir(config: dict, output_root: str, default_model_name: str='U
         os.makedirs(output_dir, exist_ok=True)
 
     else:
-        logging.info('Creating output dir')
+        logging.info('Generating output directory name')
 
         model_name = default_model_name
         if 'name' not in config['model']:
