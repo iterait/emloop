@@ -7,7 +7,8 @@ from .util import validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
-def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delete_dir: bool) -> int:
+def train(config_path: str, cl_arguments: Iterable[str], output_root: str,
+          delete_dir: bool, output_dir: str) -> int:
     """
     Load config and start the training.
 
@@ -15,6 +16,7 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delet
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
     :param delete_dir: if True, delete output directory after training finishes
+    :param output_dir: if specified new dir will be created with path `output_root`/`output_dir`
     :return: exit code of the run
     """
     emloop_training = None
@@ -26,7 +28,7 @@ def train(config_path: str, cl_arguments: Iterable[str], output_root: str, delet
         config = load_config(config_file=config_path, additional_args=cl_arguments)
         validate_config(config)
         logging.debug('\tLoaded config: %s', config)
-        emloop_training = create_emloop_training(config, output_root)
+        emloop_training = create_emloop_training(config, output_root, None, output_dir)
         emloop_training.main_loop.run_training()
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Training failed')

@@ -184,7 +184,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
                 continue
             elif self._fixed_batch_size:
                 if batch_sizes != {self._fixed_batch_size}:
-                    var, len_ = [(k, len(v)) for k, v in batch_input.items() if len(v) != self._fixed_batch_size][0]
+                    var, len_ = [(k, len(v)) for k, v in batch_input.items()
+                                 if len(v) != self._fixed_batch_size][0]
                     logging.debug('%i-th batch in stream `%s` has variable `%s` of length %i inconsistent with '
                                   '`main_loop.fixed_size` = %i', i, stream.name, var, len_, self._fixed_batch_size)
                     continue
@@ -194,7 +195,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
 
             with Timer('eval_batch_{}'.format(stream.name), self._epoch_profile):
                 batch_output = self._model.run(batch=batch_input, train=train, stream=stream)
-            assert set(batch_input.keys()).isdisjoint(set(batch_output)), 'Batch inputs and outputs must not overlap.'
+            assert set(batch_input.keys()).isdisjoint(set(batch_output)
+                                                      ), 'Batch inputs and outputs must not overlap.'
 
             with Timer('after_batch_hooks_{}'.format(stream.name), self._epoch_profile):
                 batch_data = {**batch_input, **batch_output}
@@ -302,7 +304,8 @@ class MainLoop(CaughtInterrupts):   # pylint: disable=too-many-instance-attribut
         if len(train_streams) > 0:
             self._training_epochs_done += 1
 
-        epoch_data = OrderedDict([(stream_name, OrderedDict()) for stream_name in train_streams + eval_streams])
+        epoch_data = OrderedDict([(stream_name, OrderedDict())
+                                  for stream_name in train_streams + eval_streams])
 
         end_training_exception = None
         with Timer('after_epoch_hooks', self._epoch_profile):
