@@ -40,7 +40,7 @@ def evaluate(model_path: str, eval_target: str, config_path: Optional[str], cl_a
         config = load_config(config_file=config_path, additional_args=cl_arguments,
                              override_stream=eval_target)
         stream_names = [eval_target]
-        if eval_target in config['eval'] and 'stream_names' in config['eval'][eval_target]:
+        if 'eval' in config and eval_target in config['eval'] and 'stream_names' in config['eval'][eval_target]:
             stream_names = config['eval'][eval_target]['stream_names']
         logging.info('Will evaluate on streams `%s`', stream_names)
 
