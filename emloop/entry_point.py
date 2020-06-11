@@ -61,7 +61,7 @@ def entry_point() -> None:
                            output_dir=known_args.output_dir)
 
     elif known_args.subcommand == 'eval':
-        exit_code = evaluate(model_path=known_args.model_path, stream_name=known_args.stream_name,
+        exit_code = evaluate(model_path=known_args.model_path, eval_target=known_args.stream_name,
                              config_path=known_args.config, cl_arguments=unknown_args,
                              output_root=known_args.output_root, delete_dir=known_args.rm,
                              output_dir=known_args.output_dir)
