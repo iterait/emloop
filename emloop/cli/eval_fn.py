@@ -8,17 +8,19 @@ from .util import validate_config, find_config, print_delete_warning
 from ..utils.config import load_config
 
 
-def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_arguments: Iterable[str],
+def evaluate(model_path: str, eval_target: str, config_path: Optional[str], cl_arguments: Iterable[str],
              output_root: str, delete_dir: bool, output_dir: Optional[str]=None) -> int:
     """
-    Evaluate the given model on the specified data stream.
+    Evaluate the given model.
+    If `stream_names` are stated in config, then evaluation runs on those data streams.
+    Otherwise evaluation runs on data stream specified by `eval_target`.
 
     Configuration is updated by the respective predict.stream_name section, in particular:
         - hooks section is entirely replaced
         - model and dataset sections are updated
 
     :param model_path: path to the model to be evaluated
-    :param stream_name: data stream name to be evaluated
+    :param eval_target: evaluation target name
     :param config_path: path to the config to be used, if not specified infer the path from ``model_path``
     :param cl_arguments: additional command line arguments which will update the configuration
     :param output_root: output root in which the training directory will be created
@@ -34,14 +36,21 @@ def evaluate(model_path: str, stream_name: str, config_path: Optional[str], cl_a
             print_delete_warning()
         model_dir = path.dirname(model_path) if not path.isdir(model_path) else model_path
         config_path = find_config(model_dir if config_path is None else config_path)
+
         config = load_config(config_file=config_path, additional_args=cl_arguments,
-                             override_stream=stream_name)
+                             override_stream=eval_target)
+        stream_names = [eval_target]
+        if 'eval' in config and eval_target in config['eval'] and 'stream_names' in config['eval'][eval_target]:
+            stream_names = config['eval'][eval_target]['stream_names']
+        logging.info('Will evaluate on streams `%s`', stream_names)
 
         validate_config(config)
 
         logging.debug('\tLoaded config: %s', config)
         emloop_training = create_emloop_training(config, output_root, model_path, output_dir)
-        emloop_training.main_loop.run_evaluation(stream_name)
+        for stream_name in stream_names:
+            logging.info('Starting evalutation on `%s`', stream_name)
+            emloop_training.main_loop.run_evaluation(stream_name)
     except (Exception, AssertionError) as ex:  # pylint: disable=broad-except
         logging.error('Evaluation failed')
         logging.exception('%s', ex)
