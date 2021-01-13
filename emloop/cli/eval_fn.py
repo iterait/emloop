@@ -34,8 +34,12 @@ def evaluate(model_path: str, eval_target: str, config_path: Optional[str], cl_a
     try:
         if delete_dir:
             print_delete_warning()
-        model_dir = path.dirname(model_path) if not path.isdir(model_path) else model_path
-        config_path = find_config(model_dir if config_path is None else config_path)
+        if model_path.endswith('.yaml'):
+            config_path = model_path
+            model_dir = path.dirname(model_path)
+        else:
+            model_dir = path.dirname(model_path) if not path.isdir(model_path) else model_path
+            config_path = find_config(model_dir if config_path is None else config_path)
 
         config = load_config(config_file=config_path, additional_args=cl_arguments,
                              override_stream=eval_target)
